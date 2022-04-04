@@ -1,0 +1,95 @@
+.width-30px-style{
+    width: 30px;
+}
+
+.tasklist-box-style{
+    border-radius: 30px;
+    font-weight: bold;
+    padding: 4px;
+    text-align: center;
+}
+
+.red-box-style{
+    background-color: #ffeaea;
+    color: #f80309;
+}
+
+.blue-box-style{
+    background-color: #e5f6fd;
+    color: #61abde;
+}
+
+.green-box-style{
+    background-color: #e5fdf0;
+    color: #36b98c;
+}
+
+.yellow-box-style{
+    background-color: #faeed9;
+    color: #ed9511;
+}
+
+.purple-box-style{
+    background-color: #ead2f6;
+    color: #aa48d7;
+}
+
+.assignment-row-style:hover{
+    background-color: #fff6f4;
+}
+
+.heading-style{
+    color: #000000;
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+.width-50px-style{
+    width: 50px;
+}
+
+.delete-button-style{
+    border-radius: 30px;
+    border: 1px solid #F6430F;
+}
+
+.width-100px-style{
+    width: 100px;
+}
+
+.top-margin-10-style{
+    margin-top: 10px;
+}
+
+.vertical-align-middle-icon-style{
+    display:inline-flex;
+    margin-top: 10px;
+    vertical-align:top;
+  }
+
+.top-right{
+    top: 0;
+    right: 0;
+}
+  
+
+::ng-deep .carousel .carousel-control-prev-icon, ::ng-deep .carousel .carousel-control-next-icon {
+    background-color: #F6430F;
+    width: 50px;
+    height: 50px;
+    background-size: 41%;
+    border-radius: 50%;
+  }
+
+  ::ng-deep .carousel .carousel-item img{
+    width: 100%;
+    height: auto;
+    /* max-height: 245px; */
+    margin: auto; 
+    display: block;
+}
+
+::ng-deep .carousel .carousel-indicators li {background-color: #f35524;}
+::ng-deep .carousel .carousel-indicators li.active {background-color: #ff3e04;}

@@ -1,0 +1,124 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="page-margin">
+        <div class="d-flex justify-content-between align-items-center flex-row heading-style">
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                Problems of the day&nbsp;<span class="problem-of-the-day">({{problemOfTheDayDate | date:'dd MMM,
+                    yyyy'}})</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-start flex-row">
+                <div class="d-flex">
+                    <input type="date" class="form-control input-style" #searchDate>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <div class="d-flex">
+                    <button class="btn btn-default swabhav-button-round search-button-margin"
+                        (click)="onSearchButtonClick(searchDate.value)">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="problemList.length > 0">
+            <div class="row">
+                <ng-container *ngFor="let problem of problemList; let i = index">
+                    <div class="form-group col-sm-6 col-md-4">
+                        <div class="card card-shadow card-style h-100">
+                            <div class="card-body card-body-style">
+                                <div class="problem-header">
+                                    <span class="problem-name-style">
+                                        {{problem.label}}
+                                    </span>
+                                    <div class="score-style float-right">
+                                        <span class="arrow"><i
+                                                class="material-icons score-icon">monetization_on</i></span>{{problem.score}}
+                                    </div>
+                                </div>
+                                <!-- <div class="problem-date">{{problemOfTheDayDate | date:'dd MMM, yyyy'}}</div> -->
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="row">
+                                            <span class="col-sm-8 col-md-8 px-0 card-sub-header">Success Rate</span>
+                                            <div class="col-sm-4 col-md-4 px-0">
+                                                <span class="card-sub-detail">{{problem.successRatio}}%</span>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <span class="col-sm-8 col-md-8 px-0 card-sub-header">Attempted By</span>
+                                            <div class="col-sm-4 col-md-4 px-0">
+                                                <span class="card-sub-detail">{{problem.attemptedByCount}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="row">
+                                            <span class="col-sm-8 col-md-8 px-0 card-sub-header">Solved By</span>
+                                            <div class="col-sm-4 col-md-4 px-0">
+                                                <span class="card-sub-detail">{{problem.solvedByCount}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <span class="col-sm-8 col-md-8 px-0 card-sub-header">Difficulty</span>
+                                            <div class="col-sm-4 col-md-4 px-0">
+                                                <span [ngClass]="problem.levelClass">{{problem.levelName}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="center-style">
+                                    <span class="solve-now" (click)="redirectToProblemDetails(problem.id)">
+                                        {{searchDateInString? 'View' : 'Solve Now'}}
+                                        <span class="arrow">
+                                            <i class="material-icons icon-style">arrow_right_alt</i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="problemList.length == 0">
+            <div class="card">
+                <div class="card-body not-found">
+                    <h2>No Problems Today</h2>
+                </div>
+            </div>
+        </div>
+        <div class="heading-style">Leader Board <span class="problem-of-the-day">({{problemOfTheDayDate | date:'dd MMM,
+                yyyy'}})</span>
+            <div *ngIf="performerList.length > 0">
+                <table class="leader-board-table-style">
+                    <tr class="table-header">
+                        <th>Star Performers</th>
+                        <!-- <th>Rewards</th> -->
+                        <th>Score</th>
+                        <th>Rank</th>
+                    </tr>
+                    <tr *ngFor="let performer of performerList; let i = index">
+                        <td class="table-details">
+                            <img class="leader-image" src={{performer.image}} alt="">
+                            &nbsp;&nbsp;&nbsp;{{performer.firstName + " " + performer.lastName}}
+                        </td>
+                        <!-- <td><img class="medals" src={{leader.rewards}} alt=""></td> -->
+                        <td class="table-details">{{performer.totalScore}}</td>
+                        <td class="table-details">{{performer.rank}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div *ngIf="performerList.length == 0">
+                <div class="card">
+                    <div class="card-body not-found">
+                        <h2>No Leader Board Found</h2>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+        </div>
+    </div>

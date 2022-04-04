@@ -1,0 +1,280 @@
+<app-master-navbar></app-master-navbar>
+
+
+<ng-template #freeTemplate>
+    <span class="color-212121 font-sm-style easy">Free</span>
+</ng-template>
+
+<div>
+    <br>
+
+    <button class="btn btn-default swabhav-button-square back-button" (click)="backToPreviousPage()">Back</button>
+
+    <br><br>
+</div>
+
+<div>
+    <div *ngIf="event?.eventImage; else defaultLogo">
+        <img class="main-image" src={{event?.eventImage}} alt="">
+    </div>
+    <ng-template #defaultLogo>
+        <img class="main-image" src="assets/images/default-course.png" alt="">
+    </ng-template>
+</div>
+
+<div class="container-fluid">
+    <div class="standard-page-margin">
+        <br>
+
+        <div class="color-000000 font-weight-bold font-xl-style">Workshop on {{event?.title}}</div>
+
+        <br>
+        <div class="row">
+            <div class="bubble">
+                <div class="color-D63C2A font-sm-style">
+                    <span class="vertical-align-top-icon-style"><i class="material-icons">today</i></span>&nbsp;When
+                </div>
+                <div class="color-212121 font-sm-style">
+                    {{event?.fromDate | date:'mediumDate'}}
+                    <!--  - {{event?.toDate | date:'mediumDate'}} -->
+                </div>
+            </div>
+            <div class="bubble">
+                <div class="color-D63C2A font-sm-style">
+                    <span class="vertical-align-top-icon-style"><i
+                            class="material-icons">location_on</i></span>&nbsp;Where
+                </div>
+                <div class="color-212121 font-sm-style">
+                    <div *ngIf="event?.isOnline; else showVenue">Online</div>
+                    <ng-template #showVenue>
+                        <span class="sub-details">{{event?.state?.name}}</span>
+                    </ng-template>
+                </div>
+            </div>
+            <!-- <div class="bubble">
+                <div class="color-D63C2A font-sm-style">
+                    <span class="vertical-align-top-icon-style"><i class="material-icons">mic</i></span>&nbsp;Who
+                </div>
+                <div class="color-212121 font-sm-style">
+                    {{event?.speaker}}
+                </div>
+            </div> -->
+            <div class="bubble">
+                <div class="color-D63C2A font-sm-style">
+                    <span class="font-lg-style">&#x20b9;</span>&nbsp;Entry Fees
+                </div>
+                <div *ngIf="event?.entryFee > 0; else freeTemplate" class="color-212121 font-sm-style">
+                    {{event?.entryFee}}
+                </div>
+            </div>
+        </div>
+        <br>
+        <div>
+            <div *ngIf="event?.eventStatus == 'Upcoming'">
+                <button class="btn btn-default swabhav-button-square button-style" type="button"
+                    (click)="onRegisterNowButtonClick()" [disabled]="registrationDetails?.isTalentRegistered">
+                    {{registrationDetails?.isTalentRegistered ? 'Registered': 'Register Now'}}
+                </button>
+            </div>
+            <div
+                *ngIf="event?.eventStatus == 'Live' && event?.eventMeetingLink && registrationDetails?.isTalentRegistered">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" [value]="event?.eventMeetingLink" readonly
+                        aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-meeting-link" (click)="onMeetingLinkClick()">
+                            <a href={{event?.eventMeetingLink}} target="_blank" class="meeting-link">Go To</a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="event?.eventStatus == 'Completed' && !registrationDetails?.isTalentRegistered">
+            </div>
+        </div>
+        <hr>
+        <div class="color-000000 font-weight-bold font-lg-style">Description</div>
+
+        <br>
+
+        <div class="color-757575" [innerHTML]="event?.description"></div>
+
+        <br>
+        <hr>
+        <br>
+
+        <div class="color-000000 font-weight-bold font-lg-style">
+            Liked This Workshop? Improve your skills in this with related courses
+        </div>
+        <br>
+        <div class="row">
+            <ng-container *ngFor="let course of relatedCourseList; let i = index">
+                <div class="form-group col-sm-6 col-md-4">
+                    <div class="card card-margin card-style h-100 px-0 pt-0">
+                        <div *ngIf="course.image; else defaultLogo">
+                            <img class="event-image" src={{course.image}} alt="">
+                        </div>
+                        <ng-template #defaultLogo>
+                            <img class="event-image" src="assets/images/java.png" alt="">
+                        </ng-template>
+                    </div>
+                    <div class="color-000000 font-weight-bold font-md-style">
+                        {{course.name}} Course
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <br><br>
+    </div>
+</div>
+
+<!-- Register -->
+<!-- <ng-template #registerModal let-modal>
+
+    <div class="modal-body">
+        <div class="form-header">
+            Registration Form
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right" (click)="modal.dismiss('Close click')">
+                <span class="vertical-align-top-icon-style"><i class="material-icons modal-popup-close-icon-style">close</i></span>Close
+            </div>
+        </div>
+        <br>
+        <form [formGroup]="registerForm">
+            <div class="row">
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Name</label>
+                    <input type="text" class="form-control input-style" appEmptyToNull formControlName="name"
+                        placeholder="eg: Ravi Sharma">
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('name').touched 
+                        || registerForm.get('name').dirty) && registerForm.get('name').invalid">
+                        <div *ngIf="registerForm.get('name').errors.pattern">
+                            Name should only have alphabets
+                        </div>
+                        <div *ngIf="registerForm.get('name').errors.maxLength">
+                            Name can have maximum 50 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Email Address</label>
+                    <input type="text" class="form-control input-style" appEmptyToNull formControlName="email"
+                        placeholder="eg: ravisharma@gmail.com">
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('email').touched 
+                        || registerForm.get('email').dirty) && registerForm.get('email').invalid">
+                        <div *ngIf="registerForm.get('email').errors.pattern">
+                            Email should be in example@domain.com format
+                        </div>
+                        <div *ngIf="registerForm.get('email').errors.maxLength">
+                            Email can have maximum 100 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Phone Number</label>
+                    <input type="text" class="form-control input-style" formControlName="contact" placeholder="eg: 9876543219" appEmptyToNull>
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('contact').touched 
+                        || registerForm.get('contact').dirty) && registerForm.get('contact').invalid">
+                        <div *ngIf="registerForm.get('contact').errors.pattern">
+                            Contact should consist of a 10 digit valid number
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Are you a student or working?</label>
+                    <select class="form-control input-style" formControlName="isExperienced">
+                        <option [ngValue]="null">Select</option>
+                        <option [ngValue]="false">Fresher</option>
+                        <option [ngValue]="true">Working</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">College Name</label>
+                    <input type="text" class="form-control input-style" appEmptyToNull formControlName="college"
+                        placeholder="eg: Thakur College">
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('college').touched 
+                        || registerForm.get('college').dirty) && registerForm.get('college').invalid">
+                        <div *ngIf="registerForm.get('college').errors.maxLength">
+                            College name can have maximum 50 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Company Name</label>
+                    <input type="text" class="form-control input-style" appEmptyToNull formControlName="company"
+                        placeholder="eg: Swabhav Techlabs">
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('company').touched 
+                        || registerForm.get('company').dirty) && registerForm.get('company').invalid">
+                        <div *ngIf="registerForm.get('company').errors.maxLength">
+                            Company name can have maximum 50 characters
+                        </div> 
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Qualification</label>
+                    <select class="form-control input-style" formControlName="qualification">
+                        <option [ngValue]="null">Select</option>
+                        <option [ngValue]="'BE'">BE</option>
+                        <option [ngValue]="'ME'">ME</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">City</label>
+                    <input type="text" class="form-control input-style" appEmptyToNull formControlName="city"
+                        placeholder="eg: Mumbai">
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('city').touched 
+                        || registerForm.get('city').dirty) && registerForm.get('city').invalid">
+                        <div *ngIf="registerForm.get('city').errors.pattern">
+                            City name should only have alphabets
+                        </div>
+                        <div *ngIf="registerForm.get('name').errors.maxLength">
+                            City name can have maximum 50 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Rate yourself out of 10 in <span class="register-color-000000 font-weight-bold font-xl-style">{{event?.title}}</span></label>
+                    <input type="number" class="form-control input-style" formControlName="courseRating" placeholder="eg: 10"
+                        appAllowNumbersOnly>
+                    <div class="alert alert-danger" *ngIf="(registerForm.get('courseRating').touched 
+                        || registerForm.get('courseRating').dirty) && registerForm.get('courseRating').invalid">
+                        <div *ngIf="registerForm.get('courseRating').errors.min">
+                            Rating should be minimum 1
+                        </div>
+                        <div *ngIf="registerForm.get('courseRating').errors.max">
+                            Rating should be maximum 10
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <label class="color-757575 font-sm-style">Coding languages that you are aware of</label>
+                    <input type="text" class="form-control input-style" appEmptyToNull formControlName="technologies"
+                        placeholder="eg: Java, Python">
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-default register-button" (click)="register()">
+                    Register
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template> -->
+
+<!-- Register -->
+<ng-template #successModal let-modal>
+    <div class="modal-body">
+        <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+            (click)="onSuccessModalClose(modal)">
+            <span class="vertical-align-top-icon-style"><i
+                    class="material-icons modal-popup-close-icon-style">close</i></span>Close
+        </div>
+        <div class="success-body">
+            <div class="color-004370 font-weight-bold font-xl-style text-center">
+                Congratulations!!!
+            </div>
+            <br>
+            <div class="color-000000 font-larger-style text-center">
+                You have successfully registered yourself for the Workshop
+            </div>
+        </div>
+    </div>
+</ng-template>

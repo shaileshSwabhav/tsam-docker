@@ -1,0 +1,997 @@
+<!-- <app-master-navbar></app-master-navbar> -->
+
+
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="filter-form-label"><span class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label class="filter-form-label">{{name}}:</label>
+</ng-template>
+
+<ng-template #readingType>
+  <span class="badge reading-badge">READING</span>
+</ng-template>
+
+<ng-template #readingImage>
+  <img src="assets/icon/colour-icons/homework.png" width="30">
+</ng-template>
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="searchAssignmentForm">
+      <div class="row filter-by-field">
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Assignment Name:</label>
+          <input type="text" class="form-control input-style" formControlName="name" placeholder="eg: Assignment 1">
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Status:</label>
+          <select class="form-control input-style" formControlName="isActive">
+            <option [ngValue]="null">Select Active/Inactive</option>
+            <option [ngValue]="1">Active</option>
+            <option [ngValue]="0">Closed</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <br>
+
+    <div class="text-center">
+      <button type="button" class="btn btn-submit-swabhav material-icons-button"
+        [disabled]="!searchAssignmentForm.dirty" (click)="searchAndCloseDrawer()">
+        Search <i class="inline-icon material-icons">search</i>
+      </button>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-between align-items-baseline flex-row flex-wrap">
+        <!-- <div class="d-flex flex-wrap">
+          <button type="button" class="btn filter-button" (click)="backToPreviousPage()">
+            <i class="inline-icon material-icons-outlined">chevron_left</i>Back
+          </button>
+        </div> -->
+        <div class="d-flex flex-wrap">
+          <h1 class="display-1">Course Name: <span
+              class="swabhav-light-orange-text"><strong>{{courseName}}</strong></span></h1>
+        </div>
+        <div class="d-flex flex-wrap">
+          <div class="d-flex justify-content-between flex-nowrap">
+            <button *ngIf="permission?.add" class="btn btn-outline-submit-swabhav" (click)="onAddAssignmentClick()">Add
+              Programming Assignment
+            </button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button *ngIf="permission?.add" class="btn btn-submit-swabhav" (click)="onAddClick()">Add Assignments to
+              Course
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Course Assignments: <span class="swabhav-light-orange-text">{{totalCourseAssignment || 0}}</span>
+          </h1>
+        </div>
+      </div>
+
+      <div *ngIf="totalCourseAssignment > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalCourseAssignment}}</strong></span>
+      </div>
+
+      <!-- <div class="d-flex justify-content-between align-items-center flex-row flex-wrap"> -->
+      <!-- <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button" 
+            (click)="resetSearchAndGetAll()">View All Course Assignment
+          </button>
+        </div> -->
+      <!-- <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            --- changePage(1) change of limit will set the offset to 0 ---
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let assignment of courseAssignments | paginate: { id:'courseAssignmentPageID',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalCourseAssignment }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="courseAssignmentPageID">
+            </pagination-controls>
+          </div>
+        </div> -->
+      <!-- </div> -->
+
+      <br />
+
+      <div class="card-body padding-0pt swabhav-shadow"
+        *ngIf="courseSessionAssignments.length > 0; else assignmentsNotFound">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th class="text-center">No.</th>
+                <th>Name</th>
+                <th class="text-center">Hours</th>
+                <th class="text-center">Assignments</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let session of courseSessionAssignments; let i = index">
+                <tr>
+                  <td class="text-nowrap text-center">
+                    <button type="button" class="btn btn-default"
+                      (click)="session.showAssignments = !session.showAssignments"
+                      *ngIf="session.courseProgrammingAssignment?.length > 0; else noAssignments">
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{session.showAssignments ? 'expand_more' : 'chevron_right'}}
+                      </i> {{i+1}}
+                    </button>
+                    <ng-template #noAssignments>{{i+1}}</ng-template>
+                  </td>
+                  <td>
+                    <img src="assets/icon/colour-icons/sessions.png" width="30">
+                    {{session.name}}
+                  </td>
+                  <td class="text-center">{{session.hours}}</td>
+                  <td class="text-center">{{session.courseProgrammingAssignment?.length || 0}}</td>
+                </tr>
+                <tr *ngIf="session.showAssignments">
+                  <td colspan="5">
+                    <div class="table-responsive">
+                      <table class="table table-borderless table-unstriped">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Sr. No</th>
+                            <th>Assignment</th>
+                            <th class="text-center">Difficulty</th>
+                            <th class="text-center">Assignment Type</th>
+                            <th class="text-center">Score</th>
+                            <th class="text-center" *ngIf="permission?.update">Edit</th>
+                            <!-- <th class="text-center" *ngIf="permission?.delete">Delete</th> -->
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <ng-container *ngFor="let assignment of session.courseProgrammingAssignment; let j = index">
+                            <tr>
+                              <td class="text-nowrap text-center">
+                                <button type="button" class="btn btn-default"
+                                  (click)="assignment.showDetails = !assignment.showDetails">
+                                  <i class="material-icons-outlined material-icons-button inline-icon">
+                                    {{assignment.showDetails ? 'expand_more' : 'chevron_right'}}
+                                  </i> {{j+1}}
+                                </button>
+                              </td>
+                              <td class="text-nowrap">
+                                <ng-container
+                                  *ngIf="assignment.programmingAssignment.programmingAssignmentType=='Coding'; else readingImage">
+                                  <img src="assets/icon/colour-icons/assignment.png" width="30">
+                                </ng-container>
+                                {{assignment.programmingAssignment.title}}
+                              </td>
+                              <td>
+                                <ng-container *ngIf="assignment.programmingAssignment?.complexityLevel == 1; then first; 
+                                  else (assignment.complexityLevel == 2 && second) || (third)">
+                                </ng-container>
+                                <ng-template #first>
+                                  <span class="badge easy-level-badge">Easy</span>
+                                </ng-template>
+                                <ng-template #second>
+                                  <span class="badge medium-level-badge">Medium</span>
+                                </ng-template>
+                                <ng-template #third>
+                                  <span class="badge hard-level-badge">Hard</span>
+                                </ng-template>
+                              </td>
+                              <td>
+                                <ng-container
+                                  *ngIf="assignment.programmingAssignment?.programmingAssignmentType=='Coding'; else reading">
+                                  <span class="badge coding-badge">CODING</span>
+                                </ng-container>
+                                <ng-template #reading>
+                                  <span class="badge reading-badge">READING</span>
+                                </ng-template>
+                              </td>
+                              <td class="text-center">{{assignment.programmingAssignment?.score}}</td>
+                              <td class="text-center" *ngIf="permission?.update">
+                                <button class="btn btn-default" (click)="onUpdateClick(assignment)">
+                                  <img src="assets/icon/colour-icons/edit.png" alt="edit assignment" width=30>
+                                </button>
+                              </td>
+                              <!-- <td class="text-center" *ngIf="permission?.delete">
+                                <button type="button" class="btn btn-default" (click)="onDeleteClick(assignment)">
+                                  <img src="assets/icon/colour-icons/delete.png" alt="delete assignment" width=30>
+                                </button>
+                              </td> -->
+                            </tr>
+                            <tr *ngIf="assignment.showDetails" class="unstriped-tr">
+                              <td colspan="7">
+                                <div class="assignment-alignment">
+                                  <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                                    <h1 class="swabhav-light-orange-text"><strong>Assignment Details</strong></h1>
+                                  </div>
+                                  <div class="row d-flex justify-content-center">
+                                    <div *ngIf="assignment.programmingAssignment.programmingAssignmentType"
+                                      class="form-group col-sm-3 col-md-3 text-nowrap">
+                                      <label><strong>Type:</strong>&nbsp;
+                                        <ng-container
+                                          *ngIf="assignment.programmingAssignment?.programmingAssignmentType=='Coding'; else readingType">
+                                          <span class="badge coding-badge">CODING</span>
+                                        </ng-container>
+                                      </label>
+                                    </div>
+                                    <div *ngIf="assignment.programmingAssignment.complexityLevel"
+                                      class="form-group col-sm-3 col-md-3 text-nowrap">
+                                      <label><strong>Difficulty:</strong> &nbsp;
+                                        <span>
+                                          <ng-container
+                                            *ngIf="assignment.programmingAssignment.complexityLevel == 1; then first; 
+                                            else (assignment.programmingAssignment.complexityLevel == 2 && second) || (third)">
+                                          </ng-container>
+                                          <ng-template #first>
+                                            <span class="badge easy-level-badge">Easy</span>
+                                          </ng-template>
+                                          <ng-template #second>
+                                            <span class="badge medium-level-badge">Medium</span>
+                                          </ng-template>
+                                          <ng-template #third>
+                                            <span class="badge hard-level-badge">Hard</span>
+                                          </ng-template>
+                                        </span>
+                                      </label>
+                                    </div>
+                                    <div *ngIf="assignment.programmingAssignment.score"
+                                      class="form-group col-sm-3 col-md-3 text-nowrap">
+                                      <label><strong>Score:</strong> {{assignment.programmingAssignment.score}}</label>
+                                    </div>
+                                    <div *ngIf="assignment.programmingAssignment.timeRequired"
+                                      class="form-group col-sm-3 col-md-3 text-nowrap">
+                                      <label><strong>Duration:</strong>
+                                        {{assignment.programmingAssignment.timeRequired}}</label>
+                                    </div>
+                                  </div>
+                                  <div *ngIf="assignment.programmingAssignment.programmingAssignmentSubTask.length > 0"
+                                    class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                                    <h3 class="swabhav-light-orange-text"><strong>Assignment Sub Task</strong></h3>
+                                  </div>
+                                  <div *ngIf="assignment.programmingAssignment.programmingAssignmentSubTask.length > 0">
+                                    <ng-container
+                                      *ngFor="let subTask of assignment.programmingAssignment.programmingAssignmentSubTask;let k = index">
+                                      <div class="row">
+                                        <div *ngIf="subTask.source" class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Source:</strong> {{subTask.source}}</label>
+                                        </div>
+                                        <div *ngIf="subTask.sourceURL" class="form-group col-sm-4 col-md-4 text-nowrap">
+                                          <label><strong>Source URL:</strong>
+                                            <a class="anchor-tag" href={{subTask.sourceURL}} target="_blank">Open
+                                              URL</a>
+                                          </label>
+                                        </div>
+                                      </div>
+                                      <div class="row">
+                                        <div *ngIf="subTask.description" class="form-group text-nowrap">
+                                          <label><strong>Description:</strong></label>
+                                        </div>
+                                        <div class="form-group col-sm-10">
+                                          <span class="content-style" [innerHTML]="subTask.description"></span>
+                                        </div>
+                                      </div>
+                                    </ng-container>
+                                  </div>
+                                  <br>
+                                  <div *ngIf="assignment.programmingAssignment.programmingQuestion?.length > 0"
+                                    class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                                    <h3 class="swabhav-light-orange-text"><strong>Questions</strong></h3>
+                                  </div>
+                                  <div *ngIf="assignment.programmingAssignment.programmingQuestion?.length > 0">
+                                    <div
+                                      *ngFor="let question of assignment.programmingAssignment.programmingQuestion; let k = index">
+                                      <div class="row">
+                                        <div class="col-sm-12 col-md-12">
+                                          <h3 class="swabhav-light-orange-text">Question {{k+1}}</h3>
+                                        </div>
+                                        <div class="form-group text-nowrap">
+                                          <label><strong>Question:</strong></label>
+                                        </div>
+                                        <div class="form-group col-sm-10">
+                                          <span class="content-style" [innerHTML]="question.question"></span>
+                                        </div>
+                                        <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Question Type:</strong>&nbsp;
+                                            {{question.programmingQuestionType?.programmingType}}
+                                          </label>
+                                        </div>
+                                        <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Label:</strong> {{question.label}}</label>
+                                        </div>
+                                        <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Difficulty:</strong> &nbsp; {{question.level}}
+                                          </label>
+                                        </div>
+                                        <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Status:</strong> {{question.isActive ? 'Active':
+                                            'Inactive'}}</label>
+                                        </div>
+                                        <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Score:</strong> {{question.score}}</label>
+                                        </div>
+                                        <div *ngIf="question.timeRequired"
+                                          class="form-group col-sm-4 col-md-3 text-nowrap">
+                                          <label><strong>Time required:</strong> {{question.timeRequired}}
+                                            minute(s)</label>
+                                        </div>
+                                      </div>
+                                      <div class="row">
+                                        <div *ngIf="question.example" class="form-group text-nowrap">
+                                          <label><strong>Examples:</strong>
+                                          </label>
+                                        </div>
+                                        <div class="form-group col-sm-10">
+                                          <span class="content-style" [innerHTML]="question.example"></span>
+                                        </div>
+                                      </div>
+                                      <div class="row">
+                                        <div *ngIf="question.constraints" class="form-group text-nowrap">
+                                          <label><strong>Constraints:</strong></label>
+                                        </div>
+                                        <div class="form-group col-sm-10">
+                                          <span class="content-style">{{question.constraints}}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </ng-container>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- No Sessions -->
+      <ng-template #assignmentsNotFound>
+        <br />
+        <br />
+        <div class="col-sm-12 col-md-8 mx-auto">
+          <div class="jumbotron">
+            <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Sessions not found for this course</h2>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+<!-- Add assignment modal -->
+<ng-template #addAssignmentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="modal-title display-2">
+      {{isAddMode ? 'Add Programming Assignment' : 'Update Programming Assignment'}}
+    </h2>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button">
+      <i class="material-icons close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="programmingAssignmentSearchForm">
+      <div class="d-flex justify-content-between align-items-baseline flex-row flex-wrap">
+        <div class="form-inline">
+          <label for="assignmentTitle" class="filter-form-label">Title:</label>
+          &nbsp;&nbsp;
+          <input type="text" name="assignmentTitle" class="form-control input-style" formControlName="title"
+            placeholder="eg: Assignment 1">&nbsp;&nbsp;
+          <button class="btn btn-sm filter-button material-icons-button" type="submit"
+            (click)="searchProgrammingAssignment()"
+            [disabled]="!programmingAssignmentSearchForm.dirty||programmingAssignmentSearchForm.invalid">Search
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-sm btn-submit-swabhav material-icons-button"
+            (click)="resetAssignmentSearchAndGetAll()" *ngIf="isProgrammingAssignmentSearched">View All Programming
+            Assignment
+          </button>
+        </div>
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" formControlName="limit"
+              (change)="changeAssignmentPage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let assignment of programmingAssignments | paginate: { id:'programmingAssignmentPageID',
+              itemsPerPage: programmingAssignmentSearchForm.get('limit').value, 
+              currentPage: +programmingAssignmentSearchForm.get('offset').value + 1, 
+              totalItems: totalProgrammingAssignment }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changeAssignmentPage($event)"
+              id="programmingAssignmentPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="d-flex justify-content-start"> -->
+      <!-- <button type="button" class="btn btn-sm btn-submit-swabhav material-icons-button" 
+          (click)="resetAssignmentSearchAndGetAll()" *ngIf="isProgrammingAssignmentSearched">View All Programming Assignment
+        </button> -->
+      <!-- </div> -->
+    </form>
+
+    <br />
+
+    <form [formGroup]="courseAssignmentForm">
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th>Title</th>
+              <th class="text-center">Session</th>
+              <th class="text-center">Order</th>
+              <th class="text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="courseAssignments"
+              *ngFor="let assignmentControl of assignmentControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <tr>
+                  <td class="text-nowrap text-center">
+                    <button type="button" class="btn btn-default"
+                      (click)='assignmentControl.get("showDetails").value = !assignmentControl.get("showDetails").value'>
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{assignmentControl.get('showDetails').value ? 'expand_more' : 'chevron_right'}}
+                      </i> {{i+1}}
+                    </button>
+                    <label class="form-check-label">
+                      <label class="checkbox-container">
+                        <input type="checkbox" [checked]="assignmentControl.get('isMarked').value"
+                          (change)="toggleAssignment(assignmentControl)" formControlName="isMarked" />
+                        <span class="checkmark"></span>
+                      </label>
+                    </label>
+                  </td>
+                  <td class="text-nowrap"><strong>{{programmingAssignments[i].title}}</strong></td>
+                  <td class="text-center">
+                    <ng-select [items]="courseSessionList" bindValue="id" bindLabel="name" placeholder="Select Session"
+                      appendTo="body" [searchable]="true" [clearable]="true" formControlName="courseSessionID"
+                      class="ng-select-style" [compareWith]="compareFn"
+                      (change)="onCourseAssignmentFormInput(assignmentControl)">
+                      <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                        {{item.name}}
+                      </ng-template>
+                    </ng-select>
+                    <div class="alert alert-danger"
+                      *ngIf=" (assignmentControl.get('courseSessionID').dirty || 
+                      assignmentControl.get('courseSessionID').touched) && assignmentControl.get('courseSessionID').invalid">
+                      <div *ngIf="assignmentControl.get('courseSessionID').errors.required">
+                        Course session must be specified
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" placeholder="Eg: 1"
+                      formControlName="order" (input)="onCourseAssignmentFormInput(assignmentControl)">
+                    <div class="alert alert-danger" *ngIf=" (assignmentControl.get('order').dirty || 
+                      assignmentControl.get('order').touched) && assignmentControl.get('order').invalid">
+                      <div *ngIf="assignmentControl.get('order').errors.required">
+                        Order must be specified
+                      </div>
+                      <div *ngIf="assignmentControl.get('order').errors.min">
+                        Order must be greater than 0
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <select class="form-control input-style" formControlName="isActive"
+                      (change)="onCourseAssignmentFormInput(assignmentControl)">
+                      <option [ngValue]="null" disabled>Select Active/Inactive</option>
+                      <option [ngValue]="true">Active</option>
+                      <option [ngValue]="false">Inactive</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf=" (assignmentControl.get('isActive').dirty || 
+                      assignmentControl.get('isActive').touched) && assignmentControl.get('isActive').invalid">
+                      <div *ngIf="assignmentControl.get('isActive').errors.required">
+                        Is active must be specified
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="assignmentControl.get('showDetails').value" class="no-stripe">
+                  <td colspan="5">
+                    <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                      <h1 class="swabhav-light-orange-text"><strong>Assignment Details</strong></h1>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                      <div *ngIf="programmingAssignments[i].programmingAssignmentType"
+                        class="form-group col-sm-3 col-md-3 text-nowrap">
+                        <label><strong>Type:</strong>&nbsp;
+                          <ng-container
+                            *ngIf="programmingAssignments[i].programmingAssignmentType=='Coding'; else readingType">
+                            <span class="badge coding-badge">CODING</span>
+                          </ng-container>
+                        </label>
+                      </div>
+                      <div *ngIf="programmingAssignments[i].complexityLevel"
+                        class="form-group col-sm-3 col-md-3 text-nowrap">
+                        <label><strong>Difficulty:</strong>&nbsp;
+                          <span>
+                            <ng-container *ngIf="programmingAssignments[i].complexityLevel == 1; then first; 
+                              else (programmingAssignments[i].complexityLevel == 2 && second) || (third)">
+                            </ng-container>
+                            <ng-template #first>
+                              <span class="badge easy-level-badge">Easy</span>
+                            </ng-template>
+                            <ng-template #second>
+                              <span class="badge medium-level-badge">Medium</span>
+                            </ng-template>
+                            <ng-template #third>
+                              <span class="badge hard-level-badge">Hard</span>
+                            </ng-template>
+                          </span>
+                        </label>
+                      </div>
+                      <div *ngIf="programmingAssignments[i].score" class="form-group col-sm-3 col-md-3 text-nowrap">
+                        <label><strong>Score:</strong> {{programmingAssignments[i].score}}</label>
+                      </div>
+                      <div *ngIf="programmingAssignments[i].timeRequired"
+                        class="form-group col-sm-3 col-md-3 text-nowrap">
+                        <label><strong>Duration:</strong> {{programmingAssignments[i].timeRequired}}
+                          <!-- <ngb-timepicker formControlName="programmingAssignments[i].timeRequired" 
+                            [spinners]="false"></ngb-timepicker> -->
+                        </label>
+                      </div>
+                    </div>
+                    <div *ngIf="programmingAssignments[i].programmingAssignmentSubTask.length > 0"
+                      class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                      <h3 class="swabhav-light-orange-text"><strong>Assignment Sub Task</strong></h3>
+                    </div>
+                    <div *ngIf="programmingAssignments[i].programmingAssignmentSubTask.length > 0">
+                      <ng-container
+                        *ngFor="let subTask of programmingAssignments[i].programmingAssignmentSubTask;let k = index">
+                        <div class="row">
+                          <div *ngIf="subTask.resource" class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Resource:</strong> {{subTask.resourceName}}</label>
+                          </div>
+                          <!-- <div *ngIf="subTask.source" class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Source:</strong> {{subTask.source}}</label>
+                          </div>
+                          <div *ngIf="subTask.sourceURL" class="form-group col-sm-4 col-md-4 text-nowrap">
+                            <label><strong>Source URL:</strong> 
+                              <a class="anchor-tag" href={{subTask.sourceURL}} target="_blank">Open URL</a>
+                            </label>
+                          </div> -->
+                        </div>
+                        <div class="d-flex">
+                          <div *ngIf="subTask.description" class="form-group text-nowrap">
+                            <label><strong>Description:</strong></label>
+                          </div>
+                          <div class="form-group col-sm-10">
+                            <span class="content-style" [innerHTML]="subTask.description"></span>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                    <br>
+                    <div *ngIf="programmingAssignments[i].programmingQuestion?.length > 0"
+                      class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                      <h3 class="swabhav-light-orange-text"><strong>Questions</strong></h3>
+                    </div>
+                    <div *ngIf="programmingAssignments[i].programmingQuestion?.length > 0">
+                      <div *ngFor="let question of programmingAssignments[i].programmingQuestion; let k = index">
+                        <div class="row">
+                          <div class="col-sm-12 col-md-12">
+                            <h3 class="swabhav-light-orange-text">Question {{k+1}}</h3>
+                          </div>
+                          <div class="form-group col-2 text-nowrap">
+                            <label><strong>Question:</strong></label>
+                          </div>
+                          <div class="form-group col-sm-10">
+                            <span class="content-style" [innerHTML]="question.question"></span>
+                          </div>
+                          <!-- <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Type:</strong>&nbsp;
+                              <ng-container *ngIf="question.programmingQuestionType?.programmingType=='Coding'; else readingType">
+                                <span class="badge coding-badge">CODING</span>
+                              </ng-container>
+                            </label>
+                          </div> -->
+                          <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Label:</strong> {{question.label}}</label>
+                          </div>
+                          <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Difficulty:</strong>&nbsp;
+                              <span>
+                                <ng-container *ngIf="question.level == 1; then first; 
+                                else (question.level == 2 && second) || (third)">
+                                </ng-container>
+                                <ng-template #first>
+                                  <span class="badge easy-level-badge">Easy</span>
+                                </ng-template>
+                                <ng-template #second>
+                                  <span class="badge medium-level-badge">Medium</span>
+                                </ng-template>
+                                <ng-template #third>
+                                  <span class="badge hard-level-badge">Hard</span>
+                                </ng-template>
+                              </span>
+                            </label>
+                          </div>
+                          <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Status:</strong> {{question.isActive ? 'Active': 'Inactive'}}</label>
+                          </div>
+                          <div class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Score:</strong> {{question.score}}</label>
+                          </div>
+                          <div *ngIf="question.timeRequired" class="form-group col-sm-4 col-md-3 text-nowrap">
+                            <label><strong>Time required:</strong> {{question.timeRequired}} minute(s)</label>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div *ngIf="question.example" class="form-group text-nowrap">
+                            <label><strong>Examples:</strong>
+                            </label>
+                          </div>
+                          <div class="form-group col-sm-10">
+                            <span class="content-style" [innerHTML]="question.example"></span>
+                          </div>
+                        </div>
+                        <div class="d-flex">
+                          <div *ngIf="question.constraints" class="form-group text-nowrap">
+                            <label><strong>Constraints:</strong></label>
+                          </div>
+                          <div class="form-group col-sm-10">
+                            <span class="content-style">{{question.constraints}}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text fixed-btn"
+      (click)="modal.dismiss()">Close</button>
+    <button type="submit" class="btn btn-submit-swabhav fixed-btn" (click)="validateCourseAssignment()"
+      [disabled]='assignedCourseAssignments.length == 0'>
+      {{isAddMode ? 'Add Assignment' : 'Update Assignment'}}
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template #updateCourseAssignmentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h1 class="display-1">Title: {{assignmentTitle}}</h1>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click');" class="btn btn-default" type="button"><i
+        class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="courseAssignmentForm">
+      <ng-container formArrayName="courseAssignments"
+        *ngFor="let assignmentControl of assignmentControlArray.controls;let i = index">
+        <ng-container [formGroupName]="i">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="sel1"><span class="red">*</span> Order:</label>
+              <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="order">
+              <div class="alert alert-danger" *ngIf="(assignmentControl.get('order').dirty || assignmentControl.get('order').touched)
+                  &&assignmentControl.get('order').invalid">
+                <div *ngIf="assignmentControl.get('order').errors.required">
+                  Order must be specified
+                </div>
+                <div *ngIf="assignmentControl.get('order').errors.min">
+                  Order must be greater than 0
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="sel1"><span class="red">*</span> Status:</label>
+              <select class="form-control input-style" formControlName="isActive">
+                <option [ngValue]="null">Select Active/Inactive</option>
+                <option [ngValue]="true">Active</option>
+                <option [ngValue]="false">Inactive</option>
+              </select>
+              <div class="alert alert-danger" *ngIf=" (assignmentControl.get('isActive').dirty || 
+                assignmentControl.get('isActive').touched) && assignmentControl.get('isActive').invalid">
+                <div *ngIf="assignmentControl.get('isActive').errors.required">
+                  Is active must be specified
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text" (click)="modal.dismiss()">Close</button>
+    <button type="button" [disabled]="!courseAssignmentForm.dirty" (click)="validateSingleAssignment()"
+      class="btn btn-submit-swabhav">Update Assignment</button>
+  </div>
+</ng-template>
+
+
+<ng-template #addCourseAssignmentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Assign assignment to course</h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="btn filter-button material-icons-button" (click)="onAssignClick()"
+      [disabled]="assignedCourseAssignments.length == 0">Assign Course Assignment
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #assignmentFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Add Assignment</h4>
+      <span class="red">* </span> Marked fields are mandatory
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="assignmentForm">
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-4">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Title'}"></ng-container>
+          <input type="text" class="form-control input-style" formControlName="title" placeholder="eg: Java">
+          <div class="alert alert-danger"
+            *ngIf="(assignmentForm.get('title').dirty || assignmentForm.get('title').touched) && assignmentForm.get('title').errors">
+            <span *ngIf="assignmentForm.get('title').errors.required">
+              Assignment Title must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Type'}"></ng-container>
+          <select class="form-control input-style" formControlName="programmingAssignmentType"
+            (change)="onAssignmentTypeChange()">
+            <option [ngValue]="null" disabled>Select Assignment Type</option>
+            <option *ngFor="let type of assignmentType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('programmingAssignmentType').dirty || assignmentForm.get('programmingAssignmentType').touched) 
+								&& assignmentForm.get('programmingAssignmentType').errors">
+            <span *ngIf="assignmentForm.get('programmingAssignmentType').errors.required">
+              Programming assignment type must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Time Required (In minutes)'}">
+          </ng-container>
+          <input type="number" class="form-control input-style" formControlName="timeRequired" placeholder="eg: 60"
+            appAllowNumbersOnly nbInput>
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('timeRequired').dirty || assignmentForm.get('timeRequired').touched) 
+								&& assignmentForm.get('timeRequired').errors">
+            <span *ngIf="assignmentForm.get('timeRequired').errors.required">
+              Programming assignment type must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Complexity Level'}"></ng-container>
+          <select class="form-control input-style" formControlName="complexityLevel">
+            <option [ngValue]="null" disabled>Select Complexity Level</option>
+            <option *ngFor="let level of complexityLevel" [ngValue]="level.key">{{level.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('complexityLevel').dirty 
+						|| assignmentForm.get('complexityLevel').touched) && assignmentForm.get('complexityLevel').invalid">
+            <div *ngIf="assignmentForm.get('complexityLevel').errors.required">
+              Complexity level must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-2 col-md-2">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Score'}"></ng-container>
+          <input type="number" class="form-control input-style" formControlName="score" placeholder="eg: 10">
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('score').dirty || assignmentForm.get('score').touched) 
+						&& assignmentForm.get('score').errors">
+            <span *ngIf="assignmentForm.get('score').errors.required">
+              Score must be specified
+            </span>
+            <span *ngIf="assignmentForm.get('score').errors.min">
+              Score should be greater than 0.
+            </span>
+          </div>
+        </div>
+        <ng-container *ngIf="assignmentForm.get('programmingAssignmentType').value == CODING">
+          <div class="form-group col-sm-6 col-md-4">
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Programming Question'}"></ng-container>
+            <ng-select [items]="programmingQuestionList" bindLabel="label" placeholder="Select Programming Question"
+              appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+              formControlName="programmingQuestion" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.label}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </ng-container>
+      </div>
+      <ng-container *ngIf="assignmentForm.get('programmingAssignmentType').value == READING">
+        <div *ngIf="subTasks.controls.length > 0" class="row col-sm-12 col-md-12 d-flex justify-content-center">
+          <h1 class="swabhav-light-orange-text"><strong>Assignment Sub Task</strong></h1>
+        </div>
+        <div formArrayName="programmingAssignmentSubTask" *ngFor="let subTask of subTasks.controls;let i = index">
+          <ng-container [formGroupName]="i">
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <h3><strong>Sub Task: {{i+1}}</strong>
+                  <button *ngIf="subTasks.controls.length > 1" type="button"
+                    class="float-right btn btn-sm material-icons-button" style="cursor: pointer;"
+                    (click)="deleteSubTask(i)"><i class="material-icons red material-icons-button close-icon">close</i>
+                  </button>
+                </h3>
+              </div>
+              <div class="form-group col-sm-3 col-md-4">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Resource'}"></ng-container>
+                <ng-select [items]="resourcesList" bindLabel="resourceName" bindValue="id" placeholder="Select Resource"
+                  appendTo="body" [searchable]="true" [clearable]="true" formControlName="resourceID"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.resourceName}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(subTask.get('resourceID').dirty || subTask.get('resourceID').touched) 
+                  && subTask.get('resourceID').errors">
+                  <span *ngIf="subTask.get('resourceID').errors.required">
+                    Resource must be specified
+                  </span>
+                </div>
+              </div>
+              <!-- <div class="form-group col-sm-4 col-md-3">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Source'}"></ng-container>
+                <select class="form-control input-style" formControlName="source">
+                  <option [ngValue]="null">Select Source</option>
+                  <option *ngFor="let source of sourceList" [ngValue]="source.value">{{source.value}}</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(subTask.get('source').dirty || subTask.get('source').touched) 
+                  && subTask.get('source').errors">
+                  <span *ngIf="subTask.get('source').errors.required">
+                    Source must be specified
+                  </span>
+                </div>
+              </div> -->
+              <!-- <div class="form-group col-sm-4 col-md-4">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Source URL'}"></ng-container>
+                <input type="text" class="form-control input-style" formControlName="sourceURL" placeholder="eg: Enter source url">
+              </div> -->
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-12">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Description'}"></ng-container>
+                <ckeditor [config]="ckConfig" formControlName="description"></ckeditor>
+                <div class="alert alert-danger" *ngIf="(subTask.get('description').dirty || subTask.get('description').touched) 
+                  && subTask.get('description').errors">
+                  <span *ngIf="subTask.get('description').errors.required">
+                    Description must be specified
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div class="float-right">
+          <button class="btn filter-button btn-sm material-icons-button" (click)="createSubTaskForm()">Add Sub Task
+          </button>
+        </div>
+      </ng-container>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="reset"
+      (click)="modal.dismiss()">Close</button>
+    <button type="submit" class="btn btn-submit-swabhav material-icons-button" [disabled]="!assignmentForm.dirty"
+      (click)="validateAssignmentForm()">Add Assignment
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Delete User Confirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="modal-title">Delete Confirmation</h2>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit"><i
+        class="material-icons close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure you want to delete this assignment from the course?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">No</button>
+  </div>
+</ng-template>

@@ -1,0 +1,152 @@
+<div class="modal-body">
+
+    <!-- Headers -->
+    <div class="float-right">
+        <button type="button" class="close" (click)="sendIsSuccessful(null)" class="btn btn-default"
+            type="button"><i class="material-icons close-icon">close</i>
+        </button>
+    </div>
+
+    <br><br>
+
+    <div class="row">
+        <div class="col-2">
+            <img src="assets/icon/colour-icons/feedbackmodal.png" alt="feedback" class="image-fit-style" width="100">
+        </div>
+        <div class="col-10">
+            <div class="font-lg-style color-F6430F font-weight-bold">
+                Rate faculty for the following session:
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-6">
+                    <ng-container *ngIf="faculty">
+                        <span class="font-md-style font-weight-bold">Faculty Name: </span>{{faculty.firstName + " " + faculty.lastName}}
+                    </ng-container>
+                </div>
+                <div class="col-6">
+                    <span class="font-md-style font-weight-bold">Date: </span>{{batchSessionDate | date: 'fullDate'}}
+                </div>
+                <div class="col-6">
+                    <span class="font-md-style font-weight-bold">Session Number: </span>{{sessionNumber}}
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+    <br>
+
+    <!-- Topics and Sub topics covered -->
+    <div class="row">
+        <ng-container *ngFor="let topic of topics">
+            <div class="col-6">
+                <div class="card task-list-card-style">
+                    <div class="card-body task-list-card-body-style">
+                        <div>
+                            <span class="font-md-style font-weight-bold">Topic Covered: </span>{{topic.topicName}}
+                        </div>
+                        <br>
+                        <div>
+                            <span class="font-md-style font-weight-bold">SubTopics Covered: </span>
+                        </div>
+                        <ol>
+                            <ng-container *ngFor="let subTopic of topic.subTopics">
+                                <li>{{subTopic.topicName}}</li>
+                            </ng-container>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <br>
+    
+    <!-- Feedback form -->
+    <ng-container *ngIf="talentTofacultyFeedbackQuestionList?.length > 0 && talentFeedbackToFaculytyForm">
+        <form [formGroup]="talentFeedbackToFaculytyForm">
+            <ng-container formArrayName="feedbacks" *ngFor="let feedbackControl of feedbackArray.controls;let i = index">
+                <ng-container [formGroupName]="i">
+                    <ng-container *ngIf="talentTofacultyFeedbackQuestionList[i].hasOptions; else noOptions">
+                        <div class="row">
+                            <div class="col-6">
+                                {{i+1}}. {{talentTofacultyFeedbackQuestionList[i].question}}
+                            </div>
+                            <div class="col-6">
+                                <ng-container>
+                                    <ng-container *ngIf="talentTofacultyFeedbackQuestionList[i].options.length == MAX_SCORE; else showOptions">
+                                        <ngb-rating (rateChange)="onTalentFeedbackForFacultyInput($event, i, feedbackControl)">
+                                            <ng-template let-fill="fill" let-index="index">
+                                                <span class="star" [class.star-fill]="fill === 100">&#9733;</span>
+                                            </ng-template>
+                                        </ngb-rating>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+          
+                            <!-- SHOW OPTIONS -->
+                            <ng-template #showOptions>
+                                <select class="form-control input-style" formControlName="optionID"
+                                    (change)="onTalentFeedbackForFacultyChange(feedbackControl, talentTofacultyFeedbackQuestionList[i].options)">
+                                    <option [ngValue]="null" disabled>Select Option</option>
+                                    <option *ngFor="let option of talentTofacultyFeedbackQuestionList[i].options" 
+                                        [ngValue]="option.id">{{option.value}}
+                                    </option>
+                                </select>
+                                <div class="alert alert-danger" *ngIf="(feedbackControl.get('optionID').touched || 
+                                    feedbackControl.get('optionID').dirty) && feedbackControl.get('optionID').invalid">
+                                    <div *ngIf="feedbackControl.get('optionID').errors.required">
+                                        Option must be specified
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </div>
+                        <br>
+                    </ng-container>
+                
+                    <!-- No Options -->
+                    <ng-template #noOptions>
+                        <div class="row">
+                            <div class="form-group col-12">
+                                <label>{{i+1}}. {{talentTofacultyFeedbackQuestionList[i].question}}</label>
+                                <textarea class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3"
+                                    formControlName="answer" placeholder="Enter your answer">
+                                </textarea>
+                                <div class="alert alert-danger" *ngIf="(feedbackControl.get('answer').touched || 
+                                    feedbackControl.get('answer').dirty) && feedbackControl.get('answer').invalid">
+                                    <div *ngIf="feedbackControl.get('answer').errors.required">
+                                        Answer must be specified
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ng-container>
+            </ng-container>
+        </form>
+    </ng-container>
+    
+    <ng-template #noFeedbackQuestions>
+        <br>
+        <br>
+        <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+                <div class="jumbotron">
+                    <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                        <h2>Feedback Questions Not Found</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+       
+    <!-- Close and submit button -->
+    <div class="d-flex justify-content-end">
+        <br>
+        <button type="button" class="btn btn-default swabhav-light-orange-text" (click)="sendIsSuccessful(null)">Close</button>
+        <button type="button" class="btn btn-submit-swabhav wide-btn material-icons-button" (click)="validateTalentFeedback()"
+            *ngIf="!feedbacks || feedbacks?.length == 0">
+            Submit
+        </button>
+    </div>
+</div>

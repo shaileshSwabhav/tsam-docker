@@ -1,0 +1,412 @@
+<app-master-navbar></app-master-navbar>
+
+<ng-template #zeroTemplate>
+    <span class="btn btn-default no-link-style">
+        0
+    </span>
+</ng-template>
+
+<div class="container-fluid">
+    <br>
+    <ul ngbNav #nav="ngbNav" [destroyOnHide]="true" class="nav-tabs ul-space-even-style"
+        (onChange)="onTabChange($event)">
+
+        <!-- Company Branch -->
+        <li [ngbNavItem]="1" (click)="onTabChange(1)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Company Branch</a>
+            <ng-template ngbNavContent>
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Entries -
+                            <span class="color-F6430F"> {{totalEntries}}</span>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="totalEntries > 0" class="view-label-flex">
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                            <span class="pagination-numbers">{{totalEntries}}</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-row">
+                        <div *ngIf="totalEntries > 0" class="d-flex justify-content-between align-items-start flex-row">
+                            <div class="d-flex">
+                                <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                                    (change)="changePage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="d-flex">
+                                <ul class="pagination no-padding-left" *ngFor="let waitingListCompanyBranchReport of 
+                                    waitingListCompanyBranchReportList | paginate: { id:'waitingListCompanyBranchReportID',
+                                    itemsPerPage: limit, currentPage: currentPage, totalItems: totalEntries }">
+                                </ul>
+                                <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                                    id="waitingListCompanyBranchReportID">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalEntries > 0">
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped text-center">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Company Name</th>
+                                        <th>Talents</th>
+                                        <th>Enquiries</th>
+                                        <th>Total</th>
+                                    </tr>
+                                    <tbody>
+                                        <ng-container
+                                            *ngFor="let waiting of waitingListCompanyBranchReportList; let i = index">
+                                            <tr (click)="onCompanyBranchRowClick(waiting)" class="cursor-pointer-style">
+                                                <td>{{(i+1)+(offset*limit)}}</td>
+                                                <td>{{waiting.companyBranch.branchName}}</td>
+                                                <td class="text-center" data-toggle="tooltip" data-placement="top"
+                                                    title="Go To Talents Page">
+                                                    <button *ngIf='waiting.talentCount != 0; else zeroTemplate'
+                                                        class="btn btn-default fake-link-style" type="button"
+                                                        (click)="redirectByWaitingList(waiting.companyBranch.id, 'Company branch', true)">
+                                                        <span><strong>{{waiting.talentCount}}</strong></span>
+                                                    </button>
+                                                </td>
+                                                <td class="text-center" data-toggle="tooltip" data-placement="top"
+                                                    title="Go To Talent Enquiries Page">
+                                                    <button *ngIf='waiting.enquiryCount != 0; else zeroTemplate'
+                                                        class="btn btn-default fake-link-style" type="button"
+                                                        (click)="redirectByWaitingList(waiting.companyBranch.id, 'Company branch', false)">
+                                                        <span><strong>{{waiting.enquiryCount}}</strong></span>
+                                                    </button>
+                                                </td>
+                                                <td><span class="btn btn-default no-link-style">{{waiting.talentCount +
+                                                        waiting.enquiryCount}}</span></td>
+                                            </tr>
+                                            <ng-container *ngIf="waiting?.isVisible">
+                                                <ng-container *ngIf="totalSubEntries > 0;else noSubEntries">
+                                                    <tr class="sub-table-header-style">
+                                                        <th>No.</th>
+                                                        <th>Reuirement Code</th>
+                                                        <th>Talents</th>
+                                                        <th>Enquiries</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                    <ng-container
+                                                        *ngFor="let waitingRequirement of waitingListRequirementReportList; let j = index">
+                                                        <tr class="sub-table-details-style">
+                                                            <td>{{j+1}}</td>
+                                                            <td>{{waitingRequirement.requirement.code}}</td>
+                                                            <td class="text-center" data-toggle="tooltip"
+                                                                data-placement="top" title="Go To Talent Page">
+                                                                <button
+                                                                    *ngIf='waitingRequirement.talentCount != 0; else zeroTemplate'
+                                                                    class="btn btn-default fake-link-style"
+                                                                    type="button"
+                                                                    (click)="redirectByWaitingList(waitingRequirement.requirement.id, 'Requirement', true)">
+                                                                    <span><strong>{{waitingRequirement.talentCount}}</strong></span>
+                                                                </button>
+                                                            </td>
+                                                            <td class="text-center" data-toggle="tooltip"
+                                                                data-placement="top"
+                                                                title="Go To Talent Enquiries Page">
+                                                                <button
+                                                                    *ngIf='waitingRequirement.enquiryCount != 0; else zeroTemplate'
+                                                                    class="btn btn-default fake-link-style"
+                                                                    type="button"
+                                                                    (click)="redirectByWaitingList(waitingRequirement.requirement.id, 'Requirement', false)">
+                                                                    <span><strong>{{waitingRequirement.enquiryCount}}</strong></span>
+                                                                </button>
+                                                            </td>
+                                                            <td><span
+                                                                    class="btn btn-default no-link-style">{{waitingRequirement.talentCount
+                                                                    + waitingRequirement.enquiryCount}}</span></td>
+                                                        </tr>
+                                                    </ng-container>
+                                                </ng-container>
+                                                <ng-template #noSubEntries>
+                                                    <tr class="no-sub-entries-style">
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>No waiting list for company requirements</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </ng-template>
+                                            </ng-container>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalEntries == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Waiting List For Company Branch Found</h2>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+
+        <!-- Course -->
+        <li [ngbNavItem]="2" (click)="onTabChange(2)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Course</a>
+            <ng-template ngbNavContent>
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Entries -
+                            <span class="color-F6430F"> {{totalEntries}}</span>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="totalEntries > 0" class="view-label-flex">
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                            <span class="pagination-numbers">{{totalEntries}}</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-row">
+                        <div *ngIf="totalEntries > 0" class="d-flex justify-content-between align-items-start flex-row">
+                            <div class="d-flex">
+                                <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                                    (change)="changePage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="d-flex">
+                                <ul class="pagination no-padding-left" *ngFor="let waitingListCourseReport of 
+                                waitingListCourseReportList | paginate: { id:'waitingListCourseReportID',
+                                    itemsPerPage: limit, currentPage: currentPage, totalItems: totalEntries }">
+                                </ul>
+                                <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                                    id="waitingListCourseReportID">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalEntries > 0">
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped text-center">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Course</th>
+                                        <th>Talents</th>
+                                        <th>Enquiries</th>
+                                        <th>Total</th>
+                                    </tr>
+                                    <tbody>
+                                        <ng-container
+                                            *ngFor="let waiting of waitingListCourseReportList; let i = index">
+                                            <tr (click)="onCourseRowClick(waiting)" class="cursor-pointer-style">
+                                                <td>{{(i+1)+(offset*limit)}}</td>
+                                                <td>{{waiting.course.name}}</td>
+                                                <td class="text-center" data-toggle="tooltip" data-placement="top"
+                                                    title="Go To Talents Page">
+                                                    <button *ngIf='waiting.talentCount != 0; else zeroTemplate'
+                                                        class="btn btn-default fake-link-style" type="button"
+                                                        (click)="redirectByWaitingList(waiting.course.id, 'Course', true)">
+                                                        <span><strong>{{waiting.talentCount}}</strong></span>
+                                                    </button>
+                                                </td>
+                                                <td class="text-center" data-toggle="tooltip" data-placement="top"
+                                                    title="Go To Talent Enquiries Page">
+                                                    <button *ngIf='waiting.enquiryCount != 0; else zeroTemplate'
+                                                        class="btn btn-default fake-link-style" type="button"
+                                                        (click)="redirectByWaitingList(waiting.course.id, 'Course', false)">
+                                                        <span><strong>{{waiting.enquiryCount}}</strong></span>
+                                                    </button>
+                                                </td>
+                                                <td><span class="btn btn-default no-link-style">{{waiting.talentCount +
+                                                        waiting.enquiryCount}}</span></td>
+                                            </tr>
+                                            <ng-container *ngIf="waiting?.isVisible" class="sub-table-header-style">
+                                                <ng-container *ngIf="totalSubEntries > 0;else noSubEntries">
+                                                    <tr class="sub-table-header-style">
+                                                        <th>No.</th>
+                                                        <th>Batch Name</th>
+                                                        <th>Talents</th>
+                                                        <th>Enquiries</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                    <ng-container
+                                                        *ngFor="let waitingBatch of waitingListBatchReportList; let j = index">
+                                                        <tr class="sub-table-details-style">
+                                                            <td>{{j+1}}</td>
+                                                            <td>{{waitingBatch.batch.batchName}}</td>
+                                                            <td class="text-center" data-toggle="tooltip"
+                                                                data-placement="top" title="Go To Talents Page">
+                                                                <button
+                                                                    *ngIf='waitingBatch.talentCount != 0; else zeroTemplate'
+                                                                    class="btn btn-default fake-link-style"
+                                                                    type="button"
+                                                                    (click)="redirectByWaitingList(waitingBatch.batch.id, 'Batch', true)">
+                                                                    <span><strong>{{waitingBatch.talentCount}}</strong></span>
+                                                                </button>
+                                                            </td>
+                                                            <td class="text-center" data-toggle="tooltip"
+                                                                data-placement="top" title="Go To Talents Page">
+                                                                <button
+                                                                    *ngIf='waitingBatch.enquiryCount != 0; else zeroTemplate'
+                                                                    class="btn btn-default fake-link-style"
+                                                                    type="button"
+                                                                    (click)="redirectByWaitingList(waitingBatch.batch.id, 'Batch', false)">
+                                                                    <span><strong>{{waitingBatch.enquiryCount}}</strong></span>
+                                                                </button>
+                                                            </td>
+                                                            <td><span
+                                                                    class="btn btn-default no-link-style">{{waitingBatch.talentCount
+                                                                    + waitingBatch.enquiryCount}}</span></td>
+                                                        </tr>
+                                                    </ng-container>
+                                                </ng-container>
+                                                <ng-template #noSubEntries>
+                                                    <tr class="no-sub-entries-style">
+                                                        <th></th>
+                                                        <th>No waiting list for batch</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </ng-template>
+                                            </ng-container>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalEntries == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Waiting List For Course Found</h2>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+
+        <!-- Technology -->
+        <li [ngbNavItem]="3" (click)="onTabChange(3)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Technology</a>
+            <ng-template ngbNavContent>
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Entries -
+                            <span class="color-F6430F"> {{totalEntries}}</span>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="totalEntries > 0" class="view-label-flex">
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                            <span class="pagination-numbers">{{totalEntries}}</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-row">
+                        <div *ngIf="totalEntries > 0" class="d-flex justify-content-between align-items-start flex-row">
+                            <div class="d-flex">
+                                <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                                    (change)="changePage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="d-flex">
+                                <ul class="pagination no-padding-left" *ngFor="let waitingListCourseReport of 
+                                waitingListTechnologyReportList | paginate: { id:'waitingListCourseReportID',
+                                    itemsPerPage: limit, currentPage: currentPage, totalItems: totalEntries }">
+                                </ul>
+                                <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                                    id="waitingListCourseReportID">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalEntries > 0">
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped text-center">
+                                    <thead class="main-header">
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Technology</th>
+                                            <th>Talents</th>
+                                            <th>Enquiries</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let waiting of waitingListTechnologyReportList; let i = index">
+                                            <td>{{(i+1)+(offset*limit)}}</td>
+                                            <td>{{waiting.technology.language}}</td>
+                                            <td class="text-center" data-toggle="tooltip" data-placement="top"
+                                                title="Go To Talents Page">
+                                                <button *ngIf='waiting.talentCount != 0; else zeroTemplate'
+                                                    class="btn btn-default fake-link-style" type="button"
+                                                    (click)="redirectByWaitingList(waiting.technology.id, 'Technology', true)">
+                                                    <span><strong>{{waiting.talentCount}}</strong></span>
+                                                </button>
+                                            </td>
+                                            <td class="text-center" data-toggle="tooltip" data-placement="top"
+                                                title="Go To Talent Enquiries Page">
+                                                <button *ngIf='waiting.enquiryCount != 0; else zeroTemplate'
+                                                    class="btn btn-default fake-link-style" type="button"
+                                                    (click)="redirectByWaitingList(waiting.technology.id, 'Technology', false)">
+                                                    <span><strong>{{waiting.enquiryCount}}</strong></span>
+                                                </button>
+                                            </td>
+                                            <td><span class="btn btn-default no-link-style">{{waiting.talentCount +
+                                                    waiting.enquiryCount}}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalEntries == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Waiting List For Technology Found</h2>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+</div>

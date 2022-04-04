@@ -1,0 +1,125 @@
+.node-card-style{
+    margin-left: 15px;
+    margin-bottom: 50px;
+    text-align: center;
+    width: 200px;
+    box-shadow: 0 0 15px #f6430f26;
+    border: none;
+    background-color: #FFFFFF;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.row-style{
+    justify-content: center;
+}
+
+.no-side-padding{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.add-child-concept-button-style{
+    padding: 4px;
+    font-size: small;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+
+.remove-button-style{
+    margin-top:  5px;
+}
+
+.line-text-style {
+    width: 100%; 
+    text-align: center; 
+    border-bottom: 1.5px solid #BDBDBD; 
+    line-height: 0.1em;
+    margin: 15px 0 20px; 
+} 
+
+.show-parent-style { 
+    background:#fff; 
+    padding:0 10px; 
+    color: #757575;
+}
+
+.concept-select-style{
+    margin-left: 10px;
+}
+
+.hr-style{
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.add-parent-button-style{
+    margin-top: -20px;
+}
+
+.bottom-hr-style{
+    margin-top: -0.5px;
+}
+
+.card-body-style{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.margin-botton-style{
+    margin-bottom: 6px;
+}
+
+.text-with-line-style {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #000;
+    line-height: 0.1em;
+    margin: 10px 0 15px;
+} 
+ 
+.text-with-line-text-style{ 
+    background:#fff; 
+    padding:0 1px; 
+    color: #707070;
+}
+
+.red-box-style{
+    background-color: #D63C2A;
+}
+
+.orange-box-style{
+    background-color: #F26A00;
+}
+
+.green-box-style{
+    background-color: #009E0B;
+}
+
+.white-box-style{
+    background-color: white;
+}
+
+
+.white-style{
+    border-radius: 10px;
+    background-color: white;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 3.5px;
+}
+

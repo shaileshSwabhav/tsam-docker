@@ -1,0 +1,121 @@
+.top-panel-style{
+    background-color: #F26A00;
+    color: white;
+    padding: 15px;
+  }
+  
+  .top-panel-left {
+    float: left;
+    text-align: left;
+  }
+  
+  .top-panel-center {
+    text-align: center;
+    padding-right: 20%;
+  }
+  
+  
+  
+  .right{
+    right: 0;
+    position: absolute;
+  }
+  
+  .hover-click:hover {
+    cursor: pointer;
+    background-color: #ffded7;
+  }
+  .pointer{
+    cursor: pointer;
+  }
+  
+  td,th{
+    text-align: center;
+  }
+  
+  
+  
+  .font-20-style{
+    font-size: 20px;
+  }
+  
+  .talent-dropdown-style{
+    width: 30%;
+    display: inline
+  }
+  
+  
+  .pending-box-style{
+    background-color: #ffeaea;
+    color: #f80309;
+  }
+  
+  .unchecked-box-style{
+    background-color: rgb(247, 230, 207);
+    color: rgb(253, 147, 9);
+  }
+  
+  .completed-box-style{
+    background-color: #e5fdf0;
+    color: #36b98c;
+  }
+  
+  
+  .tasklist-box-style{
+    border-radius: 30px;
+    font-weight: bold;
+    padding: 7px;
+    text-align: center;
+    font-size: medium;
+  }
+  
+  .no-padding-style{
+    padding: 0;
+  }
+  
+  .example-box-style{
+    padding: 6px;
+    background-color: #efefef;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+  }
+  
+  .width-50px-style{
+    width: 50px;
+  }
+  
+  .width-150px-style{
+    width: 150px;
+  }
+  
+  .width-100px-style{
+    width: 100px;
+  }
+  
+  .width-30px-style{
+    width: 30px;
+  }
+  
+  .submit-box-style{
+    border-radius: 30px;
+    padding: 5px;
+    background-color: #BDBDBD;
+    color: white;
+    font-weight: bold;
+    font-size: small; 
+  }
+  
+  .delete-button-style{
+    border-radius: 30px;
+    border: 1px solid #F6430F;
+  }
+  
+  .button-width-style{
+    width: 20%;
+  }
+  
+  .score-box-style{
+    margin: 0 auto;
+    width: 50%;
+  }
+  

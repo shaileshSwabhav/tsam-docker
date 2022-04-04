@@ -1,0 +1,272 @@
+<br>
+
+<mat-drawer-container class="module-tab-container">
+
+  <!-- Course Module Tabs -->
+  <mat-drawer mode="side" opened class="drawer-container drawer-style">
+    <br>
+    <div class="text-center font-lg-style font-weight-bold">MODULES</div>
+    <br>
+    <div class="drawer-container-menu">
+      <ng-container *ngFor="let courseModule of selectedModuleList">
+        <div class="row col-12 cursor-pointer-style course-module-tab-style"
+          [ngClass]="{'module-background': courseModule.isSelected==true}" (click)="onModuleClick(courseModule)">
+          <img src={{courseModule?.module?.logo}} width="30">
+          &nbsp;&nbsp;
+          <span class="font-md-style font-weight-bold">
+            {{courseModule?.module?.moduleName}}
+          </span>
+        </div>
+      </ng-container>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content class="content-container">
+    <div class="container-fluid">
+      <!-- Course Module Topics Table -->
+      <div *ngIf="selectedModuleTopicList.length > 0">
+        <br>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped table-borderless">
+            <thead>
+              <tr class="text-center">
+                <th>Sr No.</th>
+                <th class="text-left">Topics</th>
+                <th>Sub Topics</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let topic of selectedModuleTopicList;let i = index">
+                <tr class="striped-tr text-center">
+                  <td class="text-nowrap table-td-center-align">
+                    <ng-container *ngIf="!isAssignmentVisible">
+                      <button type="button" class="btn btn-default" (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                        *ngIf="topic.subTopics && topic.subTopics.length != 0;else noSubTopics" >
+                        <i class="material-icons-outlined material-icons-button inline-icon">
+                          {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                        </i> {{i+1}}
+                      </button>
+                    </ng-container>
+
+                    <ng-container *ngIf="isAssignmentVisible">
+                      <button type="button" class="btn btn-default" (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                      *ngIf="topic.topicProgrammingQuestions.length!=0; else noSubTopics" >
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                      </i> {{i+1}}
+                    </button>
+                    </ng-container>
+                    
+                    <ng-template #noSubTopics>
+                      <label class="no-sub-session">{{i+1}}</label>
+                    </ng-template>
+                   
+                  </td>
+                  <td class="text-left table-td-center-align">
+                    <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                    {{topic.topicName}}
+                  </td>
+                  <!-- <td class="text-left">
+                    <dl>
+                      <dt>
+                        <img src="assets/course/topics.png" width="30">
+                        &nbsp;&nbsp;{{topic.topicName}}
+                      </dt>
+                    </dl>
+                  </td> -->
+                  <td class="table-td-center-align">{{topic.subTopics?.length}}</td>
+                </tr>
+                <tr *ngIf="topic.isTopicClicked">
+                  <ng-container *ngIf="!isAssignmentVisible">
+                    <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                      <ng-container [ngTemplateOutlet]="subTopicsTemplate"
+                        [ngTemplateOutletContext]="{moduleTopic:topic}">
+                      </ng-container>
+                    </td>
+                  </ng-container>
+                  <ng-container *ngIf="isAssignmentVisible">
+                    <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                      <ng-container [ngTemplateOutlet]="assignmentTemplate"
+                        [ngTemplateOutletContext]="{topic:topic}">
+                      </ng-container>
+                    </td>
+                  </ng-container>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- No topics found -->
+      <div *ngIf="selectedModuleTopicList.length == 0">
+        <br><br>
+        <div class="card">
+          <div class="card-body not-found-card-style">
+            <h2>No Topics Found</h2>
+          </div>
+        </div>
+      </div>
+
+      <br><br>
+
+      <!-- Bottom Buttons -->
+      <div>
+        <button type="button" *ngIf="!isAssignmentVisible" class="btn btn-submit-swabhav btn-width" (click)="resetToModules()">Back</button>
+        <button type="button" *ngIf="isAssignmentVisible" class="btn btn-submit-swabhav btn-width" (click)="resetToTopics()">Back</button>
+        <div class="float-right">
+          <button type="button" *ngIf="!isAssignmentVisible" class="btn btn-submit-swabhav btn-width" (click)="onNextClick()">Next</button>
+          <span *ngIf="isAssignmentVisible" class="create-roadmap-style cursor-pointer-style" (click)="onCreateClick()">
+            <img width=20 src="assets/course/createroadmap.png" alt="Create roadmap">
+            &nbsp;Create one&nbsp;&nbsp;
+          </span>
+        </div>
+      </div>
+
+      <br><br>
+
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<ng-template let-topic="topic" #assignmentTemplate>
+  <!-- <table class="table">
+    <thead>
+      <tr class="no-background-tr-style text-center">
+        <th>Sr No.</th>
+        <th class="text-left">Sub Topics</th>
+        <th>Assignments</th>
+      </tr>
+    </thead>
+    <tbody> -->
+      <!-- <ng-container *ngFor="let subTopic of topic; let j = index;"> -->
+        <!-- <tr class="no-background-tr-style text-center">
+          <td class="table-td-center-align">
+            <button type="button" class="btn btn-default" (click)="subTopic.isSubTopicClicked=!subTopic.isSubTopicClicked"
+              *ngIf="subTopic.topicProgrammingQuestions && subTopic.topicProgrammingQuestions.length != 0; else noSubTopics">
+              <i class="material-icons-outlined material-icons-button inline-icon">
+                {{subTopic.isSubTopicClicked ? 'expand_more' : 'chevron_right'}}
+              </i> {{j+1}}
+            </button>
+          </td>
+          <ng-template #noSubTopics>
+            <label class="no-sub-session">{{j+1}}</label>
+          </ng-template>
+          <td class="text-left table-td-center-align">
+            <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+            {{subTopic.topicName}}
+          </td> -->
+          <!-- <td class="text-left">
+            <dl>
+              <dt>
+                <img src="assets/course/subtopics.png" width="30">
+                &nbsp;&nbsp;{{subTopic.topicName}}
+              </dt>
+            </dl>
+          </td> -->
+          <!-- <td class="table-td-center-align">{{subTopic.topicProgrammingQuestions?.length}}</td>
+        </tr> -->
+        <!-- <tr *ngIf="subTopic.isSubTopicClicked"> -->
+          <!-- <tr>
+          <td colspan="100%" class="no-background-tr-style table-margin-left-style"> -->
+            <ng-template #noAssignments>
+              <br><br>
+              <div class="container full-h">
+                <div class="d-flex align-items-center full-h">
+                  <div class="col-sm-12 col-md-12 mx-auto">
+                    <div class="jumbotron">
+                      <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                        <h2>Assignments not found</h2>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+            <ng-container *ngIf="topic.topicProgrammingQuestions.length>0; else noAssignments">
+
+            <table class="table assignment-table-style">
+              <thead>
+                <tr class="no-background-tr-style text-center">
+                  <th>Order</th>
+                  <th class="text-left">Assignment Name</th>
+                  <th>Total Mins</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let assignment of topic.topicProgrammingQuestions; let k = index;">
+                  <tr class="no-background-tr-style text-center">
+                    <td class="table-td-center-align">{{k+1}}</td>
+                    <td class="text-left table-td-center-align">
+                      <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                      {{assignment.programmingQuestion?.label}}
+                    </td>
+                    <!-- <td class="text-left">
+                      <dl>
+                        <dt>
+                          <img src="assets/colour-icons/assignment.png" width="30">
+                          &nbsp;&nbsp;{{assignment.programmingAssignment?.title}}
+                        </dt>
+                      </dl>
+                    </td> -->
+                    <td class="table-td-center-align">{{assignment.programmingQuestion?.timeRequired}}</td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          <!-- </td>
+        </tr> -->
+      </ng-container>
+    <!-- </tbody>
+  </table> -->
+</ng-template>
+
+<ng-template let-moduleTopic="moduleTopic" #subTopicsTemplate>
+  <div class="row">
+    <div class="col-md-6 col-sm-12" *ngIf="moduleTopic?.subTopics?.length > 0">
+      <table class="table table-borderless table-unstriped">
+        <thead>
+          <tr>
+            <th class="text-center">Order</th>
+            <th>Sub-Topic</th>
+            <th class="text-center">Approx Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let subTopic of moduleTopic.subTopics; let even = even">
+            <tr *ngIf="even">
+              <td class="text-center table-td-center-align">{{subTopic.order}}</td>
+              <td class="table-td-center-align">
+                <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                {{subTopic.topicName}}
+              </td>
+              <td class="text-center table-td-center-align">{{subTopic.totalTime | minute}}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6 col-sm-12" *ngIf="moduleTopic?.subTopics?.length > 1">
+      <table class="table table-borderless table-unstriped">
+        <thead>
+          <tr>
+            <th class="text-center">Order</th>
+            <th>Sub-Topic</th>
+            <th class="text-center">Approx Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let subTopic of moduleTopic.subTopics; let odd = odd">
+            <tr *ngIf="odd">
+              <td class="text-center table-td-center-align">{{subTopic.order}}</td>
+              <td class="table-td-center-align">
+                <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                {{subTopic.topicName}}
+              </td>
+              <td class="text-center table-td-center-align">{{subTopic.totalTime | minute}}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-template>

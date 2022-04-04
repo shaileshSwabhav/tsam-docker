@@ -1,0 +1,273 @@
+i{
+  cursor: pointer;
+}
+
+.header-style{
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.header-total-number-color{
+  color: #F6430F;
+}
+
+.close-icon{
+  font-size: 30px;
+  padding-top: 20%;
+}
+
+.close-icon-form{
+  font-size: 15px;
+  padding-top: 20%;
+  font-weight: bold;
+}
+
+.close-form-style{
+  color: #757575;
+  font-size: small;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.search-filter-name-style{
+  background-color: #F6430F26;
+  color: #F6430F;
+  border-radius: 30px;
+  margin-left: 1%;
+  border: 1.5px solid #F6430F;
+  padding: 0.5%;
+  display: inline-block;
+}
+
+.page-margin{
+  margin-left: 2%;
+  margin-right: 2%;
+} 
+
+.card-style{
+  margin-left: 2%;
+  margin-right: 2%;
+  margin-bottom: 2%;
+  border: none;
+  background-color: #FFFFFF;
+}
+
+.card-shadow {
+  box-shadow: 0 0 15px #f6430f26;
+}
+
+/************** TABLE STYLE **************/
+
+.table td, .table th {
+  padding: .75rem;
+  vertical-align: top;
+  border-top: none;
+}
+
+tbody tr:nth-child(odd) 
+{
+  background-color: #FFF0EC;
+}
+
+th{
+  color: #212121;
+  font-weight: bold;
+}
+
+td{
+  color: #414141;
+}
+
+/******************************************/
+
+.icon-align{
+  display:inline-flex;
+  vertical-align:top;
+}
+
+.option-icon-style{
+  font-size: 20px;
+}
+
+.mat-drawer-style{
+  width: 50%;
+}
+
+.center-style{
+  text-align: center;
+}
+
+.search-icon-style{
+  font-size: 15px;
+  padding-top: 5px;
+}
+
+/* *******************INPUT STYLES***************** */
+
+.input-style{
+  color: black;
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-weight: bold;
+  font-size: small;
+}
+
+.form-control:focus {
+  box-shadow: none;
+}
+
+::-webkit-input-placeholder {
+  font-weight: 400;
+}
+
+input[disabled] {
+  border-color: #FC6E26;
+  color: black;
+  border-width: 1.5px;
+  font-weight: bold;
+  font-size: small;
+}
+
+textarea[disabled] {
+  border-color: #FC6E26;
+  color: black;
+  border-width: 1.5px;
+  font-weight: bold;
+  font-size: small;
+}
+
+select[disabled] {
+  border-color: #FC6E26;
+  color: black;
+  border-width: 1.5px;
+  font-weight: bold;
+  font-size: small;
+}
+
+input:disabled::-webkit-input-placeholder { 
+  color: black;
+}
+
+textarea:disabled::-webkit-input-placeholder { 
+  color: black;
+}
+
+select:disabled::-webkit-input-placeholder { 
+  color: black;
+}
+
+.ng-select.ng-select-style ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-style ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+/******************************************/
+
+.form-header-style{
+  margin-bottom: 1%;
+  color: #000000;
+  font-size: x-large;
+  margin-top: 2%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.marked-fields-style{
+  text-align: center;
+  font-size: smaller;
+  margin-right: 5%;
+}
+
+.form-control-label-style{
+  color: #757575;
+  font-size: medium;
+  font-weight: bold;
+}
+
+.edit-icon-style{
+  color: #F6430F;
+}
+
+.red-color-style{
+  color: red;
+}
+
+.delete-text-style{
+  margin-top: 5%;
+  margin-bottom: 5%;
+  font-weight: bold;
+  color: #D63C2A;
+}
+
+.not-found{
+  text-align: center;
+  font-weight: bold;
+  color: #D63C2A;
+  border: solid;
+  border-radius: 5px;
+}
+
+.pagination-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.pagination-flex-item {
+  display: flex;
+  align-items: baseline;
+  margin-left: auto;
+}
+
+.pagination-control-flex-item {
+  display: flex;
+  margin-bottom: auto;
+}
+
+.search-body{
+  overflow-x: hidden;
+}
+
+.badge-style{
+  background-color: #EE3733;
+  color: #FFFFFF;
+}
+
+.badge-timimg-style{
+  font-size: small;
+}
+
+.badge-outer-style{
+  background-color: #EE3733;
+  color: #FFFFFF;
+  margin-bottom: 2%;
+}
+
+.badge-inner-style{
+  background-color: #FFFFFF;
+  color: #EE3733;
+}
+
+.feeling-name-style{
+  color: #F6430F;
+  font-weight: bold;
+}
+

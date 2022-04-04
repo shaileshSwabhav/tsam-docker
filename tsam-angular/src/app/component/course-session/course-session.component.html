@@ -1,0 +1,726 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid margin-2pt">
+
+  <br />
+
+  <div class="d-flex justify-content-between align-items-baseline flex-row flex-wrap">
+    <div class="d-flex flex-wrap">
+      <button type="button" class="btn filter-button" (click)="backToPreviousPage()">
+        <i class="inline-icon material-icons-outlined">chevron_left</i>Back
+      </button>
+    </div>
+    <div class="d-flex flex-wrap">
+      <h1 class="display-1">Course Name: <span class="swabhav-light-orange-text"><strong>{{courseName}}</strong></span>
+      </h1>
+    </div>
+    <div class="d-flex flex-wrap">
+      <button *ngIf="!addNewSession && permission?.add" class="btn btn-submit-swabhav" (click)="addNewSession=true">Add
+        Session
+      </button>
+    </div>
+  </div>
+
+  <br />
+
+  <div *ngIf="addNewSession" id="editSession">
+    <div class="card margin-2pt">
+      <div class="card-header modal-title">
+        <h1 class="modal-title display-2 swabhav-light-orange-text">{{modalHeader}} Sessions</h1>
+        <span class="red">*</span> marked fields are mandatory
+      </div>
+      <div class="card-body">
+        <form [formGroup]="sessionForm">
+          <div class="row">
+            <div class="col-sm-6 col-md-6">
+              <div class="form-group">
+                <label for="sel1"><span class="red">*</span> Session Name:</label>
+                <input type="text" class="form-control input-style" formControlName="name"
+                  placeholder="Enter Session Name">
+                <div class="alert alert-danger" *ngIf="(sessionForm.get('name').dirty || sessionForm.get('name').touched)
+                    &&sessionForm.get('name').invalid">
+                  <div *ngIf="sessionForm.get('name').errors.required">
+                    Session Name must be specified
+                  </div>
+                  <div *ngIf="sessionForm.get('name').errors.pattern">
+                    Session Name should only have alphabets
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!addSubSessionClicked" class="form-group col-sm-6 col-md-6">
+              <label for="sel1"><span class="red">*</span> Total Hours:</label>
+              <input type="number" class="form-control input-style" formControlName="hours"
+                placeholder="Sessions Total Hours" appAllowNumbersWithDecimal>
+              <div class="alert alert-danger" *ngIf="(sessionForm.get('hours').dirty || sessionForm.get('hours').touched)
+                  &&sessionForm.get('hours').invalid">
+                <div *ngIf="sessionForm.get('hours').errors.required">
+                  Total hour must be specified for session
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label for="sel1"><span class="red">*</span> Session Order:</label>
+              <input type="number" class="form-control input-style" formControlName="order" placeholder="Session Order"
+                appAllowNumbersOnly>
+              <div class="alert alert-danger" *ngIf="(sessionForm.get('order').dirty || sessionForm.get('order').touched)
+                  &&sessionForm.get('order').invalid">
+                <div *ngIf="sessionForm.get('order').errors.required">
+                  Total order must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label for="sel1"><span class="red">*</span> Student Output:</label>
+              <input type="text" class="form-control input-style" formControlName="studentOutput"
+                placeholder="Student Output">
+              <div class="alert alert-danger" *ngIf="(sessionForm.get('studentOutput').dirty || sessionForm.get('studentOutput').touched)
+                  &&sessionForm.get('studentOutput').invalid">
+                <div *ngIf="sessionForm.get('studentOutput').errors.required">
+                  Student output for the session must be specified
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div *ngIf="addSubSessionClicked">
+            <h3><strong>Sub-Sessions:</strong></h3>
+            <div class="subSession" formArrayName="subSessions"
+              *ngFor="let subSessions of subSessionControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <br />
+                <div class="card">
+                  <div class="card-header">
+                    <div class="col-sm-12 col-md-12">
+                      <label for="sel1"><strong>Sub-Sesion: {{i+1}}</strong></label>
+                      <button type="button" class="float-right btn btn-sm" style="cursor: pointer;"
+                        (click)="deleteSubSessionInForm(i)"><i class="material-icons red">close</i></button>
+                    </div>
+                  </div>
+                  <div class="card-body row">
+                    <div class="col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <label for="sel1"><span class="red">*</span> Session Name:</label>
+                        <input type="text" class="form-control input-style" formControlName="name"
+                          placeholder="Enter Session Name">
+                        <div class="alert alert-danger" *ngIf="(subSessions.get('name').dirty || subSessions.get('name').touched)
+                              &&subSessions.get('name').invalid">
+                          <div *ngIf="subSessions.get('name').errors.required">
+                            Session Name must be specified
+                          </div>
+                          <div *ngIf="subSessions.get('name').errors.pattern">
+                            Session Name should only have alphabets
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-6">
+                      <label for="sel1"><span class="red">*</span> Total Hours:</label>
+                      <input type="number" class="form-control input-style" formControlName="hours"
+                        placeholder="Sessions Total Hours" appAllowNumbersWithDecimal>
+                      <div class="alert alert-danger" *ngIf="(subSessions.get('hours').dirty || subSessions.get('hours').touched)
+                          &&subSessions.get('hours').invalid">
+                        <div *ngIf="subSessions.get('hours').errors.required">
+                          Total hour must be specified for session
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-6">
+                      <label for="sel1"><span class="red">*</span> Session Order:</label>
+                      <input type="number" class="form-control input-style" formControlName="order"
+                        placeholder="Session Order" appAllowNumbersOnly>
+                      <div class="alert alert-danger" *ngIf="(subSessions.get('order').dirty || subSessions.get('order').touched)
+                          &&subSessions.get('order').invalid">
+                        <div *ngIf="subSessions.get('order').errors.required">
+                          Total session hour must be specified
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-6">
+                      <label for="sel1"><span class="red">*</span> Student Output:</label>
+                      <input type="text" class="form-control input-style" formControlName="studentOutput"
+                        placeholder="Student Output">
+                      <div class="alert alert-danger" *ngIf="(subSessions.get('studentOutput').dirty || subSessions.get('studentOutput').touched)
+                          &&subSessions.get('studentOutput').invalid">
+                        <div *ngIf="subSessions.get('studentOutput').errors.required">
+                          Student output for the session must be specified
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          <br />
+          <button type="button" class="btn filter-button btn-sm float-right"
+            (click)="createSubSessionForm();addSubSessionClicked=true">
+            Add Sub-Session</button>
+        </form>
+      </div>
+      <div class="card-footer">
+        <div class="float-left">
+          <button class="btn filter-button" *ngIf="existingSessions > 0"
+            (click)="resetSessionForm();addNewSession=false">Hide Add Session</button>
+        </div>
+        <div class="float-right">
+          <button *ngIf="isEditSessionClicked || isUpdateClicked" class="btn btn-default swabhav-light-orange-text"
+            (click)="cancelUpdate()">Cancel</button>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" [disabled]="!sessionForm.dirty" (click)="validateSessionForm(sessionForm.value)"
+            class="btn btn-submit-swabhav">{{modalButton}}</button>&nbsp;&nbsp;&nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid margin-2pt">
+  <div class="card" *ngIf="totalSessions > 0">
+    <div class="card-header">
+      <div class="form-group col-sm-12 col-md-12">
+        <h1 class="display-2">Sessions Preview</h1>
+        <p class="lead">Total Sessions: {{totalSessions}}</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-12 col-md-12">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Sr No.</th>
+                  <th>Session Name</th>
+                  <th>Total Hours</th>
+                  <th>Order</th>
+                  <th>Student Output</th>
+                  <th>Sub-Sesion</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let session of addSessionToList; let i = index">
+                  <td>{{i+1}}</td>
+                  <td>{{session.name}}</td>
+                  <td>{{session.hours}} Hrs.</td>
+                  <td>{{session.order}}</td>
+                  <td>{{session.studentOutput}}</td>
+                  <td>
+                    <div *ngFor="let subSession of session.subSessions; let i = index">
+                      <span class="badge badge-info">Sub-Session: {{subSession.order}}</span>
+                      <br />
+                      <span class="badge badge-primary">Name: {{subSession.name}}</span>
+                      <!-- <span class="badge badge-secondary"></span> -->
+                      <br />
+                      <span class="badge badge-primary">Total Hours: {{subSession.hours}}</span>
+                      <span class="badge badge-secondary"></span>
+                      <br />
+                    </div>
+                    <div *ngIf="session.subSessions?.length == 0">
+                      <span class="badge badge-success">No Sub-Sesions</span>
+                      <br />
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn" (click)="onEditSessionClick(session, i)">
+                      <a><i class="material-icons green">edit</i></a></button>
+                  </td>
+                  <td>
+                    <button (click)="deleteSessionFromList(session)" class="btn">
+                      <i class="material-icons red">delete</i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="float-right">
+        <!-- <button type="submit" class="btn btn-danger" routerLink="/course-master"
+                type="button">Close</button> &nbsp;&nbsp;&nbsp; -->
+        <button type="submit" [disabled]="addSessionToList?.length == 0" class="btn btn-submit-swabhav"
+          (click)="addSession()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid margin-2pt">
+  <div class="card" *ngIf="existingSessions > 0">
+    <div class="card-header">
+      <div class="form-group col-sm-12 col-md-12">
+        <h1 class="display-2">Existing Sessions: {{existingSessions}}</h1>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- 
+          class property binding is done with interface where on show Sub-Session btn its cardColumn property is
+          changed by calling changeColValue() function which checks the viewSubSessionClicked value and changes
+          the class value for that particular session
+         -->
+        <!-- [class]="session.viewSubSessionClicked ? 'col-lg-6 col-md-6 col-sm-12 d-flex' : 'col-lg-6 col-md-6 col-sm-12 d-flex'" -->
+        <div *ngFor="let session of sessionList; let i = index" [class]="session.cardColumn">
+          <div class="card card-color flex-fill">
+            <div class="card-header header-style">
+              <h1 class="display-3">
+                Name: {{session.name}}
+                <div class="float-right">
+                  <!-- && session.resource.length == 0 -->
+                  <button *ngIf="permission?.add" class="btn" (click)="addResourceClick(session, resourceModal)">
+                    <i class="material-icons">attach_file</i>
+                  </button>
+                  <button *ngIf="permission?.update" class="btn" id="edit"
+                    (click)="onEditExistingSessionClick(session, i)">
+                    <i class="material-icons green">edit</i>
+                  </button>
+                  <button *ngIf="permission?.delete" class="btn" (click)="deleteSession(session)">
+                    <i class="material-icons red">delete</i>
+                  </button>
+                </div>
+              </h1>
+            </div>
+            <div class="card-body">
+              <p>Session total hours: {{session.hours}}</p>
+              <p>Session order: {{session.order}}</p>
+              <p>Session student output: {{session.studentOutput}}</p>
+              <div *ngIf="session.resource?.length != 0">
+                <br />
+                <h3><strong>Resources:</strong></h3>
+                <div *ngFor="let resource of session.resource">
+                  <p>Resource:
+                    <button type="button" class="btn btn-sm float-right"
+                      (click)="deleteResources(session.id, resource.id)">
+                      <i class="material-icons red">remove_circle</i>
+                    </button>
+                    <button class="btn filter-button btn-sm">
+                      <a [href]="resource.resourceURL" target="_blank">Open</a>
+                    </button>
+                  </p>
+                  <p>Resource description:
+                    <span *ngIf="resource.description; else noDescription">{{resource.description}}</span>
+                    <ng-template #noDescription>No Description</ng-template>
+                  </p>
+                </div>
+              </div>
+              <br />
+              <br />
+
+              <div *ngIf="session.viewSubSessionClicked">
+                <div class="subSession" *ngFor="let subSessions of session.subSessions; let i = index">
+                  <div class="card sub-card-color">
+                    <div class="card-header sub-header-style">
+                      <h1 class="display-3">Name: {{subSessions.name}}
+                        <div class="float-right">
+                          <!-- && subSessions.resource.length == 0 -->
+                          <button *ngIf="permission?.add" type="button"
+                            (click)="addResourceClick(subSessions, resourceModal)" class="btn">
+                            <i class="material-icons">attach_file</i>
+                          </button>
+                        </div>
+                      </h1>
+                    </div>
+                    <div class="card-body">
+                      <p>Session total hours: {{subSessions.hours}}</p>
+                      <p>Session order: {{subSessions.order}}</p>
+                      <p>Session student output: {{subSessions.studentOutput}}</p>
+                      <br />
+                      <div *ngIf="subSessions.resource && subSessions.resource?.length > 0">
+                        <h3><strong>Resources:</strong></h3>
+                        <div *ngFor="let resource of subSessions.resource">
+                          <p>Resource:
+                            <button type="button" class="btn btn-sm float-right"
+                              (click)="deleteResources(subSessions.id, resource.id)">
+                              <i class="material-icons red">remove_circle</i>
+                            </button>
+                            <button class="btn filter-button btn-sm">
+                              <a [href]="resource.resourceURL" target="_blank">Open</a>
+                            </button>
+                            <!-- <a class="badge badge-primary" [href]="resource.resourceURL" target="_blank">{{resource.resourceURL}}</a> -->
+                          </p>
+                          <br />
+                          <p>Resource description:
+                            <span *ngIf="resource.description; else noDescription">{{resource.description}}</span>
+                            <ng-template #noDescription>No Description</ng-template>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="card-footer"> -->
+                    <!-- <div class="float-right"> -->
+                    <!-- <button class="btn btn-submit-swabhav btn-sm" *ngIf="subSessions.resource.length != 0"
+                          (click)="onViewResourceClick(subSessions, resourceModal)">View Resource</button>
+                        &nbsp;&nbsp;&nbsp; -->
+                    <!-- <button *ngIf="permission?.add" type="button" (click)="addResourceClick(subSessions);openModal(resourceModal)"
+                          class="btn btn-primary">Add Resource</button> -->
+                    <!-- </div> -->
+                    <!-- </div> -->
+                  </div>
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div class="card-footer" *ngIf="session.subSessions && session.subSessions?.length > 0">
+              <div class="float-left">
+                <button class="btn filter-button" (click)="changeColValue(session);">
+                  {{session.viewSubSessionClicked ? 'Hide Sub-Session' : 'Show Sub-Session'}}
+                </button> &nbsp;&nbsp;&nbsp;
+                <!-- <button class="btn btn-submit-swabhav btn-sm" *ngIf="session.resource.length != 0"
+                  (click)="onViewResourceClick(session, resourceModal)">View Resource</button> -->
+                <!-- <button *ngIf="!session.viewSubSessionClicked" class="btn filter-button"
+                  (click)="changeColValue(session);">Show Sub-Sessions</button>
+                <button class="btn filter-button" *ngIf="session.viewSubSessionClicked"
+                  (click)="changeColValue(session);">Hide Sub-Session</button> -->
+              </div>
+              <!-- <div class="float-right"> -->
+              <!-- <button class="btn btn-primary" *ngIf="session.resource.length != 0"
+                  (click)="onViewResourceClick(session);openModal(resourceModal)">View Resource</button>
+                &nbsp;&nbsp;&nbsp; -->
+              <!-- <button *ngIf="permission?.add" class="btn btn-primary" (click)="addResourceClick(session);openModal(resourceModal)">Add
+                  Resource</button> -->
+              <!-- <button *ngIf="session.subSessions.length > 7" class="btn btn-success">Edit</button> -->
+              <!-- </div> -->
+            </div>
+          </div>
+        </div>
+        <!--ngFor End-->
+      </div>
+      <!--class=row End-->
+    </div>
+    <!--Card Body End-->
+  </div>
+</div>
+
+<ng-template #resourceModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h2 class="modal-title swabhav-light-orange-text">{{resourceModalHeader}}
+        <!-- <button type="button" *ngIf="isViewClicked && permission?.update" class="btn" (click)="updateResourceClick()">
+          <i class="material-icons">create</i></button> -->
+      </h2>
+      <span *ngIf="!isViewClicked"><span class="red">*</span> marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit"><i
+        class="material-icons close-icon close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="multipleResourcesForm">
+      <div formArrayName="resources" *ngFor="let resourceForm of resourceFormArray.controls;let i = index">
+        <ng-container [formGroupName]="i">
+          <div class="row">
+            <div class="col-sm-12 col-md-12">
+              <label for="sel1"><strong>Resource {{i+1}}:</strong></label>
+              <button *ngIf="!isViewClicked && resourceFormArray.controls?.length > 1" type="button"
+                class="float-right btn btn-sm" style="cursor: pointer;" (click)="deleteResource(i, modal)">
+                <i class="material-icons red">close</i>
+              </button>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label for="sel1"><span class="red">*</span> Add Existing Resource:</label>
+                <select class="form-control input-style" formControlName="isExistingResource"
+                  (change)="checkAddExistingResource(i)">
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(resourceForm.get('isExistingResource').dirty || resourceForm.get('isExistingResource').touched)
+                  &&resourceForm.get('isExistingResource').invalid">
+                  <div *ngIf="resourceForm.get('isExistingResource').errors.required">
+                    Yes/No must be selected
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label for="sel1"><span class="red">*</span> Resource Type:</label>
+                <select class="form-control input-style" formControlName="resourceType"
+                  (change)="getResourcesByType(i)">
+                  <option [ngValue]="null" disabled>Select Resource Type</option>
+                  <option *ngFor="let type of resourceTypeList" [ngValue]="type.value">
+                    {{type.value}}
+                  </option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(resourceForm.get('resourceType').dirty || resourceForm.get('resourceType').touched)
+                  &&resourceForm.get('resourceType').invalid">
+                  <div *ngIf="resourceForm.get('resourceType').errors.required">
+                    Resource type must be specified
+                  </div>
+                  <div *ngIf="resourceForm.get('resourceType').errors.maxlength">
+                    Resource type cannot have more than 50 characters
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4 form-group">
+              <label for="sel1">Resource Sub Type:</label>
+              <select class="form-control input-style" formControlName="resourceSubType">
+                <option [ngValue]="null">Select Resource Sub Type</option>
+                <option *ngFor="let type of resourceSubTypeList" [ngValue]="type.value">
+                  {{type.value}}
+                </option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-md-4 form-group">
+              <div class="d-flex">
+                <div class="col-md-10 file-type-input">
+                  <fieldset [disabled]="resourceForm.get('isFileUploading').value">
+                    <label for="sel1"><span *ngIf="!isViewClicked" class="red">*</span> File Type:</label>
+                    <select class="form-control input-style" formControlName="fileType" (change)="checkFileType(i)">
+                      <option [ngValue]="null" disabled>Select File Type</option>
+                      <option *ngFor="let type of fileTypeList" [ngValue]="type.value">
+                        {{type.value}}
+                      </option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(resourceForm.get('fileType').dirty || resourceForm.get('fileType').touched)
+                        &&resourceForm.get('fileType').invalid">
+                      <div *ngIf="resourceForm.get('fileType').errors.required">
+                        File type must be specified
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+                <!-- POPOVER -->
+                <div *ngIf="resourceForm.get('fileType').value && resourceForm.get('fileType').value != VIDEO
+                      && resourceForm.get('fileType').value != URL">
+                  <ng-template #popContent>Allowed file types: {{resourceForm.get('allowedExtension').value}}
+                  </ng-template>
+                  <button type="button" class="btn btn-default" [ngbPopover]="popContent" placement="bottom"
+                    triggers="mouseenter:mouseleave">
+                    <i class="material-icons material-icons-button cursor">help_outline</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <ng-container *ngIf="resourceForm.get('isExistingResource').value; else newResource">
+              <div class="form-group col-sm-6 col-md-4">
+                <!-- <fieldset [disabled]="!(resourceForm.get('fileType')?.value && resourceForm.get('fileType')?.value) || resourceList.length==0"> -->
+                <label for="sel1"><span class="red">*</span> Resource:</label>
+                <ng-select [items]="resourceList" bindLabel="resourceName" placeholder="Select Resource" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="id" bindValue="id"
+                  [loading]="isResourceLoading" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.resourceName}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(resourceForm.get('id').dirty || resourceForm.get('id').touched)
+                    &&resourceForm.get('id').invalid">
+                  <div *ngIf="resourceForm.get('id').errors.required">
+                    Resource must be selected
+                  </div>
+                </div>
+                <!-- </fieldset> -->
+              </div>
+            </ng-container>
+
+            <ng-template #newResource>
+              <div class="form-group col-sm-6 col-md-4">
+                <label for="sel1"><span class="red">*</span> Resource Name:</label>
+                <input type="text" class="form-control input-style" formControlName="resourceName"
+                  placeholder="Enter Resource Name">
+                <div class="alert alert-danger" *ngIf="(resourceForm.get('resourceName').dirty || resourceForm.get('resourceName').touched)
+                  &&resourceForm.get('resourceName').invalid">
+                  <div *ngIf="resourceForm.get('resourceName').errors.required">
+                    Resource Name must be specified
+                  </div>
+                  <div *ngIf="resourceForm.get('resourceName').errors.maxlength">
+                    Resource Name cannot have more than 100 characters
+                  </div>
+                </div>
+              </div>
+
+              <!-- VIDEO OR URL -->
+              <!-- <div *ngIf="resourceForm.get('fileType')?.value && (resourceForm.get('fileType').value==VIDEO
+                    || resourceForm.get('fileType').value==URL); else uploadFile" class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label for="sel1">
+                      <span *ngIf="!isViewClicked; else goTo"><span class="red">*</span>
+                        {{resourceForm.get('fileType').value}} Link:</span>
+                      <ng-template #goTo> {{resourceForm.get('fileType').value}}:</ng-template>
+                  </label>
+                  <input *ngIf="!isViewClicked" type="text" class="form-control input-style" formControlName="resourceURL"
+                    placeholder="Enter link">
+                  <div *ngIf="resourceForm.get('resourceURL').value && isViewClicked" data-toggle="tooltip"
+                    data-placement="top" title="View">
+                    <button class="btn filter-button"><a [href]="resourceForm.get('resourceURL').value" target="_blank">
+                      View {{resourceForm.get('fileType').value}}</a>
+                    </button>
+                  </div>
+                  <div class="alert alert-danger" *ngIf="(resourceForm.get('resourceURL').dirty || resourceForm.get('resourceURL').touched)
+                      &&resourceForm.get('resourceURL').invalid">
+                    <div *ngIf="resourceForm.get('resourceURL').errors.required">
+                      Resource required
+                    </div>
+                    <div *ngIf="resourceForm.get('resourceURL').errors.pattern">
+                      URL should be of the form https://www.example.com
+                    </div>
+                    <div *ngIf="resourceForm.get('resourceURL').errors.maxlength">
+                      Resource URL cannot have more than 255 characters
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+
+              <!-- <ng-template #uploadFile> -->
+              <div *ngIf="resourceForm.get('fileType')?.value && (resourceForm.get('fileType').value!=VIDEO
+                    || resourceForm.get('fileType').value!=URL)" class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label for="sel1">Upload {{resourceForm.get('fileType').value}}:</label>
+                  <span *ngIf="!isViewClicked" class="custom-file">
+                    <input type="file" class="custom-file-input input-style"
+                      (change)="onResourceSelect($event, resourceForm.get('fileType').value, i)" id="customFile"
+                      value="resourceForm.get('displayedFileName').value"
+                      placeholder="Select {{resourceForm.get('fileType').value}}">
+                    <label class="custom-file-label" id="custom-file-label" for="customFile"
+                      [innerHTML]="resourceForm.get('displayedFileName').value"></label>
+                    <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                      *ngIf="resourceForm.get('isFileUploading').value">
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      Uploading {{resourceForm.get('fileType').value}}...
+                    </button>
+                    <br />
+                  </span>
+                  <div
+                    *ngIf="resourceForm.get('resourceURL').value && !resourceForm.get('isDocumentUploadedToServer').value && isViewClicked"
+                    data-toggle="tooltip" data-placement="top">
+                    <button class="btn filter-button"><a class="link" [href]="resourceForm.get('resourceURL').value"
+                        target="_blank">Open</a>
+                    </button>
+                  </div>
+                  <!-- should add view uploaded resume using a resume variable after cleaning. -->
+                  <label id="uploadStatus" for="customFile" [innerHTML]="resourceForm.get('docStatus').value"></label>
+                </div>
+              </div>
+              <!-- </ng-template> -->
+
+              <!-- UPLOAD PREVIEW IMAGE -->
+              <div *ngIf="resourceForm.get('fileType')?.value && resourceForm.get('fileType').value!=IMAGE"
+                class="col-sm-6 col-md-4 form-group">
+                <label for="sel1">Upload Preview Image:</label>
+                <span *ngIf="!isViewClicked" class="custom-file">
+                  <input type="file" class="custom-file-input" (change)="onResourceSelect($event, PREVIEW, i)"
+                    id="customFile" value="" placeholder="Select Preview Image">
+                  <label class="custom-file-label" id="custom-file-label" for="customFile"
+                    [innerHTML]="resourceForm.get('previewDisplayedFileName').value"></label>
+                  <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                    *ngIf="resourceForm.get('isPreviewFileUploading').value">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Uploading Preview Image...
+                  </button>
+                  <br />
+                </span>
+                <!-- <div *ngIf="multipleResourcesForm.get('previewURL').value && !isPreviewUploadedToServer && isViewClicked"
+                      data-toggle="tooltip" data-placement="top" title="Open Preview Image">
+                      <button class="btn btn-primary">
+                        <a class="link" [href]="multipleResourcesForm.get('previewURL').value" target="_blank">
+                          Open Preview</a>
+                      </button>
+                  </div> -->
+                <label id="uploadStatus" for="customFile"
+                  [innerHTML]="resourceForm.get('previewImageDocStatus').value"></label>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label for="sel1">Link:</label>
+                  <input *ngIf="!isViewClicked" type="text" class="form-control input-style"
+                    formControlName="resourceURL" placeholder="Enter link">
+                  <div *ngIf="resourceForm.get('resourceURL').value && isViewClicked" data-toggle="tooltip"
+                    data-placement="top" title="View">
+                    <button class="btn filter-button"><a [href]="resourceForm.get('resourceURL').value" target="_blank">
+                        View {{resourceForm.get('fileType').value}}</a>
+                    </button>
+                  </div>
+                  <div class="alert alert-danger" *ngIf="(resourceForm.get('resourceURL').dirty || resourceForm.get('resourceURL').touched)
+                      &&resourceForm.get('resourceURL').invalid">
+                    <div *ngIf="resourceForm.get('resourceURL').errors.required">
+                      Resource required
+                    </div>
+                    <div *ngIf="resourceForm.get('resourceURL').errors.pattern">
+                      URL should be of the form https://www.example.com
+                    </div>
+                    <div *ngIf="resourceForm.get('resourceURL').errors.maxlength">
+                      Resource URL cannot have more than 255 characters
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-sm-6 col-md-4">
+                <label for="sel1">Technology:</label>
+                <ng-select [items]="technologyList" bindLabel="language" bindValue="id" placeholder="Select Technology"
+                  [searchable]="true" [clearable]="true" formControlName="technologyID" appendTo="body"
+                  class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+                  [loading]="isTechLoading">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.language}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-3 col-md-4">
+                <label for="sel1"><span *ngIf="!isViewClicked" class="red">*</span> Is Book:</label>
+                <select class="form-control input-style" formControlName="isBook"
+                  (change)="onIsBookChange(resourceForm)">
+                  <option [ngValue]="null" disabled>Select</option>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(resourceForm.get('isBook').dirty || 
+                      resourceForm.get('isBook').touched) && resourceForm.get('isBook').invalid">
+                  <div *ngIf="resourceForm.get('isBook').errors.required">
+                    Is resource book or not must be specified
+                  </div>
+                </div>
+              </div>
+              <ng-container *ngIf="resourceForm.get('isBook')?.value">
+                <div class="form-group col-sm-6 col-sm-4">
+                  <label for="sel1">Author Name:</label>
+                  <input type="text" class="form-control" formControlName="author" placeholder="Robert C. Martin">
+                </div>
+                <div class="form-group col-sm-6 col-sm-4">
+                  <label for="sel1">Publication Name:</label>
+                  <input type="text" class="form-control" formControlName="publication" placeholder="O'Reilly">
+                </div>
+              </ng-container>
+              <div class="form-group col-sm-12 col-md-12">
+                <label for="sel1">Description:</label>
+                <textarea class="form-control input-style" rows="5" formControlName="description"
+                  placeholder="Enter description" nbInput appEmptyToNull></textarea>
+                <div class="alert alert-danger" *ngIf="(resourceForm.get('description').dirty || resourceForm.get('description').touched)
+                    &&resourceForm.get('description').invalid">
+                  <div *ngIf="resourceForm.get('description').errors.maxlength">
+                    Description cannot have more than 250 characters
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+        </ng-container>
+      </div>
+      <button type="button" *ngIf="!isViewClicked" class="btn filter-button btn-sm float-right"
+        (click)="addResourcesToForm();">
+        Add Resource</button>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text"
+      (click)="dismissFormModal(modal)">Close</button>
+    <button type="button" *ngIf="!isViewClicked" class="btn btn-submit-swabhav"
+      (click)="validateResource()">{{resourceButton}}</button>
+  </div>
+
+</ng-template>
+
+<app-master-footer></app-master-footer>

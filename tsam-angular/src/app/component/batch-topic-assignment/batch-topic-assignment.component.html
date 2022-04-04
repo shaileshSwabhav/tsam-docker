@@ -1,0 +1,289 @@
+<!-- http://localhost:4201/my/batch/session/details?batchID=8be73788-35ba-43eb-bf4b-c6bfecf5febb&courseID=f2261272-1c67-46fc-9c08-0e1fbcf18c2f&batchName=Dummybatch -->
+
+<ng-template #readingType>
+  <span class="badge reading-badge">READING</span>
+</ng-template>
+
+<ng-template #readingImage>
+  <img src="assets/icon/colour-icons/homework.png" width="30">
+</ng-template>
+
+<!-- No module logo template -->
+<ng-template #noModuleLogo>
+  <img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<ng-template #batchModuleTabs let-batchModuleTabs="batchModuleTabs">
+  <div class="card module-tab-menu-style">
+    <mat-tab-group mat-align-tabs="center" (selectedTabChange)="onModuleTabClick($event)">
+      <ng-container *ngFor="let batchModuleTab of batchModuleTabs;let i = index">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <div>
+              <ng-container *ngIf="batchModuleTab?.module?.logo; else logoNotFound">
+                <img width="40" src={{batchModuleTab?.module?.logo}}>
+              </ng-container>
+              <ng-template #logoNotFound>
+                <img width="40" src="assets/icon/grey-icons/Score.png">
+              </ng-template>
+              <br><br>
+              <div>{{batchModuleTab?.module?.moduleName}}</div>
+            </div>
+          </ng-template>
+        </mat-tab>
+      </ng-container>
+    </mat-tab-group>
+  </div>
+</ng-template>
+
+<div class="container-fluid">
+  <br>
+
+  <ng-container *ngIf="isAssign">
+    <ng-container *ngTemplateOutlet="assignmentAssign;"></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="isView">
+    <ng-container *ngTemplateOutlet="assignmentView;"></ng-container>
+  </ng-container>
+
+</div>
+
+<ng-template #assignmentAssign>
+
+  <ng-template *ngTemplateOutlet="batchModuleTabs; context: {batchModuleTabs: batchModules}">
+  </ng-template>
+  
+  <br>
+  <br>
+
+  <!-- Topics table -->
+  <div class="card-body padding-0pt swabhav-shadow">
+    <div *ngIf="moduleTopics?.length > 0; else moduleNotFound">
+      <div class="table-responsive">
+        <table class="table table-striped table-borderless">
+          <tr class="text-center">
+            <th>Order</th>
+            <th class="text-left">Topic Name</th>
+            <th>Assignments</th>
+            <th>Approx Time</th>
+          </tr>
+          <tbody>
+            <ng-container *ngFor="let moduleTopic of moduleTopics">
+              <tr class="no-background-tr-style text-center">
+                <td class="text-nowrap table-td-center-align">
+                  <button type="button" class="btn btn-default"
+                    (click)="moduleTopic.showDetails=!moduleTopic.showDetails"
+                    *ngIf="moduleTopic?.topicProgrammingQuestions?.length > 0; else noExpand">
+                    <i class="material-icons material-icons-button inline-icon">
+                      {{moduleTopic.showDetails ? 'expand_more' : 'chevron_right'}}
+                    </i> {{moduleTopic.order}}
+                  </button>
+                  <ng-template #noExpand>
+                    <label class="no-sub-session">{{moduleTopic.order}}</label>
+                  </ng-template>
+                </td>
+                <td class="text-left table-td-center-align">{{moduleTopic.topicName}}</td>
+                <td class="table-td-center-align">{{moduleTopic.topicProgrammingQuestions?.length}}</td>
+                <td class="table-td-center-align">{{moduleTopic.totalTime | minute}}</td>
+              </tr>
+              <tr *ngIf="moduleTopic?.topicProgrammingQuestions?.length > 0 && moduleTopic.showDetails"
+                class="unstriped-tr">
+                <td colspan="10">
+                  <table class="table table-borderless table-unstriped">
+                    <thead>
+                      <tr>
+                        <th>
+                        </th>
+                        <th>Assignment Name</th>
+                        <th class="text-center">Difficulty</th>
+                        <th class="text-center">Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let topicProgrammingQuestion of moduleTopic.topicProgrammingQuestions; let j = index">
+                        <td class="text-right">
+                          <label class="form-check-label">
+                            <label class="checkbox-container"
+                              [ngClass]="(selectedProgrammingQuestion.includes(topicProgrammingQuestion.programmingQuestion.id) ||
+                              (!topicProgrammingQuestion.isMarked && newProgrammingQuestions.includes(topicProgrammingQuestion.programmingQuestion.id))) ? 'disabled': ''">
+                              <input type="checkbox"
+                                [checked]="(selectedProgrammingQuestion.includes(topicProgrammingQuestion.programmingQuestion.id) ||
+                                (topicProgrammingQuestion.isMarked && newProgrammingQuestions.includes(topicProgrammingQuestion.programmingQuestion.id)))"
+                                (change)="toggleProgrammingQuestion(moduleTopic.id, topicProgrammingQuestion)"
+                                [disabled]="selectedProgrammingQuestion.includes(topicProgrammingQuestion.programmingQuestion.id) ||
+                                  (!topicProgrammingQuestion.isMarked && newProgrammingQuestions.includes(topicProgrammingQuestion.programmingQuestion.id))" />
+                              <span class="checkmark"></span>
+                            </label>
+                          </label>
+                        </td>
+                        <td class="text-left">
+                          <img src="assets/course/assignment.png" width="30">&nbsp;&nbsp;
+                          {{topicProgrammingQuestion?.programmingQuestion?.label}}
+                        </td>
+                        <td class="text-center">
+                          <span class="tasklist-box-style" [ngClass]="{'green-box-style': topicProgrammingQuestion?.programmingQuestion?.level==1,
+                                  'yellow-box-style': topicProgrammingQuestion?.programmingQuestion?.level==2,
+                                  'red-box-style': topicProgrammingQuestion?.programmingQuestion?.level==3}">
+                            {{(topicProgrammingQuestion?.programmingQuestion?.level == 1) ? "Easy" :
+                            (topicProgrammingQuestion?.programmingQuestion?.level==2) ? "Medium" : "Hard"}}
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          {{topicProgrammingQuestion?.programmingQuestion?.score}}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Sessions -->
+  <ng-template #moduleNotFound>
+    <br />
+    <br />
+    <div class="col-sm-12 col-md-8 mx-auto">
+      <div class="jumbotron">
+        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+          <h2>Modules not found for this course</h2>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <br>
+  <br>
+
+  <!-- Create a session plan button -->
+  <div class="d-flex justify-content-end mr-5 mb-5">
+    <button class="btn swabhav-button-round" [disabled]="batchTopicAssignments.length<1" type="button"
+      (click)="onAssignAssignmentClick()">Assign
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template #assignmentView>
+
+  <ng-template *ngTemplateOutlet="batchModuleTabs; context: {batchModuleTabs: batchModules}">
+  </ng-template>
+  <br>
+
+  <div class="card-body padding-0pt swabhav-shadow">
+    <div class="table-responsive">
+      <table class="table table-striped table-borderless">
+        <thead>
+          <tr class="text-center">
+            <th>Order</th>
+            <th class="text-left">Topic Name</th>
+            <th>Assignments</th>
+            <th>Approx Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let moduleTopic of batchModuleTopics; let i = index">
+            <tr class="no-background-tr-style text-center">
+              <td class="text-nowrap table-td-center-align">
+                <button type="button" class="btn btn-default"
+                  *ngIf="moduleTopic?.batchTopicAssignment?.length > 0; else noTopicAssignment"
+                  (click)='moduleTopic.showDetails = !moduleTopic.showDetails'>
+                  <i class="material-icons-outlined material-icons-button inline-icon">
+                    {{ moduleTopic.showDetails ? 'expand_more' : 'chevron_right' }}
+                  </i> {{moduleTopic.order}}
+                </button>
+                <ng-template #noTopicAssignment>
+                  {{moduleTopic.order}}
+                </ng-template>
+              </td>
+              <td class="text-left table-td-center-align">{{moduleTopic.topicName}}</td>
+              <td class="table-td-center-align">{{moduleTopic.batchTopicAssignment?.length || 0}}</td>
+              <td class="table-td-center-align">{{moduleTopic.totalTime | minute}}</td>
+            </tr>
+            <tr *ngIf="moduleTopic.showDetails" class="unstriped-tr">
+              <td colspan="10">
+                <table class="table table-borderless table-unstriped">
+                  <thead>
+                    <tr>
+                      <th>Assignment Name</th>
+                      <th class="text-center">Difficulty</th>
+                      <th class="text-center">Assigned Date</th>
+                      <th class="text-center">Score</th>
+                      <th class="text-center">Delete</th>
+                    </tr>
+                    <tr *ngFor="let topicAssignment of moduleTopic.batchTopicAssignment">
+                      <td>
+                        <img src="assets/course/assignment.png" width="30">&nbsp;&nbsp;
+                        {{topicAssignment.programmingQuestion?.label}}
+                      </td>
+                      <td class="text-center">
+                        <div class="tasklist-box-style" [ngClass]="{'green-box-style': topicAssignment?.programmingQuestion?.level==1,
+                            'yellow-box-style': topicAssignment?.programmingQuestion?.level==2,
+                            'red-box-style': topicAssignment?.programmingQuestion?.level==3}">
+                          {{(topicAssignment?.programmingQuestion?.level == 1) ? "Easy" :
+                          (topicAssignment?.programmingQuestion?.level==2) ? "Medium" : "Hard"}}
+                        </div>
+                      </td>
+                      <td class="text-center">{{topicAssignment?.assignedDate | date : 'longDate' || "-"  }}</td>
+                      <td class="text-center">{{topicAssignment?.programmingQuestion?.score}}</td>
+                      <td class="text-center" data-toggle="tooltip" data-placement="top" title="Delete Assignment">
+                        <button type="button" (click)="onDeleteAssignmentClick(moduleTopic.id,topicAssignment.id)"
+                          class="btn btn-default">
+                          <img src="assets/icon/colour-icons/delete.png" alt="delete" width="30">
+                        </button>
+                      </td>
+                    </tr>
+                  </thead>
+                </table>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <ng-template #noAssignedAssignments>
+    <br />
+    <br />
+    <div class="col-sm-12 col-md-8 mx-auto">
+      <div class="jumbotron">
+        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+          <h2>Assignment not assigned</h2>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ng-template>
+
+
+<!-- Delete Talent Comfirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title">Comfirmation</h3>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="button"><i
+        class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click')">No</button>
+  </div>
+</ng-template>

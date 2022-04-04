@@ -1,0 +1,960 @@
+<app-master-navbar></app-master-navbar>
+<!--  -->
+
+<br>
+<div class="container-fluid">
+
+  <div class="d-flex justify-content-start align-items-baseline flex-row flex-wrap">
+    <div class="d-flex flex-wrap">
+      <button type="button" class="btn filter-button" (click)="backToPreviousPage()">
+        <i class="inline-icon material-icons-outlined">arrow_back</i>
+      </button>
+    </div> &nbsp;&nbsp;&nbsp;&nbsp;
+    <div class="d-flex flex-wrap">
+      <h1 class="display-1">Batch Name: <span class="swabhav-light-orange-text"><strong>{{batchName}}</strong></span>
+      </h1>
+    </div>
+  </div>
+</div>
+
+
+
+<mat-drawer-container [hasBackdrop]="false" class="menu-tab-container">
+  <!--- autosize -->
+  <mat-drawer mode="side" class="drawer-container" #sidePanelDrawer [(opened)]="opened"
+    (mouseleave)="lockStatus?null:sidePanelDrawer.close()">
+
+    <div class="drawer-container-menu">
+      <div class="ml-auto pr-3" *ngIf="lockStatus==false">
+        <i class="teal pointer select-disabled material-icons-outlined" (click)="lockStatus=true">lock_open</i>
+      </div>
+      <div class="ml-auto pr-3" *ngIf="lockStatus==true">
+        <i class="btn-swabhav select-disabled pointer material-icons-outlined" (click)="lockStatus=false">lock</i>
+      </div>
+      <!-- BATCH DETAILS TAB -->
+      <div *ngFor="let tab of batchDetailsTab; let i = index">
+        <h3><strong>{{tab.tabName}}</strong></h3>
+        <div *ngFor="let menu of tab.subTab; let j = index">
+          <ng-container *ngIf="menu.isRedirect; else noRedirect">
+            <button type="button" class="drawer-button"
+              [ngClass]="menu.isActive ? 'btn btn-default swabhav-light-orange-text tab-btn' : 'btn btn-default'"
+              (click)="menu.fn()">{{menu.tabName}}
+            </button>
+          </ng-container>
+          <ng-template #noRedirect>
+            <button type="button" class="drawer-button"
+              [ngClass]="menu.isActive ? 'btn btn-default swabhav-light-orange-text tab-btn' : 'btn btn-default'"
+              (click)="onBatchDetailTabClick(menu, i)">{{menu.tabName}}
+            </button>
+          </ng-template>
+        </div>
+        <br>
+      </div>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content class="content-container">
+
+
+    <!-- Side tab for toggling drawer -->
+    <!-- <div class="verticalLine" (mouseover)="sidePanelDrawer.open()" *ngIf="!opened"> -->
+    <div class="verticalLine toggle-side-nav-style" (mouseover)="sidePanelDrawer.open()" *ngIf="!opened">
+      <i class="toggle-side-nav-style material-icons-outlined p-1">arrow_forward</i>
+    </div>
+    <!-- </div> -->
+
+
+    <!-- <div class="container-fluid"> -->
+    <ng-container *ngFor="let tab of batchDetailsTab; let i = index">
+      <ng-container *ngFor="let menu of tab.subTab; let j = index">
+        <ng-container *ngIf="menu.isActive && menu.templateName">
+          <ng-container *ngTemplateOutlet="menu.templateName"></ng-container>
+        </ng-container>
+      </ng-container>
+      <br>
+    </ng-container>
+    <!-- </div> -->
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<!-- NO VIEW -->
+<ng-template #noView>
+  <img class="logo-size" src="assets/images/page-under-construction.jpg" alt="Tab under construction">
+</ng-template>
+
+<ng-template #batchSessionPlanCreate>
+  <app-batch-topic></app-batch-topic>
+</ng-template>
+
+<ng-template #batchSessionPlanView>
+  <app-batch-session-details></app-batch-session-details>
+</ng-template>
+
+<ng-template #batchModules>
+  <app-batch-modules [activeModuleTab]=activatedModulesTab></app-batch-modules>
+</ng-template>
+
+<!-- BATCH DETAILS -->
+
+<!-- BATCH -->
+<ng-template #batchView>
+
+  <div class="batch-view">
+    <div class="d-flex justify-content-center align-items-baseline">
+      <h1 class="modal-title swabhav-light-orange-text">
+        {{isViewClicked ? 'Batch Details' : 'Update Batch'}}
+      </h1> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <button *ngIf="isViewClicked && permission?.update" class="btn material-icons-button" type="button"
+        (click)="onBatchUpdateClick()"><i class="material-icons grey-icon">create</i>
+      </button>
+    </div>
+    <div class="container-fluid">
+      <form [formGroup]="batchForm">
+        <fieldset [disabled]="isViewClicked">
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Objective:</label>
+              <select class="form-control input-style" formControlName="batchObjective">
+                <option [ngValue]="null" disabled>Select Objective</option>
+                <option *ngFor="let objective of batchObjectives" [ngValue]="objective.value">{{objective.value}}
+                </option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('batchObjective').touched || batchForm.get('batchObjective').dirty)
+                    && batchForm.get('batchObjective').invalid">
+                <div *ngIf="batchForm.get('batchObjective').errors.required">
+                  Objective must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Name:</label>
+              <input type="text" class="form-control input-style" formControlName="batchName" placeholder="eg: Java01">
+              <div class="alert alert-danger" *ngIf="(batchForm.get('batchName').touched || batchForm.get('batchName').dirty)
+                    && batchForm.get('batchName').invalid">
+                <div *ngIf="batchForm.get('batchName').errors.required">
+                  Batch name must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked">
+              <label>BatchID:</label>
+              <input type="text" class="form-control input-style" formControlName="code" [readonly]="true">
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Course:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="course">
+                <option [ngValue]="null" disabled>Select Course</option>
+                <option *ngFor="let course of courseList" [ngValue]="course">{{course.name}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('course').touched || batchForm.get('course').dirty)
+                    && batchForm.get('course').invalid">
+                <div *ngIf="batchForm.get('course').errors.required">
+                  Course must be specified
+                </div>
+              </div>
+            </div>
+            <!--  *ngIf="isFaculty || isSalesPerson" -->
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked && (isFaculty || isSalesPerson)" class="red">*</span> Start
+                Date:</label>
+              <input type="date" class="form-control input-style" formControlName="startDate">
+              <div class="alert alert-danger" *ngIf="(batchForm.get('startDate').touched || batchForm.get('startDate').dirty)
+                  && batchForm.get('startDate').invalid">
+                <div *ngIf="batchForm.get('startDate').errors.required">
+                  Start Date must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked">
+              <label>Estimated End Date:</label>
+              <input type="date" class="form-control input-style" formControlName="estimatedEndDate" [readonly]="true">
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked">
+              <label>Total Students:</label>
+              <input type="number" class="form-control input-style" formControlName="totalStudents" [readonly]="true">
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Total Intake:</label>
+              <input type="number" class="form-control input-style" formControlName="totalIntake" placeholder="eg: 10">
+              <div class="alert alert-danger" *ngIf="(batchForm.get('totalIntake').touched || batchForm.get('totalIntake').dirty)
+                    && batchForm.get('totalIntake').invalid">
+                <div *ngIf="batchForm.get('totalIntake').errors.required">
+                  Total Intake must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> SalesPerson:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="salesPerson">
+                <option [ngValue]="null" disabled>Select SalesPerson</option>
+                <option *ngFor="let sales of salesPeople" [ngValue]="sales">{{sales.firstName}}
+                  {{sales.lastName}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('salesPerson').touched || batchForm.get('salesPerson').dirty)
+                    && batchForm.get('salesPerson').invalid">
+                <div *ngIf="batchForm.get('salesPerson').errors.required">
+                  Sales Person must be specified
+                </div>
+              </div>
+            </div>
+            <!-- <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Faculty:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="faculty">
+                <option [ngValue]="null" disabled>Select Faculty</option>
+                <option *ngFor="let faculty of facultyList" [ngValue]="faculty">{{faculty.firstName}}
+                  {{faculty.lastName}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('faculty').touched || batchForm.get('faculty').dirty)
+                    && batchForm.get('faculty').invalid">
+                <div *ngIf="batchForm.get('faculty').errors.required">
+                  Faculty must be specified
+                </div>
+              </div>
+            </div> -->
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isFaculty || isSalesPerson || isAdmin">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Status:</label>
+              <select class="form-control input-style" formControlName="batchStatus">
+                <option [ngValue]="null" disabled>Select Status</option>
+                <option *ngFor="let status of batchStatus" [ngValue]="status.value">{{status.value}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('batchStatus').touched || batchForm.get('batchStatus').dirty)
+                    && batchForm.get('batchStatus').invalid">
+                <div *ngIf="batchForm.get('batchStatus').errors.required">
+                  Status must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Is Active:</label>
+              <select class="form-control input-style" formControlName="isActive">
+                <option [ngValue]="true">Active</option>
+                <option [ngValue]="false">Closed</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('isActive').touched || batchForm.get('isActive').dirty)
+                    && batchForm.get('isActive').invalid">
+                <div *ngIf="batchForm.get('isActive').errors.required">
+                  Status must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Type:</label>
+              <select class="form-control input-style" formControlName="isB2B">
+                <option [ngValue]="null" disabled>Select Batch Type</option>
+                <option [ngValue]="true">B2B</option>
+                <option [ngValue]="false">B2C</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('isB2B').dirty || batchForm.get('isB2B').touched) 
+                    && batchForm.get('isB2B').invalid">
+                <span *ngIf="batchForm.get('isB2B').errors.required">
+                  Batch type must be specified
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+              <label>Requirement:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="requirement">
+                <option [ngValue]="null">Select Requirement</option>
+                <option *ngFor="let requirement of requirementList" [ngValue]="requirement">
+                  {{requirement.branch.branchName}} - {{requirement.code}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label>Meet Link:</label>
+              <input type="text" class="form-control input-style" formControlName="meetLink"
+                placeholder="eg: https://meet.google.com/">
+            </div>
+
+            <div class="form-group col-sm-6 col-md-4">
+              <label>Telegram Link:</label>
+              <input type="text" class="form-control input-style" formControlName="telegramLink"
+                placeholder="eg: https://t.me/">
+            </div>
+
+            <hr>
+          </div>
+          <br>
+          <!-- <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+            <h1 class="swabhav-light-orange-text"><strong>Session Timings</strong></h1>
+          </div> -->
+          <div class="row col-sm-12 col-md-12 d-flex justify-content-center" *ngIf="(isFaculty || isSalesPerson) ">
+            <h1 class="swabhav-light-orange-text"><strong>Session Timings</strong></h1>
+          </div>
+          <div *ngIf="(isFaculty || isSalesPerson) ">
+            <div class="row">
+              <div class="col-12">
+                <label class="font-weight-bold"><span class="red">*</span> No of sessions in a week:</label>
+                &nbsp;&nbsp;
+                <button class="btn btn-border" [disabled]="isViewClicked"
+                  [ngClass]="{'selected-day': day.isSelected==true}" *ngFor="let day of daysList"
+                  (click)="onDayClick(day)">
+                  {{day?.day?.substr(0,1)}}
+                </button>
+              </div>
+            </div>
+            <br>
+
+            <!-- Batch timings form -->
+            <div class="row">
+              <div class="col-12" *ngIf="this.batchTiming.length > 0">
+                <label class="font-weight-bold"><span class="red">*</span> Session Timings For:</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="container">
+                  <div formArrayName="batchTimings" *ngFor="let time of batchTiming.controls;let i = index">
+                    <ng-container [formGroupName]="i">
+                      <div class="row">
+                        <div class="form-group col-sm-4 col-md-2">
+                          <div class="day-text text-right">
+                            {{time.get('day').value?.day}}:
+                          </div>
+                        </div>
+                        <div class="form-group col-sm-5 col-md-4">
+                          <input type="time" class="form-control input-style" formControlName="fromTime"
+                            (change)="onBatchTimeChange(i, time)">
+                          <div class="alert alert-danger" *ngIf="(time.get('fromTime').touched 
+                            || time.get('fromTime').dirty) && time.get('fromTime').invalid">
+                            <div *ngIf="time.get('fromTime').errors.required">
+                              Session start time must be specified
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-1 col-md-1">
+                          <div class="day-text text-center">To</div>
+                        </div>
+                        <div class="form-group col-sm-5 col-md-4">
+                          <input type="time" class="form-control input-style" formControlName="toTime"
+                            (change)="onBatchTimeChange(i, time)">
+                          <div class="alert alert-danger" *ngIf="(time.get('toTime').touched 
+                            || time.get('toTime').dirty) && time.get('toTime').invalid">
+                            <div *ngIf="time.get('toTime').errors.required">
+                              Session end time must be specified
+                            </div>
+                          </div>
+                          <div class="alert alert-danger" *ngIf="time.get('toTime').touched && time.get('toTime').dirty
+                            && time.get('toTime').value == time.get('fromTime').value">
+                            Start time and end time cannot be same
+                          </div>
+                        </div>
+                        <div *ngIf="!isViewClicked" class="col-sm-2 col-md-1 no-padding-style text-center">
+                          <img *ngIf="batchTiming.controls.length > 1" (click)="deleteBatchTimingInBatchForm(i)"
+                            src="assets/icon/colour-icons/delete.png" width="20" class="cursor-pointer-style">
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6" *ngIf="!isViewClicked && this.batchTiming.length > 0">
+                <div class="col-sm-12 col-md-12 no-padding-style">
+                  <div class="form-check no-padding-style">
+                    <label class="form-check-label">
+                      <label class="checkbox-container">
+                        <input type="checkbox" (change)="onApplyToAllSessionsClick()"
+                          formControlName="isApplyToAllSessions">
+                        <span class="checkmark"></span>
+                      </label>
+                      <span class="font-sm-style">Apply it to all sessions</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <!-- Eligibility Formgroup -->
+          <div class="form-group form-check" *ngIf="!isViewClicked && (isFaculty || isSalesPerson)">
+            <label class="form-check-label">
+              <label class="checkbox-container">
+                <input type="checkbox" [checked]="doesEligibilityExists" id="eligilibility-checkbox"
+                  (change)="eligilibilityChecked($event)">
+                <span class="checkmark"></span>
+                <span class="checkbox-text" for="eligilibility-checkbox"> Add Eligibility</span>
+              </label>
+            </label>
+          </div>
+          <div *ngIf="doesEligibilityExists && (isFaculty || isSalesPerson)">
+            <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+              <h1 class="swabhav-light-orange-text"><strong>Eligibility Details</strong></h1>
+            </div>
+            <div class="row" formGroupName="eligibility">
+              <ng-container>
+                <div class="form-group col-sm-6 col-md-3">
+                  <label><span *ngIf="!isViewClicked" class="red">*</span> Technology:</label>
+                  <ng-select [items]="technologies" bindLabel="language" placeholder="Select Technology" appendTo="body"
+                    multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+                    class="ng-select-style" (search)="getTechnology($event)" (focus)="getTechnology()"
+                    [loading]="isTechLoading">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                      {{item.language}}
+                    </ng-template>
+                  </ng-select>
+                  <div class="alert alert-danger" *ngIf="(batchForm.get('eligibility').get('technologies').dirty 
+                    || batchForm.get('eligibility').get('technologies').touched)
+                    && batchForm.get('eligibility').get('technologies').invalid">
+                    <div *ngIf="batchForm.get('eligibility').get('technologies').errors.required">
+                      Technology is required
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-3">
+                  <label>Student Rating:</label>
+                  <select class="form-control input-style" formControlName="studentRating">
+                    <option [ngValue]="null">Select Student Rating</option>
+                    <option *ngFor=" let rating of ratinglist" [ngValue]="rating.value">{{rating.value}}</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-3">
+                  <label>Experience:</label>
+                  <select class="form-control input-style" formControlName="experience">
+                    <option [ngValue]="null">Select Experience</option>
+                    <option [ngValue]=false>Fresher</option>
+                    <option [ngValue]=true>Experience</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-3">
+                  <label>Academic Year:</label>
+                  <select class="form-control input-style" formControlName="academicYear">
+                    <option [ngValue]="null">Select Academic Year</option>
+                    <option *ngFor=" let year of academicYears" [ngValue]="year.value">{{year.value}}</option>
+                  </select>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- span is used to hide the border as well -->
+          <span *ngIf="(!isViewClicked || batchForm.get('brochure')?.value) && (isAdmin || isSalesPerson)">
+            <hr>
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Brochure:</label>
+              <div class="col-sm-4">
+                <span class="custom-file custom-file-border">
+                  <input *ngIf="!isViewClicked" type="file" class="custom-file-input"
+                    (change)="onResourceSelect($event)" id="customFile" value="displayedFileName">
+                  <label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label" for="customFile"
+                    [innerHTML]="displayedFileName"></label>
+                  <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                    *ngIf="isFileUploading">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Uploading file...
+                  </button>
+                  <div *ngIf="batchForm.get('brochure')?.value && !isBrochureUploadedToServer" data-toggle="tooltip"
+                    data-placement="top" title="View Brochure">
+                    <button *ngIf="isViewClicked" class="btn btn-submit-swabhav material-icons-button">
+                      <a [href]="batchForm.get('brochure').value" target="_blank" class="anchor">View Brochure</a>
+                    </button>
+                  </div>
+                </span>
+                <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+                <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+              </div>
+            </div>
+          </span>
+
+          <br>
+          <br>
+          <div class="text-center">
+            <button type="button" *ngIf="isUpdateClicked" class="btn btn-submit-swabhav material-icons-button"
+              [disabled]="!batchForm.dirty" (click)="validateBatchDetails()">Update Batch
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Progress reports -->
+<ng-template #progressReport>
+  <div class="container-fluid">
+    <app-batch-progress-report>
+    </app-batch-progress-report>
+  </div>
+</ng-template>
+
+<!-- ASSIGNMENTS -->
+
+<!-- ASSIGNMENTS ASSIGN -->
+<ng-template #assignmentAssignView>
+  <div class="container-fluid">
+    <app-batch-topic-assignment [isView]=isAssignmentManage [isAssign]=isAssignmentAssign>
+    </app-batch-topic-assignment>
+  </div>
+</ng-template>
+
+<!-- MANAGE ASSIGNMENTS -->
+<ng-template #assignmentManageView>
+  <div class="container-fluid">
+    <app-batch-topic-assignment [isView]=isAssignmentManage [isAssign]=isAssignmentAssign>
+    </app-batch-topic-assignment>
+  </div>
+</ng-template>
+
+<!-- ASSIGNMENTS SCORE -->
+<ng-template #assignmentScoreView>
+  <div class="container-fluid">
+    <app-batch-topic-assignment-score></app-batch-topic-assignment-score>
+  </div>
+</ng-template>
+
+
+<!-- PROJECTS -->
+<ng-template #projectAssignView>
+  <app-batch-project [isAssignClick]="isProjectAssignClicked" [isManageClick]="isProjectManageClicked">
+  </app-batch-project>
+</ng-template>
+
+<ng-template #projectManageView>
+  <!-- <p>Project manage view</p> -->
+  <app-batch-project [isAssignClick]="isProjectAssignClicked" [isManageClick]="isProjectManageClicked">
+  </app-batch-project>
+</ng-template>
+
+<!-- PROJECTS SCORE -->
+<ng-template #projectScoreView>
+  <div class="container-fluid">
+    <app-batch-project-score></app-batch-project-score>
+  </div>
+</ng-template>
+
+<!-- FEEDBACK VIEW -->
+<ng-template #studentDetailsFeedbackView>
+  <div class="container-fluid mt-auto">
+
+    <div class="container-fluid">
+      <h1 class="swabhav-light-orange-text"><strong>Student Performance Feedback</strong></h1>
+      <p class="grey">See the feedback of all students for each session.</p>
+      <div class="table-responsive" *ngIf=" batchTalents.length > 0; else noTalentFound">
+        <table class="table table-striped table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">Sr No</th>
+              <th>Student Name</th>
+              <th class="text-center">Overall Feedback</th>
+              <th class="text-center">Total hrs</th>
+              <th class="text-center">Sessions Attended</th>
+              <th class="text-center">Average Rating</th>
+              <th class="swabhav-light-orange-text text-center">Session Feedbacks left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let details of batchTalents; let i = index">
+              <tr>
+                <td class="text-nowrap text-center">{{i+1}}</td>
+                <td>{{details.talent.firstName + " " + details.talent.lastName}}</td>
+                <td class="text-center align-middle">
+                  <div
+                    *ngIf="(details.totalSessionsCount == details.totalFeedbacksGiven|| details.sessionsAttendedCount<1);else feedbacksPending">
+                    <img src="assets/icon/colour-icons/review.png" alt="Feedback assigned" width=30>
+                  </div>
+                  <ng-template #feedbacksPending>
+                    <img src="assets/icon/grey-icons/review.png" alt="Feedback not assigned" width=30>
+                  </ng-template>
+                </td>
+                <td class="text-center">{{details?.attendedHours|minute}} / {{ details?.totalHours|minute}}</td>
+                <td class="text-center">{{details.sessionsAttendedCount + "/" + details.totalSessionsCount}}</td>
+                <td class="text-center">{{details.averageRating}}</td>
+                <td class="text-center">
+                  <button type="button" class="btn btn-default" (click)="onBatchTalentClick(details)">
+                    <!-- {{details.totalSessionsCount - details.totalFeedbacksGiven}} -->
+                    <span class="swabhav-light-orange-text">
+                      {{details.sessionsAttendedCount - details.totalFeedbacksGiven}}
+                    </span>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="details.showDetails" class="unstriped-tr">
+                <td colspan="7">
+                  <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                      <table class="table table-borderless table-unstriped">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Order</th>
+                            <th>Session Date</th>
+                            <th class="text-center">Session Feedback</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <ng-container *ngFor="let session of details.sessionDetails; let j = index; let even = even">
+                            <tr *ngIf="even">
+                              <td class="text-center">{{j+1}}</td>
+                              <td>{{session.batchSession.date}}</td>
+                              <td class="text-center align-middle">
+                                <div *ngIf="session.isFeedbackGiven; else feedbackNotGiven">
+                                  <button type="button" class="btn btn-default"
+                                    (click)="onFeedbackAlreadyGivenClick(details, session.batchSession)"
+                                    [disabled]="!session.isPresent">
+                                    <img src="assets/icon/colour-icons/review.png" alt="Feedback assigned" width=30>
+                                  </button>
+                                </div>
+                                <ng-template #feedbackNotGiven>
+                                  <button type="button" class="btn btn-default"
+                                    (click)="onFeedbackClick(details, session.batchSession)"
+                                    [disabled]="!session.isPresent">
+                                    <img src="assets/icon/grey-icons/review.png" alt="Feedback not assigned" width=30>
+                                  </button>
+                                </ng-template>
+                              </td>
+                            </tr>
+                          </ng-container>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                      <table class="table table-borderless table-unstriped">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Order</th>
+                            <th>Session Date</th>
+                            <th class="text-center">Session Feedback</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <ng-container *ngFor="let session of details.sessionDetails; let j = index; let odd = odd">
+                            <tr *ngIf="odd">
+                              <td class="text-center">{{j+1}}</td>
+                              <td>{{session.batchSession.date}}</td>
+                              <td class="text-center align-middle">
+                                <div *ngIf="session.isFeedbackGiven; else feedbackNotGiven">
+                                  <button type="button" class="btn btn-default"
+                                    (click)="onFeedbackAlreadyGivenClick(details, session.batchSession)"
+                                    [disabled]="!session.isPresent">
+                                    <img src="assets/icon/colour-icons/review.png" alt="Feedback assigned" width=30>
+                                  </button>
+                                </div>
+                                <ng-template #feedbackNotGiven>
+                                  <button type="button" class="btn btn-default"
+                                    (click)="onFeedbackClick(details, session.batchSession)"
+                                    [disabled]="!session.isPresent">
+                                    <img src="assets/icon/grey-icons/review.png" alt="Feedback not assigned" width=30>
+                                  </button>
+                                </ng-template>
+                              </td>
+                            </tr>
+                          </ng-container>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No session assignments -->
+      <ng-template #noTalentFound>
+        <br />
+        <br />
+        <div class="col-sm-12 col-md-8 mx-auto">
+          <div class="jumbotron">
+            <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Talents not found in this batch</h2>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <br>
+
+      <div class="container-fluid" *ngIf="talentFeedbacks?.length > 0 && talentFeedbackKeywords?.length > 0
+        && talentSessionFeedback?.length > 0">
+        <h1 class="swabhav-light-orange-text"><strong>Your Teaching Feedback</strong></h1>
+        <p class="grey">See your session wise feedback given by the students.</p>
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th class="text-center">Sr.No</th>
+                <th class="text-center">Session Date</th>
+                <th *ngFor="let keyword of talentFeedbackKeywords" class="text-center">{{keyword}}</th>
+                <th class="text-center">Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let batchSession of talentFeedbacks; let i = index">
+                <td class="text-center">{{i+1}}</td>
+                <td class="text-center">{{batchSession.batchSession.date}}</td>
+                <td *ngFor="let keyword of talentFeedbackKeywords" class="text-center">
+                  {{calculateKeywordAvgScore(keyword, batchSession.batchSession.id)}}
+                </td>
+                <td class="text-center">
+                  <ng-container
+                    *ngIf="batchSession.batchSessionFeedback && 
+                    batchSession?.batchSessionFeedback?.length>0 && talentFeedbackComments.length > 0; else noFeedback">
+                    <button class="btn btn-default" (click)="onCommentClick(batchSession.batchSession.id)">
+                      <img src="assets/icon/colour-icons/chat.png" alt="comments given" width="30">
+                    </button>
+                  </ng-container>
+                  <ng-template #noFeedback>
+                    <img src="assets/icon/grey-icons/comments.png" alt="feedback not given" width="30"
+                      data-toggle="tooltip" data-placement="top" title="No Comments Found">
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ng-template>
+
+<!-- STUDENT DETAILS MANAGE -->
+<ng-template #studentDetailsManage>
+  <app-batch-talent [batchID]=batchID></app-batch-talent>
+</ng-template>
+
+<!-- MODALS -->
+
+
+<ng-template #batchSessionFeedbackModal let-modal>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+    <ng-container *ngTemplateOutlet="sessionFeedbackTemplate">
+    </ng-container>
+
+    <div class="d-flex justify-content-end">
+      <br>
+      <button type="button" class="btn btn-default swabhav-light-orange-text"
+        (click)="modal.dismiss('Cross click')">Close</button>
+      <button type="button" class="btn btn-submit-swabhav wide-btn material-icons-button"
+        (click)="validateFacultyFeedback()" *ngIf="facultyFeedbackQuestions.length > 0 && !isFeedbackAlreadySubmitted">
+        {{FEEDBACK_TALENT_INDEX == batchTalents.length-1 || isSingleTalentFeedback ? 'Submit' : 'Next ❯'}}
+      </button>
+    </div>
+  </div>
+
+</ng-template>
+
+
+
+<ng-template #commentsModal let-modal>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <br>
+    <div class="d-flex justify-content-between">
+      <div class="d-flex text-nowrap">
+        <h1 class="swabhav-light-orange-text">Additional Comments for the following session:</h1>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+            class="material-icons close-icon">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br>
+
+    <div *ngFor="let comments of talentFeedbackComments;let i = index">
+      <div>Question: {{comments.question}}</div>
+      <br>
+      <div *ngFor="let answer of comments.answers;let j = index">
+        Answer {{j+1}}: {{answer}}
+        <br>
+      </div>
+      <ng-container *ngIf="(talentFeedbackComments?.length)-1 != i">
+        <hr>
+      </ng-container>
+
+      <br>
+
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #sessionFeedbackTemplate>
+  <div class="row d-flex align-items-center">
+    <div class="col-sm-2">
+      <img src="assets/icon/colour-icons/feedbackmodal.png" alt="feedback" class="feedback-img-icon">
+    </div>
+    <div class="col-sm-10" *ngIf="!isFeedbackAlreadySubmitted; else feedbackAlreadySubmitted">
+      <h1 class="swabhav-light-orange-text"><strong>Rate {{feedbackTo}} performance for the following session:</strong>
+      </h1>
+    </div>
+    <ng-template #feedbackAlreadySubmitted class="col-sm-10">
+      <h1 class="swabhav-light-orange-text"><strong>{{feedbackTo}} performance for the following session:</strong></h1>
+    </ng-template>
+  </div>
+
+  <div class="d-flex justify-content-around">
+    <div class="d-flex">
+      <label><strong>Student Name: </strong></label> &nbsp;
+      <label>{{feedbackTo}}</label>
+    </div>
+
+    <div class="d-flex date-margin">
+      <label><strong>Date: </strong></label> &nbsp;
+      <label>{{sessionDate | date: 'fullDate'}}</label>
+    </div>
+  </div>
+  
+  <div class="d-flex justify-content-center" *ngIf="!isFeedbackAlreadySubmitted">
+    <form [formGroup]="feedbackTypeForm">
+      <select class="form-control d-flex justify-content-center input-style input-width" formControlName="feedbackType"
+        (change)="onFeedbackTypeChange()">
+        <option [value]="FACULTY_SESSION_FEEDBACK">{{FACULTY_SESSION_FEEDBACK}}</option>
+        <option [value]="FACULTY_SESSION_FEEDBACK_NON_TECH">{{FACULTY_SESSION_FEEDBACK_NON_TECH}}</option>
+      </select>
+    </form>
+  </div>
+
+
+  <br>
+
+  <form [formGroup]="feedbackForm">
+    <ng-container formArrayName="feedbacks" *ngFor="let feedbackControl of feedbackArray.controls;let i = index">
+      <ng-container [formGroupName]="i">
+        <ng-container *ngIf="facultyFeedbackQuestions[i].hasOptions; else noOptions">
+          <div class="row">
+            <div class="col-4">
+              {{i+1}}. {{facultyFeedbackQuestions[i].question}}
+            </div>
+            <div class="col-2 star-selected-count">
+              <ng-container class="star-selected-count">
+                {{feedbackControl.get("hover").value}}
+              </ng-container>
+            </div>
+
+            <div class="col-6" *ngIf="!isFeedbackAlreadySubmitted; else SubmittedFeedback">
+              <ng-container>
+                <ng-container *ngIf="facultyFeedbackQuestions[i].options.length == MAX_SCORE; else showOptions">
+                  <ngb-rating (rateChange)="onFacutyFeedbackInput($event, i, feedbackControl)"
+                    (hover)="feedbackControl.get('hover').setValue($event)"
+                    (leave)="feedbackControl.get('hover').setValue(feedbackControl.get('answer').value)">
+
+                    <ng-template let-fill="fill" let-index="index">
+                      <span class="star" [class.star-fill]="fill === 100">&#9733;</span>
+                    </ng-template>
+                  </ngb-rating>
+                </ng-container>
+              </ng-container>
+            </div>
+
+            <ng-template #SubmittedFeedback>
+              <ng-container>
+                <ng-container
+                  *ngIf="facultyFeedbackQuestions[i].options.length == MAX_SCORE; else showSubmittedOptions">
+                  <ngb-rating [rate]="feedbackControl.get('answer').value" [readonly]="true">
+                    <ng-template let-fill="fill" let-index="index">
+                      <span class="star" [class.star-fill]="fill === 100">&#9733;</span>
+                    </ng-template>
+                  </ngb-rating>
+                </ng-container>
+              </ng-container>
+            </ng-template>
+
+            <!-- SHOW OPTIONS -->
+            <ng-template #showOptions>
+              <select class="form-control input-style" formControlName="optionID"
+                (change)="onFacultyFeedbackChange(feedbackControl, facultyFeedbackQuestions[i].options)">
+                <option [ngValue]="null" disabled>Select Option</option>
+                <option *ngFor="let option of facultyFeedbackQuestions[i].options" [ngValue]="option.id">
+                  {{option.value}}
+                </option>
+              </select>
+            </ng-template>
+
+            <ng-template #showSubmittedOptions>
+              <select class="form-control input-style" formControlName="optionID" [attr.disabled]="true">
+                <option *ngFor="let option of facultyFeedbackQuestions[i].options" [ngValue]="option.id">
+                  {{option.value}}
+                </option>
+              </select>
+            </ng-template>
+          </div>
+          <br>
+        </ng-container>
+
+        <!-- No Options -->
+        <ng-template #noOptions>
+          <ng-container *ngIf="isFeedbackAlreadySubmitted">
+            <div class="row">
+              <div class="form-group col-12">
+                <label>{{i+1}}. {{facultyFeedbackQuestions[i].question}}</label>
+                <textarea [attr.disabled]="true" class="form-control rounded-0" id="exampleFormControlTextarea2"
+                  rows="3" formControlName="answer" placeholder="Enter your answer"></textarea>
+                <div class="alert alert-danger" *ngIf="(feedbackControl.get('answer').touched || 
+                    feedbackControl.get('answer').dirty) && feedbackControl.get('answer').invalid">
+                  <div *ngIf="feedbackControl.get('answer').errors.required">
+                    Answer must be specified
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <div class="row" *ngIf="!isFeedbackAlreadySubmitted">
+            <div class="form-group col-12">
+              <label>{{i+1}}. {{facultyFeedbackQuestions[i].question}}</label>
+              <textarea class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3"
+                formControlName="answer" placeholder="Enter your answer"></textarea>
+              <div class="alert alert-danger" *ngIf="(feedbackControl.get('answer').touched || 
+                  feedbackControl.get('answer').dirty) && feedbackControl.get('answer').invalid">
+                <div *ngIf="feedbackControl.get('answer').errors.required">
+                  Answer must be specified
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+    </ng-container>
+  </form>
+
+  <ng-template #noFeedbackQuestions>
+    <br />
+    <br />
+    <div class="d-flex align-items-center full-h">
+      <div class="col-sm-12 col-md-8 mx-auto">
+        <div class="jumbotron">
+          <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+            <h2>Feedback Questions Not Found</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+</ng-template>
+
+<!-- Delete Talent Comfirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title">Comfirmation</h3>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="button"><i
+        class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        <h3>{{deleteModalText}}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click')">No</button>
+  </div>
+</ng-template>
+
+<br>
+<br>

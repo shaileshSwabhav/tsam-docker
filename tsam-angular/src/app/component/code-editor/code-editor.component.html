@@ -1,0 +1,203 @@
+<!-- ----START----- -->
+
+<!-- header -->
+<!-- <div>
+    <nav class="navbar navbar-light bg-light ">
+        <div class="container text-center p-2 ">
+            <span class="mx-auto text-bold">IDE</span>
+        </div>
+    </nav>
+</div> -->
+
+
+
+<div class="container h-100 mt-4">
+    <!-- languages & theme -->
+    <!-- <div class="row mb-4 justify-content-center mx-4">
+        <div class="col-auto col-lg-3 col-md-4 col-sm-6">
+            <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="selection">Languages</label>
+                </div>
+                <select class="selection" id="languages-select" (change)="onLanguageChange($event)">
+                    <option [value]="langCCpp">C</option>
+                    <option [value]="langCCpp">C++</option>
+                    <option [value]="langPhp">PHP</option>
+                    <option [value]="langJava">Java</option>
+                    <option [value]="langGolang">Go</option>
+                    <option [value]="langPython">Python</option>
+                    <option [value]="langJavascript">Java Script</option>
+                </select>
+                
+            </div>
+        </div>
+        <div class="col-auto col-lg-3 col-md-4 col-sm-6">
+            <div class="btn-group btn-group-toggle btn-group-sm mx-auto" data-toggle="buttons">
+                <label class="btn btn-secondary active">
+                    <input type="radio" name="options" id="option1" autocomplete="off" (click)="onThemeChange($event)"
+                        checked [value]="twilightTheme">
+                    Twilight
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="options" id="option2" autocomplete="off" (click)="onThemeChange($event)"
+                        [value]="githubTheme">
+                    Github
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="options" id="option3" autocomplete="off" (click)="onThemeChange($event)"
+                        [value]="nordDarkTheme">
+                    Nord
+                </label>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- ********************************** LANGUAGE DROPDOWN ********************************** -->
+    
+    <ng-container *ngIf="!isSolution">
+        <form [formGroup]="languageForm">
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                    <label class="form-control-label-style">Language: </label>
+                    <select class="form-control input-style" (change)="onLanguageChange()"
+                        formControlName="programmingLanguage">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let language of languageArray" [ngValue]="language">
+                            {{language.name}}
+                        </option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(languageForm.get('programmingLanguage').touched || languageForm.get('programmingLanguage').dirty) 
+                        && languageForm.get('programmingLanguage').invalid">
+                        <div *ngIf="languageForm.get('programmingLanguage').errors.required">
+                            Programming Language must be specified
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-container>
+
+    <!-- ********************************** CODE EDITOR ********************************** -->
+
+    <div class="code-editor-style">
+        <div class="row mb-4">
+            <div class="col">
+                <div class="code-editor" #codeEditor></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ********************************** INPUT FORM ********************************** -->
+    <!-- <label class="checkbox-container">
+        <input type="checkbox" (change)="toggleCustomInput()">
+        <span class="checkmark"></span>
+        <span class="color-EE3733 font-md-style font-weight-bold">Give Custom Input</span>
+    </label> -->
+    <ng-container *ngIf="showInputForm">
+        <form [formGroup]="inputForm">
+            <div class="row">
+                <div class="form-group col-sm-12 col-md-12">
+                    <label class="form-control-label-style">Input: </label>
+    
+                    <textarea class="form-control input-style" formControlName="input" rows="5" id="comment"
+                        placeholder="Enter all inputs here...." appEmptyToNull>
+                    </textarea>
+    
+                    <!-- <input type="text" formControlName="input" class="form-control input-style" placeholder="Enter all inputs"
+                    appEmptyToNull> -->
+                    <!-- <div class="alert alert-danger" *ngIf="(inputForm.get('input').touched || inputForm.get('input').dirty) 
+                        && inputForm.get('input').invalid">
+                        <div *ngIf="inputForm.get('input').errors.required">
+                            Programming Language must be specified
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </form>
+    </ng-container>
+
+    <!-- <form [formGroup]="testCaseJudgeForm">
+        <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+                <label class="form-control-label-style">Test Case Judge: </label>
+                <textarea class="form-control input-style" formControlName="testCaseJudge" rows="10"
+                    placeholder="Test case judge" appEmptyToNull>
+                </textarea>
+            </div>
+        </div>
+    </form> -->
+    <!-- <button type="button" class="btn btn-default swabhav-button-square" (click)="addJudgeSphere()">
+        Judge
+    </button>
+    <button type="button" class="btn btn-default swabhav-button-square" (click)="addProblemSphere()">
+        Problem
+    </button>
+    <button type="button" class="btn btn-default swabhav-button-square" (click)="addTestCaseSphere()">
+        Test case
+    </button>
+    <button type="button" class="btn btn-default swabhav-button-square" (click)="addSubmissionSphere()">
+        Submission
+    </button> -->
+
+    <!-- ********************************** BUTTONS ********************************** -->
+
+    <div class="row">
+        <div class="col-3">
+            <button type="button" class="btn btn-default swabhav-button-square button-size" (click)="run()">
+                <span *ngIf="showInputForm">
+                    Run
+                </span>
+                <span *ngIf="!showInputForm">
+                    Run Test Cases
+                </span>
+            </button>
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-default swabhav-button-square button-size" (click)="beautifyContent()">
+                Format
+            </button>
+        </div>
+        <div *ngIf="!isReadOnly" class="col-3">
+            <button type="button" class="btn btn-default swabhav-button-square button-size" (click)="clear()">
+                Clear
+            </button>
+        </div>
+        <div *ngIf="!isReadOnly" class="col-3">
+            <button type="button" class="btn btn-default swabhav-button-square button-size" (click)="validateLanguageAndCode()">
+                Submit
+            </button>
+        </div>
+        <!-- <div *ngIf="!isReadOnly && isCodeRunning" class="col-3">
+            <button type="button" class="btn btn-default swabhav-button-square button-size" (click)="validateLanguageAndCode()">
+                Submit
+            </button>
+        </div> -->
+    </div>
+
+    <!-- ********************************** OUTPUT BOX ********************************** -->
+
+    <div class="row mt-4">
+        <div class="col">
+            <label class="form-control-label-style">Output: </label>
+            <textarea [value]="output" class="form-control output" rows="6" disabled="true" aria-label="output-textarea"></textarea>
+        </div>
+    </div>
+
+    <!-- run, clear & beautify buttons -->
+    <!-- <div class="row mb-4 justify-content-center mx-4">
+        <div class="col-4 col-lg-2 col-md-3 col-sm-4 w-75">
+           
+        </div>
+        <div class="col-4 col-lg-2 col-md-3 col-sm-4 w-75">
+            <button type="button" class="btn btn-primary btn-sm btn-block px-4 mx-2" (click)="clear()">
+                Clear
+            </button>
+        </div>
+        <div class="col-4 col-lg-2 col-md-3 col-sm-4 w-75">
+            <button type="button" class="btn btn-beautify btn-sm btn-block px-4 mx-2" (click)="beautifyContent()">
+                Submit
+            </button>
+        </div>
+    </div>
+    <button class="btn btn-default swabhav-button-round" (click)="validateLanguageAndCode()">Submit</button> -->
+</div>

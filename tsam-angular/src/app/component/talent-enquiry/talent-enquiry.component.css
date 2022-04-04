@@ -1,0 +1,114 @@
+i{
+  cursor: pointer;
+}
+
+.popover-title-style{
+  font-size: 4mm;
+  font-weight: bold;
+}
+
+.popover-style:hover{
+  transform: scale(1.2);
+  cursor: default !important;
+}
+
+.search-filter-name-style{
+  background-color: #F6430F26;
+  color: #F6430F;
+  border-radius: 30px;
+  margin-left: 1%;
+  border: 1.5px solid #F6430F;
+  padding: 1%;
+  display: inline-block;
+  margin-top: 1%;
+}
+
+.search-mat-drawer-style{
+  width: 20%;
+}
+
+.search-main-content-style{
+  background-color: white;
+  padding: 5%;
+  min-height: 500px;
+}
+
+.college-td-style{
+  width: 50%;
+}
+
+.talent-status-style{
+  padding-left: 15px;
+  color: #414141;
+}
+
+.search-section-name-style{
+  font-weight: bold;
+  color: #757575;
+  padding-top: 20%;
+  border-bottom: 1.5px solid hsl(0, 0%, 46%);
+  cursor: pointer;
+}
+
+.selected-search-section-name-style{
+  font-weight: bold;
+  color: #F6430F;
+  padding-top: 20%;
+  border-bottom: 1.5px solid #F6430F;
+  cursor: pointer;
+}
+
+.search-section-group-style{
+  padding-right: 10%;
+  padding-top: 50%;
+}
+
+.vertical-line-style{
+  color: black;
+  font-weight: bold;
+}
+
+.pagination-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.pagination-flex-item {
+  display: flex;
+  align-items: baseline;
+}
+
+.pagination-control-flex-item {
+  display: flex;
+  margin-bottom: auto;
+}
+
+.back-button-style{
+  margin-top: 20%;
+}
+
+.processing-text-style{
+  color: #FC6E26;
+}
+
+.progress-custom {
+  /* width: 100%; */
+  background-color: #FF7000BF;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}

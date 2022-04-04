@@ -1,0 +1,1214 @@
+<app-master-navbar></app-master-navbar>
+
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<div class="container-fluid">
+    <br>
+    <div class="row">
+        <span class="col-6 text-center font-weight-bold font-xl-style">Talent Calling Reports</span>
+        <span class="col-6 text-center font-weight-bold font-xl-style">Talent-Enquiry Calling Reports</span>
+    </div>
+    <br>
+    <ul ngbNav #nav="ngbNav" [destroyOnHide]="true" class="nav-tabs ul-space-even-style"
+        (onChange)="onTabChange($event)">
+
+        <!-- Talent Loginwise -->
+        <li [ngbNavItem]="1" (click)="onTabChange(1)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Loginwise</a>
+            <ng-template ngbNavContent>
+                <br>
+                <mat-drawer-container class="drawer-container-style">
+                    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+                        <div class="overflow-x-hidden-style">
+                            <div class="filter-header">
+                                Edit Filters&nbsp;&nbsp;&nbsp;
+                                <span class="clear-filter-style" (click)="resetLoginwiseCallingReportSearchForm()">
+                                    Clear all filters
+                                </span>
+                                <div class="float-right" (click)="drawer.toggle()">
+                                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                                </div>
+                            </div>
+                            <br>
+                            <form [formGroup]="loginwiseCallingReportSearchForm">
+                                <div class="filter-by-field row">
+                                    <div class="form-group col-sm-12 col-md-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <ng-container
+                                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Duration'}">
+                                                </ng-container>
+                                            </span>
+                                            <select class="form-control input-style" formControlName="duration">
+                                                <option [ngValue]=null>Select</option>
+                                                <option [ngValue]=1>Last 24 hours</option>
+                                                <option [ngValue]=7>Last Week</option>
+                                                <option [ngValue]=14>Last Fortnight</option>
+                                                <option [ngValue]=30>Last Month</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <ng-container
+                                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}">
+                                                </ng-container>
+                                            </span>
+                                            <input type="date" class="form-control input-style"
+                                                formControlName="fromDate">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <ng-container
+                                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Till Date'}">
+                                                </ng-container>
+                                            </span>
+                                            <input type="date" class="form-control input-style"
+                                                formControlName="toDate">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button class="btn btn-default filter-button" type="submit"
+                                        [disabled]="!loginwiseCallingReportSearchForm.dirty || loginwiseCallingReportSearchForm.invalid"
+                                        (click)="searchLoginwiseCallingReports();drawer.toggle()">
+                                        Search
+                                        <span class="vertical-align-top-icon-style"><i
+                                                class="material-icons search-button-icon-style">search</i></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </mat-drawer>
+                    <div class="standard-page-margin">
+                        <div class="display-inline">
+                            <div class="font-weight-bold font-xl-style">
+                                Loginwise Talent Call Report
+                                &nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-default filter-button" type="button" *ngIf="isLoginwiseSearched"
+                                    (click)="resetLoginwiseSearchAndGetAll()">
+                                    View All Time
+                                </button>
+                            </div>
+                            <div class="float-right">
+                                <button class="btn btn-default swabhav-button-round" (click)="drawer.toggle()">
+                                    Add Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Calling Count</th>
+                                        <th>Talent Count</th>
+                                        <th>View</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr *ngFor="let report of loginwiseCallingReports; let i = index">
+                                            <td>{{i+1}}</td>
+                                            <!-- <td>{{(i+1)+(loginwiseOffset*loginwiseLimit)}}</td> -->
+                                            <td>{{report.firstName}}</td>
+                                            <td>{{report.lastName}}</td>
+                                            <td class="color-F6430F font-weight-bold">{{report.totalCallingCount}}</td>
+                                            <td class="color-F6430F font-weight-bold">{{report.totalTalentCount}}</td>
+                                            <td data-toggle="tooltip" data-placement="top" title="View Calling Details">
+                                                <span
+                                                    (click)="onViewCallReportsClick({'controlName':'credentialID','value':report.credentialID})">
+                                                    <i class="material-icons color-F6430F">visibility</i>
+                                                </span>
+                                                <!-- <button type="button" (click)="viewCallReport(report)" class="btn btn-primary">
+                                            View</button> -->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                </mat-drawer-container>
+            </ng-template>
+        </li>
+
+        <!-- Talent Daywise -->
+        <li [ngbNavItem]="2" (click)="onTabChange(2)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Daywise</a>
+            <ng-template ngbNavContent>
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Daywise Talent Call Report
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="card table-card-shadow table-card-style">
+                    <div class="card-body padding-0pt">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Date</th>
+                                    <th>Calling Count</th>
+                                    <th>Talent Count</th>
+                                    <th>View</th>
+                                </tr>
+                                <tbody>
+                                    <tr *ngFor="let report of daywiseCallingReports; let i = index">
+                                        <td>{{i+1}}</td>
+                                        <!-- <td>{{(i+1)+(loginwiseOffset*loginwiseLimit)}}</td> -->
+                                        <td>{{report.date}}</td>
+                                        <td class="color-F6430F font-weight-bold">{{report.totalCallingCount}}</td>
+                                        <td class="color-F6430F font-weight-bold">{{report.totalTalentCount}}</td>
+                                        <td data-toggle="tooltip" data-placement="top" title="View Calling Details">
+                                            <span
+                                                (click)="onViewCallReportsClick({'controlName':'date','value':report.date})">
+                                                <i class="material-icons color-F6430F">visibility</i>
+                                            </span>
+                                            <!-- <button type="button" (click)="viewCallReport(report)" class="btn btn-primary">
+                                        View</button> -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+
+        <!-- Enquiry Loginwise -->
+        <li [ngbNavItem]="3" (click)="onTabChange(3)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Loginwise</a>
+            <ng-template ngbNavContent>
+                <br>
+                <mat-drawer-container class="drawer-container-style">
+                    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+                        <div class="overflow-x-hidden-style">
+                            <div class="filter-header">
+                                Edit Filters&nbsp;&nbsp;&nbsp;
+                                <span class="clear-filter-style"
+                                    (click)="resetLoginwiseEnquiryCallingReportSearchForm()">
+                                    Clear all filters
+                                </span>
+                                <div class="float-right" (click)="drawer.toggle()">
+                                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                                </div>
+                            </div>
+                            <br>
+                            <form [formGroup]="loginwiseEnquiryCallingReportSearchForm">
+                                <div class="filter-by-field row">
+                                    <div class="form-group col-sm-12 col-md-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <ng-container
+                                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Duration'}">
+                                                </ng-container>
+                                            </span>
+                                            <select class="form-control input-style" formControlName="duration">
+                                                <option [ngValue]=null>Select</option>
+                                                <option [ngValue]=1>Last 24 hours</option>
+                                                <option [ngValue]=7>Last Week</option>
+                                                <option [ngValue]=14>Last Fortnight</option>
+                                                <option [ngValue]=30>Last Month</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <ng-container
+                                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}">
+                                                </ng-container>
+                                            </span>
+                                            <input type="date" class="form-control input-style"
+                                                formControlName="fromDate">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <ng-container
+                                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Till Date'}">
+                                                </ng-container>
+                                            </span>
+                                            <input type="date" class="form-control input-style"
+                                                formControlName="toDate">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button class="btn btn-default filter-button" type="submit" [disabled]="!loginwiseEnquiryCallingReportSearchForm.dirty 
+                                        || loginwiseEnquiryCallingReportSearchForm.invalid"
+                                        (click)="searchLoginwiseEnquiryCallingReports();drawer.toggle()">
+                                        Search
+                                        <span class="vertical-align-top-icon-style"><i
+                                                class="material-icons search-button-icon-style">search</i></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </mat-drawer>
+                    <div class="standard-page-margin">
+                        <div class="display-inline">
+                            <div class="font-weight-bold font-xl-style">
+                                Loginwise Talent Enquiry Call Report
+                                &nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-default filter-button" type="button"
+                                    *ngIf="isLoginwiseEnquirySearched" (click)="resetLoginwiseEnquirySearchAndGetAll()">
+                                    View All Time
+                                </button>
+                            </div>
+                            <div class="float-right">
+                                <button class="btn btn-default swabhav-button-round" (click)="drawer.toggle()">
+                                    Add Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Calling Count</th>
+                                        <th>Talent Enquiry Count</th>
+                                        <th>View</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr *ngFor="let report of loginwiseEnquiryCallingReports; let i = index">
+                                            <td>{{i+1}}</td>
+                                            <!-- <td>{{(i+1)+(loginwiseOffset*loginwiseLimit)}}</td> -->
+                                            <td>{{report.firstName}}</td>
+                                            <td>{{report.lastName}}</td>
+                                            <td class="color-F6430F font-weight-bold">{{report.totalCallingCount}}</td>
+                                            <td class="color-F6430F font-weight-bold">{{report.totalEnquiryCount}}</td>
+                                            <td data-toggle="tooltip" data-placement="top"
+                                                title="View Enquiry Calling Details">
+                                                <span
+                                                    (click)="onViewEnquiryCallReportsClick({'controlName':'credentialID','value':report.credentialID})">
+                                                    <i class="material-icons color-F6430F">visibility</i>
+                                                </span>
+                                                <!-- <button type="button" (click)="viewCallReport(report)" class="btn btn-primary">
+                                            View</button> -->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                </mat-drawer-container>
+            </ng-template>
+        </li>
+
+        <!-- Enquiry Daywise -->
+        <li [ngbNavItem]="4" (click)="onTabChange(4)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Daywise</a>
+            <ng-template ngbNavContent>
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Daywise Talent Enquiry Call Report
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="card table-card-shadow table-card-style">
+                    <div class="card-body padding-0pt">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Date</th>
+                                    <th>Calling Count</th>
+                                    <th>Talent Enquiry Count</th>
+                                    <th>View</th>
+                                </tr>
+                                <tbody>
+                                    <tr *ngFor="let report of daywiseEnquiryCallingReports; let i = index">
+                                        <td>{{i+1}}</td>
+                                        <!-- <td>{{(i+1)+(loginwiseOffset*loginwiseLimit)}}</td> -->
+                                        <td>{{report.date}}</td>
+                                        <td class="color-F6430F font-weight-bold">{{report.totalCallingCount}}</td>
+                                        <td class="color-F6430F font-weight-bold">{{report.totalEnquiryCount}}</td>
+                                        <td data-toggle="tooltip" data-placement="top" title="View Calling Details">
+                                            <span
+                                                (click)="onViewEnquiryCallReportsClick({'controlName':'date','value':report.date})">
+                                                <i class="material-icons color-F6430F">visibility</i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+    </ul>
+    <!-- Output of the selected ngbNavItem -->
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+</div>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Talent Calling Report Modal -->
+<ng-template #callingReportModal let-modal>
+    <mat-drawer-container class="drawer-container-style">
+        <mat-drawer #drawerCandidate mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+            <div class="overflow-x-hidden-style">
+                <div class="filter-header">
+                    Edit Filters&nbsp;&nbsp;&nbsp;
+                    <span class="clear-filter-style" (click)="resetCallReportSearchForm()">Clear all filters</span>
+                    <div class="float-right" (click)="drawerCandidate.toggle()">
+                        <span><i class="material-icons filter-close-icon-style">close</i></span>
+                    </div>
+                </div>
+                <br>
+                <form [formGroup]="callingReportSearchForm">
+                    <div class="filter-by-field row">
+                        <!-- <div class="form-group col-sm-4 col-md-4">
+                            <label for="purposeID"> Purpose:</label>
+                            <ng-select formControlName="purposeID" placeholder="Select Purpose">
+                                <ng-option [value]="purpose.id" [disabled]="purpose.disabled"
+                                    *ngFor="let purpose of purposeList">
+                                    {{purpose.purpose}}
+                                </ng-option>
+                            </ng-select>
+                        </div> -->
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Purpose'}">
+                                </ng-container>
+                            </span>
+                            <select class="form-control input-style" formControlName="purposeID"
+                                (change)="getOutcomesByPurposeID(callingReportSearchForm)">
+                                <option [ngValue]="null">Select</option>
+                                <option *ngFor="let purpose of purposeList" [ngValue]="purpose.id">
+                                    {{purpose.purpose}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <fieldset [disabled]="!outcomeList">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}">
+                                    </ng-container>
+                                </span>
+                                <select class=" form-control input-style" formControlName="outcomeID">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let outcome of outcomeList" [ngValue]="outcome.id">
+                                        {{outcome.outcome}}</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="fromDate">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Till Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="toDate">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Start Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="targetFromDate">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target End Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="targetToDate"
+                                    nbInput>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Login'}">
+                                </ng-container>
+                            </span>
+                            <select class="form-control input-style" formControlName="credentialID">
+                                <option [ngValue]="null">Select</option>
+                                <option *ngFor="let credential of userCredentialList" [ngValue]="credential.id">
+                                    {{credential?.firstName + ' ' + credential?.lastName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-default filter-button" type="submit"
+                            [disabled]="!callingReportSearchForm.dirty||callingReportSearchForm.invalid"
+                            (click)="searchCallingReports();drawerCandidate.toggle()">
+                            Search
+                            <span class="vertical-align-top-icon-style"><i
+                                    class="material-icons search-button-icon-style">search</i></span>
+                        </button>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </mat-drawer>
+        <div class="modal-body">
+            <div class="form-header-style">
+                Talent Calling Report
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Cross click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <br>
+            <div class="candidate-body">
+                <div class="display-inline">
+                    <div class="font-weight-bold font-xl-style">
+                        Total Calling Reports -
+                        <span class="color-F6430F"> {{totalCallingReports}}</span>
+                        &nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-default filter-button" type="button" *ngIf="isCallingReportSearched"
+                            (click)="resetCallReportSearchAndGetAll()">
+                            View All Reports
+                        </button>
+                    </div>
+                    <div class="float-right" *ngIf="(totalCallingReports == 0 && isCallingReportSearched) 
+                        || (totalCallingReports > 0 && !isCallingReportSearched) 
+                        || (totalCallingReports > 0 && isCallingReportSearched)">
+                        <button class="btn btn-default filter-button" (click)="drawerCandidate.toggle()">
+                            Add Filter <strong>+</strong>
+                        </button>
+                        <br><br>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalCallingReports > 0">
+                    <div class="text-right">
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                            <span class="pagination-numbers">{{totalCallingReports}}</span>
+                        </span>
+                    </div>
+                    <div class="pagination-flex">
+                        <div class="pagination-flex-item">
+                            <div class="pagination-control-flex-item">
+                                <select class="form-control form-control-sm input-style"
+                                    [(ngModel)]="callingReportLimit" (change)="changeCallingReportPage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="pagination-control-flex-item">
+                                <ul class="pagination"
+                                    *ngFor="let report of callingReportList | paginate: { id:'callingReportPageID',
+                                    itemsPerPage: callingReportLimit, currentPage: currentCallingReportPage, totalItems: totalCallingReports }">
+                                </ul>
+                                <pagination-controls id="callingReportPageID" responsive="true" maxSize="10"
+                                    (pageChange)="changeCallingReportPage($event)">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+                <div *ngIf="totalCallingReports > 0">
+                    <div class="row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <div class="card table-card-shadow modal-popup-table-card-style">
+                                <div class="card-body padding-0pt">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped modal-popup-table-style">
+                                            <tr>
+                                                <th class="no">No.</th>
+                                                <th class="loginName">Login Name</th>
+                                                <th class="talentName">Talent Name</th>
+                                                <th class="contact">Contact</th>
+                                                <th class="email">Email</th>
+                                                <th class="date">Date</th>
+                                                <th class="purpose">Purpose</th>
+                                                <th class="outcome">Outcome</th>
+                                                <th class="comment">Comment</th>
+                                                <th class="view">View</th>
+                                            </tr>
+                                            <tbody>
+                                                <tr *ngFor="let report of callingReportList; let i = index">
+                                                    <td>{{(i+1)+(callingReportOffset*callingReportLimit)}}</td>
+                                                    <td>{{report.loginName}}</td>
+                                                    <td>{{report.talent?.firstName+' '+report.talent?.lastName}}</td>
+                                                    <td>{{report.talent?.contact}}</td>
+                                                    <td>{{report.talent?.email}}</td>
+                                                    <td>{{report.dateTime | date:'dd MMM, yyyy'}}</td>
+                                                    <td>{{report.purpose}}</td>
+                                                    <td>{{report.outcome}}</td>
+                                                    <!-- <td>{{report.comment?.length > 30? report.comment?.substring(0,30)+'...':report.comment ||
+                                                        'No comments'}}</td> -->
+                                                    <td>{{report.comment? report.comment.length > 30?
+                                                        report.comment?.substring(0,30)+'...':report.comment:
+                                                        'No comment'}}</td>
+                                                    <td data-toggle="tooltip" data-placement="top"
+                                                        title="View Calling Details">
+                                                        <!-- <button type="button"
+                                                            (click)="getCallingReports(report.credentialID);openModal(callingReportModal, 'xl')"
+                                                            class="btn">
+                                                            <i class="material-icons teal">visibility</i></button> -->
+                                                        <span (click)="onDetailedReportViewClick(report)">
+                                                            <i class="material-icons color-F6430F">visibility</i>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalCallingReports == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Calling Report Found</h2>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+                    (click)="modal.dismiss('Cross click')">
+                    Close
+                </button>
+            </div>
+        </div>
+    </mat-drawer-container>
+</ng-template>
+
+
+<!--Detailed Talent Calling Report Modal -->
+<ng-template #detailedCallingReportModal let-modal>
+    <div class="container">
+        <div class="modal-body">
+            <div class="form-header-style">
+                Detailed Report
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Close click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="detailedCallingReportForm">
+                <fieldset disabled="disabled">
+                    <div class="form-sub-header-style">Calling Details</div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Login Name'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="loginName">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-5">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="dateTime">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Purpose'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="purpose">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="outcome">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="targetDate">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Expected CTC'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="expectedCTC">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Notice Period'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="noticePeriod">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}">
+                                    </ng-container>
+                                </span>
+                                <!-- <input type="text" class="form-control" formControlName="comment"> -->
+                                <textarea class="form-control rounded-0 input-style" name="comment" rows="2"
+                                    formControlName="comment"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-sub-header-style">Talent Details</div>
+                    <div formGroupName="talent">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="firstName">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="lastName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="email">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Contact'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="contact">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- =======================================================TALENT-ENQUIRY======================================================= -->
+
+<!-- Enquiry Calling Report Modal -->
+<ng-template #enquiryCallingReportModal let-modal>
+    <mat-drawer-container class="drawer-container-style">
+        <mat-drawer #drawerCandidate mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+            <div class="overflow-x-hidden-style">
+                <div class="filter-header">
+                    Edit Filters&nbsp;&nbsp;&nbsp;
+                    <span class="clear-filter-style" (click)="resetEnquiryCallReportSearchForm()">Clear all
+                        filters</span>
+                    <div class="float-right" (click)="drawerCandidate.toggle()">
+                        <span><i class="material-icons filter-close-icon-style">close</i></span>
+                    </div>
+                </div>
+                <br>
+                <form [formGroup]="enquiryCallingReportSearchForm">
+                    <div class="filter-by-field row">
+                        <!-- <div class="form-group col-sm-4 col-md-4">
+                            <label for="purposeID"> Purpose:</label>
+                            <ng-select formControlName="purposeID" placeholder="Select Purpose">
+                                <ng-option [value]="purpose.id" [disabled]="purpose.disabled"
+                                    *ngFor="let purpose of purposeList">
+                                    {{purpose.purpose}}
+                                </ng-option>
+                            </ng-select>
+                        </div> -->
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Purpose'}">
+                                </ng-container>
+                            </span>
+                            <select class="form-control input-style" formControlName="purposeID"
+                                (change)="getOutcomesByPurposeID(callingReportSearchForm)">
+                                <option [ngValue]="null">Select</option>
+                                <option *ngFor="let purpose of purposeList" [ngValue]="purpose.id">
+                                    {{purpose.purpose}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <fieldset [disabled]="!outcomeList">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}">
+                                    </ng-container>
+                                </span>
+                                <select class=" form-control input-style" formControlName="outcomeID">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let outcome of outcomeList" [ngValue]="outcome.id">
+                                        {{outcome.outcome}}</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="fromDate">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Till Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="toDate">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Start Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="targetFromDate">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target End Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="targetToDate"
+                                    nbInput>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Login'}">
+                                </ng-container>
+                            </span>
+                            <select class="form-control input-style" formControlName="credentialID">
+                                <option [ngValue]="null">Select</option>
+                                <option *ngFor="let credential of userCredentialList" [ngValue]="credential.id">
+                                    {{credential?.firstName + ' ' + credential?.lastName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-default filter-button" type="submit"
+                            [disabled]="!enquiryCallingReportSearchForm.dirty||enquiryCallingReportSearchForm.invalid"
+                            (click)="searchEnquiryCallingReports();drawerCandidate.toggle()">
+                            Search
+                            <span class="vertical-align-top-icon-style"><i
+                                    class="material-icons search-button-icon-style">search</i></span>
+                        </button>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </mat-drawer>
+        <div class="modal-body">
+            <div class="form-header-style">
+                Talent Calling Report
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Cross click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <br>
+            <div class="candidate-body">
+                <div class="display-inline">
+                    <div class="font-weight-bold font-xl-style">
+                        Talent Enquiry Calling Report -
+                        <span class="color-F6430F"> {{totalEnquiryCallingReports}}</span>
+                        &nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-default filter-button" type="button"
+                            *ngIf="isEnquiryCallingReportSearched" (click)="resetEnquiryCallReportSearchAndGetAll()">
+                            View All Reports
+                        </button>
+                    </div>
+                    <div class="float-right" *ngIf="(totalEnquiryCallingReports == 0 && isEnquiryCallingReportSearched) 
+                        || (totalEnquiryCallingReports > 0 && !isEnquiryCallingReportSearched) 
+                        || (totalEnquiryCallingReports > 0 && isEnquiryCallingReportSearched)">
+                        <button class="btn btn-default filter-button" (click)="drawerCandidate.toggle()">
+                            Add Filter <strong>+</strong>
+                        </button>
+                        <br><br>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalEnquiryCallingReports > 0">
+                    <div class="text-right">
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                            <span class="pagination-numbers">{{totalEnquiryCallingReports}}</span>
+                        </span>
+                    </div>
+                    <div class="pagination-flex">
+                        <div class="pagination-flex-item">
+                            <div class="pagination-control-flex-item">
+                                <select class="form-control form-control-sm input-style"
+                                    [(ngModel)]="enquiryCallingReportLimit"
+                                    (change)="changeEnquiryCallingReportPage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="pagination-control-flex-item">
+                                <ul class="pagination"
+                                    *ngFor="let report of enquiryCallingReportList | paginate: { id:'enquiryCallingReportPageID',
+                                    itemsPerPage: enquiryCallingReportLimit, currentPage: currentEnquiryCallingReportPage, totalItems: totalEnquiryCallingReports }">
+                                </ul>
+                                <pagination-controls id="enquiryCallingReportPageID" responsive="true" maxSize="10"
+                                    (pageChange)="changeEnquiryCallingReportPage($event)">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+                <div *ngIf="totalEnquiryCallingReports > 0">
+                    <div class="row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <div class="card table-card-shadow modal-popup-table-card-style">
+                                <div class="card-body padding-0pt">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped modal-popup-table-style">
+                                            <tr>
+                                                <th class="no">No.</th>
+                                                <th class="loginName">Login Name</th>
+                                                <th class="talentName">Talent Name</th>
+                                                <th class="contact">Contact</th>
+                                                <th class="email">Email</th>
+                                                <th class="date">Date</th>
+                                                <th class="purpose">Purpose</th>
+                                                <th class="outcome">Outcome</th>
+                                                <th class="comment">Comment</th>
+                                                <th class="view">View</th>
+                                            </tr>
+                                            <tbody>
+                                                <tr *ngFor="let report of enquiryCallingReportList; let i = index">
+                                                    <td>{{(i+1)+(callingReportOffset*enquiryCallingReportLimit)}}</td>
+                                                    <td>{{report.loginName}}</td>
+                                                    <td>{{report.talent?.firstName+' '+report.talent?.lastName}}</td>
+                                                    <td>{{report.talent?.contact}}</td>
+                                                    <td>{{report.talent?.email}}</td>
+                                                    <td>{{report.dateTime | date:'dd MMM, yyyy'}}</td>
+                                                    <td>{{report.purpose}}</td>
+                                                    <td>{{report.outcome}}</td>
+                                                    <!-- <td>{{report.comment?.length > 30? report.comment?.substring(0,30)+'...':report.comment ||
+                                                        'No comments'}}</td> -->
+                                                    <td>{{report.comment? report.comment.length > 30?
+                                                        report.comment?.substring(0,30)+'...':report.comment:
+                                                        'No comment'}}</td>
+                                                    <td data-toggle="tooltip" data-placement="top"
+                                                        title="View Calling Details">
+                                                        <!-- <button type="button"
+                                                            (click)="getCallingReports(report.credentialID);openModal(callingReportModal, 'xl')"
+                                                            class="btn">
+                                                            <i class="material-icons teal">visibility</i></button> -->
+                                                        <span (click)="onEnquiryDetailedReportViewClick(report)">
+                                                            <i class="material-icons color-F6430F">visibility</i>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalEnquiryCallingReports == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Calling Report Found</h2>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+                    (click)="modal.dismiss('Cross click')">
+                    Close
+                </button>
+            </div>
+        </div>
+    </mat-drawer-container>
+</ng-template>
+
+<!--Detailed Enquiry Calling Report Modal -->
+<ng-template #detailedEnquiryCallingReportModal let-modal>
+    <div class="container">
+        <div class="modal-body">
+            <div class="form-header-style">
+                Detailed Report
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Close click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="enquiryDetailedCallingReportForm">
+                <fieldset disabled="disabled">
+                    <div class="form-sub-header-style">Calling Details</div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Login Name'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="loginName">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-5">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="dateTime">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Purpose'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="purpose">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="outcome">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Date'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="targetDate">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Expected CTC'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="expectedCTC">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Notice Period'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" class="form-control input-style" formControlName="noticePeriod">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="form-group">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}">
+                                    </ng-container>
+                                </span>
+                                <!-- <input type="text" class="form-control" formControlName="comment"> -->
+                                <textarea class="form-control rounded-0 input-style" name="comment" rows="2"
+                                    formControlName="comment"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-sub-header-style">Talent Enquiry Details</div>
+                    <div formGroupName="talentEnquiry">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="firstName">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="lastName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="email">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <span>
+                                        <ng-container
+                                            *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Contact'}">
+                                        </ng-container>
+                                    </span>
+                                    <input type="text" class="form-control input-style" formControlName="contact">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

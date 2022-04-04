@@ -1,0 +1,581 @@
+<div *ngIf="isEditSessionPlan">
+  <app-session-plan-update (changeTab)="($event==3) ? (isEditSessionPlan = !isEditSessionPlan) : '' "></app-session-plan-update>
+</div>
+<ng-template #dashTemplate>-</ng-template>
+
+<div class="container-fluid" *ngIf="!isEditSessionPlan">
+  <br>
+
+  <div class="d-flex justify-content-end" *ngIf="totalbatchSession > 0 && isFaculty">
+    <button type="button" class="btn btn-outline-info mb-5 left-margin" (click)="isEditSessionPlan=!isEditSessionPlan">Edit</button>
+    <button type="button" class="btn btn-outline-danger mb-5" (click)="onDeleteSessionPlanClick()">Delete</button>
+  </div>
+
+  <ng-container *ngIf="isTalent">
+    <div class="font-weight-bold font-lg-style color-F6430F text-center">
+      My Session Plan
+    </div>
+    <br>
+  </ng-container>
+
+  <div class="table-responsive padding-0pt" *ngIf="totalbatchSession > 0">
+    <table class="table table-bordered">
+      <tr>
+        <th class="text-center">Sr No</th>
+        <th class="text-center">Date</th>
+        <th class="text-center">Module</th>
+        <th class="text-center">Topics</th>
+        <th>Sub Topics</th>
+        <th class="text-center">Time Taken</th>
+        <th class="text-center">Concepts</th>
+        <th class="text-center">Assignment</th>
+        <th class="text-center">Resources</th>
+        <th class="text-center">Pre Requisite</th>
+      </tr>
+      <tbody>
+        <ng-container *ngFor="let batchSession of batchSessions; let i = index">
+          <tr>
+            <td class="text-center text-nowrap align-middle" [attr.rowspan]="batchSession.totalModuleSubTopic || 1">
+              {{i+1}}
+            </td>
+            <td class="text-center text-nowrap align-middle" [attr.rowspan]="batchSession.totalModuleSubTopic || 1">
+              {{batchSession?.date | date:'fullDate'}}
+            </td>
+            <td class="text-center align-middle" [attr.rowspan]="batchSession.module[0]?.totalSubTopics || 1">
+              {{batchSession?.module[0]?.moduleName || "-"}}
+            </td>
+            <td class="text-center align-middle"
+              [attr.rowspan]="batchSession.module[0]?.moduleTopics && batchSession.module[0]?.moduleTopics[0]?.subTopics.length || 1">
+              {{batchSession.module[0]?.moduleTopics ? batchSession.module[0]?.moduleTopics[0]?.topicName : '-'}}
+            </td>
+            <td class="align-middle">
+              {{batchSession.module[0]?.moduleTopics ? batchSession.module[0]?.moduleTopics[0]?.subTopics[0]?.topicName : "-"}}
+            </td>
+            <td class="text-center align-middle"
+              [attr.rowspan]="batchSession.module[0]?.moduleTopics && batchSession.module[0]?.moduleTopics[0]?.subTopics.length || 1">
+              <!-- {{batchSession.module[0]?.moduleTopics[0]?.totalTime | minute}} -->
+              {{"some time"}}
+            </td>
+            <td class="align-middle" 
+              [attr.rowspan]="batchSession.module[0]?.moduleTopics && batchSession.module[0]?.moduleTopics[0]?.subTopics.length || 1">
+              <ng-container
+                *ngIf="batchSession.module[0]?.moduleTopics && batchSession.module[0]?.moduleTopics[0]?.topicProgrammingConcept.length > 0; 
+                  else dashTemplate">
+                <div *ngFor="let concept of batchSession.module[0]?.moduleTopics[0]?.topicProgrammingConcept">
+                  <span class="badge concept-badge-style">
+                    {{concept?.programmingConcept?.name}}
+                  </span>
+                </div>
+              </ng-container>
+            </td>
+            <td class="text-center align-middle" 
+              [attr.rowspan]="batchSession.module[0]?.moduleTopics && batchSession.module[0]?.moduleTopics[0]?.subTopics?.length || 1">
+              <button type="button" class="btn btn-default"
+                [disabled]="batchSession.module[0]?.moduleTopics && batchSession.module[0]?.moduleTopics[0]?.batchTopicAssignment?.length == 0"
+                (click)="onAssignmentClick(batchSession?.module[0],batchSession?.module[0]?.moduleTopics[0],i)">
+                <img src="assets/course/assignment.png" alt="view assignment" width="30">
+              </button>
+            </td>
+            <td class="text-center text-nowrap align-middle"
+              [attr.rowspan]="batchSession.module[0]?.totalSubTopics || 1">
+              <button type="button" class="btn btn-default" (click)="onManageResourceClick(batchSession.module[0])"
+                [disabled]="isTalent && batchSession?.module[0]?.resources?.length == 0">
+                <img src="assets/icon/colour-icons/manageresources.png" alt="view resource" width="30">
+              </button>
+            </td>
+            <td class="text-center text-nowrap align-middle" [attr.rowspan]="batchSession?.totalModuleSubTopic || 1">
+              <button type="button" class="btn btn-default" (click)="onPreRequisiteClick(batchSession)"
+                [disabled]="isTalent && !batchSession?.batchSessionPrerequisite">
+                <img src="assets/icon/colour-icons/addtask.png" alt="pre-requisite" width="30">
+              </button>
+            </td>
+          </tr>
+          <ng-container *ngIf="batchSession?.module[0]?.moduleTopics">
+            <ng-container [ngTemplateOutlet]="subTopics"
+              [ngTemplateOutletContext]="{subTopics:batchSession?.module[0]?.moduleTopics[0]?.subTopics}">
+            </ng-container>
+          </ng-container>
+          <ng-container [ngTemplateOutlet]="moduleTopics" [ngTemplateOutletContext]="{module:batchSession?.module[0]}">
+          </ng-container>
+
+          <!-- Module after first iteration -->
+          <ng-container *ngFor="let module of batchSession.module | slice: 1; let n=index">
+            <tr>
+              <td class="text-center align-middle" [attr.rowspan]="module?.totalSubTopics || 1">
+                {{module?.moduleName}}
+              </td>
+              <td class="text-center align-middle" [attr.rowspan]="module?.moduleTopics[0]?.subTopics?.length || 1">
+                {{module?.moduleTopics[0]?.topicName || '-'}}
+              </td>
+              <td class="align-middle">
+                {{module?.moduleTopics[0]?.subTopics[0]?.topicName}}
+              </td>
+              <td class="text-center align-middle" [attr.rowspan]="module?.moduleTopics[0]?.subTopics?.length || 1">
+                {{module?.moduleTopics[0]?.totalTime | minute}}
+              </td>
+              <td class="align-middle" [attr.rowspan]="module?.moduleTopics[0]?.subTopics?.length || 1">
+                <ng-container *ngIf="module?.moduleTopics[0]?.topicProgrammingConcept?.length > 0; else dashTemplate">
+                  <div *ngFor="let concept of module?.moduleTopics[0]?.topicProgrammingConcept">
+                    <span class="badge concept-badge-style">
+                      {{concept?.programmingConcept?.name}}
+                    </span>
+                  </div>
+                </ng-container>
+              </td>
+              <td class="text-center align-middle" [attr.rowspan]="module?.moduleTopics[0]?.subTopics?.length || 1">
+                <button type="button" class="btn btn-default"
+                  [disabled]="module?.moduleTopics[0]?.batchTopicAssignment?.length == 0"
+                  (click)="onAssignmentClick(module,module?.moduleTopics[0],n)">
+                  <img src="assets/course/assignment.png" alt="add assignment" width="30">
+                </button>
+              </td>
+              <td class="text-center text-nowrap align-middle" [attr.rowspan]="module?.totalSubTopics || 1">
+                <button type="button" class="btn btn-default" (click)="onManageResourceClick(module)"
+                  [disabled]="isTalent && module?.resources.length == 0">
+                  <img src="assets/icon/colour-icons/manageresources.png" alt="view resource" width="30">
+                </button>
+              </td>
+            </tr>
+            <ng-container [ngTemplateOutlet]="subTopics"
+              [ngTemplateOutletContext]="{subTopics:module?.moduleTopics[0]?.subTopics}">
+            </ng-container>
+            <ng-container [ngTemplateOutlet]="moduleTopics" [ngTemplateOutletContext]="{module:module}">
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template let-module="module" #moduleTopics>
+    <ng-container *ngFor="let moduleTopic of module?.moduleTopics | slice: 1; let k = index">
+      <tr>
+        <td class="text-center align-middle" [attr.rowspan]="(moduleTopic?.subTopics?.length) || 1">
+          {{moduleTopic?.topicName}}
+        </td>
+        <td>{{moduleTopic?.subTopics[0].topicName}}</td>
+        <td class="text-center align-middle" [attr.rowspan]="moduleTopic?.subTopics?.length || 1">
+          {{moduleTopic?.totalTime | minute}}
+        </td>
+        <td class="align-middle" [attr.rowspan]="moduleTopic?.subTopics?.length || 1">
+          <ng-container *ngIf="moduleTopic?.topicProgrammingConcept[1]?.programmingConcept; else dashTemplate">
+            <span class="badge concept-badge-style">
+              {{moduleTopic?.topicProgrammingConcept[1]?.programmingConcept?.name || "-"}}
+            </span>
+          </ng-container>
+        </td>
+        <td class="text-center align-middle" [attr.rowspan]="(moduleTopic?.subTopics?.length) || 1">
+          <button type="button" class="btn btn-default" [disabled]="moduleTopic?.batchTopicAssignment?.length == 0"
+            (click)="onAssignmentClick(module,moduleTopic,k)">
+            <img src="assets/course/assignment.png" alt="add assignment" width="30">
+          </button>
+        </td>
+      </tr>
+      <ng-container [ngTemplateOutlet]="subTopics" [ngTemplateOutletContext]="{subTopics:moduleTopic?.subTopics}">
+      </ng-container>
+    </ng-container>
+  </ng-template>
+
+  <ng-template let-subTopics="subTopics" #subTopics>
+    <ng-container *ngFor="let subTopic of subTopics | slice: 1; let m = index">
+      <tr>
+        <td>{{subTopic.topicName}}</td>
+      </tr>
+    </ng-container>
+  </ng-template>
+
+  <div *ngIf="totalbatchSession == 0">
+    <div class="card">
+      <div class="card-body not-found-card-style">
+        <h2>No Session Plan Found</h2>
+      </div>
+    </div>
+  </div>
+
+  <br>
+  <br>
+
+</div>
+
+<ng-template #resourceModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/course/manageresources.png" width="80">
+      </div>
+      <div class="col-sm-10 left-margin">
+        <h1 *ngIf="!isTalent" class="swabhav-light-orange-text"><strong>Add Resources To:</strong></h1>
+        <h1 *ngIf="isTalent" class="swabhav-light-orange-text"><strong>Resources For:</strong></h1>
+        <h2>Module Name: &nbsp; {{module.moduleName}}</h2>
+        <button type="button" class="btn btn-submit-swabhav" *ngIf="!isAddResourceClick && !isTalent"
+          (click)="isAddResourceClick=!isAddResourceClick">
+          Add New Resource<i class="material-icons inline-icon">add</i>
+        </button>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div *ngIf="!isAddResourceClick && moduleResources.length == 0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Resources Found</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <!-- Modal body -->
+    <div *ngIf="!isAddResourceClick && moduleResources.length > 0">
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th>Resource Name</th>
+              <th class="text-center">File Type</th>
+              <th class="text-center">URL/PDF</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let resource of moduleResources; let i = index">
+              <tr>
+                <td class="text-center align-middle">
+                  {{i+1}}
+                </td>
+                <td class="align-middle">{{resource.resourceName}}</td>
+                <td class="text-center align-middle">{{resource.fileType}}</td>
+                <td class="text-center align-middle" data-toggle="tooltip" data-placement="top" title="Delete Resource">
+                  <button type="button" class="btn btn-default" (click)="redirectToMeetLink(resource.resourceURL)">
+                    <img src="assets/icon/colour-icons/link.png" alt="delete module" width="30">
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="isAddResourceClick">
+      <form [formGroup]="multipleResourcesForm">
+        <div formArrayName="resources" *ngFor="let resourceForm of resourceFormArray.controls;let i = index">
+          <ng-container [formGroupName]="i">
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <label for="sel1"><strong>Resource {{i+1}}:</strong></label>
+                <button *ngIf="!isViewClicked && resourceFormArray.controls?.length > 1" type="button"
+                  class="float-right btn btn-sm" style="cursor: pointer;" (click)="deleteResource(i, modal)">
+                  <i class="material-icons red">close</i>
+                </button>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label for="sel1">Resource Type:</label>
+                  <select class="form-control input-style" formControlName="resourceType"
+                    (change)="getResourcesByType(i)">
+                    <option [ngValue]="null">Select Resource Type</option>
+                    <option *ngFor="let type of resourceTypeList" [ngValue]="type.value">
+                      {{type.value}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4 form-group">
+                <label for="sel1">Resource Sub Type:</label>
+                <select class="form-control input-style" formControlName="resourceSubType"
+                  (change)="getResourcesByType(i)">
+                  <option [ngValue]="null">Select Resource Sub Type</option>
+                  <option *ngFor="let type of resourceSubTypeList" [ngValue]="type.value">
+                    {{type.value}}
+                  </option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-4 form-group">
+                <label for="sel1">File Type:</label>
+                <select class="form-control input-style" formControlName="fileType" (change)="getResourcesByType(i)">
+                  <option [ngValue]="null">Select File Type</option>
+                  <option *ngFor="let type of fileTypeList" [ngValue]="type.value">
+                    {{type.value}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <label for="sel1"><span class="red">*</span> Resource:</label>
+                <ng-select [items]="resourceList" bindLabel="resourceName" placeholder="Select Resource" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="resourceID" bindValue="id"
+                  [loading]="isResourceLoading" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.resourceName}}
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <button type="button" *ngIf="!isViewClicked" class="btn filter-button btn-sm float-right"
+          (click)="addResourcesToForm()">Add Resource</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text"
+      (click)="dismissFormModal(modal)">Close</button>
+    <button type="button" *ngIf="isAddResourceClick" class="btn btn-submit-swabhav"
+      (click)="onSubmitResourceClick()">Save</button>
+  </div>
+
+</ng-template>
+
+
+<ng-template #assignmentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/course/assignment.png" width="80">
+      </div>
+      <div class="col-sm-10 left-margin">
+        <div>
+          <h1 class="swabhav-light-orange-text"><strong>Assignments For:</strong></h1>
+          <h3>Module: &nbsp; {{module.moduleName}}</h3>
+          <h3>Topic: &nbsp; {{moduleTopic.topicName}}</h3>
+          <h3></h3>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+
+
+    <div *ngIf="moduleTopic.batchTopicAssignment.length == 0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Assignment Found</h2>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <!-- Subtopics Info -->
+    <ng-container *ngIf="!isViewAssignmentClick && moduleTopic.batchTopicAssignment.length>0">
+      <div class="table-responsive">
+        <table class="table table-borderless agenda-table-text-style">
+          <thead>
+            <tr class="text-center">
+              <th>Order</th>
+              <th class="text-left">Assignment Name</th>
+              <th>Difficulty</th>
+              <th>Time Taken</th>
+              <th>Deadline</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let assignment of moduleTopic.batchTopicAssignment; let k = index">
+              <tr class="text-center">
+                <td class="align-middle">{{k+1}}</td>
+                <td class="text-left">{{assignment.programmingQuestion?.label}}</td>
+                <td class="align-middle">
+                  <div class="tasklist-box-style" [ngClass]="{'green-box-style': assignment.programmingQuestion.level===1,
+                        'yellow-box-style': assignment.programmingQuestion.level===2,
+                        'red-box-style': assignment.programmingQuestion.level===3}">
+                    <div *ngIf="assignment.programmingQuestion.level===1">
+                      Easy
+                    </div>
+                    <div *ngIf="assignment.programmingQuestion.level===2">
+                      Medium
+                    </div>
+                    <div *ngIf="assignment.programmingQuestion.level===3">
+                      Hard
+                    </div>
+                  </div>
+                </td>
+                <td class="align-middle">
+                  {{assignment.programmingQuestion?.timeRequired}}
+                </td>
+                <td class="align-middle">
+                  <span *ngIf="assignment.dueDate;else dashTemplate">
+                    {{assignment.dueDate | date:'EEE, MMM d, y'}}
+                  </span>
+                  <!-- {{calculateDeadlineDate(assignment.days)}} -->
+                </td>
+                <td class="align-middle">
+                  {{assignment.programmingQuestion?.score}}
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+  </div>
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" (click)="dismissFormModal(modal)">Close</button>
+  </div>
+
+</ng-template>
+
+
+<ng-template #preRequisiteFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/icon/colour-icons/addtask.png" width="80">
+      </div>
+      <div class="col-sm-10 left-margin">
+        <div>
+          <h1><strong><span class="swabhav-light-orange-text">Pre-requisite</span></strong></h1>
+        </div>
+        <ng-container *ngFor="let module of batchSession.module">
+          <h4>Module Name: <span>{{module.moduleName}}</span></h4>
+          <h4>Topic Name:
+            <span *ngFor="let moduleTopic of module.moduleTopics">
+              {{moduleTopic.topicName}}
+            </span>
+          </h4>
+        </ng-container>
+      </div>
+    </div>
+    <br>
+    <br>
+
+    <!-- Modal Body -->
+    <form [formGroup]="preRequisiteForm">
+      <div class="row">
+        <div class="form-group col-10 row-3">
+          <span *ngIf="!isViewMode" class="red">*</span>
+          <span><strong> Description:</strong></span>
+          <div *ngIf="isTalent" [innerHTML]="preRequisiteForm.get('prerequisite').value">
+          </div>
+          <ng-container *ngIf="!isTalent">
+            <ckeditor [config]="ckConfig" formControlName="prerequisite"></ckeditor>
+            <div class="alert alert-danger" *ngIf="(preRequisiteForm.get('prerequisite').touched||
+              preRequisiteForm.get('prerequisite').dirty)&&preRequisiteForm.get('prerequisite').invalid">
+              <div *ngIf="preRequisiteForm.get('prerequisite').errors.required">
+                Description must be specified
+              </div>
+              <div *ngIf="preRequisiteForm.get('prerequisite').errors.maxlength">
+                Description can have maximum 100 characters
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </form>
+    <br>
+    <br>
+
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button type="button" (click)="dismissFormModal(modal)" class="btn btn-default">Close</button>
+    &nbsp;&nbsp;
+    <button type="button" [disabled]="!preRequisiteForm.dirty" class="btn btn-default swabhav-button-round"
+      *ngIf="!isViewMode && !isTalent" (click)="validatePreRequisiteForm()">
+      Save
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Delete Talent Comfirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h1 class="modal-title">Comfirmation</h1>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="button"><i
+        class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        <h3 class="red"><strong>This will delete all the session plan created for {{loginName}}. Are you sure you want
+            to continue?</strong></h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click')">No</button>
+  </div>
+</ng-template>
+
+
+<!-- MODULE TOPICS -->
+<!-- <ng-container *ngFor="let moduleTopic of batchSession.module[0]?.moduleTopics | slice: 1; let k = index">
+  <tr>
+    <td class="text-center align-middle" [attr.rowspan]="(moduleTopic?.subTopics?.length) || 1">
+      {{moduleTopic.topicName}} R3
+    </td>
+    <td>{{moduleTopic.subTopics[0].topicName}} R3</td>
+    <td class="text-center align-middle" [attr.rowspan]="moduleTopic?.subTopics?.length || 1">
+      {{moduleTopic.totalTime | minute}} R3
+    </td>
+    <td class="text-center align-middle" [attr.rowspan]="moduleTopic?.subTopics?.length || 1">
+      {{moduleTopic.topicProgrammingConcept[1]?.programmingConcept?.name || "-"}} R3
+    </td>
+    <td class="text-center align-middle" [attr.rowspan]="(moduleTopic?.subTopics?.length) || 1">
+      {{moduleTopic.topicProgrammingQuestions ?
+      moduleTopic.topicProgrammingQuestions[0]?.programmingQuestion?.label : "-"}} R3
+    </td>
+  </tr>
+  <ng-container [ngTemplateOutlet]="subTopics"
+    [ngTemplateOutletContext]="{subTopics:moduleTopic?.subTopics}">
+  </ng-container>
+</ng-container> -->
+<!-- <ng-container
+  *ngFor="let moduleTopic of module?.moduleTopics | slice: 1; let k = index">
+  <tr>
+    <td class="text-center align-middle" [attr.rowspan]="(moduleTopic?.subTopics?.length) || 1">
+      {{moduleTopic.topicName}} R6
+    </td>
+    <td>{{moduleTopic.subTopics[0].topicName}} R6</td>
+    <td class="text-center align-middle" [attr.rowspan]="moduleTopic?.subTopics?.length || 1">
+      {{moduleTopic.totalTime | minute}} R6
+    </td>
+    <td class="text-center align-middle" [attr.rowspan]="moduleTopic?.subTopics?.length || 1">
+      {{moduleTopic.topicProgrammingConcept[1]?.programmingConcept?.name || "-"}} R6
+    </td>
+    <td class="text-center align-middle" [attr.rowspan]="(moduleTopic?.subTopics?.length) || 1">
+      {{moduleTopic.topicProgrammingQuestions ?
+      moduleTopic.topicProgrammingQuestions[0]?.programmingQuestion?.label : "-"}} R6
+    </td>
+  </tr>
+  <ng-container [ngTemplateOutlet]="subTopics"
+    [ngTemplateOutletContext]="{subTopics:moduleTopic?.subTopics}">
+  </ng-container>
+</ng-container> -->

@@ -1,0 +1,324 @@
+<ng-template #fieldName let-name="name">
+  <label><strong><span *ngIf="!isViewMode" class="red">*</span> {{name}}</strong></label>
+</ng-template>
+
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon close-icon">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="feedbackQuestionGroupSearchForm">
+      <div class="filter-by-field row">
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Group Name:</label>
+          <input type="text" class="form-control input-style" formControlName="groupName" placeholder="eg: A">
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Order:</label>
+          <input type="number" class="form-control input-style" formControlName="order" placeholder="eg: 1">
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Group Type:</label>
+          <select class="form-control input-style" formControlName="type">
+            <option [ngValue]="null">Select Type</option>
+            <option *ngFor="let type of feedbackType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <br>
+
+    <div class="text-center">
+      <button type="button" class="btn btn-submit-swabhav material-icons-button"
+        [disabled]="!feedbackQuestionGroupSearchForm.dirty" (click)="searchAndCloseDrawer()">Search <i
+          class="inline-icon material-icons no-hover">search</i>
+      </button>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="totalLabel">
+          <h1>Total Feedback Questions Groups:
+            <span class="swabhav-light-orange-text">{{totalFeedbackQuestionGroups || 0}}</span>
+          </h1>
+        </div>
+
+        <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission?.add"
+          (click)="onAddNewFeedbackQuestionGroupClick()">Add Feedback Question Group
+          <i class="inline-icon material-icons no-hover">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalFeedbackQuestionGroups > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalFeedbackQuestionGroups}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row">
+        <div class="d-flex justify-content-between align-items-center flex-row">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons no-hover">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-sm filter-button material-icons-button" *ngIf="isSearched"
+            (click)="resetSearchAndGetAll()">View All Feedback Question Groups
+          </button>
+        </div>
+        <div class="d-flex justify-content-between align-items-start flex-row">
+          <div class="d-flex">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex">
+            <ul class="pagination" *ngFor="let feedbackQuestionGroup of feedbackQuestionGroupList | paginate: { id:'feedbackQuestionGroupPageID',
+                  itemsPerPage: limit, currentPage: currentPage, totalItems: totalFeedbackQuestionGroups }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+              id="feedbackQuestionGroupPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card-body swabhav-shadow padding-0pt"
+        *ngIf="totalFeedbackQuestionGroups> 0; else noFeedbackQuestionGroup">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th><strong>No.</strong></th>
+                <th><strong>Group Name</strong></th>
+                <th><strong>Type</strong></th>
+                <th><strong>Description</strong></th>
+                <th><strong>Order</strong></th>
+                <th><strong>View</strong></th>
+                <!-- <th></th> -->
+                <!-- <th>Delete</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let feedbackQuestionGroup of feedbackQuestionGroupList; let i = index">
+                <td>{{(i+1)+(offset*limit)}}</td>
+                <td>{{feedbackQuestionGroup.groupName}}</td>
+                <td>{{feedbackQuestionGroup.type}}</td>
+                <td>{{feedbackQuestionGroup.groupDescription}}</td>
+                <td>{{feedbackQuestionGroup.order}}</td>
+                <td>
+                  <button class="btn btn-default" (click)="onViewFeedbackQuestionGroupClick(feedbackQuestionGroup)">
+                    <i class="inline-icon material-icons">visibility</i>
+                  </button>
+                </td>
+                <!-- <td class="text-left">
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-element material-icons-button" type="button" id="dropdownMenuButton" 
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="material-icons"><strong>more_vert</strong></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <button class="dropdown-item btn btn-default btn-dropdown" 
+                        (click)="onViewFeedbackQuestionGroupClick(feedbackQuestionGroup)">
+                        <i class="inline-icon material-icons-outlined">visibility</i> View
+                      </button>
+                      <button class="dropdown-item btn btn-default btn-dropdown" 
+                        (click)="onDeleteFeedbackQuestionGroupClick(feedbackQuestionGroup.id)"
+                        *ngIf="permission && permission?.delete"><i class="inline-icon material-icons">delete</i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </td> -->
+                <!-- <td data-toggle="tooltip" data-placement="top" title="Update feedbackQuestionGroup">
+                  <button type="button"
+                    (click)="()"
+                    class="btn"><i class="material-icons">visibility</i></button>
+                </td>
+                <td data-toggle="tooltip" data-placement="top" title="Delete feedbackQuestionGroup">
+                  <button type="button"
+                    (click)="(feedbackQuestionGroup.id)"
+                    class="btn"><i class="material-icons red">delete</i></button>
+                </td> -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Feedback Question Groups Not Found -->
+      <ng-template #noFeedbackQuestionGroup>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Feedback Question Groups Not Found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+
+<!-- Add/Update/View Feedback Question Group -->
+<ng-template #feedbackQuestionGroupFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+        {{isViewMode? 'Feedback Question Group Details': isOperationUpdate ? 'Update Feedback Question Group' : 'Add
+        Feedback Question Group' }}
+        <button *ngIf="isViewMode && permission?.update" class="btn btn-default material-icons-button" type="button"
+          (click)="onUpdateFeedbackQuestionGroupClick()"><i class="material-icons grey-icon">create</i>
+        </button>
+      </h4><span *ngIf="!isViewMode"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <form [formGroup]="feedbackQuestionGroupForm">
+    <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldName; context:{name:'Group Name'}"></ng-container>
+          </span>
+          <input type="text" class="form-control input-style" formControlName="groupName" placeholder="eg: A">
+          <div class="alert alert-danger" *ngIf="(feedbackQuestionGroupForm.get('groupName').touched||
+                feedbackQuestionGroupForm.get('groupName').dirty)&&feedbackQuestionGroupForm.get('groupName').invalid">
+            <div *ngIf="feedbackQuestionGroupForm.get('groupName').errors.required">
+              Feedback Question Group Name must be specified
+            </div>
+            <div *ngIf="feedbackQuestionGroupForm.get('groupName').errors.maxlength">
+              Feedback Question Group Name must contain maximum 50 characters
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldName; context:{name:'Group Type'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="type">
+            <option [ngValue]="null" disabled>Select Type</option>
+            <option *ngFor="let type of feedbackType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(feedbackQuestionGroupForm.get('type').touched||
+              feedbackQuestionGroupForm.get('type').dirty)&&feedbackQuestionGroupForm.get('type').invalid">
+            <div *ngIf="feedbackQuestionGroupForm.get('type').errors.required">
+              Group type must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldName; context:{name:'Order'}"></ng-container>
+          </span>
+          <input type="number" class="form-control input-style" formControlName="order" placeholder="eg: 1">
+          <div class="alert alert-danger" *ngIf="(feedbackQuestionGroupForm.get('order').touched||
+              feedbackQuestionGroupForm.get('order').dirty)&&feedbackQuestionGroupForm.get('order').invalid">
+            <div *ngIf="feedbackQuestionGroupForm.get('order').errors.required">
+              Order must be specified
+            </div>
+            <div *ngIf="feedbackQuestionGroupForm.get('order').errors.min">
+              Order cannot be below 1
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-12 col-md-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldName; context:{name:'Group Description'}"></ng-container>
+          </span>
+          <textarea class="form-control input-style" formControlName="groupDescription" rows="5" id="comment"
+            placeholder="Description...."></textarea>
+          <div class="alert alert-danger"
+            *ngIf="(feedbackQuestionGroupForm.get('groupDescription').touched||
+                feedbackQuestionGroupForm.get('groupDescription').dirty)&&feedbackQuestionGroupForm.get('groupDescription').invalid">
+            <div *ngIf="feedbackQuestionGroupForm.get('groupDescription').errors.required">
+              Feedback Question Group Description must be specified
+            </div>
+            <div *ngIf="feedbackQuestionGroupForm.get('groupDescription').errors.maxlength">
+              Feedback Question Group Description must contain maximum 200 characters
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+        (click)="modal.dismiss('Close click')">Close
+      </button>
+      <button type="submit" class="btn btn-submit-swabhav material-icons-button" *ngIf="!isViewMode"
+        [disabled]="!feedbackQuestionGroupForm.dirty" (click)="onFormSubmit()">
+        {{isOperationUpdate ? 'Update Feedback Question Group' : 'Add Feedback Question Group'}}
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Delete Feedback Question Group Confirmation -->
+<ng-template #deleteFeedbackQuestionGroupModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="modal-title">Confirmation</h2>
+    <button type="button" class="close" (click)="modal.dismiss('Close click')" class="btn btn-default" type="submit">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure you want to delete this feedbackQuestionGroup?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Close click')">No</button>
+  </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>

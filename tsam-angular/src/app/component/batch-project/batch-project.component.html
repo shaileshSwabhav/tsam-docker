@@ -1,0 +1,586 @@
+<ng-container *ngIf="isAssignClick">
+
+  <div class="container-fluid margin-2pt">
+    <br>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+      <div class="totalLabel">
+        <h1>Total Projects: <span class="swabhav-light-orange-text">{{totalProgrammingProjects || 0}}</span></h1>
+      </div>
+
+      <div class="d-flex">
+        <button class="btn btn-outline-swabhav text-nowrap material-icons-button" *ngIf="permission?.add"
+          (click)="onAddClick()">Add New Project
+        </button> &nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+
+    <br>
+
+    <div *ngIf="totalProgrammingProjects > 0" class="view-label-flex">
+      Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{programmingPaginationString}}</strong> </span>
+      &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalProgrammingProjects}}</strong></span>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+      <div class="d-flex justify-content-between align-items-center flex-row">
+        <form class="form-inline" [formGroup]="programmingProjectSearchForm">
+          <label for="projectName" class="filter-form-label">Project Name:</label>
+          &nbsp;&nbsp;
+          <input type="text" name="projectName" class="form-control input-style" formControlName="projectName"
+            placeholder="Search Project Name" maxlength="100"> <!--  (input)="searchProgrammingProject()" -->
+          &nbsp;&nbsp;
+        </form> &nbsp;&nbsp;&nbsp;
+        <button class="btn btn-sm filter-button material-icons-button" type="submit"
+          (click)="searchProgrammingProject()"
+          [disabled]="!programmingProjectSearchForm.dirty||programmingProjectSearchForm.invalid">Search
+        </button> &nbsp;&nbsp;&nbsp;
+        <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+          (click)="resetSearchAndGetAll()">View All Projects</button>
+      </div>
+      <div class="d-flex justify-content-between align-items-center flex-row flex-wrap"
+        *ngIf="programmingProjectIDList.length > 0 && permission?.add">
+        <button class="btn btn-submit-swabhav text-nowrap material-icons-button"
+          [disabled]="!multipleBatchProjectsForm.dirty" (click)="validateBatchProject()">Assign To Batch
+        </button>
+      </div>
+      <form [formGroup]="programmingProjectSearchForm">
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <!-- changePage(1) change of limit will set the offset to 0 -->
+            <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let project of programmingProjects | paginate: { id:'projectPageID',
+							itemsPerPage: programmingProjectSearchForm.get('limit').value, 
+							currentPage: (+programmingProjectSearchForm.get('offset').value + 1), 
+							totalItems: totalProgrammingProjects }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="projectPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <br>
+
+    <div class="card-body swabhav-shadow padding-0pt" *ngIf="isProgrammingProject; else noProjectFound">
+      <div class="table-responsive">
+        <table class="table table-striped table-borderless">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Project Name</th>
+              <th>project Type</th>
+              <th>Complexity Level</th>
+              <th>Required Hours</th>
+              <th>Status</th>
+              <th>Technology</th>
+              <th>Resource</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let project of programmingProjects; let i = index">
+              <td>
+                {{(i+1)+(offset*limit)}} &nbsp;&nbsp;&nbsp;
+                <label class="form-check-label">
+                  <label class="checkbox-container"
+                    [ngClass]="allBatchProjectIDs.includes(project.id) ? 'disabled': ''">
+                    <input type="checkbox" [checked]="programmingProjectIDList.includes(project.id)"
+                      [disabled]="allBatchProjectIDs.includes(project.id)" (change)="toggleBatchProjects(project.id)" />
+                    <span class="checkmark"></span>
+                  </label>
+                </label>
+              </td>
+              <td>{{project.projectName}}</td>
+              <td>{{project.projectType}}</td>
+              <td>{{project.complexityLevel}}</td>
+              <td>{{project.requiredHours}}</td>
+              <td>
+                <div *ngIf="project.isActive; else inActive">
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <ng-template #inActive>
+                  <span class="badge badge-danger">Inactive</span>
+                </ng-template>
+              </td>
+              <td>
+                <div *ngFor="let tech of project.technologies">
+                  <span class="badge badge-dark">
+                    {{tech.language}}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <ng-container *ngIf="project.resources.length > 0; else noResource">
+                  <div *ngFor="let resource of project.resources">
+                    <span class="badge badge-dark">
+                      {{resource.resourceName}}
+                    </span>
+                  </div>
+                </ng-container>
+                <ng-template #noResource>
+                  {{"-"}}
+                </ng-template>
+              </td>
+              <td data-toggle="tooltip" data-placement="top" title="View Batch Project">
+                <button type="button" (click)="onViewClick(project)" class="btn">
+                  <i class="material-icons">visibility</i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #noProjectFound>
+  <br>
+  <br>
+  <div class="container full-h">
+    <div class="d-flex align-items-center full-h">
+      <div class="col-sm-12 col-md-12 mx-auto">
+        <div class="jumbotron">
+          <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+            <h2>Projects not found</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-container *ngIf="isManageClick">
+  <div class="container-fluid margin-2pt">
+    <br>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+      <div class="totalLabel">
+        <h1>Total Projects: <span class="swabhav-light-orange-text">{{totalBatchProjects || 0}}</span></h1>
+      </div>
+
+      <div *ngIf="totalBatchProjects > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{batchPaginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalBatchProjects}}</strong></span>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="d-flex justify-content-end align-items-center flex-row flex-wrap">
+      <form [formGroup]="batchProjectSearchForm">
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" formControlName="limit"
+              (change)="changeBatchProjectPage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let project of batchProjects | paginate: { id:'batchProjectPageID',
+							itemsPerPage: batchProjectSearchForm.get('limit').value, 
+							currentPage: (+batchProjectSearchForm.get('offset').value + 1), 
+							totalItems: totalBatchProjects }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changeBatchProjectPage($event)"
+              id="batchProjectPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <br>
+
+    <div class="card-body swabhav-shadow padding-0pt" *ngIf="totalBatchProjects > 0; else noProjectFound">
+      <div class="table-responsive">
+        <table class="table table-striped table-borderless">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Project Name</th>
+              <th>Project Type</th>
+              <th>Complexity Level</th>
+              <th>Required Hours</th>
+              <th>Status</th>
+              <th>Technology</th>
+              <th>Resource</th>
+              <th>Publish Project</th>
+              <th>View</th>
+              <th *ngIf="permission?.delete">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let project of batchProjects; let i = index">
+              <td>{{(i+1)+(offset*limit)}}</td>
+              <td>{{project.programmingProject?.projectName}}</td>
+              <td>{{project.programmingProject?.projectType}}</td>
+              <td>{{project.programmingProject?.complexityLevel}}</td>
+              <td>{{project.programmingProject?.requiredHours}}</td>
+              <td>
+                <div *ngIf="project.programmingProject?.isActive; else inActive">
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <ng-template #inActive>
+                  <span class="badge badge-danger">Inactive</span>
+                </ng-template>
+              </td>
+              <td>
+                <div *ngFor="let tech of project.programmingProject?.technologies">
+                  <span class="badge badge-dark">{{tech.language}}</span>
+                </div>
+              </td>
+              <td>
+                <ng-container *ngIf="project.programmingProject?.resources?.length > 0; else noResource">
+                  <div *ngFor="let resource of project.programmingProject?.resources">
+                    <span class="badge badge-dark">
+                      {{resource.resourceName}}
+                    </span>
+                  </div>
+                </ng-container>
+                <ng-template #noResource>{{"-"}}</ng-template>
+              </td>
+              <td data-toggle="tooltip" data-placement="top" title="{{project.dueDate ? 'Allready Publised Project':'Published Project'}}">
+                <button type="button" [disabled]="project.dueDate"(click)="onPublishClick(project)" class="btn btn-default">
+                  <i class="material-icons">visibility</i>
+                </button>
+              </td>
+              <td data-toggle="tooltip" data-placement="top" title="View Programming Project">
+                <button type="button" (click)="onViewClick(project.programmingProject)" class="btn btn-default">
+                  <i class="material-icons">visibility</i>
+                </button>
+              </td>
+              <td data-toggle="tooltip" data-placement="top" title="Delete Batch Project" *ngIf="permission?.delete">
+                <button type="button" (click)="onBatchProjectDeleteClick(project)" class="btn btn-default">
+                  <i class="material-icons red">delete</i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</ng-container>
+
+
+<!-- Programming Project Modal -->
+<ng-template #programmingProjectFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h2 class="modal-title swabhav-light-orange-text">Programming Project Details</h2>
+      <span *ngIf="!isViewMode"><span class="red">* </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="programmingProjectForm">
+      <div class="row">
+        <div *ngIf="isViewMode" class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong>ProjectID:</strong></label>
+          <input type="text" class="form-control input-style" formControlName="code">
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span> Project
+              Name:</strong></label>
+          <input type="text" class="form-control input-style" formControlName="projectName" placeholder="eg: Project-1">
+          <div class="alert alert-danger" *ngIf="(programmingProjectForm.get('projectName').dirty || programmingProjectForm.get('projectName').touched) 
+							&& programmingProjectForm.get('projectName').invalid">
+            <div *ngIf="programmingProjectForm.get('projectName').errors.required">
+              Project Name must be specified
+            </div>
+            <div *ngIf="programmingProjectForm.get('projectName').errors.maxlength">
+              Project Name cannot have more than 100 characters
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isViewMode || isOperationUpdate" class="form-group col-sm-6 col-md-3">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span> Status:</strong></label>
+          <select class="form-control input-style" formControlName="isActive">
+            <option [ngValue]="null" disabled>Select Status</option>
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Inactive</option>
+          </select>
+          <div class="alert alert-danger"
+            *ngIf="(programmingProjectForm.get('isActive').dirty 
+                        || programmingProjectForm.get('isActive').touched) && programmingProjectForm.get('isActive').invalid">
+            <div *ngIf="programmingProjectForm.get('isActive').errors.required">
+              Project status must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span> Required
+              Hours:</strong></label>
+          <input type="number" class="form-control input-style" formControlName="requiredHours" placeholder="eg: 50">
+          <div class="alert alert-danger"
+            *ngIf="(programmingProjectForm.get('requiredHours').dirty 
+              || programmingProjectForm.get('requiredHours').touched) && programmingProjectForm.get('requiredHours').invalid">
+            <div *ngIf="programmingProjectForm.get('requiredHours').errors.required">
+              Required Hours must be specified
+            </div>
+            <div *ngIf="programmingProjectForm.get('requiredHours').errors.min">
+              Required Hours must be greater than or equal to 1
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span> Complexity Level:</strong></label>
+          <select class="form-control input-style" formControlName="complexityLevel">
+            <option [ngValue]="null" disabled>Select</option>
+            <option *ngFor="let count of getIntegerArray()" [ngValue]="count">{{count}}</option>
+          </select>
+          <div class="alert alert-danger"
+            *ngIf="(programmingProjectForm.get('complexityLevel').dirty 
+              || programmingProjectForm.get('complexityLevel').touched) && programmingProjectForm.get('complexityLevel').invalid">
+            <div *ngIf="programmingProjectForm.get('complexityLevel').errors.required">
+              Complexity level must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong>Sample URL:</strong></label>
+          <input type="text" class="form-control input-style" formControlName="sampleUrl"
+            placeholder="eg: https://www.example.com">
+          <div class="alert alert-danger" *ngIf="(programmingProjectForm.get('sampleUrl').dirty 
+            	|| programmingProjectForm.get('sampleUrl').touched) && programmingProjectForm.get('sampleUrl').invalid">
+            <div *ngIf="programmingProjectForm.get('sampleUrl').errors.pattern">
+              SampleURL should be of the form https://www.example.com
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewMode" class="red">*</span>Project Type:</label>
+          <select class="form-control input-style" formControlName="projectType">
+            <option [ngValue]="null" disabled>Select Type</option>
+            <option *ngFor="let batchProjectType of batchProjectTypes" [ngValue]="batchProjectType.value">{{batchProjectType.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(programmingProjectForm.get('projectType').touched || programmingProjectForm.get('projectType').dirty)
+                && programmingProjectForm.get('projectType').invalid">
+            <div *ngIf="programmingProjectForm.get('projectType').errors.required">
+              Project Type must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span>Technology:</strong></label>
+          <ng-select [items]="technologyList" bindLabel="language" placeholder="Select Technology" appendTo="body"
+            multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+            class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+            [loading]="isTechLoading">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.language}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger"
+            *ngIf="(programmingProjectForm.get('technologies').dirty 
+              || programmingProjectForm.get('technologies').touched) && programmingProjectForm.get('technologies').invalid">
+            <div *ngIf="programmingProjectForm.get('technologies').errors.required">
+              Technology must be specified
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong>Resource Type:</strong></label>
+          <select class="form-control input-style" formControlName="resourceType"
+            (change)="getResourceListByType(this.programmingProjectForm.get('resourceType')?.value)">
+            <option [ngValue]="null">Select Resource Type</option>
+            <option *ngFor="let type of resourceTypeList" [ngValue]="type.value">
+              {{type.value}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong>Resource:</strong></label>
+          <ng-select [items]="resourceList" bindLabel="resourceName" placeholder="Select Resource" appendTo="body"
+            [searchable]="true" [clearable]="true" formControlName="resources" [loading]="isResourceLoading"
+            multiple="true" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.resourceName}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(programmingProjectForm.get('resources').dirty 
+              || programmingProjectForm.get('resources').touched) && programmingProjectForm.get('resources').invalid">
+            <div *ngIf="programmingProjectForm.get('resources').errors.required">
+              Resources must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span> Score:</strong></label>
+          <input type="number" class="form-control input-style" formControlName="score" placeholder="eg: 10">
+          <div class="alert alert-danger"
+            *ngIf="(programmingProjectForm.get('score').dirty 
+              || programmingProjectForm.get('score').touched) && programmingProjectForm.get('score').invalid">
+            <div *ngIf="programmingProjectForm.get('score').errors.required">
+              Score must be specified
+            </div>
+            <div *ngIf="programmingProjectForm.get('score').errors.min">
+              Score must be greater than or equal to 1
+            </div>
+            <div *ngIf="programmingProjectForm.get('score').errors.max">
+              Score must be less than or equal to 100
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <label for="sel1"><strong><span *ngIf="!isViewMode" class="red">*</span> Description:</strong></label>
+          <!-- <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Description'}"></ng-container> -->
+          <ckeditor [config]="ckConfig" formControlName="description"></ckeditor>
+          <div class="alert alert-danger" *ngIf="(programmingProjectForm.get('description').dirty 
+						|| programmingProjectForm.get('description').touched) && programmingProjectForm.get('description').invalid">
+            <div *ngIf="programmingProjectForm.get('description').errors.required">
+              Description must be specified
+            </div>
+            <div *ngIf="programmingProjectForm.get('description').errors.maxlength">
+              Description cannot have more than 250 characters
+            </div>
+          </div>
+        </div>
+      </div>
+      <span *ngIf="(!isViewMode || programmingProjectForm.get('document')?.value)">
+				<hr>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label">Project Document:</label>
+					<div class="col-sm-4">
+						<span class="custom-file custom-file-border">
+							<input *ngIf="!isViewMode" type="file" class="custom-file-input"
+								(change)="onResourceSelect($event)" id="customFile" value="displayedFileName">
+							<label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label"
+								for="customFile" [innerHTML]="displayedFileName"></label>
+							<button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton"
+								type="button" *ngIf="isFileUploading">
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+								Uploading file...
+							</button>
+							<div *ngIf="programmingProjectForm.get('document')?.value && !isDocumentUploadedToServer"
+								data-toggle="tooltip" data-placement="top" title="View Document">
+								<button *ngIf="isViewMode" class="btn btn-submit-swabhav material-icons-button">
+									<a [href]="programmingProjectForm.get('document').value" target="_blank" class="anchor">View
+										Project Document</a>
+								</button>
+							</div>
+						</span>
+						<!-- should add view uploaded document using a document variable after cleaning. -->
+						<label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+					</div>
+				</div>
+			</span>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="reset"
+      (click)="dismissFormModal(modal)">Close</button>
+    <button type="submit" *ngIf="!isViewMode" class="btn btn-submit-swabhav material-icons-button"
+      [disabled]="!programmingProjectForm.dirty" (click)="validateProgrammingProject()">
+      {{isOperationUpdate ? 'Update Project' : 'Add Project'}}
+    </button>
+  </div>
+
+</ng-template>
+
+<!-- Delete User Confirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="modal-title">Confirmation</h2>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit">
+      <i class="material-icons close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure you?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">No</button>
+  </div>
+</ng-template>
+
+<!-- Project Publish -->
+
+<ng-template #publishProjectFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+       Publish Project
+      </h4>
+      <span *ngIf="!isViewMode"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="projectPublishForm">
+      <div class="row">
+        <div class="form-group col-8">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Due Date'}"></ng-container>
+          </span>
+          <input type="date" class="form-control input-style input-style-date" formControlName="dueDate" placeholder="eg: GO">
+          <div class="alert alert-danger" *ngIf="(projectPublishForm.get('dueDate').touched||
+          projectPublishForm.get('dueDate').dirty)&&projectPublishForm.get('dueDate').invalid">
+            <div *ngIf="projectPublishForm.get('dueDate').errors.required">
+              Name must be specified
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button type="button" (click)="dismissFormModal(modal)" class="btn btn-default">Close</button>
+    &nbsp;&nbsp;
+    <button type="button" [disabled]="!projectPublishForm.dirty" class="btn btn-default swabhav-button-round"
+       (click)="validatePublishProjectForm()">
+      Publish Date
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="form-control-label-style"><span class="red">*</span> {{name}}:</label>
+</ng-template>

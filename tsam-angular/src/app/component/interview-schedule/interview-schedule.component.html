@@ -1,0 +1,398 @@
+<app-master-navbar></app-master-navbar>
+
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #talentNameDisplay>
+    <span class="color-F6430F"> {{talentName}}</span>
+</ng-template>
+
+<div class="container-fluid">
+    <br>
+    <div class="standard-page-margin">
+        <div class="display-inline">
+            <div class="font-weight-bold font-xl-style">
+                <span>
+                    <button class="btn btn-default filter-button" (click)="backToPreviousPage()">
+                        <i class="material-icons-outlined back-button-position-style">arrow_back</i>
+                    </button>
+                    &nbsp;&nbsp;&nbsp;
+                </span>
+                Interview Schedules of
+                <span>
+                    <ng-container *ngTemplateOutlet="talentNameDisplay"></ng-container>
+                </span> -
+                <span class="color-F6430F"> {{totalInterviewSchedules}}</span>
+            </div>
+            <div class="float-right">
+                <button *ngIf="permission?.add" class="btn btn-default swabhav-button-round"
+                    (click)="onAddNewInterviewScheduleButtonClick()">
+                    Add New Interview Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div *ngIf="totalInterviewSchedules > 0">
+        <div class="card table-card-shadow table-card-style">
+            <div class="card-body padding-0pt">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>No.</th>
+                            <th>Schedule Date</th>
+                            <th>Schdeule Status</th>
+                            <th data-toggle="tooltip" data-placement="top" title="Delete Talent">
+                                View
+                            </th>
+                            <th data-toggle="tooltip" data-placement="top" title="Delete Talent">
+                                Interview Rounds
+                            </th>
+                            <th *ngIf="permission?.delete" data-toggle="tooltip" data-placement="top"
+                                title="Delete Interview Schedule">
+                                Delete
+                            </th>
+                        </tr>
+                        <tbody>
+                            <tr *ngFor="let interviewSchedule of interviewSchedulesList; let i = index">
+                                <td>{{i+1}}</td>
+                                <td>{{interviewSchedule.scheduledDate | date:'dd MMM, yyyy'}}</td>
+                                <td>{{interviewSchedule.status}}</td>
+                                <td data-toggle="tooltip" data-placement="top"
+                                    title="View details of interview schedule">
+                                    <span (click)="onViewInterviewScheduleClick(interviewSchedule)">
+                                        <i class="material-icons color-F6430F">visibility</i>
+                                    </span>
+                                </td>
+                                <td data-toggle="tooltip" data-placement="top" title="View all Interviews">
+                                    <span (click)="getIntreviewsForSelectedInterviewSchedule(interviewSchedule.id)">
+                                        <i class="material-icons color-F6430F">list</i>
+                                    </span>
+                                </td>
+                                <td *ngIf="permission?.delete" data-toggle="tooltip" data-placement="top"
+                                    title="Delete Interview Schedule">
+                                    <span (click)="onDeleteInterviewScheduleClick(interviewSchedule.id)">
+                                        <i class="material-icons color-F6430F">delete</i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="totalInterviewSchedules == 0">
+        <div class="card">
+            <div class="card-body not-found">
+                <h2>No Interview Schedules Found</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/View/Update Interview Schedule -->
+<ng-template #interviewScheduleFormModal let-modal>
+    <form [formGroup]="interviewScheduleForm">
+        <div class="modal-body">
+            <div class="form-header-style">
+                {{isViewMode? 'Interview Schedule Details': isOperationInterviewScheduleUpdate ? 'Update Interview
+                Schedule' : 'Add Interview Schedule' }}
+                <span *ngIf="isViewMode && permission?.update" (click)="onUpdateInterviewScheduleClick()">
+                    <i class="material-icons">create</i>
+                </span>
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Cross click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red"><strong>*</strong></span>
+                marked fields are mandatory</div>
+            <br>
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-6">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Scheduled Date'}">
+                        </ng-container>
+                    </span>
+                    <input type="date" class="form-control input-style" formControlName="scheduledDate">
+                    <div class="alert alert-danger" *ngIf="(interviewScheduleForm.get('scheduledDate').touched || interviewScheduleForm.get('scheduledDate').dirty) 
+                            && interviewScheduleForm.get('scheduledDate').invalid">
+                        <div *ngIf="interviewScheduleForm.get('scheduledDate').errors.required">
+                            Scheduled Date must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Status'}"></ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="status">
+                        <option *ngFor="let status of interviewScheduleStatusList" [ngValue]="status.value">
+                            {{status.value}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(interviewScheduleForm.get('status').touched || interviewScheduleForm.get('status').dirty) 
+                            && interviewScheduleForm.get('status').invalid">
+                        <div *ngIf="interviewScheduleForm.get('status').errors.required">
+                            Status must be specified
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="text-center">
+        <button type="button" (click)="modal.dismiss('Cross click')" class="btn btn-default swabhav-button-round">
+            Close
+        </button>
+        &nbsp;&nbsp;&nbsp;
+        <button type="button" [disabled]="!interviewScheduleForm.dirty " class="btn btn-default swabhav-button-round"
+            *ngIf="!isViewMode" (click)="onFormSubmit()">
+            {{isOperationInterviewScheduleUpdate ? 'Update Interview Schedule' : 'Add Interview Schedule'}}
+        </button>
+    </div>
+    <br>
+</ng-template>
+
+<!-- Add Interview -->
+<ng-template #interviewFormModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Interviews of <span>
+                <ng-container *ngTemplateOutlet="talentNameDisplay"></ng-container>
+            </span>
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <div *ngIf="showInterviewForm" class="marked-fields-right-style"><span class="red"><strong>*</strong></span>
+            marked fields are mandatory</div>
+        <br>
+        <div *ngIf="showInterviewForm">
+            <form [formGroup]="interviewForm">
+                <div class="row">
+                    <div class="form-group col-sm-6 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Round'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="roundID" 
+                            (change)="getInterviewerbyRound(interviewForm.get('roundID').value)">
+                            <option [ngValue]="null" disabled>Select Round</option>
+                            <option *ngFor="let round of interviewRoundList" [ngValue]="round.id">
+                                {{round.name}}</option>
+                        </select>
+                        <div class="alert alert-danger" *ngIf="(interviewForm.get('roundID').touched || interviewForm.get('roundID').dirty) 
+                            && interviewForm.get('roundID').invalid">
+                            <div *ngIf="interviewForm.get('roundID').errors.required">
+                                Round must be specified
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Rating'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="rating">
+                            <option [ngValue]="null" disabled>Select Rating</option>
+                            <option *ngFor="let rating of ratingList" [ngValue]="rating.value">
+                                {{rating.value}}</option>
+                        </select>
+                        <div class="alert alert-danger" *ngIf="(interviewForm.get('rating').touched || interviewForm.get('rating').dirty) 
+                                && interviewForm.get('rating').invalid">
+                            <div *ngIf="interviewForm.get('rating').errors.required">
+                                Rating must be specified
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Taken By'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="selectedInterviewerList" bindLabel="firstName" placeholder="Select Interviewer"
+                            appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+                            formControlName="takenBy" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.firstName + ' ' + item.lastName }}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(interviewForm.get('takenBy').touched || interviewForm.get('takenBy').dirty) 
+                                && interviewForm.get('takenBy').invalid">
+                            <div *ngIf="interviewForm.get('takenBy').errors.required">
+                                Taken By must be specified
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Status'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="status">
+                            <option [ngValue]="null" disabled>Select Status</option>
+                            <option *ngFor="let status of interviewStatusList" [ngValue]="status.value">
+                                {{status.value}}</option>
+                        </select>
+                        <div class="alert alert-danger" *ngIf="(interviewForm.get('status').touched || interviewForm.get('status').dirty) 
+                                && interviewForm.get('status').invalid">
+                            <div *ngIf="interviewForm.get('status').errors.required">
+                                Status must be specified
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-12 col-lg-12">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}">
+                            </ng-container>
+                        </span>
+                        <textarea class="form-control input-style" formControlName="comment" rows="5" id="comment"
+                            placeholder="Comment...." appEmptyToNull></textarea>
+                        <div class="alert alert-danger" *ngIf="(interviewForm.get('comment').touched || interviewForm.get('comment').dirty) 
+                                && interviewForm.get('comment').invalid">
+                            <div *ngIf="interviewForm.get('comment').errors.maxLength">
+                                Comment must be below 1000 characters
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="button" *ngIf="!isOperationInterviewUpdate" [disabled]="!interviewForm.dirty"
+                        class="btn btn-default swabhav-button-round" (click)="validateInterviewForm()">
+                        Add Interview
+                    </button>
+                    <button type="button" *ngIf="isOperationInterviewUpdate" [disabled]="!interviewForm.dirty"
+                        class="btn btn-default swabhav-button-round" (click)="validateInterviewForm()">
+                        Update Interview
+                    </button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button type="button" class="btn btn-default swabhav-button-round"
+                        (click)="showInterviewForm=false">
+                        Close Form
+                    </button>
+                </div>
+                <br>
+            </form>
+            <hr>
+        </div>
+        <div *ngIf="!showInterviewForm" class="row">
+            <div class="form-group col-sm-6 col-md-4">
+                <button type="button" class="btn btn-default swabhav-button-round"
+                    (click)="onAddNewInterviewButtonClick()" *ngIf="permission?.add">
+                    Add Interview
+                </button>
+            </div>
+        </div>
+        <div *ngIf="interviewList.length > 0">
+            <div class="row">
+                <div class="form-group col-sm-12 col-md-12">
+                    <div class="card table-card-shadow modal-popup-table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped modal-popup-table-style">
+                                    <tr>
+                                        <th>Sr</th>
+                                        <th>Round</th>
+                                        <th>Rating</th>
+                                        <th>Taken by</th>
+                                        <th>Comment</th>
+                                        <th *ngIf="permission?.update">Update</th>
+                                        <th *ngIf="permission?.delete">Delete</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr *ngFor="let interview of interviewList; let i = index">
+                                            <td>{{i+1}}</td>
+                                            <td>{{getRoundNameByRoundID(interview.roundID)}}</td>
+                                            <td class="color-F6430F font-weight-bold">{{interview.rating}}</td>
+                                            <td>
+                                                <div *ngIf="interview.takenBy?.length != 0">
+                                                    <span *ngFor="let interviewer of interview.takenBy">
+                                                        <span class="badge swabhav-badge-style">
+                                                            {{interviewer.firstName + " " + interviewer.lastName}}
+                                                        </span>&nbsp;
+                                                    </span>
+                                                </div>
+                                                <!-- <span class="badge badge-info" *ngFor="let interviewer of interview.takenBy">
+                                                    {{interviewer.firstName + " " + interviewer.lastName}}
+                                                </span> -->
+                                            </td>
+                                            <td>{{interview.comment}}</td>
+                                            <td *ngIf="permission?.update">
+                                                <span (click)="OnUpdateInterviewButtonClick(i)">
+                                                    <i class="material-icons color-F6430F">edit</i>
+                                                </span>
+                                            </td>
+                                            <td *ngIf="permission?.delete">
+                                                <span (click)="deleteInterview(interview.id)">
+                                                    <i class="material-icons color-F6430F">delete</i>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="interviewerList.length==0">
+            <div class="card">
+                <div class="card-body not-found">
+                    <h2>No Interviews Found</h2>
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+            (click)="modal.dismiss('Close click')">
+            Close
+        </button>
+    </div>
+    <br>
+</ng-template>
+
+
+<!-- Delete Interview Schedule Confirmation -->
+<ng-template #deleteInterviewScheduleModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this interview schedule?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>

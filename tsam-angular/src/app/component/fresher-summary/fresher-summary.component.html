@@ -1,0 +1,526 @@
+<app-master-navbar></app-master-navbar>
+
+
+<!-- ZERO COUNT TEMPLATE -->
+<ng-template #zeroTemplate>
+    <span class="btn btn-default no-link">
+        0
+    </span>
+</ng-template>
+
+<!-- TEMPLATE FOR CONTENT OF TECHNOLOGIES (USED TO DISPLAY TABLE-HEADER FOR TECHNOLOGIES) -->
+<ng-template #technologiesContentTemplate>
+    <ng-container *ngIf="isTechVisible">
+        <th class="text-center">Advance Java</th>
+        <th class="text-center">Cloud</th>
+        <th class="text-center">Dotnet</th>
+        <th class="text-center">Golang</th>
+        <th class="text-center">Java</th>
+        <th class="text-center">Machine Learning</th>
+        <th class="text-center">Other</th>
+    </ng-container>
+</ng-template>
+
+<!-- TEMPLATE FOR COUT OF ALL TECHNOLOGIES -->
+<ng-template let-summary="summary" let-isLookingForJob="isLookingForJob" let-talentType="talentType"
+    #technologyCountTemplate>
+    <ng-container *ngFor="let academic of academicTechnologyFresherSummary">
+        <ng-container *ngIf="summary.columnName === academic.columnName">
+            <ng-container *ngFor="let tech of academic.technologySummary">
+                <td class="text-center">
+                    <button *ngIf='tech.totalCount != 0; else zeroTemplate' type="button"
+                        class="btn btn-default fake-link"
+                        (click)="redirectToTalents(summary, isLookingForJob, talentType, tech)">
+                        <u>{{tech.totalCount}}</u>
+                    </button>
+                </td>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR FRESHER AND OVERALL COUNT -->
+<ng-template let-talentType="talentType" let-experience="experience" #countTemplate>
+    <ng-container *ngIf="experience === '0'; else allExperience">
+        <ng-container [ngTemplateOutlet]="totalFresherCountTemplate"
+            [ngTemplateOutletContext]="{talentType:talentType,experience:experience}">
+        </ng-container>
+    </ng-container>
+    <ng-template #allExperience>
+        <ng-container [ngTemplateOutlet]="totalCountTemplate"
+            [ngTemplateOutletContext]="{talentType:talentType,experience:experience}">
+        </ng-container>
+    </ng-template>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR FRESHER -->
+<ng-template let-talentType="talentType" let-experience="experience" #totalFresherCountTemplate>
+    <button *ngIf='calculateFresherCount(talentType) != 0; else zeroTemplate' type="button"
+        class="btn btn-default fake-link" (click)="redirectTotalToTalents(talentType, experience)">
+        <u>{{calculateFresherCount(talentType)}}</u>
+    </button>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR ALL TALENTS -->
+<ng-template let-talentType="talentType" let-experience="experience" #totalCountTemplate>
+    <button *ngIf='calculateTotalTalentsCount(talentType) != 0; else zeroTemplate' type="button"
+        class="btn btn-default fake-link" (click)="redirectTotalToTalents(talentType, experience)">
+        <u>{{calculateTotalTalentsCount(talentType)}}</u>
+    </button>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR FRESHER AND OVERALL COUNT -->
+<ng-template let-talentType="talentType" let-experience="experience" #technologiesCountTemplate>
+    <ng-container *ngIf="experience === '0'; else allTechnologyExperience">
+        <ng-container [ngTemplateOutlet]="totalTechnologyFresherCountTemplate"
+            [ngTemplateOutletContext]="{talentType:talentType,experience:experience}">
+        </ng-container>
+    </ng-container>
+    <ng-template #allTechnologyExperience>
+        <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+            [ngTemplateOutletContext]="{talentType:talentType,experience:experience}">
+        </ng-container>
+    </ng-template>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR FRESHER TALENTS TECHNOLOGIES COUNT -->
+<ng-template let-talentType="talentType" let-experience="experience" #totalTechnologyFresherCountTemplate>
+    <ng-container *ngFor="let tech of technologyList">
+        <td class="text-center">
+            <button *ngIf='calculateFresherTechnologyTotal(tech) != 0; else zeroTemplate' type="button"
+                class="btn btn-default fake-link" (click)="redirectTotalToTalents(talentType, experience, tech.id)">
+                <u>{{calculateFresherTechnologyTotal(tech)}}</u>
+            </button>
+        </td>
+    </ng-container>
+    <td class="text-center">
+        <button *ngIf='calculateFresherOtherTechnologyTotal() != 0; else zeroTemplate' type="button"
+            class="btn btn-default fake-link" (click)="redirectTotalToTalents(talentType, experience, 'Other')">
+            <u>{{calculateFresherOtherTechnologyTotal()}}</u>
+        </button>
+    </td>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR ALL TALENTS TECHNOLOGIES COUNT -->
+<ng-template let-talentType="talentType" let-experience="experience" #totalTechnologyCountTemplate>
+    <ng-container *ngFor="let tech of technologyList">
+        <td class="text-center">
+            <button *ngIf='calculateTechnologyTotal(tech) != 0; else zeroTemplate' type="button"
+                class="btn btn-default fake-link" (click)="redirectTotalToTalents(talentType, experience, tech.id)">
+                <u>{{calculateTechnologyTotal(tech)}}</u>
+            </button>
+        </td>
+    </ng-container>
+    <td class="text-center">
+        <button *ngIf='calculateOtherTechnologyTotal() != 0; else zeroTemplate' type="button"
+            class="btn btn-default fake-link" (click)="redirectTotalToTalents(talentType, experience, 'Other')">
+            <u>{{calculateOtherTechnologyTotal()}}</u>
+        </button>
+    </td>
+</ng-template>
+
+
+<div class="container-fluid margin-2pt">
+    <div class="card">
+        <div class="card-body padding-0pt">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center heading">Academic Year</th>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Outstanding &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="outstandingDetails"
+                                            (click)="onOutstandingClick();" [(ngModel)]="isOutstandingTechVisible">
+                                        <label class="custom-control-label" for="outstandingDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isOutstandingTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Excellent &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="excellentDetails"
+                                            (click)="onExcellentClick();" [(ngModel)]="isExcellentTechVisible">
+                                        <label class="custom-control-label" for="excellentDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isTechVisible && isExcellentTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Average &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="averageDetails"
+                                            (click)="onAverageClick();" [(ngModel)]="isAverageTechVisible">
+                                        <label class="custom-control-label" for="averageDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isTechVisible && isAverageTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Unranked &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="unrankedDetails"
+                                            (click)="onUnrankedClick();" [(ngModel)]="isUnrankedTechVisible">
+                                        <label class="custom-control-label" for="unrankedDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isTechVisible && isUnrankedTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <!-- <th class="text-center heading">Total</th> -->
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Total &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="totalDetails"
+                                            (click)="onTotalClick();" [(ngModel)]="isTotalVisible">
+                                        <label class="custom-control-label" for="totalDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isTechVisible && isTotalVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let summary of fresherSummary | slice: 0:5">
+                            <td class="text-center heading">
+                                <div *ngIf="summary.columnName">
+                                    {{summary.columnName}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <button *ngIf='summary.outstandingCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', OUTSTANDING)">
+                                    <u>{{summary.outstandingCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isOutstandingTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:OUTSTANDING}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.excellentCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', EXCELLENT)">
+                                    <u>{{summary.excellentCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isExcellentTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:EXCELLENT}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.averageCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', AVERAGE)">
+                                    <u>{{summary.averageCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isAverageTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:AVERAGE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.unrankedCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', UNRANKED)">
+                                    <u>{{summary.unrankedCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isUnrankedTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:UNRANKED}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='calculateAcademicYearTotal(summary) != 0; else zeroTemplate'
+                                    type="button" class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0')">
+                                    <u>{{calculateAcademicYearTotal(summary)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isTotalVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:null}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+                        <!-- CALCULATE TOTAL FRESHERS -->
+                        <tr>
+                            <td class="text-center heading">Non Professional</td>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:OUTSTANDING,experience:'0'}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isOutstandingTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:OUTSTANDING,experience:'0'}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:EXCELLENT,experience:'0'}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isExcellentTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:EXCELLENT,experience:'0'}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:AVERAGE,experience:'0'}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isAverageTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:AVERAGE,experience:'0'}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:UNRANKED,experience:'0'}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isUnrankedTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:UNRANKED,experience:'0'}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='calculateTotalFresherCount() != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirect('0')">
+                                    <u>{{calculateTotalFresherCount()}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isTotalVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:null,experience:'0'}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+
+                        <!-- PROFESSIONALS -->
+                        <tr *ngFor="let summary of fresherSummary | slice: 5:6">
+                            <td class="text-center heading">
+                                <div *ngIf="summary.columnName">
+                                    {{summary.columnName}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <button *ngIf='summary.outstandingCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', OUTSTANDING)">
+                                    <u>{{summary.outstandingCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isOutstandingTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:OUTSTANDING}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.excellentCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', EXCELLENT)">
+                                    <u>{{summary.excellentCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isExcellentTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:EXCELLENT}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.averageCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', AVERAGE)">
+                                    <u>{{summary.averageCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isAverageTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:AVERAGE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.unrankedCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0', UNRANKED)">
+                                    <u>{{summary.unrankedCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isUnrankedTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:UNRANKED}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='calculateAcademicYearTotal(summary) != 0; else zeroTemplate'
+                                    type="button" class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '0')">
+                                    <u>{{calculateAcademicYearTotal(summary)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isTotalVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'0',talentType:null}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+
+                        <!-- CALCULATE TOTAL TALENTS -->
+                        <tr>
+                            <td class="text-center heading">Total Talents</td>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:OUTSTANDING,experience:null}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isOutstandingTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:OUTSTANDING,experience:null}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:EXCELLENT,experience:null}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isExcellentTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:EXCELLENT,experience:null}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:AVERAGE,experience:null}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isAverageTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:AVERAGE,experience:null}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <ng-container [ngTemplateOutlet]="countTemplate"
+                                    [ngTemplateOutletContext]="{talentType:UNRANKED,experience:null}">
+                                </ng-container>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isUnrankedTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:UNRANKED,experience:null}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='calculateTalent() != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirect()">
+                                    <u>{{calculateTalent()}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isTotalVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesCountTemplate"
+                                    [ngTemplateOutletContext]="{talentType:null,experience:null}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+
+                        <br />
+
+                        <!-- JOB SEEKERS AND COMPANY REQUIREMENT -->
+                        <tr *ngFor="let summary of fresherSummary | slice: 6">
+                            <td class="text-center heading">
+                                <div *ngIf="summary.columnName">
+                                    {{summary.columnName}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <button *ngIf='summary.outstandingCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '1', OUTSTANDING)">
+                                    <u>{{summary.outstandingCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isOutstandingTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'1',talentType:OUTSTANDING}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.excellentCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '1', EXCELLENT)">
+                                    <u>{{summary.excellentCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isExcellentTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'1',talentType:EXCELLENT}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.averageCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '1', AVERAGE)">
+                                    <u>{{summary.averageCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isAverageTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'1',talentType:AVERAGE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='summary.unrankedCount != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '1', UNRANKED)">
+                                    <u>{{summary.unrankedCount}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isUnrankedTechVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'1',talentType:UNRANKED}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center">
+                                <button *ngIf='calculateAcademicYearTotal(summary) != 0; else zeroTemplate'
+                                    type="button" class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, '1')">
+                                    <u>{{calculateAcademicYearTotal(summary)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTechVisible && isTotalVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,isLookingForJob:'1',talentType:null}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<app-master-footer></app-master-footer>

@@ -1,0 +1,469 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid margin-2pt">
+    <form [formGroup]="searchForm">
+        <div class="card">
+            <div class="card-header">
+                <button class="btn btn-primary float-right" data-toggle="modal" data-target="#addNewQues"
+                    (click)="onAddQuesClick()">Add Question</button>
+            </div>
+            <div class=" card-body search-bar padding">
+                <div class="search-input">
+                    <div class="form-group">
+                        <div class="input-group mb-3 input-group-lg">
+                            <input type="text" class="form-control" placeholder="Search">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="material-icons">search</i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-6 col-md-3">
+                        <label for="question">Question:</label>
+                        <input type="text" forControlName="quesyion" class="form-control"
+                            placeholder="Enter your Question">
+                    </div>
+                    <div class="form-group col-sm-6 col-md-3">
+                        <label for="subject">Subject:</label>
+                        <select class="form-control" formControlName="subject">
+                            <option [ngValue]="null">Select Subject</option>
+                            <option *ngFor="let tech of technologies" [ngValue]="tech.language">
+                                {{tech.language}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-3">
+                        <label for="difficulty">Difficulty:</label>
+                        <select class="form-control" formControlName="difficulty">
+                            <option [ngValue]="null">Select Difficulty Level</option>
+                            <option *ngFor="let diff of difficultyLevels" [ngValue]="diff.value">{{diff.value}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="float-right">
+                    <button class="btn btn-success" type="submit" [disabled]="!searchForm.valid || !searchForm.dirty"
+                        (click)="search()">Search</button> &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-secondary" type="button" (click)="resetSearch()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="card margin-2pt">
+        <div class="card-header">
+            <div class=" row display-inline">
+                <div class="form-group col-sm-6 col-md-6">
+                    <div class="row">
+                        <select class="form-control col-sm-2 col-md-2" [(ngModel)]="limit" (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select>
+                        &nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-primary" type="button" *ngIf="searched" (click)="getQuestions()"> View
+                            All Questions</button>
+                    </div>
+                </div>
+                <ul class="pagination" *ngFor="let question of questions | paginate: { id:'quesId',
+        itemsPerPage: limit, 
+        currentPage: currentpage, totalItems: totalQues }">
+                </ul>
+                <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="quesId">
+                </pagination-controls>
+            </div>
+        </div>
+        <div class="card-body padding-0pt">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Question</th>
+                            <th>Subject</th>
+                            <th>Difficulty</th>
+                            <th>View Options</th>
+                            <th>View</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let question of questions;let i=index">
+                            <td>{{i+1}}</td>
+                            <td>{{question.question}}</td>
+                            <td>{{question.subject}}</td>
+                            <td>{{question.difficulty}}</td>
+                            <td data-toggle="tooltip" data-placement="top" title="View Options">
+                                <button type="button" data-toggle="modal" (click)="getOptionsforID(question.id)"
+                                    data-target="#viewOptions" class="btn"><i
+                                        class="material-icons">visibility</i></button>
+                            </td>
+                            <td data-toggle="tooltip" data-placement="top" title="View Question">
+                                <button type="button" data-toggle="modal" class="btn btn-outline-success"
+                                    (click)="onViewQuestion(question.id)" data-target="#viewQues">View</button>
+                            </td>
+                            <td data-toggle="tooltip" data-placement="top" title="Update Question">
+                                <button type="button" data-toggle="modal" (click)="onUpdateQuestionClick(question.id)"
+                                    data-target="#addNewQues" class="btn"><i class="material-icons">create</i></button>
+                            </td>
+                            <td data-toggle="tooltip" data-placement="top" title="Delete Question">
+                                <button type="button" data-toggle="modal" data-target="#deleteConfirmation"
+                                    (click)="assignID(question.id)" class="btn"><i
+                                        class="material-icons red">delete</i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            Total Questions: {{totalQues}}
+        </div>
+    </div>
+</div>
+
+
+
+<!-- View Options -->
+
+<div class="modal fade" id="viewOptions">
+    <div class="modal-dialog modal-dialog-centered  modal-l">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Options</h4>
+                <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="reset"><i
+                        class="material-icons">highlight_off</i></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+
+                <div class="card margin-2pt">
+                    <div class="card-body padding-0pt">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Option</th>
+                                        <th>Status</th>
+                                        <th>Update</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let option of options;let i=index">
+                                        <td>{{i+1}}</td>
+                                        <td>{{option.option}}</td>
+                                        <td>{{option.status}}</td>
+                                        <td data-toggle="tooltip" data-placement="top" title="View Option">
+                                            <button type="button" data-toggle="modal" class="btn"
+                                                data-target="#updateOption" (click)="updateOptionClick(option.id)"><i
+                                                    class="material-icons">create</i></button>
+                                        </td>
+                                        <td data-toggle="tooltip" data-placement="top" title="Delete Option">
+                                            <button type="button" data-toggle="modal" data-target="#deleteOption"
+                                                class="btn" (click)="assignOptionId(option.id)">
+                                                <i class="material-icons red">delete
+                                                </i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Add new Question -->
+
+
+<div class="modal fade" id="addNewQues">
+    <div class="modal-dialog modal-dialog-centered  modal-xl">
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+                <h4 class="modal-title">{{modelHeader}}</h4>
+                <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="reset"><i
+                        class="material-icons">highlight_off</i></button>
+            </div>
+
+
+            <form [formGroup]="questionForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Question</label>
+                                <textarea type="text" formControlName="question" class="form-control"
+                                    placeholder="Enter your Question"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select class="form-control" formControlName="subject">
+                                    <option [ngValue]="null">Select Subject</option>
+                                    <option *ngFor="let tech of technologies" [ngValue]="tech.language">
+                                        {{tech.language}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Difficulty</label>
+                                <select class="form-control" formControlName="difficulty">
+                                    <option [ngValue]="null">Select Difficulty Level</option>
+                                    <option *ngFor="let diff of difficultyLevels" [ngValue]="diff.value">{{diff.value}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <label>Set Options</label>
+                            <div class="form-group" id="options" formArrayName="options">
+                                <div *ngFor="let item of newOptions.controls; let pointIndex=index"
+                                    [formGroupName]="pointIndex" class="optionClass">
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" formControlName="option"
+                                                placeholder="Enter option value">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <select class="form-control" formControlName="status">
+                                                <option [ngValue]="null">Select Status</option>
+                                                <option [ngValue]=true>True</option>
+                                                <option [ngValue]=false>False</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <button type="button" class="btn btn-info" (click)="addOption()">Add Option</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal"
+                        (click)="modelAction()">{{modelButton}}</button>
+                    <button type="button" class="btn btn-secondary" type="reset" (click)="reset()">Reset</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- View Question -->
+<div class="modal fade" id="viewQues">
+    <div class="modal-dialog modal-dialog-centered  modal-xl">
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+                <h4 class="modal-title">View Question
+                    <button type="button" data-toggle="modal" class="btn btn-default"
+                        (click)="onUpdateQuestionClick(this.Id)" data-target="#addNewQues" data-dismiss="modal"><i
+                            class="material-icons">create</i></button>
+
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" (click)="reset()" class="btn btn-default"
+                    type="reset"><i class="material-icons">highlight_off</i></button>
+            </div>
+
+
+            <form [formGroup]="questionForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Question</label>
+                                <textarea type="text" formControlName="question" class="form-control"
+                                    placeholder="Enter your Question"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select class="form-control" formControlName="subject">
+                                    <option [ngValue]="null">Select Subject</option>
+                                    <option *ngFor="let tech of technologies" [ngValue]="tech.language">
+                                        {{tech.language}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Difficulty</label>
+                                <select class="form-control" formControlName="difficulty">
+                                    <option [ngValue]="null">Select Difficulty Level</option>
+                                    <option *ngFor="let diff of difficultyLevels" [ngValue]="diff.value">{{diff.value}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <label>Set Options</label>
+                            <div class="form-group" id="options" formArrayName="options">
+                                <div *ngFor="let item of newOptions.controls; let pointIndex=index"
+                                    [formGroupName]="pointIndex" class="optionClass">
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" formControlName="option"
+                                                placeholder="Enter option value">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <select class="form-control" formControlName="status">
+                                                <option [ngValue]="null">Select Status</option>
+                                                <option [ngValue]=true>True</option>
+                                                <option [ngValue]=false>False</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="reset()">
+                        Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Option -->
+<div class="modal fade" id="updateOption">
+    <div class="modal-dialog modal-dialog-centered  modal-xl">
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+                <h4 class="modal-title">Update Option</h4>
+                <button type="button" class="close" data-dismiss="modal" (click)="reset()" class="btn btn-default"
+                    type="reset"><i class="material-icons">highlight_off</i></button>
+            </div>
+
+
+            <form [formGroup]="optionForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Option Value</label>
+                                <input type="text" formControlName="option" class="form-control"
+                                    placeholder="Enter your Option">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <label>Option Status</label>
+                                <select class="form-control" formControlName="status">
+                                    <option [ngValue]="null">Select Status</option>
+                                    <option [ngValue]=true>True</option>
+                                    <option [ngValue]=false>False</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="updateOption()">Update
+                        Option</button>
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        (click)="reset()">Close</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Question Confirmation -->
+<div class="modal" id="deleteConfirmation">
+    <div class="modal-dialog modal-dialog-centered  modal-xl">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Confirmation</h4>
+                <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+                        class="material-icons">highlight_off</i></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group col-sm-12 col-md-12">
+                        Are you Sure want to Delete this Question ?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" (click)="deleteQuestion()"
+                    data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Option Confirmation -->
+<div class="modal" id="deleteOption">
+    <div class="modal-dialog modal-dialog-centered  modal-xxl">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Confirmation</h4>
+                <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+                        class="material-icons">highlight_off</i></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group col-sm-12 col-md-12">
+                        Are you Sure want to Delete this Option ?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" (click)="deleteOption()"
+                    data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>

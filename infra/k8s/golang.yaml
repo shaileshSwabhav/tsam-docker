@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsam-go-depl
+  labels:
+    app: tsam-go-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tsam-go-app
+  template:
+    metadata:
+      name: tsam-go-pod
+      labels:
+        app: tsam-go-app
+    spec:
+      containers:
+        - name: tsam-go-pod
+          # image: shaileshb/tsam-go
+          image: us.gcr.io/kubernetes-demo-345511/tsam-golang
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsam-go-serv
+spec:
+  selector:
+    app: tsam-go-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

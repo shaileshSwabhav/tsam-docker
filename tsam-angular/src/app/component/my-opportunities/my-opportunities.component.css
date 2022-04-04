@@ -1,0 +1,75 @@
+.selected-header-button:hover:enabled {
+  transform: scale(1.1);
+}
+
+.header-button:hover:enabled {
+  transform: scale(1.1);
+}
+
+.opportunity-card-margin {
+  margin-bottom: 5%;
+  /* background-color: cornflowerblue; */
+}
+
+.opportunity-card-shadow {
+  padding: 10px;
+  box-shadow: 5px 10px 8px #00000029;
+}
+
+.opportunity-card-body-margin{
+  padding-bottom: 0%;
+}
+
+.company-branch-name{
+  color: #000000;
+  font-size: x-large;
+  font-weight: bold;
+  padding-bottom: 4%;
+}
+
+.logo{
+  height: auto;
+  width: 120px;
+  position: relative;
+  /* bottom: 150px;
+  left: 5px; */
+}
+
+.heading-style{
+  color: #707070;
+  font-size: x-large;
+  font-weight: bold;
+  margin-bottom: 2%;
+  margin-top: 2%;
+}
+
+.selected-header-button{
+  background-color: #FFB2B0;
+  border: #D63C2A solid;
+  min-width: 15%;
+  height: 50px;
+  font-size: small;
+  font-weight: bold;
+  padding: 10px;
+  box-shadow: 5px 10px 8px #00000029;
+}
+
+.selected-header-button:hover{
+  color: black;
+}
+
+.header-button{
+  border: #D63C2A solid;
+  min-width: 15%;
+  height: 50px;
+  font-size: small;
+  font-weight: bold;
+  padding: 10px;
+  color: #EE3733;
+}
+
+.view-details-button-style{
+  width: 50%;
+}
+
+

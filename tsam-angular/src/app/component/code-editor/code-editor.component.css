@@ -1,0 +1,133 @@
+/* div.code-editor { max-height: 70vh;} */
+
+.code-editor-style{
+  max-height: 70vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+div.label-box {
+    border-top-left-radius: .5rem!important;
+    border-top-right-radius: .5rem!important;
+}
+
+.form-control { border-radius: 0 !important; }
+
+.form-control:disabled { background-color: #ffffff !important; }
+
+.output {
+    border-bottom-left-radius: .5rem!important;
+    border-bottom-right-radius: .5rem!important;
+}
+
+.app-ace-editor {
+    border: 2px solid #f8f9fa;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+
+.btn-beautify {
+    color: #ffffff;
+    background-color: #e83e8c;
+}
+
+select.selection {
+    cursor: pointer;
+}
+
+select.selection > option {
+    display: block;
+    background: ghostwhite;
+}
+
+select.selection:focus > option:checked { 
+    font-weight: bold;
+}
+
+/* *******************INPUT STYLES***************** */
+
+.input-style{
+    color: black;
+    border-color: #FC6E26;
+    border-width: 1.5px;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  .form-control:focus {
+    box-shadow: none;
+  }
+  
+  ::-webkit-input-placeholder {
+    font-weight: 400;
+  }
+  
+  input[disabled] {
+    border-color: #FC6E26;
+    color: black;
+    border-width: 1.5px;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  textarea[disabled] {
+    border-color: #FC6E26;
+    color: black;
+    border-width: 1.5px;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  select[disabled] {
+    border-color: #FC6E26;
+    color: black;
+    border-width: 1.5px;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  input:disabled::-webkit-input-placeholder { 
+    color: black;
+  }
+  
+  textarea:disabled::-webkit-input-placeholder { 
+    color: black;
+  }
+  
+  select:disabled::-webkit-input-placeholder { 
+    color: black;
+  }
+  
+  .ng-select.ng-select-style ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  .ng-select.ng-select-style ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  .ng-select.ng-select-disabled>.ng-select-container {
+    color: #FFFFFF;
+    background-color: #FC6E26;
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+  }
+  
+  /******************************************/
+
+  .form-control-label-style{
+    color: #757575;
+    font-size: medium;
+    font-weight: bold;
+}
+
+.button-size{
+  width: 80%;
+}

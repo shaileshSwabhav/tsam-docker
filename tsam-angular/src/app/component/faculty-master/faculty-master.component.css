@@ -1,0 +1,76 @@
+.color-teal {
+  color: teal;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+a {
+  color:white;
+  text-decoration: none;
+}
+
+.text-size {
+  font-size: large;
+}
+
+.swabhav-badge {
+  background-color: #EE3733;
+  color: #FFFFFF;
+}
+
+table {
+  font-size: small;
+}
+
+.anchor-tag {
+  color: #000;
+  text-decoration: none;
+}
+
+/* DROPDOWN STYLE */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+.filter-form-label {
+  font-size: medium;
+  font-weight: bold;
+}
+
+/* *******************input styles***************** */
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+/* SIDE NAV */
+.mat-drawer-style {
+  width: 40%;
+  position: fixed;
+}
+
+.mat-drawer-inner-container {
+  overflow: hidden;
+}
+
+.checkbox-label {
+  cursor: pointer;
+}

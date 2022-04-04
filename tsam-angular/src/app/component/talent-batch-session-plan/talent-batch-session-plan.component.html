@@ -1,0 +1,299 @@
+<div class="font-weight-bold font-lg-style color-F6430F text-center">
+    Session Plan
+</div>
+
+<br>
+
+<ng-container *ngIf="batchSessionList.length > 0">
+    <!-- <div class="text-center">
+        <img class="width-80px-style" src="assets/icon/talent-dashboard/agenda.png" alt="Telegram">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="font-lg-style">
+            <span class="font-weight-bold">
+                All Sessions
+            </span> 
+        </span>
+    </div> -->
+
+    <div *ngIf="isSessionPresent;else sessionsNotFound">
+        <br>
+        <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+                <thead>
+                    <tr>
+                        <th class="text-center">Session No.</th>
+                        <th>Name</th>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Hours</th>
+                        <th class="text-center">Sub Sessions</th>
+                        <th class="text-center">Assignments</th>
+                        <!-- <th class="text-center">Projects</th> -->
+                        <th class="text-center">Feedback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let sessions of batchSessionList;let i = index">
+                        <tr class="striped-tr"
+                            [ngClass]="{'current-session-row-style': sessions.order==currentSessionOrder}">
+                            <td class="text-nowrap">
+                                <button type="button" class="btn btn-default"
+                                    (click)="sessions.session.viewSubSessionClicked=!sessions.session.viewSubSessionClicked"
+                                    *ngIf="sessions.session.subSessions && sessions.session.subSessions.length != 0; else noBatchSession">
+                                    <i class="material-icons-outlined material-icons-button inline-icon">
+                                        {{sessions.session.viewSubSessionClicked ? 'expand_more' : 'chevron_right'}}
+                                    </i> {{i+1}}
+                                </button>
+                                <ng-template #noBatchSession>
+                                    <label class="no-sub-session">{{i+1}}</label>
+                                </ng-template>
+                            </td>
+                            <td class="text-wrap">
+                                <dl>
+                                    <dt>
+                                        <!-- <i class="material-icons-outlined inline-icon">calendar_today</i> -->
+                                        <img src="assets/icon/colour-icons/sessions.png" width="30">
+                                        {{sessions.session && sessions.session?.name}}
+                                    </dt>
+                                </dl>
+                            </td>
+                            <td class="text-center">
+                                {{sessions.startDate | date:'dd MMM, yyyy'}}
+                            </td>
+                            <td class="text-center">{{sessions.session && sessions.session?.hours}}</td>
+                            <td class="text-center">{{sessions?.session?.subSessions.length}}</td>
+                            <td class="text-center">Assignments</td>
+                            <!-- <td class="text-center">Projects</td> -->
+                            <td class="text-center"
+                                title="Feedback can be given when you have have attended the session">
+                                <button class="btn" [disabled]="!sessions.isCompleted && !sessions.isAttendanceGiven"
+                                    (click)="onTalentFeeddbackToFacultyClick(sessions)"
+                                    *ngIf="!sessions.isFeedbackGiven;else feedbackGiven">
+                                    <img src="assets/icon/grey-icons/review.png" alt="feedback pending" width="30">
+                                </button>
+                                <ng-template #feedbackGiven>
+                                    <img src="assets/icon/colour-icons/review.png" alt="feedback given" width="30">
+                                </ng-template>
+                            </td>
+                        </tr>
+                        <tr *ngIf="sessions.session.viewSubSessionClicked">
+                            <td colspan="7" class="no-background-tr-style">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <table class="table table-background-style">
+                                            <thead>
+                                                <tr class="no-background-tr-style">
+                                                    <th class="text-center">Order</th>
+                                                    <th>Name</th>
+                                                    <th class="text-center">Total Mins</th>
+                                                    <th class="text-center">Output</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container
+                                                    *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let even = even">
+                                                    <tr *ngIf="even" class="no-background-tr-style">
+                                                        <td class="text-center">{{j+1}}</td>
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-md-2">
+                                                                    <img src="assets/icon/colour-icons/sub-sessions.png"
+                                                                        width="30">
+                                                                </div>
+                                                                <div class="col-md-10">
+                                                                    <span>{{subSession.name}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">{{subSession.hours != null ?
+                                                            subSession.hours*60 : '-'}}</td>
+                                                        <td class="text-center">{{subSession.studentOutput}}</td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12" *ngIf="sessions.session.subSessions.length > 1">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr class="no-background-tr-style">
+                                                    <th class="text-center">Order</th>
+                                                    <th>Name</th>
+                                                    <th class="text-center">Total Mins</th>
+                                                    <th>Output</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container
+                                                    *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let odd = odd">
+                                                    <tr *ngIf="odd" class="no-background-tr-style">
+                                                        <td class="text-center">{{j+1}}</td>
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-md-2">
+                                                                    <img src="assets/icon/colour-icons/sub-sessions.png"
+                                                                        width="30">
+                                                                </div>
+                                                                <div class="col-md-10">
+                                                                    <span>{{subSession.name}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">{{subSession.hours != null ?
+                                                            subSession.hours*60 : '-'}}</td>
+                                                        <td class="text-center">{{subSession.studentOutput}}</td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- No Sessions -->
+    <ng-template #sessionsNotFound>
+        <br />
+        <br />
+        <br />
+        <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                    <h2>Session not assigned to batch</h2>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</ng-container>
+
+<!-- Talent feedback for faculty -->
+<ng-template #talentFeedbackToFacultyModal let-modal>
+
+    <div class="modal-body">
+        <div class="d-flex justify-content-end">
+            <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+                    class="material-icons close-icon">close</i>
+            </button>
+        </div>
+
+        <div class="row d-flex align-items-center">
+            <div class="col-sm-2">
+                <img src="assets/icon/colour-icons/feedbackmodal.png" alt="feedback" class="image-fit-style">
+            </div>
+            <div class="col-sm-10">
+                <h1 class="swabhav-light-orange-text"><strong>Rate faculty for the following session:</strong></h1>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-around">
+            <div class="d-flex">
+                <label><strong>Faculty Name: </strong></label> &nbsp;
+                <label>{{selectedBatchFaculty.firstName + " " + selectedBatchFaculty.lastName}}</label>
+            </div>
+            <div class="d-flex date-margin">
+                <label><strong>Date: </strong></label> &nbsp;
+                <label>{{selectedBatchSessionForTalentFeedback?.startDate | date: 'fullDate'}}</label>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-around">
+            <div class="d-flex">
+                <label><strong>Session Number: </strong></label> &nbsp;
+                <label>{{selectedBatchSessionForTalentFeedback?.order}}</label>
+            </div>
+            <div class="d-flex">
+                <label><strong>Session Name: </strong></label> &nbsp;
+                <label>{{selectedBatchSessionForTalentFeedback?.session?.name}}</label>
+            </div>
+        </div>
+
+        <br>
+
+        <form [formGroup]="talentFeedbackToFaculytyForm">
+            <ng-container formArrayName="feedbacks"
+                *ngFor="let feedbackControl of feedbackArray.controls;let i = index">
+                <ng-container [formGroupName]="i">
+                    <ng-container *ngIf="talentTofacultyFeedbackQuestionList[i].hasOptions; else noOptions">
+                        <div class="row">
+                            <div class="col-6">
+                                {{i+1}}. {{talentTofacultyFeedbackQuestionList[i].question}}
+                            </div>
+                            <div class="col-6">
+                                <ng-container>
+                                    <ng-container
+                                        *ngIf="talentTofacultyFeedbackQuestionList[i].options.length == MAX_SCORE; else showOptions">
+                                        <ngb-rating
+                                            (rateChange)="onTalentFeedbackForFacultyInput($event, i, feedbackControl)">
+                                            <ng-template let-fill="fill" let-index="index">
+                                                <span class="star" [class.star-fill]="fill === 100">&#9733;</span>
+                                            </ng-template>
+                                        </ngb-rating>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+
+                            <!-- SHOW OPTIONS -->
+                            <ng-template #showOptions>
+                                <select class="form-control input-style" formControlName="optionID"
+                                    (change)="onTalentFeedbackForFacultyChange(feedbackControl, talentTofacultyFeedbackQuestionList[i].options)">
+                                    <option [ngValue]="null" disabled>Select Option</option>
+                                    <option *ngFor="let option of talentTofacultyFeedbackQuestionList[i].options"
+                                        [ngValue]="option.id">{{option.value}}
+                                    </option>
+                                </select>
+                            </ng-template>
+                        </div>
+                        <br>
+                    </ng-container>
+
+                    <!-- No Options -->
+                    <ng-template #noOptions>
+                        <div class="row">
+                            <div class="form-group col-12">
+                                <label>{{i+1}}. {{talentTofacultyFeedbackQuestionList[i].question}}</label>
+                                <textarea class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3"
+                                    formControlName="answer" placeholder="Enter your answer">
+                                </textarea>
+                                <div class="alert alert-danger" *ngIf="(feedbackControl.get('answer').touched || 
+                                    feedbackControl.get('answer').dirty) && feedbackControl.get('answer').invalid">
+                                    <div *ngIf="feedbackControl.get('answer').errors.required">
+                                        Answer must be specified
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ng-container>
+            </ng-container>
+        </form>
+
+        <ng-template #noFeedbackQuestions>
+            <br>
+            <br>
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-8 mx-auto">
+                    <div class="jumbotron">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Feedback Questions Not Found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <div class="d-flex justify-content-end">
+            <br>
+            <button type="button" class="btn btn-default swabhav-light-orange-text"
+                (click)="modal.dismiss('Cross click')">Close</button>
+            <button type="button" class="btn btn-submit-swabhav wide-btn material-icons-button"
+                (click)="validateTalentFeedback()" *ngIf="talentTofacultyFeedbackQuestionList.length > 0">
+                Submit
+            </button>
+        </div>
+    </div>
+
+</ng-template>

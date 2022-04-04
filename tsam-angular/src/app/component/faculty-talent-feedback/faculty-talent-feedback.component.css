@@ -1,0 +1,8 @@
+.input-width{
+    width: auto;
+}
+.input-width:focus{
+    border: 3px;
+    border-style: solid;
+    border-color: rgb(255, 140, 0);
+}

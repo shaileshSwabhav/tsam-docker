@@ -1,0 +1,228 @@
+1) batch topic assignement score 
+API : 
+#score get (except for talents not submitted) ALSO DUE DATE, 
+*Batch topic assignment list (SPLIT ARCHIVE)
+Update subission (give score)*
+
+delete nbinput
+
+https://bundlephobia.com/package/excel@1.0.1
+
+
+
+https://dmitripavlutin.com/differences-between-arrow-and-regular-functions/
+https://stackoverflow.com/questions/45579466/how-to-intercept-the-value-of-formcontrol-before-setting-or-getting-it
+https://stackoverflow.com/questions/48826694/how-should-i-split-app-into-angular-modules
+https://indepth.dev/posts/1056/avoiding-common-confusions-with-modules-in-angular
+https://angular.io/guide/deployment
+PHP:- https://makitweb.com/make-destination-directory-on-file-upload-with-php/
+
+dynamic CSS: https://medium.com/swlh/6-ways-to-dynamically-style-angular-components-b43e037852fa 
+
+Quill : https://quilljs.com/docs
+
+BASE URL
+https://stackoverflow.com/questions/38112891/angular-2-set-base-href-dynamically/41949470#41949470
+
+*****************NO FUNCTION CALLS ON TEMPLATE********************************
+
+*****************Error handling for prod********************************
+https://medium.com/angular-in-depth/read-your-production-angular-errors-like-a-pro-32c3df34bdae
+*****************Error handling for prod********************************
+
+=================================Preview==================
+<embed src="https://swabhavtechlabs.com/test/tsm_uploads/resources/f71e804d-f4ed-4010-878c-36763e3f9391.pdf" width="500" height="375" 
+ type="application/pdf">
+ <iframe width="420" height="315"
+src="https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1">
+</iframe>
+===================================================================================================================
+ERROR :-
+node --max_old_space_size=(4096-500) ./node_modules/@angular/cli/bin/ng build --prod
+node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve -o --port 4201
+node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build --prod
+If you are still on Angular 6 and using Docker:
+
+RUN node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build -- configuration=${NG_CONFIGURATION};
+This worked for my team's project. We may consider using 4096 or even 2048 if that works for us.
+===================================================================================================================
+#IMPORTANT FOR NG-select
+https://github.com/ng-select/ng-select#change-detection
+===================================================================================================================
+
+Date.prototype.getDateWithoutTime = function () {
+    return new Date(this.toDateString());
+}
+Now <any-date-object>.getDateWithoutTime(); will output Date only
+
+Optional. The date format to display the date in, which can be one or more of the following:
+"yyyy" year (2016)
+"yy" year (16)
+"y" year (2016)
+"MMMM" month (January)
+"MMM" month (Jan)
+"MM" month (01)
+"M" month (1)
+"dd" day (06)
+"d" day (6)
+"EEEE" day (Tuesday)
+"EEE" day (Tue)
+"HH" hour, 00-23 (09)
+"H" hour 0-23 (9)
+"hh" hour in AM/PM, 00-12 (09)
+"h" hour in AM/PM, 0-12 (9)
+"mm" minute (05)
+"m" minute (5)
+"ss" second (05)
+"s" second (5)
+"sss" millisecond (035)
+"a" (AM/PM)
+"Z" timezone (from -1200 to +1200)
+"ww" week (00-53)
+"w" week (0-53)
+"G" era (AD)
+"GG" era (AD)
+"GGG" era (AD)
+"GGGG" era (Anno Domini)
+
+The format value can also be one of the following predefined formats:
+"short" same as "M/d/yy h:mm a" (1/5/16 9:05 AM)
+"medium" same as "MMM d, y h:mm:ss a" (Jan 5, 2016 9:05:05 AM)
+"shortDate" same as "M/d/yy" (1/5/16)
+"mediumDate" same as "MMM d, y" (Jan 5, 2016)
+"longDate" same as "MMMM d, y" (January 5, 2016)
+"fullDate" same as "EEEE, MMMM d, y" (Tuesday, January 5, 2016)
+"shortTime" same as "h:mm a" (9:05 AM)
+"mediumTime" same as "h:mm:ss a" (9:05:05 AM)
+
+for (let [key, value] of this.universityMap) {
+       console.log(key, value);
+ }
+ for (let entry of Array.from(this.universityMap.entries())) {
+       let key = entry[0];
+       let value = entry[1];
+       console.log("key:", key)
+       console.log("value:", value)
+ 
+ for (let key of Array.from(this.universityMap.keys())) {
+       console.log("key", key);
+ }
+
+ 
+If you are using Angular 2 (apparently it also works for Angular 4 too), you can use the following to round to two decimal places{{ exampleNumber | number : '1.2-2' }}, as in:
+
+<ion-input value="{{ exampleNumber | number : '1.2-2' }}"></ion-input>
+BREAKDOWN
+
+'1.2-2' means {minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}:
+
+A minimum of 1 digit will be shown before decimal point
+It will show at least 2 digits after decimal point
+But not more than 2 digits
+
+===================================================================================================================
+
+Agenda
+#1) Total number api
+2) toggle
+3) search salesperson
+
+IMPORTANT:-
+https://stackoverflow.com/questions/53995948/warning-in-budgets-maximum-exceeded-for-initial
+
+
+
+
+===================================================================================================================
+#Change port for good:-
+
+It seems things have changed in recent versions of the CLI (I'm using 6.0.1). I was able to change the default port used by ng serve by adding a port option to my project's angular.json:
+
+{
+    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+    "projects": {
+        "my-project": {
+            "architect": {
+                "serve": {
+                    "options": {
+                        "port": 4201
+                    }
+                }
+            }
+        }
+    }
+}
+
+===================================================================================================================
+# For current date as default in form control
+@Component({
+  providers: [DatePipe]
+})
+new FormControl([this.datePipe.transform(new Date(), 'yyyy-MM-dd')])
+===================================================================================================================
+#conditional-required-validation
+https://stackoverflow.com/questions/52866016/conditional-required-validation-in-angular-reactive-form
+===================================================================================================================
+CMD: curl -X POST http://localhost..
+
+===================================================================================================================
+ACE :-
+you need to include script files for extensions you use see https://github.com/ajaxorg/ace-builds/blob/v1.1.4/demo/autocompletion.html#L28
+option name is "enableLiveAutocompletion" instead of "enableLiveAutoComplete" https://github.com/ajaxorg/ace/blob/v1.1.4/lib/ace/ext/language_tools.js#L186
+options names do not have set in them so it should be highlightActiveLine
+you can see list of all available options by running Object.keys(editor.$options)
+
+===================================================================================================================
+
+<script type="text/javascript">
+  CKEDITOR.plugins.addExternal('codeTag', '/test/tsm/assets/ckeditor/plugins/codeTag/plugin.js');
+  CKEDITOR.plugins.addExternal('kbdTag', '/test/tsm/assets/ckeditor/plugins/kbdTag/plugin.js');
+  CKEDITOR.plugins.addExternal('simage', '/test/tsm/assets/ckeditor/plugins/simage/plugin.js');
+</script>
+
+===================================================================================================================
+
+node --max_old_space_size=5000 ./node_modules/@angular/cli/bin/ng build --prod
+
+node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve
+
+===================================================================================================================
+
+table row with auto sr no:
+.assignment-score > table {
+  counter-reset: rowNumber;
+}
+
+.assignment-score > table tr::before {
+  display: table-cell;
+  counter-increment: rowNumber;
+  content: counter(rowNumber) ".";
+  padding-right: 0.3em;
+  text-align: center;
+  padding-top: 1em;
+}
+===================================================================================================================
+
+deleted pacakges
+"moment": "^2.29.1",
+"caniuse-lite": "^1.0.30001211",
+"@swimlane/ngx-charts": "^14.0.0",
+"ng2-nvd3": "^2.0.0",
+"read-excel-file": "^4.1.0",
+"xlsx-import": "^2.3.4-1",
+
+
+Unused dependencies
+* enhanced
+* font-awesome -> probably used by angular material
+* jquery
+* read-excel-file
+* resolve
+* xlsx-import
+
+
+CSS:
+https://www.geeksforgeeks.org/spacing-in-bootstrap-with-examples/
+
+Since Bootstrap 4 uses flexbox or display: flex on row class you can just use ml-auto on 
+second div which will add margin-left auto and push that div to the right side.

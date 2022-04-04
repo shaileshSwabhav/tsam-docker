@@ -1,0 +1,95 @@
+.teal {
+  color: teal;
+}
+  
+.subSession {
+  margin-left: 15%;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+a, a:hover{
+  color:white;
+  text-decoration: none;
+}
+
+label {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.card-margin {
+  margin-bottom: 5%;
+}
+ 
+.session-margin {
+  margin-left: 5%;
+}
+
+.text-size {
+  font-size: large;
+}
+
+.card-overflow {
+  overflow: hidden;
+}
+
+.card-header, .card-footer {
+  background-color: #fff6f4d0;
+}
+
+.btn-swabhav {
+  color: #f6430f;
+}
+
+.table-striped > tbody > .unstriped-tr > td {
+  background-color: #fff;
+}
+
+.table-unstriped  > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #fff;
+}
+
+.no-sub-session {
+  margin-left: 43%;
+}
+
+.img-icon {
+  width: 10%;
+}
+
+/* *******************input styles***************** */
+.form-control:focus {
+  box-shadow: none;
+}
+
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+
+.sub-text {
+  /* margin-bottom: 10%; */
+  margin-top: -10%;
+  margin-left: -45%;
+  font-size: 70%;
+}

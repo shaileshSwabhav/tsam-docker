@@ -1,0 +1,46 @@
+.width-30px-style{
+    width: 30px;
+}
+
+.font-20-style{
+    font-size: 20px;
+}
+
+.session-date-style{
+    border: 1px solid #757575;
+    border-radius: 4px;
+    padding: 5px;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.tasklist-box-style{
+    border-radius: 30px;
+    font-weight: bold;
+    padding: 7px;
+    text-align: center;
+}
+
+.pending-box-style{
+    background-color: #ffeaea;
+    color: #f80309;
+}
+
+.submitted-box-style{
+    background-color: #e5f6fd;
+    color: #61abde;
+}
+
+.image-fit-style{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.width-60px-style{
+    width: 60px;
+}
+
+.right-border-style{
+    border-right: 1px solid;
+}

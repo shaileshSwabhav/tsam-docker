@@ -1,0 +1,54 @@
+.btn:hover:enabled {
+  transform: scale(1.1);
+}
+
+.material-icons:hover {
+  transform: scale(1.3);
+}
+
+.inline {
+  display: flex;
+  flex-direction: row;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+a, a:hover{
+  color:white;
+  text-decoration: none;
+}
+
+.color-teal {
+  color: teal;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.btn-style {
+  color: rgb(0, 93, 155)
+}
+
+.fake-link{
+  text-decoration: underline;
+  cursor: pointer;
+  color: rgb(33, 33, 196);
+  font-weight: 900;
+  /* font-family: cursive; */
+}
+
+.no-link{
+  font-weight: 900;
+  /* font-family: cursive; */
+  cursor: default;
+}
+
+.heading {
+  font-weight: 900;
+  /* font-family: cursive; */
+  font-size: medium
+}

@@ -1,0 +1,206 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="standard-page-margin">
+        <div *ngIf="conceptList.length > 0">
+            <ng-container *ngFor="let concept of conceptList; let i = index">
+                <div class="heading-style">
+                    <img class="main-topic-image" src={{concept.logo}} alt="">
+                    {{concept.name}}
+                    <span class="font-lg-style">
+                        <span
+                            [ngClass]="{'easy': concept.levelName === 'Easy', 'medium' : concept.levelName === 'Medium',  'hard' : concept.levelName === 'Hard'}">
+                            ({{concept.levelName}})
+                        </span>
+                    </span>
+                    <!-- <span (click)="concept.isDescriptionVisible=!concept.isDescriptionVisible" class="arrow">
+                        <i class="material-icons help-icon-style">help_outline</i>
+                    </span> -->
+                </div>
+                <!-- <div [innerHTML]="concept.description" *ngIf="concept.isDescriptionVisible" class="faq-description">
+                    <br><br>
+                </div> -->
+                <div [innerHTML]="concept.description" class="faq-description">
+                    <br><br>
+                </div>
+                <div>
+                    <button class="btn btn-default swabhav-button-square" type="button"
+                        (click)="getProgrammingQuestionListByProgrammingConceptID(concept.id)">
+                        <span *ngIf="concept.id == selectedConceptID">
+                            Hide Questions
+                        </span>
+                        <span *ngIf="concept.id != selectedConceptID">
+                            View Questions
+                        </span>
+                    </button>
+                </div>
+                <br>
+                <ng-container *ngIf="concept.id == selectedConceptID">
+                    <div class="row">
+                        <ng-container *ngFor="let problem of problemList; let i = index">
+                            <div class="form-group col-sm-6 col-md-4">
+                                <div class="card card-margin practice-card-shadow practice-card-style h-100">
+                                    <div class="card-body practice-card-body-style">
+                                        <div class="color-000000 text-center font-weight-bold font-md-style">
+                                            {{problem.label}}</div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-6">
+                                                <div class="row">
+                                                    <span
+                                                        class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Success
+                                                        Rate</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span
+                                                            class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{problem.successRatio}}%</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <span
+                                                        class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Attempted
+                                                        By</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span
+                                                            class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{problem.attemptedByCount}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div class="row">
+                                                    <span
+                                                        class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Solved
+                                                        By</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span
+                                                            class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{problem.solvedByCount}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <span
+                                                        class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Difficulty</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span class="font-weight-bold font-sm-style">
+                                                            <span
+                                                                [ngClass]="{'easy': problem.levelName === 'Easy', 'medium' : problem.levelName === 'Medium',  'hard' : problem.levelName === 'Hard'}">
+                                                                {{problem.levelName}}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="text-center">
+                                            <span
+                                                class="color-F6430F cursor-pointer-style font-weight-bold font-sm-style"
+                                                (click)="redirectToProblemDetails(problem.id)">
+                                                View
+                                                <span class="arrow"><i
+                                                        class="material-icons icon-style">arrow_right_alt</i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-container>
+                <!-- <div class="row">
+                    <ng-container *ngFor="let subConcept of concept.subProgrammingConcepts; let i = index">
+                        <div class="form-group col-sm-4 col-md-3">
+                            <div [ngClass]="subConcept.subConceptClass">
+                                <div class="card-body">
+                                    <div>{{subConcept.name}}</div>
+                                    <br>
+                                    <div class="text-center">
+                                        <span *ngIf="!selectedConcept.id" class="color-F6430F cursor-pointer-style font-weight-bold font-sm-style" (click)="getProgrammingQuestionListBySubProgrammingConceptID(concept.id,subConcept.id)">
+                                            View All
+                                            <span class="arrow"><i class="material-icons icon-style">arrow_right_alt</i></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div> -->
+                <!-- <ng-container *ngIf="concept.isVisible">
+                    <div class="sub-topic-name-header">
+                        {{selectedSubConcept.name}}
+                        <div class="close-style float-right" (click)="onCloseButtonClick()">
+                            <span class="arrow"><i class="material-icons modal-popup-close-icon-style">close</i></span>Close
+                        </div>
+                    </div>
+                    <div class="row">
+                        <ng-container *ngFor="let problem of problemList; let i = index">
+                            <div class="form-group col-sm-6 col-md-4">
+                                <div class="card card-margin practice-card-shadow practice-card-style h-100">
+                                    <div class="card-body practice-card-body-style">
+                                        <div class="color-000000 text-center font-weight-bold font-md-style">{{problem.label}}</div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-6">
+                                                <div class="row">
+                                                    <span class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Success Rate</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{problem.successRatio}}%</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <span class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Attempted By</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{problem.attemptedByCount}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div class="row">
+                                                    <span class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Solved By</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{problem.solvedByCount}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <span class="col-sm-8 col-md-8 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Difficulty</span>
+                                                    <div class="col-sm-4 col-md-4 px-0">
+                                                        <span [ngClass]="problem.levelClass">{{problem.levelName}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="text-center">
+                                            <span class="color-F6430F cursor-pointer-style font-weight-bold font-sm-style" (click)="redirectToProblemDetails(problem.id,selectedSubConcept.id)">
+                                                View
+                                                <span class="arrow"><i class="material-icons icon-style">arrow_right_alt</i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="float-right" *ngIf="totalProblems > 6">
+                        <button class="btn btn-default swabhav-button-square" 
+                            type="button" (click)="redirectToSubProgrammingConceptQuestionsPage(selectedSubConcept.id)">
+                            View All
+                        </button>
+                    </div>
+                </ng-container> -->
+            </ng-container>
+        </div>
+        <div *ngIf="conceptList.length == 0">
+            <br>
+            <br>
+            <br>
+            <br>
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Programming Concepts Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>

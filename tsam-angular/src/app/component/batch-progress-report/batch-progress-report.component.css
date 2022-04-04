@@ -1,0 +1,167 @@
+.my-course-card-style{
+    box-shadow: 0 0 15px #f6430f26;
+    border: none;
+    background-color: #FFFFFF;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.card-body-style{
+    padding: 10px;
+}
+
+.batch-talent-select-style{
+    display: inline-block;
+    width: 40%;
+}
+
+.module-for-concept-select-style{
+    display: inline-block;
+    width: 20%;
+}
+
+.batch-module-for-date-select-style{
+    display: inline-block;
+    width: 60%;
+}
+
+.feedback-question-select-style{
+    display: inline-block;
+    width: 40%;
+}
+
+.count-text-style{
+    color: #F6430F;
+    font-size: 3em;
+}
+
+.count-total-text-style{
+    color: #414141;
+    font-size: 1.5em;
+}
+
+.margin-top-10-style{
+    margin-top: 10px;
+}
+
+.assignment-donut-label-style{
+    font-size: 15px;
+}
+
+.completed-assignment-style{
+    color: #1940d9;
+}
+
+.submitted-assignment-style{
+    color: #31bacc;
+}
+
+.pending-assignment-style{
+    color: #ff715b;
+}
+
+.easy-assignment-style{
+    color: #5cad6d;
+}
+
+.medium-assignment-style{
+    color: #feb72e;
+}
+
+.hard-assignment-style{
+    color: #fd715b;
+}
+
+.card-highest-lowest-score-style{
+    height: 30%;
+}
+
+.padding-0-style{
+    padding: 0;
+}
+
+.margin-top-5-style{
+    margin-top: 5px;
+}
+
+.margin-top--style{
+    margin-top: 25px;
+}
+
+.card-body-highest-lowest-score-style{
+    padding: 10px;
+}
+
+.margin-bottom-10-style{
+    margin-bottom: 10px;
+}
+
+.padding-5-style{
+    padding: 5px;
+}
+
+.view-more-style{
+    font-size: smaller;
+    color: #757575;
+    text-decoration: underline;
+    font-weight: bold;
+    text-align: right;
+}
+
+.faculty-avaerage-rating-style{
+    font-size: 4em;
+}
+
+.faculty-average-rating-weekly-card-style{
+    height: 50%;
+    padding-top: 15%;
+}
+
+.complex-concept-box-style{
+    background-color: #eae4fa;
+    color: #8760ef;
+    border-radius: 10px;
+    margin-bottom: 4px;
+}
+
+.header-style {
+    display: flex;
+}
+
+.header-left-style {
+    margin-left: auto;
+}
+
+.display-inline-style{
+    display: inline;
+}
+
+.display-inline-block-style{
+    display: inline-block;
+}
+
+.donut-inner {
+    margin-top: -100px;
+    margin-bottom: 100px;
+}
+.donut-inner h5 {
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+.donut-inner span {
+    font-size: 12px;
+}
+
+.module-concept-donut-chart-container{
+    position: relative;
+}
+
+.module-concept-donut-chart-text-style{
+    position: absolute;
+    left: 45%;
+    bottom: 40%;
+}
+
+.hide-style{
+    display: none;
+}

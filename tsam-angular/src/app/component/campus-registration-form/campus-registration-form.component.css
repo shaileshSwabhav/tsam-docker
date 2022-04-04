@@ -1,0 +1,140 @@
+.card-margin{
+  padding-left: 20%;
+  padding-right: 20%;
+}
+
+.red {
+  color: red;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+.center{
+  text-align: center;
+}
+
+.stepper-button-style{
+  background-color: green;
+  color: white;
+  text-align: center;
+}
+
+.center-style{
+  text-align: center;
+}
+
+.addToFormArrayButton{
+  background-color: rgb(214, 117, 214);
+}
+.deleteFromFormArrayButton{
+  background-color: rgb(230, 114, 114);
+  color: white;
+}
+.cardColor{
+  background-color: white;
+}
+
+.label-style{
+  color: black;
+}
+
+h5{
+  font-size: large;
+  font-weight: bolder;
+  display: inline-block;
+}
+
+.h5-background{
+  text-align: center;
+  padding-top: 1%;
+  background-color: rgb(226, 226, 158);
+}
+
+.stepper-button-style:hover {
+  transform: scale(1.2);
+}
+
+.darkslateblue{
+  color: darkslateblue;
+}
+
+.redirect-style{
+  color: black;
+  font-size: large;
+  margin-top: 10%;
+}
+
+.large{
+  font-size: 50px;
+}
+
+*:disabled:hover {
+  cursor:not-allowed
+}
+
+.heading-style{
+  font-weight: bolder;
+  text-align: center;
+}
+
+.popover-style:hover{
+  transform: scale(1.2);
+  cursor: default !important;
+}
+
+.popover-style {
+  margin-left: 2px;
+}
+
+.academicPopoverClass{
+  vertical-align: sub;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.custom-width{
+  width: 100%;
+}
+
+.hidden-style{
+  visibility: hidden;
+}
+
+.popover-title-style{
+  font-size: 4mm;
+  font-weight: bold;
+}
+
+.menu-style{
+  padding-top: 1%;
+  padding-bottom: 1%;
+  background-color: black;
+  text-align: center;
+}
+
+img{
+  height: 75px;
+}
+
+.black{
+  color: black;
+}
+
+.marked-field-style{
+  color: red;
+  font-size: smaller
+}
+
+.submit-button-style{
+  background-color: black;
+  color: yellow;
+}
+
+.submit-button-style:hover {
+  transform: scale(1.2);
+}
+

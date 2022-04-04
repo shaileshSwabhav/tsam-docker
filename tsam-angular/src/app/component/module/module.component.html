@@ -1,0 +1,1478 @@
+<app-master-navbar></app-master-navbar>
+
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #noModuleLogo>
+  <img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #readingType>
+  <span class="badge reading-badge">READING</span>
+</ng-template>
+
+<ng-template #readingImage>
+  <img src="assets/icon/colour-icons/homework.png" width="30">
+</ng-template>
+
+<div class="container-fluid margin-2pt">
+  <br>
+
+  <div class="header-style">
+    <div><img src="assets/course/Modules.png" width="40"></div>
+    &nbsp;&nbsp;
+    <div class="total-module-style">
+      <h1>Total Modules: <span class="swabhav-light-orange-text">{{totalModules || 0}}</span></h1>
+    </div>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div>
+      <button class="btn btn-default swabhav-button-round" (click)="onAddNewModuleClick()">
+        Add New <i class="material-icons inline-icon">add</i>
+      </button>
+    </div>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div>
+      <form class="form-inline" [formGroup]="moduleSearchForm">
+        <input autofocus type="text" class="form-control input-style" formControlName="moduleName" placeholder="eg: GO">
+        &nbsp;&nbsp;
+        <button class="btn btn-sm filter-button material-icons-button" type="submit" (click)="searchModules()"
+          [disabled]="!moduleSearchForm.dirty||moduleSearchForm.invalid">Search</button> &nbsp;&nbsp;&nbsp;
+        <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+          (click)="resetSearchAndGetAll()">View All
+        </button>
+      </form>
+    </div>
+    <div class="header-left-style">
+      <div class="total-module-style">
+        <span>
+          Viewing <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong></span>
+          &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalModules}}</strong></span>
+        </span>
+      </div>
+    </div>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div>
+      <form [formGroup]="moduleSearchForm">
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let module of moduleList | paginate: { id:'modulePageID',
+          itemsPerPage: moduleSearchForm.get('limit').value, currentPage: (+moduleSearchForm.get('offset').value + 1), 
+          totalItems: totalModules }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="modulePageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- ----------------------------------------------------- NEW CHANGES ABOVE ----------------------------------------------------- -->
+<div class="container-fluid">
+  <br>
+  <div *ngIf="totalModules > 0; else modulesNotFound">
+    <div class="card-body padding-0pt swabhav-shadow">
+      <div class="table-responsive">
+        <table class="table table-striped table-borderless">
+          <tr>
+            <th class="text-center">No.</th>
+            <th>Name</th>
+            <th class="text-center">Topics</th>
+            <th class="text-center">Sub Topics</th>
+            <th class="text-center">Questions</th>
+            <th class="text-center">Topics</th>
+            <th class="text-center">Questions</th>
+            <th class="text-center">Resources</th>
+            <th class="text-center">Concepts</th>
+            <th class="text-center">View</th>
+            <th class="text-center">Delete</th>
+          </tr>
+          <tbody>
+            <tr *ngFor="let module of moduleList; let i = index">
+              <td class="text-center algin-middle">
+                {{(i+1)+(moduleSearchForm.get('offset').value*moduleSearchForm.get('limit').value)}}</td>
+              <td class="algin-middle">
+                <img [src]="module.logo" width="30"> &nbsp; {{module.moduleName}}
+              </td>
+              <td class="text-center align-middle">{{module.totalTopics || 0}}</td>
+              <td class="text-center align-middle">{{module.totalSubTopics || 0}}</td>
+              <td class="text-center align-middle">{{module.totalProgrammingQuestions || 0}}</td>
+              <td class="text-center align-middle" data-toggle="tooltip" data-placement="top" title="Manage topics">
+                <button type="button" class="btn btn-default" (click)="onAddTopicClick(module)">
+                  <img src="assets/course/topic-subtopic-edit.png" alt="edit topic" width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle" data-toggle="tooltip" data-placement="top"
+                title="Manage Questions">
+                <button type="button" class="btn btn-default" [disabled]="module.totalSubTopics == 0"
+                  (click)="onManageQuestionClick(module)">
+                  <img src="assets/course/assignments-add.png"
+                    [ngClass]="module.totalSubTopics > 0 ? 'assignments-color' : 'assignments-grey' " alt="add assignments"
+                    width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle" data-toggle="tooltip" data-placement="top"
+                title="Add Resource">
+                <button type="button" class="btn btn-default" (click)="onManageResourceClick(module)">
+                  <img src="assets/icon/colour-icons/manageresources.png" alt="add resource" width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle" data-toggle="tooltip" data-placement="top"
+                title="Manage Concepts">
+                <button type="button" class="btn btn-default" (click)="redirectToModuleConcepts(module.id,module.moduleName)">
+                  <img src="assets/icon/colour-icons/concept.png" alt="Manage Concepts" width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle" data-toggle="tooltip" data-placement="top"
+                title="View module">
+                <button type="button" class="btn btn-default" (click)="onViewModuleClick(module)">
+                  <img src="assets/course/view.png" alt="view module" width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle" data-toggle="tooltip" data-placement="top"
+                title="Delete module">
+                <button type="button" class="btn btn-default" (click)="onDeleteModuleClick(module.id)">
+                  <img src="assets/icon/colour-icons/delete.png" alt="delete module" width="30">
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #modulesNotFound>
+    <div class="container full-h">
+      <br />
+      <br />
+      <div class="d-flex align-items-center full-h">
+        <div class="col-sm-12 col-md-8 mx-auto">
+          <div class="jumbotron">
+            <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Modules Not Found</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- <div *ngIf="totalModules == 0">
+    <div class="card">
+      <div class="card-body not-found-card-style">
+        <h2>No Modules Found</h2>
+      </div>
+    </div>
+  </div> -->
+
+  <br>
+  <br>
+
+</div>
+
+<ng-template #moduleFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+        {{isViewMode? 'Module Details': isOperationUpdate ? 'Update Module' : 'Add Module' }}
+        <button type="button" *ngIf="isViewMode && permission?.update" class="btn material-icons-button"
+          (click)="onUpdateModuleClick()"><i class="material-icons grey-icon">create</i>
+        </button>
+      </h4>
+      <span *ngIf="!isViewMode"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="moduleForm">
+      <div class="row">
+        <div class="form-group col-8">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Name'}"></ng-container>
+          </span>
+          <input type="text" class="form-control input-style" formControlName="moduleName" placeholder="eg: GO">
+          <div class="alert alert-danger" *ngIf="(moduleForm.get('moduleName').touched||
+            moduleForm.get('moduleName').dirty)&&moduleForm.get('moduleName').invalid">
+            <div *ngIf="moduleForm.get('moduleName').errors.required">
+              Name must be specified
+            </div>
+            <div *ngIf="moduleForm.get('moduleName').errors.maxlength">
+              Name can have maximum 100 characters
+            </div>
+          </div>
+        </div>
+        <!-- span is used to hide the border as well -->
+        <div class="form-group col-8">
+          <span *ngIf="!isViewMode || moduleForm.get('logo')?.value">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Logo'}">
+              </ng-container>
+            </span>
+            <span class="custom-file">
+              <input *ngIf="!isViewMode" type="file" class="custom-file-input" (change)="onLogoSelect($event)"
+                id="customFile" value="logoDisplayedFileName">
+              <label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label" for="customFile"
+                [innerHTML]="logoDisplayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isLogoFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="moduleForm.get('logo')?.value && !isLogoUploadedToServer" data-toggle="tooltip"
+                data-placement="top" title="View Logo">
+                <img *ngIf="isViewMode" [src]="moduleForm.get('logo')?.value" width="90">
+              </div>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customFile" [innerHTML]="logoDocStatus"></label>
+          </span>
+        </div>
+      </div>
+    </form>
+
+
+    <ng-container *ngIf="isViewMode && module?.moduleTopics?.length > 0">
+      <hr>
+      <ng-container *ngTemplateOutlet="moduleTopicTable; context:{moduleTopics:module?.moduleTopics}"></ng-container>
+    </ng-container>
+
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button type="button" (click)="dismissFormModal(modal)" class="btn btn-default">Close</button>
+    &nbsp;&nbsp;
+    <button type="button" [disabled]="!moduleForm.dirty" class="btn btn-default swabhav-button-round"
+      *ngIf="!isViewMode" (click)="validateModuleForm()">
+      {{isOperationUpdate ? 'Update module' : 'Add module'}}
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template #addQuestionModal let-modal>
+
+  <!-- Modal Header -->
+  <!-- <div class="modal-header">
+    <div class="modal-title">
+      <h2 class="modal-title swabhav-light-orange-text">View Topics</h2>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div> -->
+
+  <!-- Modal Body-->
+  <div class="modal-body">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/course/assignments-add.png" width="80">
+      </div>
+      <div class="col-sm-4 left-margin">
+        <h1 class="swabhav-light-orange-text"><strong>Add Question To:</strong></h1>
+        <h2>Module Name: &nbsp; {{module.moduleName}} &nbsp; &nbsp; &nbsp;</h2>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="table-responsive">
+      <table class="table table-borderless">
+        <thead>
+          <tr>
+            <th class="text-center">Order</th>
+            <th>Topics</th>
+            <th class="text-center">Questions</th>
+            <th class="text-center">Add Questions</th>
+            <th class="text-center">Edit Questions</th>
+            <th class="text-center">Approx Total Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let topic of moduleTopics; let i = index">
+            <tr>
+              <td class="text-center text-nowrap algin-middle">{{topic.order}}</td>
+              <td class="algin-middle">{{topic.topicName}}</td>
+              <td class="text-center algin-middle">{{topic.topicProgrammingQuestions?.length || 0}}</td>
+              <td class="text-center algin-middle">
+                <button type="button" class="btn btn-default" (click)="onAddQuestionClick(topic)">
+                  <img src="assets/course/assignments-add.png" alt="add assignment" width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle">
+                <button type="button" class="btn btn-default" (click)="onEditQuestionClick(topic)">
+                  <img src="assets/icon/colour-icons/edit.png" alt="edit assignment" width="30">
+                </button>
+              </td>
+              <td class="text-center algin-middle">{{topic.totalTime | minute}}</td>
+            </tr>
+            <tr *ngIf="topic.isAddQuestionClick" class="unstriped-tr">
+              <td class="algin-middle" colspan="7">
+                <ng-container *ngTemplateOutlet="addAssignmentTemplate; context:{topic:topic}"></ng-container>
+              </td>
+            </tr>
+            <tr *ngIf="topic.isEditQuestionClick" class="unstriped-tr">
+              <td class="algin-middle" colspan="7">
+                <ng-container *ngTemplateOutlet="editAssignmentTemplate; context:{topic:topic}"></ng-container>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button type="button" (click)="modal.dismiss()" class="btn btn-default">Close</button>
+  </div>
+</ng-template>
+
+<ng-template let-topic="topic" #addAssignmentTemplate>
+  <form [formGroup]="programmingQuestionSearchForm">
+    <div class="d-flex justify-content-between align-items-baseline flex-row flex-wrap">
+      <div class="form-inline">
+        <label for="assignmentTitle" class="filter-form-label">Label:</label>
+        &nbsp;&nbsp;
+        <input type="text" name="assignmentTitle" class="form-control input-style" formControlName="label"
+          placeholder="eg: Assignment 1">&nbsp;&nbsp;
+        <button class="btn btn-sm filter-button material-icons-button" type="submit"
+          (click)="searchProgrammingQuestion()"
+          [disabled]="!programmingQuestionSearchForm.dirty||programmingQuestionSearchForm.invalid">Search
+        </button> &nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-sm btn-submit-swabhav material-icons-button"
+          (click)="resetAssignmentSearchAndGetAll()" *ngIf="isProgrammingQuestionSearched">View All Programming
+          Assignment
+        </button>
+      </div>
+      <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+        <div class="d-flex flex-wrap">
+          <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+          <select class="form-control form-control-sm input-style" formControlName="limit"
+            (change)="changeQuestionPage(1)">
+            <option selected>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+          </select> &nbsp;&nbsp;&nbsp;
+        </div>
+        <div class="d-flex flex-wrap">
+          <ul class="pagination" *ngFor="let assignment of programmingQuestions | paginate: { id:'programmingQuestionPageID',
+              itemsPerPage: programmingQuestionSearchForm.get('limit').value, 
+              currentPage: +programmingQuestionSearchForm.get('offset').value + 1, 
+              totalItems: totalProgrammingQuestion }">
+          </ul>
+          <pagination-controls responsive="true" maxSize="5" (pageChange)="changeQuestionPage($event)"
+            id="programmingQuestionPageID">
+          </pagination-controls>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <br />
+
+  <ng-container *ngIf="programmingQuestions.length > 0; else questionsNotFound">
+    <form [formGroup]="topicQuestionForm">
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th>Label</th>
+              <!-- <th class="text-center">Order</th> -->
+              <th class="text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="topicQuestions"
+              *ngFor="let questionControl of questionControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <tr>
+                  <td class="text-nowrap text-center algin-middle">
+                    <button type="button" class="btn btn-default"
+                      (click)='questionControl.get("showDetails").value = !questionControl.get("showDetails").value'>
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{questionControl.get('showDetails').value ? 'expand_more' : 'chevron_right'}}
+                      </i> {{i+1}}
+                    </button>
+                    <label class="form-check-label">
+                      <label class="checkbox-container">
+                        <input type="checkbox" [checked]="questionControl.get('isMarked')?.value"
+                          formControlName="isMarked" (change)="toggleAssignment(questionControl)" />
+                        <span class="checkmark"></span>
+                      </label>
+                    </label>
+                  </td>
+                  <td class="text-nowrap algin-middle"><strong>{{programmingQuestions[i]?.label}}</strong>
+                  </td>
+                  <!-- <td class="text-center algin-middle">
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" placeholder="Eg: 1"
+                      formControlName="order" (input)="onTopicQuestionFormInput(questionControl)">
+                    <div class="alert alert-danger" *ngIf=" (questionControl.get('order')?.dirty || 
+                    questionControl.get('order')?.touched) && questionControl.get('order')?.invalid">
+                      <div *ngIf="questionControl.get('order')?.errors.required">
+                        Order must be specified
+                      </div>
+                      <div *ngIf="questionControl.get('order')?.errors.min">
+                        Order must be greater than 0
+                      </div>
+                    </div>
+                  </td> -->
+                  <td class="text-center algin-middle">
+                    <select class="form-control input-style" formControlName="isActive"
+                      (change)="onTopicQuestionFormInput(questionControl)">
+                      <option [ngValue]="null" disabled>Select Active/Inactive</option>
+                      <option [ngValue]="true">Active</option>
+                      <option [ngValue]="false">Inactive</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf=" (questionControl.get('isActive')?.dirty || 
+                    questionControl.get('isActive')?.touched) && questionControl.get('isActive')?.invalid">
+                      <div *ngIf="questionControl.get('isActive')?.errors.required">
+                        Is active must be specified
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="questionControl.get('showDetails')?.value" class="no-stripe">
+                  <td class="algin-middle" colspan="5">
+                    <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                      <h1 class="swabhav-light-orange-text"><strong>Question Details</strong></h1>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                      <div *ngIf="programmingQuestions[i].question" class="form-group col-sm-12 col-md-12 text-nowrap">
+                        <label><strong>Question:</strong></label>
+                        <span class="content-style text-wrap" [innerHTML]="programmingQuestions[i].question"></span>
+                      </div>
+                      <div *ngIf="programmingQuestions[i]?.level" class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Difficulty:</strong>&nbsp;
+                          <span>
+                            <ng-container *ngIf="programmingQuestions[i]?.level == 1; then first; 
+                              else (programmingQuestions[i]?.level == 2 && second) || (third)">
+                            </ng-container>
+                            <ng-template #first>
+                              <span class="badge easy-level-badge">Easy</span>
+                            </ng-template>
+                            <ng-template #second>
+                              <span class="badge medium-level-badge">Medium</span>
+                            </ng-template>
+                            <ng-template #third>
+                              <span class="badge hard-level-badge">Hard</span>
+                            </ng-template>
+                          </span>
+                        </label>
+                      </div>
+                      <div *ngIf="programmingQuestions[i]?.isActive" class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Status:</strong> {{programmingQuestions[i].isActive ? 'Active':
+                          'Inactive'}}</label>
+                      </div>
+                      <div *ngIf="programmingQuestions[i]?.score" class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Score:</strong> {{programmingQuestions[i]?.score}}</label>
+                      </div>
+                      <div *ngIf="programmingQuestions[i]?.timeRequired"
+                        class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Duration:</strong> {{programmingQuestions[i]?.timeRequired}}
+                        </label>
+                      </div>
+                      <div *ngIf="programmingQuestions[i].example" class="form-group col-sm-12 col-md-12 text-nowrap">
+                        <label><strong>Examples:</strong>
+                          <ng-container>
+                            <span class="content-style text-wrap" [innerHTML]="programmingQuestions[i].example"></span>
+                          </ng-container>
+                        </label>
+                      </div>
+                      <!-- <div class="d-flex"> -->
+                      <div *ngIf="programmingQuestions[i].constraints"
+                        class="form-group col-sm-12 col-md-12 text-nowrap">
+                        <label><strong>Constraints:</strong></label>
+                        <ng-container>
+                          <span class="content-style text-wrap" [innerHTML]="programmingQuestions[i].constraints"></span>
+                        </ng-container>
+                      </div>
+                      <!-- </div> -->
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #questionsNotFound>
+    <br>
+    <br>
+    <div class="container full-h">
+      <div class="d-flex align-items-center full-h">
+        <div class="col-sm-12 col-md-12 mx-auto">
+          <div class="jumbotron">
+            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Coding questions not found</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="float-right">
+    <button type="button" class="btn btn-default swabhav-light-orange-text fixed-btn"
+      (click)="topic.isAddQuestionClick=!topic.isAddQuestionClick">Cancel</button>
+    <button type="submit" class="btn btn-submit-swabhav fixed-btn" (click)="validateTopicQuestion()"
+      [disabled]='assignedTopicQuestions.length == 0'>Submit
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template let-topic="topic" #editAssignmentTemplate>
+  <ng-container *ngIf="topicQuestions.length > 0; else assignedQuestionNotFound">
+    <form [formGroup]="selectedTopicQuestionForm">
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th>Label</th>
+              <!-- <th class="text-center">Order</th> -->
+              <th class="text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="selectedTopicQuestions"
+              *ngFor="let questionControl of selectedQuestionControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <tr>
+                  <td class="text-nowrap text-center algin-middle">
+                    <button type="button" class="btn btn-default"
+                      (click)='questionControl.get("showDetails").value = !questionControl.get("showDetails").value'>
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{questionControl.get('showDetails').value ? 'expand_more' : 'chevron_right'}}
+                      </i> {{i+1}}
+                    </button>
+                  </td>
+                  <td class="text-nowrap algin-middle"><strong>{{programmingQuestions[i]?.label}}</strong>
+                  </td>
+                  <!-- <td class="text-center algin-middle">
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" placeholder="Eg: 1"
+                      formControlName="order">
+                    <div class="alert alert-danger" *ngIf=" (questionControl.get('order')?.dirty || 
+                    questionControl.get('order')?.touched) && questionControl.get('order')?.invalid">
+                      <div *ngIf="questionControl.get('order')?.errors.required">
+                        Order must be specified
+                      </div>
+                      <div *ngIf="questionControl.get('order')?.errors.min">
+                        Order must be greater than 0
+                      </div>
+                    </div>
+                  </td> -->
+                  <td class="text-center algin-middle">
+                    <select class="form-control input-style" formControlName="isActive">
+                      <option [ngValue]="null" disabled>Select Active/Inactive</option>
+                      <option [ngValue]="true">Active</option>
+                      <option [ngValue]="false">Inactive</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf=" (questionControl.get('isActive')?.dirty || 
+                    questionControl.get('isActive')?.touched) && questionControl.get('isActive')?.invalid">
+                      <div *ngIf="questionControl.get('isActive')?.errors.required">
+                        Is active must be specified
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="questionControl.get('showDetails')?.value" class="no-stripe">
+                  <td class="algin-middle" colspan="5">
+                    <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+                      <h1 class="swabhav-light-orange-text"><strong>Question Details</strong></h1>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                      <div *ngIf="topicQuestions[i]?.programmingQuestion.question" class="form-group col-sm-12 col-md-12 text-nowrap">
+                        <label><strong>Question:</strong></label>
+                        <span class="content-style text-wrap" [innerHTML]="topicQuestions[i]?.programmingQuestion.question"></span>
+                      </div>
+                      <div *ngIf="topicQuestions[i]?.programmingQuestion?.level" class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Difficulty:</strong>&nbsp;
+                          <span>
+                            <ng-container *ngIf="topicQuestions[i]?.programmingQuestion?.level == 1; then first; 
+                                else (topicQuestions[i]?.programmingQuestion?.level == 2 && second) || (third)">
+                            </ng-container>
+                            <ng-template #first>
+                              <span class="badge easy-level-badge">Easy</span>
+                            </ng-template>
+                            <ng-template #second>
+                              <span class="badge medium-level-badge">Medium</span>
+                            </ng-template>
+                            <ng-template #third>
+                              <span class="badge hard-level-badge">Hard</span>
+                            </ng-template>
+                          </span>
+                        </label>
+                      </div>
+                      <div *ngIf="topicQuestions[i]?.programmingQuestion?.isActive" class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Status:</strong> {{topicQuestions[i]?.programmingQuestion?.isActive ? 'Active':
+                          'Inactive'}}</label>
+                      </div>
+                      <div *ngIf="topicQuestions[i]?.programmingQuestion?.score" class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Score:</strong> {{topicQuestions[i]?.programmingQuestion?.score}}</label>
+                      </div>
+                      <div *ngIf="topicQuestions[i]?.programmingQuestion?.timeRequired"
+                        class="form-group col-sm-4 col-md-3 text-nowrap">
+                        <label><strong>Duration:</strong> {{topicQuestions[i]?.programmingQuestion?.timeRequired}}
+                        </label>
+                      </div>
+                      <div *ngIf="topicQuestions[i]?.programmingQuestion?.example" class="form-group col-sm-12 col-md-12 text-nowrap">
+                        <label><strong>Examples:</strong>
+                          <ng-container>
+                            <span class="content-style text-wrap" [innerHTML]="topicQuestions[i]?.programmingQuestion?.example"></span>
+                          </ng-container>
+                        </label>
+                      </div>
+                      <div class="d-flex">
+                        <div *ngIf="topicQuestions[i]?.programmingQuestion?.constraints"
+                          class="form-group col-sm-12 col-md-12 text-nowrap">
+                          <label><strong>Constraints:</strong></label>
+                          <ng-container>
+                            <span class="content-style text-wrap" [innerHTML]="topicQuestions[i]?.programmingQuestion?.constraints"></span>
+                          </ng-container>
+                        </div>
+                      </div>
+                    </div>
+                    <br>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #assignedQuestionNotFound>
+    <br>
+    <br>
+    <div class="container full-h">
+      <div class="d-flex align-items-center full-h">
+        <div class="col-sm-12 col-md-12 mx-auto">
+          <div class="jumbotron">
+            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Coding questions not assigned</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="float-right">
+    <button type="button" class="btn btn-default swabhav-light-orange-text fixed-btn"
+      (click)="topic.isEditQuestionClick=!topic.isEditQuestionClick">Cancel</button>
+    <button type="submit" class="btn btn-submit-swabhav fixed-btn" (click)="validateTopicQuestion()"
+      [disabled]='assignedTopicQuestions.length == 0'>Submit
+    </button>
+  </div>
+</ng-template>
+
+<ng-template let-moduleTopics="moduleTopics" #moduleTopicTable>
+  <div class="table-responsive">
+    <table class="table table-striped table-borderless">
+      <tr>
+        <th class="text-center">Sr.No</th>
+        <th>Topic</th>
+        <th class="text-center">Concept</th>
+        <th class="text-center">Sub Topics</th>
+        <th class="text-center">Total Approx Time</th>
+      </tr>
+      <tbody>
+        <ng-container *ngFor="let topic of moduleTopics; let i = index">
+          <tr>
+            <td class=" algin-middle">
+              <button type="button" class="btn btn-default" *ngIf="topic.subTopics?.length > 0"
+                (click)="topic.showDetails=!topic.showDetails">
+                <i class="material-icons">{{topic.showDetails ? 'expand_more' : 'chevron_right'}}</i>
+              </button> {{i+1}}
+            </td>
+            <td class="algin-middle">{{topic.topicName}}</td>
+            <td class="text-center algin-middle">
+              <ng-container *ngIf="topic.topicProgrammingConcept?.length > 0; else noConcepts">
+                <ng-container *ngFor="let concept of topic.topicProgrammingConcept">
+                  <span class="badge badge-dark">{{concept.programmingConcept.name}}</span>&nbsp;&nbsp;
+                </ng-container>
+              </ng-container>
+              <ng-template #noConcepts>{{"-"}}</ng-template>
+            </td>
+            <td class="text-center algin-middle">{{topic.subTopics.length}}</td>
+            <td class="text-center algin-middle">{{topic.totalTime | minute}}</td>
+          </tr>
+          <tr *ngIf="topic.showDetails" class="unstriped-tr">
+            <td class="algin-middle" colspan="7">
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <table class="table table-borderless table-unstriped">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Order</th>
+                        <th>Sub-Topic</th>
+                        <th class="text-center">Approx Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngFor="let subTopic of topic.subTopics; let j = index; let even = even">
+                        <tr *ngIf="even">
+                          <td class="text-center algin-middle">{{subTopic.order}}</td>
+                          <td class="algin-middle">
+                            <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                            {{subTopic.topicName}}
+                          </td>
+                          <!-- <td>
+                            <ng-container *ngIf="subTopic.topicProgrammingConcept?.length > 0; else noConcepts">
+                              <ng-container *ngFor="let concept of subTopic.topicProgrammingConcept">
+                                <span class="badge badge-dark">{{concept.programmingConcept.name}}</span>&nbsp;&nbsp;
+                              </ng-container>
+                            </ng-container>
+                            <ng-template #noConcepts>{{"-"}}</ng-template>
+                          </td> -->
+                          <td class="text-center algin-middle">{{subTopic.totalTime | minute}}</td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <table class="table table-borderless table-unstriped">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Order</th>
+                        <th>Sub-Topic</th>
+                        <th class="text-center">Approx Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngFor="let subTopic of topic.subTopics; let j = index; let odd = odd">
+                        <tr *ngIf="odd">
+                          <td class="text-center algin-middle">{{subTopic.order}}</td>
+                          <td class="algin-middle">
+                            <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                            {{subTopic.topicName}}
+                          </td>
+                          <td class="text-center algin-middle">{{subTopic.totalTime | minute}}</td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+
+<ng-template #topicModal let-modal>
+
+  <!-- Modal Body-->
+  <div class="modal-body">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/course/assignments-add.png" width="80">
+      </div>
+      <div class="col-sm-10 left-margin">
+        <div>
+          <h1 class="swabhav-light-orange-text"><strong>Add Topics</strong></h1>
+          <h3>Module Name: &nbsp; {{module.moduleName}}</h3>
+          <button type="button" class="btn btn-outline-swabhav" *ngIf="!isAddTopicClick && isPreviewClick && permission?.add"
+            (click)="onAddTopicButtonClick() ">Add New Topic <i class="material-icons inline-icon">add</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <br>
+
+    <!-- BODY -->
+    <div *ngIf="isAddTopicClick && !isPreviewClick" class="margin-left">
+      <form [formGroup]="moduleTopicForm">
+        <div class="row">
+          <div class="form-group col-md-6 col-sm-6">
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Topic Name'}"></ng-container>
+            <input type="text" class="form-control input-style" formControlName="topicName"
+              placeholder="eg: Basics in GO" maxlength="1000">
+            <div class="alert alert-danger" *ngIf="(moduleTopicForm.get('topicName').touched||
+              moduleTopicForm.get('topicName').dirty)&&moduleTopicForm.get('topicName').invalid">
+              <div *ngIf="moduleTopicForm.get('topicName').errors.required">
+                Name must be specified
+              </div>
+              <div *ngIf="moduleTopicForm.get('topicName').errors.maxlength">
+                Name can have maximum 1000 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-md-2 col-sm-2">
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Topic Order'}"></ng-container>
+            <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="order"
+              placeholder="eg: 1">
+            <div class="alert alert-danger" *ngIf="(moduleTopicForm.get('order').touched||
+              moduleTopicForm.get('order').dirty)&&moduleTopicForm.get('order').invalid">
+              <div *ngIf="moduleTopicForm.get('order').errors.required">
+                Order must be specified
+              </div>
+              <div *ngIf="moduleTopicForm.get('order').errors.min">
+                Order should be greater than 0
+              </div>
+              <div *ngIf="moduleTopicForm.get('order').errors.max">
+                Order should be less than equal to 100
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-md-4 col-sm-4">
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Concept Taught'}">
+            </ng-container>
+            <ng-select formControlName="programmingConceptIDs" [searchable]="true" bindLabel="name" bindValue="id"
+              [clearable]="true" [multiple]="true" placeholder="Select Programming Concept" class="ng-select-style">
+              <ng-option *ngFor="let concept of conceptModuleList" [value]="concept.id">{{concept?.name}}
+              </ng-option>
+            </ng-select>
+          </div>
+        </div>
+        <ng-container formArrayName="subTopics"
+          *ngFor="let subTopic of moduleSubTopicControlArray.controls; let i = index">
+          <ng-container [formGroupName]="i">
+            <div class="margin-left row">
+              <div class="form-group col-md-12">
+                <h2 class="swabhav-light-orange-text"><strong>Sub Topic {{i+1}}:</strong>
+                  <span class="float-right" *ngIf="moduleSubTopicControlArray.controls.length > 1">
+                    <button class="btn btn-default" type="button" (click)="removeModuleSubTopic(i)">
+                      <i class="material-icons red">close</i>
+                    </button>
+                  </span>
+                </h2>
+              </div>
+              <div class="form-group col-md-6 col-sm-6">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Sub Topic Name'}"></ng-container>
+                <input type="text" class="form-control input-style" formControlName="topicName"
+                  placeholder="eg: Basics in GO" maxlength="1000">
+                <div class="alert alert-danger" *ngIf="(subTopic.get('topicName').touched||
+                  subTopic.get('topicName').dirty)&&subTopic.get('topicName').invalid">
+                  <div *ngIf="subTopic.get('topicName').errors.required">
+                    Name must be specified
+                  </div>
+                  <div *ngIf="subTopic.get('topicName').errors.maxlength">
+                    Name can have maximum 1000 characters
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-3 col-sm-6">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Sub Topic Order'}"></ng-container>
+                <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="order"
+                  placeholder="eg: 1">
+                <div class="alert alert-danger" *ngIf="(subTopic.get('order').touched||
+                  subTopic.get('order').dirty)&&subTopic.get('order').invalid">
+                  <div *ngIf="subTopic.get('order').errors.required">
+                    Order must be specified
+                  </div>
+                  <div *ngIf="subTopic.get('order').errors.min">
+                    Order should be greater than 0
+                  </div>
+                  <div *ngIf="subTopic.get('order').errors.max">
+                    Order should be less than equal to 100
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Time Required'}">
+                </ng-container>
+                <div class="row">
+                  <div class="col-md-5 col-sm-5">
+                    <input type="number" appAllowNumbersOnly class="form-control input-style time-placeholder"
+                      formControlName="timeHour" #temp_time_hour placeholder="00">
+                  </div>
+                  <h2><strong>:</strong></h2>
+                  <div class="col-md-5 col-sm-5">
+                    <input type="number" appAllowNumbersOnly class="form-control input-style time-placeholder"
+                      formControlName="timeMin" #temp_time_min placeholder="00">
+                  </div>
+                  <div class="col-md-12">
+                    <div class="alert alert-danger" *ngIf="((subTopic.get('timeMin').touched||
+                      subTopic.get('timeMin').dirty)&&subTopic.get('timeMin').invalid)">
+                      <div *ngIf="subTopic.get('timeMin').errors.min">
+                        Min should be greater than equal to 0
+                      </div>
+                      <div *ngIf="subTopic.get('timeMin').errors?.max">
+                        Minutes must be less than equal to 59
+                      </div>
+                    </div>
+                    <div class="alert alert-danger" *ngIf="!((subTopic.get('timeMin').touched||
+                      subTopic.get('timeMin').dirty)&&subTopic.get('timeMin').invalid)&&((subTopic.get('timeHour').touched||
+                      subTopic.get('timeHour').dirty)&&subTopic.get('timeHour').invalid)">
+                      <div *ngIf="subTopic.get('timeHour').errors.min">
+                        Hours should be greater than equal to 0
+                      </div>
+                      <div *ngIf="subTopic.get('timeHour').errors?.max">
+                        Hours must be less than equal to 24
+                      </div>
+                    </div>
+                    <div class="alert alert-danger" *ngIf="!((subTopic.get('timeMin').touched||
+                      subTopic.get('timeMin').dirty)&&subTopic.get('timeMin').invalid) && ((temp_time_hour.value)==0 
+                      && (temp_time_hour.value)!='') && ((temp_time_min.value)==0 &&(temp_time_min.value)!='')">
+                      Minutes/Hours cann't be Zero
+                    </div>
+                    <div class="alert alert-danger" *ngIf="!((subTopic.get('timeMin').touched||
+                      subTopic.get('timeMin').dirty)&&subTopic.get('timeMin').invalid) && ((temp_time_hour.value)==0 
+                      && (temp_time_hour.value)!='') && (temp_time_min.value)==''">
+                      Minutes values must be Specified
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <div class="float-right">
+          <button type="button" class="btn btn-sm btn-outline-swabhav" (click)="addSubTopicsToForm()">Add sub topic
+          </button>
+        </div>
+      </form>
+
+      <br>
+      <br>
+    </div>
+
+    <div class="container" *ngIf="previewModuleTopics.length > 0 && isPreviewClick">
+      <div class="row">
+        <div class="col-1">
+          <img src="assets/course/project.png" width="50">
+        </div>
+        <div class="col-8 pt-1">
+          <h3>Preview of all your Topics and Sub-topics in this module</h3>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">Order</th>
+              <th>Topic</th>
+              <th class="text-center">Concept</th>
+              <th class="text-center">Sub Topic</th>
+              <th class="text-center">Approx Time Taken</th>
+              <th class="text-center">Edit</th>
+              <th class="text-center">Delete/Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let preview of previewModuleTopics; let i = index">
+              <tr>
+                <td class="text-center align-middle">
+                  <button type="button" class="btn btn-default" *ngIf="preview.subTopics?.length > 0"
+                    (click)="preview.showDetails=!preview.showDetails">
+                    <i class="material-icons">{{preview.showDetails ? 'expand_more' : 'chevron_right'}}</i>
+                  </button>{{preview.order}}
+                </td>
+                <td class="align-middle">{{preview.topicName}}</td>
+                <td class="text-center align-middle">
+                  <ng-container *ngIf="preview.topicProgrammingConcept?.length > 0; else dashTemplate">
+                    <ng-container *ngFor="let concept of preview.topicProgrammingConcept">
+                      <span class="badge badge-dark">{{concept.programmingConcept.name}}</span>&nbsp;&nbsp;
+                    </ng-container>
+                  </ng-container>
+                  <!-- <ng-template #noConcepts>{{"-"}}</ng-template> -->
+                </td>
+                <td class="text-center align-middle">{{preview.subTopics?.length}}</td>
+                <td class="text-center align-middle">{{preview.totalTime | minute}}</td>
+                <td class="text-center align-middle">
+                  <button type="button" class="btn btn-default" (click)="onEditPreviewClick(preview, i)">
+                    <img src="assets/icon/colour-icons/edit.png" width="30">
+                  </button>
+                </td>
+                <td class="text-center align-middle">
+                  <ng-container *ngIf="preview?.id; then deleteModuleTopic; else removeFromPreview"></ng-container>
+                  <!-- <ng-container *ngIf="preview?.id && permission?.update; then deleteModuleTopic; 
+                    else (!permission?.update && dashTemplate); else removeFromPreview">
+                  </ng-container> -->
+                  <ng-template #deleteModuleTopic>
+                    <ng-container *ngIf="permission?.update; else dashTemplate">
+                      <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Delete Topic" 
+                        (click)="onDeleteTopicClick(preview.id)">
+                        <img src="assets/icon/colour-icons/delete.png" width="30">
+                      </button>
+                  </ng-container>
+                  </ng-template>
+                  <ng-template #dashTemplate>-</ng-template>
+                  <ng-template #removeFromPreview>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Remove Topic"
+                     (click)="onRemoveFromPreviewClick(i)">
+                      <img src="assets/icon/colour-icons/close.png" width="30">
+                    </button>
+                  </ng-template>
+                </td>
+              </tr>
+              <tr *ngIf="preview.showDetails" class="unstriped-tr">
+                <td class="align-middle" colspan="7">
+                  <div class="d-flex justify-content-center">
+                    <table class="table table-borderless table-unstriped">
+                      <thead>
+                        <tr>
+                          <th class="text-center">Order</th>
+                          <th>Sub-Topic</th>
+                          <th class="text-center">Approx Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container *ngFor="let subTopic of preview.subTopics; let j = index">
+                          <tr>
+                            <td class="text-center align-middle">{{subTopic.order}}</td>
+                            <td class="align-middle">
+                              <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                              {{subTopic.topicName}}
+                            </td>
+                            <td class="text-center align-middle ">{{subTopic.totalTime | minute}}</td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <hr>
+
+  <div class="ml-3 mr-3">
+    <div class="d-flex justify-content-between">
+      <div class="d-flex ml-3">
+        <ng-container *ngIf="previewModuleTopics?.length > 0 && isAddTopicClick">
+          <button type="button" class="btn btn-outline-swabhav" (click)="isPreviewClick=!isPreviewClick">
+            {{isPreviewClick ? 'Cancel Preview' : 'See Preview'}}
+          </button>
+        </ng-container>
+      </div>
+      <div class="d-flex mr-3">
+        <button type="button" *ngIf="!isPreviewClick && isAddTopicClick" class="btn btn-outline-swabhav"
+          [disabled]="!moduleTopicForm?.dirty" (click)="moduleTopicForm.reset()">Clear Form
+        </button> &nbsp;&nbsp;&nbsp;
+        <button type="button" *ngIf="!isPreviewClick" class="btn btn-outline-swabhav" (click)="onAddNewTopicClick()"
+          [disabled]="!moduleTopicForm.dirty">Add Topic
+        </button>
+        <ng-container *ngIf="previewModuleTopics.length > 0 && isPreviewClick">
+          <!-- <button type="button" class="btn btn-default close-icon" (click)="modal.dismiss()">Close
+          </button> &nbsp;&nbsp;&nbsp; -->
+          <button type="button" class="btn btn-default swabhav-button-round" (click)="onSubmitTopicClick()">Save
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+</ng-template>
+
+
+<ng-template #resourceModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/course/assignments-add.png" width="80">
+      </div>
+      <div class="col-sm-10 left-margin">
+        <div>
+          <h1 class="swabhav-light-orange-text"><strong>Add Resources To:</strong></h1>
+          <h2>Module Name: &nbsp; {{module.moduleName}}</h2>
+          <button type="button" class="btn btn-submit-swabhav" *ngIf="!isAddResourceClick"
+            (click)="isAddResourceClick=!isAddResourceClick">Add New Resource<i
+              class="material-icons inline-icon">add</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div *ngIf="!isAddResourceClick && module?.resources?.length == 0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Resources Found</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <!-- Modal body -->
+    <div *ngIf="!isAddResourceClick && module?.resources?.length>0">
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th>Resource Name</th>
+              <th class="text-center">Resource Type</th>
+              <th class="text-center">File Type</th>
+              <th class="text-center">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let resource of module?.resources; let i = index">
+              <tr>
+                <td class="text-center algin-middle">
+                  {{i+1}}
+                </td>
+                <td class="algin-middle">{{resource.resourceName}}</td>
+                <td class="text-center algin-middle">{{resource.resourceType}}</td>
+                <td class="text-center algin-middle">{{resource.fileType}}</td>
+                <td class="text-center algin-middle" data-toggle="tooltip" data-placement="top"
+                  title="Delete Resource">
+                  <button type="button" class="btn btn-default" (click)="onDeleteResourceClick(module.id,resource.id)">
+                    <img src="assets/icon/colour-icons/delete.png" alt="delete module" width="30">
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="isAddResourceClick">
+      <form [formGroup]="multipleResourcesForm">
+        <div formArrayName="resources" *ngFor="let resourceForm of resourceFormArray.controls;let i = index">
+          <ng-container [formGroupName]="i">
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <label for="sel1"><strong>Resource {{i+1}}:</strong></label>
+                <button *ngIf="!isViewClicked && resourceFormArray.controls?.length > 1" type="button"
+                  class="float-right btn btn-sm" style="cursor: pointer;" (click)="deleteResource(i, modal)">
+                  <i class="material-icons red">close</i>
+                </button>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label for="sel1">Resource Type:</label>
+                  <select class="form-control input-style" formControlName="resourceType"
+                    (change)="getResourcesByType(i)">
+                    <option [ngValue]="null">Select Resource Type</option>
+                    <option *ngFor="let type of resourceTypeList" [ngValue]="type.value">
+                      {{type.value}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4 form-group">
+                <label for="sel1">Resource Sub Type:</label>
+                <select class="form-control input-style" formControlName="resourceSubType"
+                  (change)="getResourcesByType(i)">
+                  <option [ngValue]="null">Select Resource Sub Type</option>
+                  <option *ngFor="let type of resourceSubTypeList" [ngValue]="type.value">
+                    {{type.value}}
+                  </option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-4 form-group">
+                <label for="sel1">File Type:</label>
+                <select class="form-control input-style" formControlName="fileType" (change)="getResourcesByType(i)">
+                  <option [ngValue]="null">Select File Type</option>
+                  <option *ngFor="let type of fileTypeList" [ngValue]="type.value">
+                    {{type.value}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <label for="sel1"><span class="red">*</span> Resource:</label>
+                <ng-select [items]="resourceList" bindLabel="resourceName" placeholder="Select Resource" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="resourceID" bindValue="id"
+                  [loading]="isResourceLoading" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.resourceName}}
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <button type="button" *ngIf="!isViewClicked" class="btn filter-button btn-sm float-right"
+          (click)="addResourcesToForm()">Add Resource</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text"
+      (click)="dismissFormModal(modal)">Close</button>
+    <button type="button" *ngIf="isAddResourceClick" class="btn btn-submit-swabhav"
+      (click)="onSubmitResourceClick()">Save</button>
+  </div>
+
+</ng-template>
+
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close material-icons-button" (click)="modal.dismiss('Cross click')"
+      class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure you want to delete the module?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button" (click)="modal.dismiss('No click')">No
+    </button>
+  </div>
+</ng-template>
+
+<!-- Concept module modal -->
+<ng-template #conceptModuleModal let-modal>
+
+  <div class="modal-body">
+
+    <div class="float-right">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <br><br>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <img src="assets/icon/colour-icons/addtask.png" width="80">
+      </div>
+      <div class="col-sm-10">
+
+        <!-- Header -->
+        <div class="font-weight-bold top-margin-10-style">
+          <span class="font-lg-style color-F6430F">Concept Tree: </span>
+        </div>
+
+        <!-- Add new concept modules -->
+        <div *ngIf="!showConceptModuleForm && !isConceptModuleUpdate" class="top-margin-10-style">
+          <button type="button" class="btn btn-submit-swabhav" (click)="onAddNewConceptModuleClick()">Add New Concepts
+            <i class="material-icons inline-icon">add</i>
+          </button>
+        </div>
+
+        <div *ngIf="!showConceptModuleForm && isConceptModuleUpdate" class="top-margin-10-style">
+          <button type="button" class="btn btn-submit-swabhav" (click)="onViewConceptModuleClick()">Update Concepts
+            <i class="material-icons inline-icon">edit</i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <br>
+
+    <!-- No concept module list -->
+    <div *ngIf="conceptModuleList?.length == 0 && !showConceptModuleForm">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Concept Tree Found</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Concept tree -->
+    <div *ngIf="conceptModuleList?.length > 0 && !showConceptModuleForm">
+      <div *ngFor="let mapEntry of conceptModuleMap | keyvalue;let j = index">
+        <div class="row">
+          <div class="col-2">
+            <span class="font-weight-bold font-md-style color-F6430F">Level {{j + 1}}:</span>
+          </div>
+          <div class="col-10">
+            <span *ngFor="let entry of mapEntry.value; let i = index">
+              <span class="concept-style">{{entry?.programmingConcept?.name}}</span>
+            </span>
+          </div>
+        </div>
+        <br>
+      </div>
+    </div>
+
+    <!-- Concept module form -->
+    <div *ngIf="showConceptModuleForm">
+      <form [formGroup]="conceptModuleForm">
+        <div class="form-sub-header-style">Concepts</div>
+        <div class="row">
+          <div class="col-12">
+            <div formArrayName="conceptModules"
+              *ngFor="let concept of conceptModuleControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <div class="row">
+                  <div class="col-sm-12 col-md-12">
+                    <label class="font-weight-bold font-lg-style">Concept {{i+1}}</label>
+                    <label class="float-right" (click)="deleteConceptModule(i)">
+                      <i class="material-icons color-F6430F cursor-pointer-style">delete</i>
+                    </label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                      <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Concept'}"></ng-container>
+                    </span>
+                    <ng-select [items]="programmingConceptList" bindLabel="name" bindValue="id" placeholder="Select"
+                      appendTo="body" [searchable]="true" [clearable]="true" formControlName="programmingConceptID"
+                      class="ng-select-style">
+                      <option [ngValue]="null" disabled>Select</option>
+                      <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                        {{item.name}}
+                      </ng-template>
+                    </ng-select>
+                    <div class="alert alert-danger" *ngIf="(conceptModuleControlArray.at(i).get('programmingConceptID').touched 
+                      || conceptModuleControlArray.at(i).get('programmingConceptID').dirty) 
+                      && conceptModuleControlArray.at(i).get('programmingConceptID').invalid">
+                      <div *ngIf="conceptModuleControlArray.at(i).get('programmingConceptID').errors.required">
+                        Concept must be specified
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                      <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Level'}"></ng-container>
+                    </span>
+                    <input type="number" class="form-control input-style" nbInput formControlName="level"
+                      placeholder="eg: 1" appAllowNumbersOnly>
+                    <div class="alert alert-danger" *ngIf="(conceptModuleControlArray.at(i).get('level').touched 
+                      || conceptModuleControlArray.at(i).get('level').dirty) 
+                      && conceptModuleControlArray.at(i).get('level').invalid">
+                      <div *ngIf="conceptModuleControlArray.at(i).get('level').errors.required">
+                        Level must be specified
+                      </div>
+                      <div *ngIf="conceptModuleControlArray.at(i).get('level').errors.min">
+                        Level cannot be less than 1
+                      </div>
+                      <div *ngIf="conceptModuleControlArray.at(i).get('level').errors.max">
+                        Level cannot be more than 99
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <button class="btn btn-default swabhav-button-round" (click)="addConceptModuleToConceptModuleForm()">
+              + Add Concept
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="text-center">
+      <button type="button" (click)="modal.dismiss('Close click')"
+        class="btn btn-default swabhav-button-round">Close</button>
+      &nbsp;&nbsp;&nbsp;
+      <button type="button" class="btn btn-default swabhav-button-round" *ngIf="showConceptModuleForm"
+        (click)="onConceptModuleFormSubmit()">
+        {{isConceptModuleUpdate ? 'Update Concepts' : 'Add Concepts'}}
+      </button>
+    </div>
+
+  </div>
+
+</ng-template>
+
+  <div class="view-label-flex">
+    <span>
+      Viewing <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong></span>
+      &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalModules}}</strong></span>
+    </span>
+  </div>
+
+<div class="d-flex flex-wrap justify-content-end align-items-center flex-row">
+  <form [formGroup]="moduleSearchForm">
+    <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+      <div class="d-flex flex-wrap">
+        <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select> &nbsp;&nbsp;&nbsp;
+      </div>
+      <div class="d-flex flex-wrap">
+        <ul class="pagination" *ngFor="let module of moduleList | paginate: { id:'modulePageID',
+      itemsPerPage: moduleSearchForm.get('limit').value, currentPage: (+moduleSearchForm.get('offset').value + 1), 
+      totalItems: totalModules }">
+        </ul>
+        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="modulePageID">
+        </pagination-controls>
+      </div>
+    </div>
+  </form>
+</div>
+
+<app-master-footer></app-master-footer>

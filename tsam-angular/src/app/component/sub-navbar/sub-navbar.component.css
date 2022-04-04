@@ -1,0 +1,14 @@
+.dropdown-style{
+    color: #707070;
+    cursor: pointer;
+}
+
+.option-hover-style:hover{
+    color: #F6430F;
+    text-decoration: none;
+}
+
+.dropdown-style:active:hover{
+    background: #F6430F; 
+    color:#fff;
+}

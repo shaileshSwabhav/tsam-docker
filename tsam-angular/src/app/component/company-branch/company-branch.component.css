@@ -1,0 +1,121 @@
+.padding {
+  padding: 1% 0.5% 1% 0.5%;
+}
+
+.inline-search-icon {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-by-field {
+  margin-top: 2%;
+}
+
+.inline {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: start; */
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+#customOnePagerFile {
+  cursor: pointer;
+}
+
+#customTermsFile {
+  cursor: pointer;
+}
+
+#customFile {
+  cursor: pointer;
+}
+
+#uploadingButton {
+  cursor: progress;
+}
+  
+a, a:hover{
+  color:white;
+  text-decoration: none;
+}
+
+.experience-label-style {
+  font-size: medium;
+  font-weight: bolder;
+}
+
+.footer-overflow {
+  overflow: hidden;
+}
+
+.anchor-tag {
+  color: #000;
+}
+
+.anchor-tag:active {
+  color: #fff;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+table {
+  font-size: small;
+}
+
+.anchor-tag {
+  color: #000;
+  text-decoration: none;
+}
+
+/* DROPDOWN STYLE */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+.filter-form-label {
+  font-size: medium;
+  font-weight: bold;
+}
+
+.swabhav-badge {
+  background-color: #EE3733;
+  color: #FFFFFF;
+}
+
+/* *******************input styles***************** */
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+/* SIDE NAV */
+.search-body {
+  overflow-x: hidden;
+}
+
+.mat-drawer-style {
+  width: 40%;
+  position: fixed;
+}

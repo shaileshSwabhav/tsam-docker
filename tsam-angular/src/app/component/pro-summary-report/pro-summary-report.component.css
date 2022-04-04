@@ -1,0 +1,110 @@
+.icon-size {
+    width: 30%;
+}
+
+#custom-file{
+    cursor: pointer;
+}
+
+#uploadingButton{
+cursor: progress;
+}
+
+.modal-title {
+    font-weight: 500;
+    font-size: larger;
+}
+
+.selectStyle{
+    width: auto
+}
+
+.up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    margin-bottom: 4px;
+}
+
+i{
+    cursor: pointer;
+}
+
+.increase-size{
+    height: 500%;
+    width: 500%;
+}
+
+ul{
+    justify-content: space-evenly;
+}
+
+.navLinkTab {
+    font-size: xx-large;
+}
+
+.main-header{
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+.dark-gray-color{
+    background-color: rgb(136, 131, 131);
+}
+
+.light-gray-color{
+    background-color: rgb(180, 175, 175);
+}
+
+.no-sub-entries-style{
+    background-color: rgb(209, 81, 81);
+    color: white;
+    font-weight: 900;
+    font-size: larger;
+    text-align: center;
+}
+
+a, a:hover{
+    color:rgb(133, 129, 129);
+    text-decoration: none;
+}
+
+.fake-link{
+    text-decoration: underline;
+    cursor: pointer;
+    color: rgb(33, 33, 196);
+    font-weight: 900;
+    font-family: cursive;
+}
+
+.no-link{
+    font-weight: 900;
+    font-family: cursive;
+    cursor: default;
+}
+
+.center-style{
+    text-align: center;
+}
+
+h5{
+    font-size: large;
+    font-weight: bold;
+}
+
+.experience-label-style{
+    font-size: medium;
+    font-weight: bolder;
+}
+
+.margin-for-button{
+    margin-right: 1%;
+}
+
+.row-hover{
+    cursor: pointer;
+}

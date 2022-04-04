@@ -1,0 +1,148 @@
+.btn-height {
+  height: 80%;
+}
+  
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.color-teal {
+  color: teal;
+}
+
+.capitalize-text {
+  text-transform: capitalize;
+}
+
+i {
+  cursor: pointer;
+}
+
+.margin-for-button {
+  margin-right: 1%;
+}
+
+table {
+  font-size: small;
+}
+
+/* SEARCH SIDE NAV */
+.mat-drawer-style {
+  position: fixed;
+  width: 50%;
+}
+
+.search-mat-drawer-style {
+  width: 20%;
+}
+
+.search-section-name-style {
+  font-weight: bold;
+  color: #757575;
+  padding-top: 20%;
+  border-bottom: 1.5px solid #757575;
+  cursor: pointer;
+}
+
+.selected-search-section-name-style {
+  font-weight: bold;
+  color: #F6430F;
+  padding-top: 20%;
+  border-bottom: 1.5px solid #F6430F;
+  cursor: pointer;
+}
+
+.search-main-content-style {
+  background-color: white;
+  padding: 5%;
+  min-height: 500px;
+}
+
+.search-section-group-style {
+  padding-right: 10%;
+  padding-top: 50%;
+}
+
+.swabhav-badge {
+  background-color: #EE3733;
+  color: #FFFFFF;
+}
+
+/* CUSTOM SWITCH */
+.cursor-pointer-style {
+  cursor: pointer;
+}
+
+.custom-switch .custom-control-label::after {
+  cursor: pointer;
+}
+
+.custom-switch .custom-control-label::before {
+  cursor: pointer;
+}
+
+.switch-text-style {
+  color: #D63C2A;
+  font-size: medium;
+  font-weight: bold;
+}
+
+/* SWICTH STYLE */
+.custom-control-input:focus ~ 
+.custom-control-label::before {
+  border-color: #F6430F;
+  box-shadow: 0 0 0 0rem #00000000;
+}
+
+.custom-control-input:checked ~ 
+.custom-control-label::before {
+  border-color: #F6430F;
+  background-color: #F6430F;
+}
+
+.custom-control-input:active ~ 
+.custom-control-label::before {
+  background-color: #F6430F;
+  border-color: #F6430F;
+}
+
+.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
+  border-color: #F6430F;
+}
+
+/* DROPDOWN STYLE */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+.filter-form-label {
+  font-size: medium;
+  font-weight: bold;
+}
+
+/* *******************input styles***************** */
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+/* SIDE NAV */
+.mat-drawer-style {
+  width: 40%;
+}

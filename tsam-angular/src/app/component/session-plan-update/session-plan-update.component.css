@@ -1,0 +1,366 @@
+.pointer {
+    cursor: pointer;
+  }
+  
+  .anchor, .anchor:hover {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .anchor-tag {
+    color: #000;
+  }
+  
+  .modal-title {
+    font-weight: 500;
+    font-size: larger;
+  }
+  
+  .fake-link {
+    text-decoration: underline;
+    cursor: pointer;
+    color: rgb(33, 33, 196);
+    font-weight: 900;
+    font-family: cursive;
+  }
+  
+  .margin-for-button {
+    margin-right: 1%;
+  }
+  
+  .overflow-hidden {
+    overflow: hidden;
+  }
+  
+  table {
+    font-size: small;
+  }
+  
+  th {
+    font-weight: 400;
+  }
+  
+  .row-hover:hover td {
+    cursor: pointer;
+    background-color: #ffded7;
+  }
+  
+  /* .table-striped>tbody>tr:hover td {
+    cursor: pointer;
+    background-color: #ffded7;
+  } */
+  
+  .btn-swabhav {
+    color: #f6430f;
+  }
+  
+  .anchor-tag {
+    color: #000;
+    text-decoration: none;
+  }
+  
+  .card-header, .card-footer {
+    background-color: #fff6f4d0;
+  }
+  .next-button{
+    width: 10%;
+  }
+  .filter-form-label {
+    font-size: medium;
+    font-weight: bold;
+    color: #757575;
+  }
+  
+  .module-tab-menu-style{
+    box-shadow: 0 0 10px #ccc;
+    margin: 0 auto;
+}
+  /* DROPDOWN STYLES */
+  .dropdown-element,
+  .dropdown-element:hover {
+    color: #000;
+  }
+  
+  /* INPUT STYLE */
+  .input-style,
+  input[disabled],
+  select[disabled],
+  .ng-select.ng-select-style ::ng-deep .ng-select-container {
+    border-color: #FC6E26;
+    border-width: 1.5px;
+    font-size: small;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .form-control:focus {
+    box-shadow: none;
+  }
+  
+
+  
+  /* SIDE NAV
+  .mat-drawer {
+    width: 40%;
+    position: fixed;
+  } */
+  
+  .selected-day {
+    color: #ffffff;
+    background-color: #f34523;
+  }
+  
+  .day {
+    border-radius: 2px;
+    width: 35px;
+    height: 30px;
+    display: inline-block;
+    border: 1px solid #bdbdbd;
+    text-align: center;
+    padding-top: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .day-text {
+    font-weight: bold;
+    margin-top: 7px;
+  }
+  
+  .btn-border {
+    border: 1px solid #bdbdbd;
+  }
+  
+  .unstriped-tr {
+    background-color: #ffffff;
+  }
+  
+  .font-20-style {
+    font-size: 20px;
+  }
+
+  
+  
+  ::ng-deep .mat-progress-bar-fill::after {
+    background-color: #fc6e26;
+  }
+  
+  ::ng-deep .mat-progress-bar-buffer {
+    background: #e4e8eb;
+  }
+  
+  ::ng-deep .mat-progress-bar {
+    border-radius: 2px;
+  }
+  
+  .course-tab-selector {
+      display: flex;
+      padding: 5%;
+      /* text-align: center; */
+      /* width: 100%; */
+      /* flex-direction: row; */
+      align-content: center;
+      justify-content: space-evenly;
+      align-items: baseline;
+  }
+  .item {
+    width: 100px;
+  
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  .mat-progress-bar {
+    width: 100%;
+    height: 10px;
+    
+  }
+  
+  /* swabhav-light-orange-text */
+  .tab-unselected-text{
+      font-weight: 500;
+      color: black;
+  }
+  
+  .padding-text{
+    padding-top: 1rem;
+  }
+  
+  .back-button{
+    align-self: center;
+    margin-bottom: -30px;
+    /* flex: 1; */
+    display: flex;
+  }
+
+  /* active tab */
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+  color:black;
+  background-color: #ffe0da;
+  height: 100px;
+}
+
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label {
+  color:black;
+  height: 100px;
+}
+
+:host::ng-deep .mat-tab-header {
+  border: none;
+}
+  
+/* ink bar */
+:host::ng-deep .mat-ink-bar {
+  background-color: var(--primary-color,#ffe0da) !important;
+}
+
+.no-background-tr-style{
+  background: white !important;
+}
+  
+
+.content-container {
+  width: 82%;
+  background-color: #fff;
+  padding-left: 1%;
+}
+
+.table-striped > tbody > .unstriped-tr > td {
+  background-color: #fff;
+}
+
+.module-background {
+  background-color: #fff6f4;
+}
+
+.course-module-tab-style{
+  padding: 10%;
+}
+
+/* .table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+  background-color: #fce9e4;
+} */
+
+.no-background-tr-style{
+  background: white !important;
+}
+    
+.table-margin-left-style{
+  padding-left: 5%;
+}
+
+.create-roadmap-style{
+  color: white;
+  background-color: #439943;
+  border-radius: 30px;
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.btn-width {
+  width: 100px;
+}
+
+.table-unstriped  > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #ffffff;
+}
+
+.table-td-center-align{
+  vertical-align: middle;
+}
+.between-session-plan{
+  width: 465px;
+  height: 401px;
+  margin: 24px 62px 390px 221px;
+  padding: 28px 16px 59px 17px;
+  border-radius: 10px;
+  background-color: #eff8fc;
+}
+.end-session-plan{
+  width: 465px;
+  height: 401px;
+  margin: 24px 335px 390px 62px;
+  padding: 28px 35px 59px 32px;
+  border-radius: 10px;
+  background-color: #e0fff7;
+}
+.session-selection-title{
+  width: 697px;
+  height: 41px;
+  margin: 185px 479px 14px 30px;
+  font-size: 30px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: right;
+  color: #f6430f;
+}
+
+.session-selection-heading{
+  width: 554px;
+  height: 34px;
+  margin: 14px 541px 58px 111px;
+  font-size: 25px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #000;  width: 554px;
+  height: 34px;
+  margin: 14px 541px 58px 111px;
+  font-size: 25px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #000;
+}
+.selection-face{
+  width: 135px;
+  height: 135px;
+  margin: 173px 30px 24px 207px;
+}
+.Add-the-selected-modules-in-between-the-current-session-plan {
+  font-size: 22px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: center;
+  color: #000;
+}
+.Add-the-selected-modules-towards-the-end-of-the-current-session-plan {
+  font-size: 22px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: center;
+  color: #000;
+}
+.Area {
+  width: 180px;
+  height: 48px;
+  margin: 53px 127px 0 125px;
+  padding: 13px 67px;
+  border-radius: 24px;
+  border: solid 1px #eff8fc;
+  background-image: linear-gradient(111deg, #fff 45%, #fff 76%);
+}
+.img-session{
+  width: 129px;
+  height: 129px;
+  margin: 0 152px 24px 151px;
+}

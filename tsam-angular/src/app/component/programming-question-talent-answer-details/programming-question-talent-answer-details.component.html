@@ -1,0 +1,136 @@
+<app-master-navbar></app-master-navbar>
+
+
+
+<div class="container-fluid">
+    <div *ngIf="answer" class="talent-answer-page-margin">
+        <button class="btn btn-default swabhav-button-square" (click)="redirectToProblemOfTheDay()">
+            Back
+        </button>
+        <br><br>
+        <div class="heading-style">
+            Solved by : <span class="color-EE3733">{{answer.talent.firstName + " " + answer.talent.lastName}}</span>
+        </div>
+        <div class="heading-style">
+            {{answer.programmingQuestion.label}}
+            <span class="color-757575 font-lg-style"> (Level <span
+                    [ngClass]="answer.programmingQuestion.levelClass">{{answer.programmingQuestion.levelName}})</span>
+            </span>
+        </div>
+        <div class="color-757575 font-md-style" [innerHTML]="answer.programmingQuestion.question">
+        </div>
+        <br>
+        <div [innerHTML]="answer.programmingQuestion.example">
+        </div>
+        <div class="color-212121 font-md-style font-weight-bold">
+            Constraints :
+        </div>
+        <div class=".question-box-style">
+            {{answer.programmingQuestion.constraints}}
+        </div>
+        <ng-container *ngIf="answer.programmingQuestion.testCases">
+            <div *ngFor="let testCase of answer.programmingQuestion.testCases;let i = index">
+                <ng-container *ngIf="testCase.isActive && !testCase.isHidden">
+                    <div class="color-212121 font-md-style font-weight-bold">
+                        Sample Input {{i+1}}:
+                    </div>
+                    <div class=".question-box-style">
+                        {{testCase.input}}
+                    </div>
+                    <div class="color-212121 font-md-style font-weight-bold">
+                        Sample Output {{i+1}}:
+                    </div>
+                    <div class=".question-box-style">
+                        {{testCase.output}}
+                    </div>
+                    <div class="color-212121 font-md-style font-weight-bold">
+                        Explanation of Sample Input {{i+1}}:
+                    </div>
+                    <div class=".question-box-style">
+                        {{testCase.explanation}}
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="answer.programmingQuestion.comment">
+            <div class="color-212121 font-md-style font-weight-bold">
+                Also note :
+            </div>
+            <div class=".question-box-style">
+                {{answer.programmingQuestion.comment}}
+            </div>
+        </ng-container>
+
+        <!-- ************************************** SOLUTIONS ************************************** -->
+
+        <!-- Solutions for question having solutions -->
+        <ng-container *ngIf="answer.programmingQuestion.solutions?.length > 0">
+            <div class="color-212121 font-md-style font-weight-font-weight-bold">
+                Solution :
+            </div>
+            <div>
+                <ul ngbNav #nav="ngbNav" [destroyOnHide]="false" class="nav-tabs ul-space-even-style">
+                    <li *ngFor="let language of solutionLanguageList" [ngbNavItem]="language.id"
+                        (click)="onLanguageTabClick(language.id)" class="list-active-link-style">
+                        <a ngbNavLink class="font-md-style modal-popup-tab-link-style">{{language.name}}</a>
+                        <ng-template ngbNavContent>
+                        </ng-template>
+                    </li>
+                </ul>
+                <div>
+                    <app-code-editor #codeEditorSolution></app-code-editor>
+                </div>
+                <br>
+            </div>
+        </ng-container>
+
+        <!-- ************************************** ANSWERS ************************************** -->
+
+        <div class="color-212121 font-md-style font-weight-bold">
+            Student Answer
+        </div>
+
+        <div class="color-757575 font-md-style font-weight-bold">
+            Programming Language: <span class="color-EE3733">{{answer.programmingLanguage.name}}</span>
+        </div>
+
+        <!-- Code editor for answer -->
+        <app-code-editor #codeEditorAnswer></app-code-editor>
+
+        <form [formGroup]="scoreForm">
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                    <label class="form-control-label-style">Score: </label>
+                    <input type="number" class="form-control input-style" formControlName="score" placeholder="eg: 10"
+                        appAllowNumbersOnly>
+                    <div class="alert alert-danger" *ngIf="(scoreForm.get('score').touched || scoreForm.get('score').dirty) 
+                        && scoreForm.get('score').invalid">
+                        <div *ngIf="scoreForm.get('score').errors.required">
+                            Score must be specified
+                        </div>
+                        <div *ngIf="scoreForm.get('score').errors.max">
+                            Score can be have maximum value {{answer.programmingQuestion.score}}
+                        </div>
+                        <div *ngIf="scoreForm.get('score').errors.min">
+                            Score can be have minimum value 0
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!answer.programmingQuestion.solutonIsViewed">
+                <button type="button" [disabled]="!scoreForm.dirty" class="btn btn-default swabhav-button-round"
+                    (click)="validateScoreForm()">
+                    Submit
+                </button>
+            </div>
+            <div *ngIf="answer.programmingQuestion.solutonIsViewed">
+                <div class="color-212121 font-md-style font-weight-bold">
+                    Solution is viewed by talent
+                </div>
+            </div>
+        </form>
+
+        <br><br>
+
+    </div>
+</div>

@@ -1,0 +1,1550 @@
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #dashTemplate>
+  <span>-</span>
+</ng-template>
+
+<ng-template #noTemplate>
+  <span>
+    No
+  </span>
+</ng-template>
+
+<ng-template #notAssignedTemplate>
+  <span class="badge swabhav-badge-style">
+    Not Assigned
+  </span>
+</ng-template>
+
+<ng-template #zeroTemplate>
+  <span class="btn btn-default no-link-style">
+    0
+  </span>
+</ng-template>
+
+<ng-template #noResultTemplate>
+  <span>
+    No Result
+  </span>
+</ng-template>
+
+<ng-template #notAttemptedTemplate>
+  <span>
+    Not Attempted
+  </span>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+    <div class="overflow-x-hidden-style">
+      <div class="filter-header">
+        Edit Filters&nbsp;&nbsp;&nbsp;
+        <span class="clear-filter-style" (click)="resetCampusDriveSearchForm()">Clear all filters</span>
+        <div class="float-right" (click)="drawer.toggle()">
+          <span><i class="material-icons filter-close-icon-style">close</i></span>
+        </div>
+      </div>
+      <br>
+      <form [formGroup]="campusDriveSearchForm">
+        <div class="filter-by-field row">
+          <div class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Campus Drive Name'}">
+              </ng-container>
+            </span>
+            <input type="text" formControlName="campusName" class="form-control input-style"
+              placeholder="eg: Thakur Drive">
+          </div>
+          <div class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}"></ng-container>
+            </span>
+            <input type="date" formControlName="fromDate" class="form-control input-style"
+              placeholder="Enter From Date">
+          </div>
+          <div class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To Date'}"></ng-container>
+            </span>
+            <input type="date" formControlName="toDate" class="form-control input-style" placeholder="Enter To Date">
+          </div>
+          <div class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'College Branch(s)'}">
+              </ng-container>
+            </span>
+            <ng-select [items]="collegeBranchList" bindLabel="branchName" bindValue="id" multiple="true"
+              placeholder="Select" appendTo="body" [searchable]="true" [clearable]="true" formControlName="collegeIDs"
+              class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.branchName}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company Requirement(s)'}">
+              </ng-container>
+            </span>
+            <ng-select [items]="companyRequirementList" bindLabel="code" bindValue="id" multiple="true"
+              placeholder="Select" appendTo="body" [searchable]="true" class="ng-select-style" [clearable]="true"
+              formControlName="companyRequirementIDs">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.branch.branchName}} - <strong>{{item.code}}</strong>
+              </ng-template>
+            </ng-select>
+          </div>
+          <div *ngIf="showForSalesPersonLogin" class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'SalesPerson(s)'}"></ng-container>
+            </span>
+            <ng-select [items]="salesPersonList" bindLabel="firstName" bindValue="id" placeholder="Select"
+              appendTo="body" multiple="true" [searchable]="true" [clearable]="true" formControlName="salesPersonIDs"
+              class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.firstName + " " + item.lastName}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div *ngIf="showForFacultyLogin" class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Faculty(s)'}"></ng-container>
+            </span>
+            <ng-select [items]="facultyList" bindLabel="firstName" bindValue="id" placeholder="Select" appendTo="body"
+              multiple="true" [searchable]="true" [clearable]="true" formControlName="facultyIDs"
+              class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.firstName + " " + item.lastName}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div *ngIf="showForDeveloperLogin" class="form-group col-sm-12 col-md-6">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Developer(s)'}"></ng-container>
+            </span>
+            <ng-select [items]="developerList" bindLabel="firstName" bindValue="id" placeholder="Select" appendTo="body"
+              multiple="true" [searchable]="true" [clearable]="true" formControlName="developerIDs"
+              class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.firstName + " " + item.lastName}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+        <div class="text-center">
+          <button class="btn btn-default filter-button" type="submit" [disabled]="!campusDriveSearchForm.dirty"
+            (click)="searchCampusDrives();drawer.toggle()">
+            Search
+            <span class="vertical-align-top-icon-style"><i
+                class="material-icons search-button-icon-style">search</i></span>
+          </button>
+        </div>
+        <br>
+      </form>
+    </div>
+  </mat-drawer>
+  <app-master-navbar></app-master-navbar>
+  <div class="container-fluid">
+    <br>
+    <div class="standard-page-margin">
+      <div class="display-inline">
+        <div class="font-weight-bold font-xl-style">
+          Campus Drives -
+          <span class="color-F6430F"> {{totalCampusDrives}}</span>
+          &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-default filter-button" type="button" *ngIf="isSearchedCampusDrive"
+            (click)="resetSearchAndGetAllForCampusDrive()">
+            View All Campus Drives
+          </button>
+        </div>
+        <div class="float-right">
+          <button class="btn btn-default swabhav-button-round" (click)="onAddNewCampusDriveButtonClick()">
+            Add New Campus Drive
+          </button>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="totalCampusDrives > 0" class="view-label-flex">
+        <span class="pagination-string">
+          Viewing <span class="pagination-numbers">{{paginationStartCampusDrive}} - {{paginationEndCampusDrive}}</span>
+          of
+          <span class="pagination-numbers">{{totalCampusDrives}}</span>
+        </span>
+      </div>
+      <div class="d-flex justify-content-between align-items-center flex-row">
+        <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalCampusDrives == 0 && isSearchedCampusDrive) || (totalCampusDrives > 0 && !isSearchedCampusDrive) 
+          || (totalCampusDrives > 0 && isSearchedCampusDrive)">
+          <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+            Add Filter <strong>+</strong>
+          </button>
+        </div>
+        <div *ngIf="totalCampusDrives > 0" class="d-flex justify-content-between align-items-start flex-row">
+          <div class="d-flex">
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limitCampusDrive"
+              (change)="changePageForCampusDrive(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex">
+            <ul class="pagination no-padding-left" *ngFor="let campusDrive of campusDriveList | paginate: { id:'campusDriveID',
+              itemsPerPage: limitCampusDrive, currentPage: currentPageCampusDrive, totalItems: totalCampusDrives }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePageForCampusDrive($event)"
+              id="campusDriveID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="searchCampusDriveFilterFieldList.length > 0">
+        <br>
+        <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchCampusDriveFilterFieldList">
+          {{searchFilterField.propertyNameText}}
+          <span (click)="deleteSearchCampusDriveCriteria(searchFilterField.propertyName)"
+            class="vertical-align-top-icon-style">
+            <i class="material-icons search-name-delete-icon-style">close</i>
+          </span>
+        </span>
+      </div>
+    </div>
+    <br>
+    <div *ngIf="totalCampusDrives > 0">
+      <div class="card table-card-shadow table-card-style">
+        <div class="card-body padding-0pt">
+          <div class="table-responsive">
+            <table class="table text-center table-striped">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Campus Code</th>
+                  <th>Campus Drive Name</th>
+                  <th>College Name(s)</th>
+                  <th>Company Requirements(s)</th>
+                  <th>Coordinator(s)</th>
+                  <th>Faculty(s)</th>
+                  <th>Developers(s)</th>
+                  <th>Drive Date</th>
+                  <th>Drive Time</th>
+                  <th>Total Requirements</th>
+                  <th>Candidates Registered</th>
+                  <th>Candidates Appeared</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let campusDrive of campusDriveList; let i = index">
+                  <td>{{(i+1)+(offsetCampusDrive*limitCampusDrive)}}</td>
+                  <td>{{campusDrive.code}}</td>
+                  <td>{{campusDrive.campusName}}</td>
+                  <td><span class="badge swabhav-badge-style"
+                      *ngFor="let branch of campusDrive.collegeBranches">{{branch.branchName}}</span></td>
+                  <td><span class="badge swabhav-badge-style"
+                      *ngFor="let requirement of campusDrive.companyRequirements">{{requirement.branch.branchName}}</span>
+                  </td>
+                  <td>
+                    <span
+                      *ngIf="campusDrive.salesPeople != null && campusDrive.salesPeople?.length > 0; else notAssignedTemplate">
+                      <span class="badge swabhav-badge-style" *ngFor="let salesPerson of campusDrive.salesPeople">
+                        {{salesPerson.firstName + " " + salesPerson.lastName}}
+                      </span>
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      *ngIf="campusDrive.faculties != null && campusDrive.faculties?.length > 0; else notAssignedTemplate">
+                      <span class="badge swabhav-badge-style" *ngFor="let faculty of campusDrive.faculties">
+                        {{faculty.firstName + " " + faculty.lastName}}
+                      </span>
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      *ngIf="campusDrive.developers != null && campusDrive.developers?.length > 0; else notAssignedTemplate">
+                      <span class="badge swabhav-badge-style" *ngFor="let developer of campusDrive.developers">
+                        {{developer.firstName + " " + developer.lastName}}
+                      </span>
+                    </span>
+                  </td>
+                  <td>{{campusDrive.campusDate.substring(0,10) | date:'dd MMM, yyyy'}}</td>
+                  <td>
+                    <span class="badge swabhav-badge-style font-sm-style">
+                      {{campusDrive.campusDate.substring(11,16)}}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="btn btn-default no-link-style">
+                      {{campusDrive.totalRequirements}}
+                    </span>
+                  </td>
+                  <td data-toggle="tooltip" data-placement="top" title="Registered Candidates">
+                    <span *ngIf='campusDrive.totalRegisteredCandidates != 0; else zeroTemplate'
+                      class="btn btn-default fake-link-style"
+                      (click)="redirectToTalentsForRegisteredCandidates(campusDrive.id)">
+                      <span>{{campusDrive.totalRegisteredCandidates}}</span>
+                    </span>
+                  </td>
+                  <td data-toggle="tooltip" data-placement="top" title="Appeared Candidates">
+                    <span *ngIf='campusDrive.totalAppearedCandidates != 0; else zeroTemplate'
+                      class="btn btn-default fake-link-style"
+                      (click)="redirectToTalentsForAppearedCandidates(campusDrive)">
+                      <span><strong>{{campusDrive.totalAppearedCandidates}}</strong></span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="dropdown">
+                      <span id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="material-icons">more_vert</i>
+                      </span>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <span class="dropdown-item disabled-dropdown-style">
+                          <span class="vertical-align-top-icon-style"><i class="material-icons">link</i></span>
+                          Send Test Link
+                        </span>
+                        <span class="dropdown-item disabled-dropdown-style">
+                          <span class="vertical-align-top-icon-style"><i class="material-icons">link</i></span>
+                          Send Registration Link
+                        </span>
+                        <a class="dropdown-item dropdown-style" (click)="onViewCampusDriveClick(campusDrive)">
+                          <span class="vertical-align-top-icon-style"><i class="material-icons">visibility</i></span>
+                          View
+                        </a>
+                        <a class="dropdown-item dropdown-style"
+                          (click)="getCandidatesBySelectedCampusDrive(campusDrive.id)">
+                          <span class="vertical-align-top-icon-style"><i class="material-icons">group_add</i></span>
+                          Register Candidates
+                        </a>
+                        <a class="dropdown-item dropdown-style" *ngIf="permission?.delete"
+                          (click)="onDeleteCampusDriveClick(campusDrive.id)">
+                          <span class="vertical-align-top-icon-style"><i class="material-icons">delete</i></span>
+                          Delete
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="totalCampusDrives == 0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Campus Drives Found</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+  </div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add/View/Update Campus Drive -->
+<ng-template #campusDriveFormModal let-modal>
+  <form [formGroup]="campusDriveForm">
+    <div class="modal-body">
+      <div class="form-header-style">
+        {{isViewMode? 'Campus Drive Details': isOperationUpdate ? 'Update Campus Drive' : 'Add Campus Drive' }}
+        <span *ngIf="isViewMode && permission?.update" (click)="onUpdateCampusDriveClick()">
+          <i class="material-icons">create</i>
+        </span>
+        <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+          (click)="modal.dismiss('Close click')">
+          <span class="vertical-align-top-icon-style">
+            <i class="material-icons modal-popup-close-icon-style">close</i>
+          </span>
+          Close
+        </div>
+      </div>
+      <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red">
+          <strong>*</strong></span> marked fields are mandatory
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-sm-3 col-md-2" *ngIf="isViewMode || isOperationUpdate">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Campus Drive Code'}">
+              </ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput formControlName="code">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Campus Drive Name'}"></ng-container>
+          </span>
+          <input type="text" class="form-control input-style" formControlName="campusName"
+            placeholder="eg: Thakur Drive 01">
+          <div class="alert alert-danger" *ngIf="(campusDriveForm.get('campusName').touched || campusDriveForm.get('campusName').dirty) 
+            && campusDriveForm.get('campusName').invalid">
+            <div *ngIf="campusDriveForm.get('campusName').errors.required">
+              Campus Name should be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'College Branch(s)'}"></ng-container>
+          </span>
+          <ng-select [items]="collegeBranchList" bindLabel="branchName" placeholder="Select" appendTo="body"
+            multiple="true" [searchable]="true" [clearable]="true" formControlName="collegeBranches"
+            class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.branchName}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(campusDriveForm.get('collegeBranches').touched || campusDriveForm.get('collegeBranches').dirty) 
+            && campusDriveForm.get('collegeBranches').invalid">
+            <div *ngIf="campusDriveForm.get('collegeBranches').errors.required">
+              College Branch should be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Company Requirement(s)'}">
+            </ng-container>
+          </span>
+          <ng-select [items]="companyRequirementList" bindLabel="code" placeholder="Select" appendTo="body"
+            multiple="true" [searchable]="true" [clearable]="true" formControlName="companyRequirements"
+            class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.branch.branchName}} - <strong>{{item.code}}</strong>
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(campusDriveForm.get('companyRequirements').touched || campusDriveForm.get('companyRequirements').dirty) 
+            && campusDriveForm.get('companyRequirements').invalid">
+            <div *ngIf="campusDriveForm.get('companyRequirements').errors.required">
+              Company Requirement should be specified
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Location'}"></ng-container>
+          </span>
+          <textarea class="form-control input-style" formControlName="location" rows="3"
+            placeholder="eg: Mumbai, Maharashtra" appEmptyToNull></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'SalesPerson(s)'}"></ng-container>
+          </span>
+          <ng-select [items]="salesPersonList" bindLabel="firstName" placeholder="Select" appendTo="body"
+            multiple="true" [searchable]="true" [clearable]="true" formControlName="salesPeople"
+            class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.firstName + " " + item.lastName}}
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Faculty'}"></ng-container>
+          </span>
+          <ng-select [items]="facultyList" bindLabel="firstName" placeholder="Select" appendTo="body" multiple="true"
+            [searchable]="true" [clearable]="true" formControlName="faculties" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.firstName + " " + item.lastName}}
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Developer(s)'}"></ng-container>
+          </span>
+          <ng-select [items]="developerList" bindLabel="firstName" placeholder="Select" appendTo="body" multiple="true"
+            [searchable]="true" [clearable]="true" formControlName="developers" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.firstName + " " + item.lastName}}
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Campus Date'}"></ng-container>
+          </span>
+          <input type="datetime-local" class="form-control input-style" formControlName="campusDate">
+          <div class="alert alert-danger" *ngIf="(campusDriveForm.get('campusDate').touched || campusDriveForm.get('campusDate').dirty) 
+            && campusDriveForm.get('campusDate').invalid">
+            <div *ngIf="campusDriveForm.get('campusDate').errors.required">
+              Campus Date should be specified
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isViewMode || isOperationUpdate" class="form-group col-sm-6 col-md-2">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Cancelled'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="cancelled">
+            <option [ngValue]=false>No</option>
+            <option [ngValue]=true>Yes</option>
+          </select>
+        </div>
+        <div *ngIf="isViewMode || isOperationUpdate" class="form-group col-sm-3 col-md-2">
+          <div>
+            <label class="font-md-style font-weight-bolder-style">Candidates:</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Required'}"></ng-container>
+          </span>
+          <input type="number" class="form-control input-style" formControlName="totalRequirements" appAllowNumbersOnly>
+        </div>
+        <div *ngIf="isViewMode || isOperationUpdate" class="form-group col-sm-3 col-md-2">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Registered'}"></ng-container>
+          </span>
+          <input type="number" class="form-control input-style" formControlName="totalRegisteredCandidates"
+            appAllowNumbersOnly>
+        </div>
+        <div *ngIf="isViewMode || isOperationUpdate" class="form-group col-sm-3 col-md-2">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Appeared'}"></ng-container>
+          </span>
+          <input type="number" class="form-control input-style" formControlName="totalAppearedCandidates"
+            appAllowNumbersOnly>
+        </div>
+      </div>
+      <div class="row">
+        <div *ngIf="isViewMode || isOperationUpdate" class="form-groupcol-sm-10 col-md-8">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Student Registration Link'}">
+            </ng-container>
+          </span>
+          <input type="text" class="form-control input-style" nbInput appEmptyToNull
+            formControlName="studentRegistrationLink" placeholder="Enter Student Registration Link">
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-12 col-lg-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Description'}"></ng-container>
+          </span>
+          <textarea class="form-control input-style" formControlName="description" rows="5"
+            placeholder="Mention details of the campus drive..." appEmptyToNull></textarea>
+        </div>
+      </div>
+      <br>
+      <div class="text-center">
+        <button type="button" (click)="modal.dismiss('Close click')"
+          class="btn btn-default swabhav-button-round">Close</button>
+        &nbsp;&nbsp;&nbsp;
+        <button type="button" [disabled]="!campusDriveForm.dirty" class="btn btn-default swabhav-button-round"
+          *ngIf="!isViewMode" (click)="onCampusDriveFormSubmit()">
+          {{isOperationUpdate ? 'Update Campus Drive' : 'Add Campus Drive'}}
+        </button>
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+
+<!-- Add/Update/View Candidate -->
+<ng-template #candidateFormModal let-modal>
+  <mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawerCandidate mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+      <div class="overflow-x-hidden-style">
+        <div class="filter-header">
+          Edit Filters&nbsp;&nbsp;&nbsp;
+          <span class="clear-filter-style" (click)="resetCandidateSearchForm()">Clear all filters</span>
+          <div class="float-right" (click)="drawerCandidate.toggle()">
+            <span><i class="material-icons filter-close-icon-style">close</i></span>
+          </div>
+        </div>
+        <br>
+        <form [formGroup]="candidateSearchForm">
+          <div class="filter-by-field row">
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}"></ng-container>
+              </span>
+              <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="firstName"
+                placeholder="Enter First Name">
+              <div class="alert alert-danger" *ngIf="(candidateSearchForm.get('firstName').touched || candidateSearchForm.get('firstName').dirty) 
+                && candidateSearchForm.get('firstName').invalid">
+                <div *ngIf="candidateSearchForm.get('firstName').errors.pattern">
+                  First Name should only have alphabets and no space
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}"></ng-container>
+              </span>
+              <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="lastName"
+                placeholder="Enter Last Name">
+              <div class="alert alert-danger" *ngIf="(candidateSearchForm.get('lastName').touched || candidateSearchForm.get('lastName').dirty) 
+                && candidateSearchForm.get('lastName').invalid">
+                <div *ngIf="candidateSearchForm.get('lastName').errors.pattern">
+                  Last Name should only have alphabets and no space
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+              </span>
+              <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="email"
+                placeholder="Enter Email">
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Contact'}"></ng-container>
+              </span>
+              <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="contact"
+                placeholder="Enter Contact">
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}"></ng-container>
+              </span>
+              <input type="date" formControlName="fromDate" class="form-control input-style"
+                placeholder="Enter From Date">
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To Date'}"></ng-container>
+              </span>
+              <input type="date" formControlName="toDate" class="form-control input-style" placeholder="Enter To Date">
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'College Branch(s)'}">
+                </ng-container>
+              </span>
+              <ng-select [items]="selectedCampusDriveCollegeList" bindLabel="branchName" bindValue="id"
+                placeholder="Select" appendTo="body" [searchable]="true" class="ng-select-style" [clearable]="true"
+                formControlName="collegeID">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.branchName}}
+                </ng-template>
+              </ng-select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Qualification'}"></ng-container>
+              </span>
+              <ng-select [items]="qualificationList" bindLabel="name" bindValue="id" placeholder="Qualification"
+                appendTo="body" [searchable]="true" [clearable]="true" formControlName="degreeID"
+                class="ng-select-style"
+                (change)="getSpecializationListForCandidateSearch(candidateSearchForm.get('degreeID').value)">
+                <option [ngValue]="null">Select</option>
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.name}}
+                </ng-template>
+              </ng-select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Specialization'}">
+                </ng-container>
+              </span>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="specializationID">
+                <option [ngValue]="null">Select</option>
+                <ng-container *ngFor="let specialization of specializationList">
+                  <option [ngValue]="specialization.id">
+                    {{specialization.branchName}}
+                  </option>
+                </ng-container>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Academic Year'}"></ng-container>
+              </span>
+              <select class="form-control input-style" formControlName="academicYear">
+                <option [ngValue]="null">Select</option>
+                <option *ngFor="let academicyear of academicYearList" [ngValue]="academicyear.key">
+                  {{academicyear.value}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Swabhav Talent?'}">
+                </ng-container>
+              </span>
+              <select class="form-control input-style" formControlName="isSwabhavTalent">
+                <option [ngValue]="null">Select</option>
+                <option [ngValue]="0">No</option>
+                <option [ngValue]="1">Yes</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Test Link Sent?'}">
+                </ng-container>
+              </span>
+              <select class="form-control input-style" formControlName="isTestLinkSent">
+                <option [ngValue]="null">Select</option>
+                <option [ngValue]="0">No</option>
+                <option [ngValue]='1'>Yes</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Has Attempted?'}">
+                </ng-container>
+              </span>
+              <select class="form-control input-style" formControlName="hasAttempted">
+                <option [ngValue]="null">Select</option>
+                <option [ngValue]="0">No</option>
+                <option [ngValue]="1">Yes</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}"></ng-container>
+              </span>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="result">
+                <option [ngValue]="null">Select</option>
+                <option *ngFor="let result of candidateResultList" [ngValue]="result.value">
+                  {{result.value}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="text-center">
+            <button class="btn btn-default filter-button" type="submit"
+              [disabled]="!candidateSearchForm.dirty||candidateSearchForm.invalid"
+              (click)="searchCandidates();drawerCandidate.toggle()">
+              Search
+              <span class="vertical-align-top-icon-style"><i
+                  class="material-icons search-button-icon-style">search</i></span>
+            </button>
+          </div>
+          <br>
+        </form>
+      </div>
+    </mat-drawer>
+    <div class="modal-body">
+      <div class="form-header-style">
+        Register Candidates
+        <span *ngIf="isViewMode && permission?.update" (click)="onUpdateCandidateFormButtonClick()">
+          <i class="material-icons">create</i>
+        </span>
+        <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+          (click)="modal.dismiss('Cross click')">
+          <span class="vertical-align-top-icon-style">
+            <i class="material-icons modal-popup-close-icon-style">close</i>
+          </span>
+          Close
+        </div>
+      </div>
+      <div *ngIf="!isViewMode && showRegisterCandidateForm" class="marked-fields-right-style"><span class="red">
+          <strong>*</strong></span> marked fields are mandatory
+      </div>
+      <br>
+      <div class="overflow-x-hidden-style">
+        <div *ngIf="showRegisterCandidateForm">
+          <form [formGroup]="candidateForm">
+            <div class="form-sub-header-style">Personal Details</div>
+            <div class="row">
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'First Name'}"></ng-container>
+                  </span>
+                  <input type="text" class="form-control input-style" nbInput formControlName="firstName"
+                    placeholder="Enter First Name">
+                  <div class="alert alert-danger" *ngIf="(candidateForm.get('firstName').touched || candidateForm.get('firstName').dirty) 
+                    && candidateForm.get('firstName').invalid">
+                    <div *ngIf="candidateForm.get('firstName').errors.required">
+                      First Name should be specified
+                    </div>
+                    <div *ngIf="candidateForm.get('firstName').errors.pattern">
+                      First Name should only have alphabets and no space
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Name'}"></ng-container>
+                  </span>
+                  <input type="text" class="form-control input-style" nbInput formControlName="lastName"
+                    placeholder="Enter Last Name">
+                  <div class="alert alert-danger" *ngIf="(candidateForm.get('lastName').touched || candidateForm.get('lastName').dirty) 
+                  && candidateForm.get('lastName').invalid">
+                    <div *ngIf="candidateForm.get('lastName').errors.required">
+                      Last name should be specified.
+                    </div>
+                    <div *ngIf="candidateForm.get('lastName').errors.pattern">
+                      Last Name should only have alphabets and no space
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Email Address'}">
+                    </ng-container>
+                  </span>
+                  <input type="email" class="form-control input-style" nbInput formControlName="email"
+                    placeholder="Enter Email">
+                  <div class="alert alert-danger" *ngIf="(candidateForm.get('email').touched || candidateForm.get('email').dirty) 
+                      && candidateForm.get('email').invalid">
+                    <div *ngIf="candidateForm.get('email').errors.pattern">
+                      Email should be in example@domain.com format
+                    </div>
+                    <div *ngIf="candidateForm.get('email').errors.required">
+                      Email should be specified
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Mobile Number'}">
+                    </ng-container>
+                  </span>
+                  <input type="text" class="form-control input-style" formControlName="contact"
+                    placeholder="Enter Contact">
+                  <div class="alert alert-danger" *ngIf="(candidateForm.get('contact').touched || candidateForm.get('contact').dirty) 
+                      && candidateForm.get('contact').invalid">
+                    <div *ngIf="candidateForm.get('contact').errors.pattern">
+                      Contact should consist of a 10 digit valid number
+                    </div>
+                    <div *ngIf="candidateForm.get('contact').errors.required">
+                      Contact should be specified
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Swabhav Talent?'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="isSwabhavTalent">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]=false>No</option>
+                  <option [ngValue]=true>Yes</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('isSwabhavTalent').touched || candidateForm.get('isSwabhavTalent').dirty) 
+                    && candidateForm.get('isSwabhavTalent').invalid">
+                  <div *ngIf="candidateForm.get('isSwabhavTalent').errors.required">
+                    Is Swabhav Talent should be specified
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-sub-header-style">Address</div>
+            <div class="row">
+              <div class="form-group col-sm-12 col-md-12">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Address'}"></ng-container>
+                </span>
+                <textarea type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="address"
+                  rows="2" placeholder="Enter Address"></textarea>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('address').touched || candidateForm.get('address').dirty) 
+                  && candidateForm.get('address').invalid">
+                  <div *ngIf="candidateForm.get('address').errors.pattern">
+                    Address should only have alphabets and special characters in (.,-/)
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Country'}"></ng-container>
+                </span>
+                <ng-select [items]="countryList" bindLabel="name" placeholder="Select" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="country" class="ng-select-style"
+                  (change)="getStateListByCountry(candidateForm.get('country').value)">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'State'}"></ng-container>
+                </span>
+                <ng-select [items]="stateList" bindLabel="name" placeholder="Select" appendTo="body" [searchable]="true"
+                  [clearable]="true" formControlName="state" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'City'}"></ng-container>
+                </span>
+                <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="city"
+                  placeholder="Enter City">
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('city').touched || candidateForm.get('city').dirty) 
+                  && candidateForm.get('city').invalid">
+                  <div *ngIf="candidateForm.get('city').errors.pattern">
+                    City name should only have alphabets
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'PIN Code'}"></ng-container>
+                </span>
+                <input type="number" class="form-control input-style" formControlName="pinCode"
+                  placeholder="Enter Pin Code">
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('pinCode').touched || candidateForm.get('pinCode').dirty) 
+                  && candidateForm.get('pinCode').invalid">
+                  <div *ngIf="candidateForm.get('pinCode').errors.pattern">
+                    Pin Code should be of 6 digits
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-sub-header-style">College Details</div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'College Name'}"></ng-container>
+                </span>
+                <ng-select [addTag]="addCollegeToList" formControlName="college" class="ng-select-style"
+                  [clearOnBackspace]=false placeholder="Select" clearable=false>
+                  <ng-option [value]="college.branchName" [disabled]="college.disabled"
+                    *ngFor="let college of selectedCampusDriveCollegeList">
+                    {{college.branchName}}
+                  </ng-option>
+                </ng-select>
+                <div *ngIf="(candidateForm.get('college').dirty || candidateForm.get('college').touched) 
+                  && candidateForm.get('college').invalid" class="alert alert-danger">
+                  <div *ngIf="candidateForm.get('college').errors.required">
+                    College Name must be specified
+                  </div>
+                  <div *ngIf="candidateForm.get('college').errors.maxLength">
+                    College Name can contain maximum 200 characters
+                  </div>
+                  <!-- <div *ngIf="candidateForm.get('college').errors.pattern">
+                    College Name should only have alphabets
+                  </div> -->
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Qualification'}"></ng-container>
+                </span>
+                <ng-select [items]="qualificationList" bindLabel="name" placeholder="Select" appendTo="body"
+                  class="ng-select-style" [searchable]="true" [clearable]="true" formControlName="degree"
+                  (change)="getSpecializationListByDegree(candidateForm.get('degree').value)">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('degree').touched || candidateForm.get('degree').dirty) 
+                  && candidateForm.get('degree').invalid">
+                  <div *ngIf="candidateForm.get('degree').errors.required">
+                    Qualification should be specified
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Specialization'}"></ng-container>
+                </span>
+                <select class="form-control input-style" [compareWith]="compareFn" formControlName="specialization">
+                  <option [ngValue]="null">Select</option>
+                  <ng-container *ngFor="let specialization of specializationList">
+                    <option [ngValue]="specialization">
+                      {{specialization.branchName}}
+                    </option>
+                  </ng-container>
+                </select>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('specialization').touched || candidateForm.get('specialization').dirty) 
+                  && candidateForm.get('specialization').invalid">
+                  <div *ngIf="candidateForm.get('specialization').errors.required">
+                    Specialization should be specified
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Academic Year'}"></ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="academicYear">
+                  <option [ngValue]="null">Select</option>
+                  <option *ngFor="let academicyear of academicYearList" [ngValue]="academicyear.key">
+                    {{academicyear.value}}</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('academicYear').touched || candidateForm.get('academicYear').dirty) 
+                    && candidateForm.get('academicYear').invalid">
+                  <div *ngIf="candidateForm.get('academicYear').errors.required">
+                    Academic Year should be specified
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Percentage'}"></ng-container>
+                </span>
+                <input type="number" class="form-control input-style" formControlName="percentage"
+                  placeholder="Enter Percentage" appAllowNumbersWithDecimal>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('percentage').touched || candidateForm.get('percentage').dirty) 
+                    && candidateForm.get('percentage').invalid">
+                  <div *ngIf="candidateForm.get('percentage').errors.min">
+                    Percentage should not be less than 1
+                  </div>
+                  <div *ngIf="candidateForm.get('percentage').errors.pattern">
+                    Percentage should not be more than 100 and have only 2 numbers after decimal
+                  </div>
+                  <div *ngIf="candidateForm.get('percentage').errors.required">
+                    Percentage should be specified
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-4">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Year of Passout'}">
+                  </ng-container>
+                </span>
+                <input type="number" class="form-control input-style" formControlName="passout" min="1980"
+                  placeholder="Enter Year" appAllowNumbersOnly>
+                <div class="alert alert-danger" *ngIf="(candidateForm.get('passout').touched || candidateForm.get('passout').dirty) 
+                  && candidateForm.get('passout').invalid">
+                  <div *ngIf="candidateForm.get('passout').errors.max">
+                    Passout year should be maximum {{currentYear + 3}}
+                  </div>
+                  <div *ngIf="candidateForm.get('passout').errors.min">
+                    Passout year should be minimum 1980
+                  </div>
+                  <div *ngIf="candidateForm.get('passout').errors.required">
+                    Passout should be specified
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-container *ngIf="showCampusTalentRegistrationFields">
+              <div class="form-sub-header-style">Campus Drive Details</div>
+              <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Registration Date'}">
+                    </ng-container>
+                  </span>
+                  <input type="date" class="form-control input-style" formControlName="registrationDate">
+                  <div class="alert alert-danger" *ngIf="(candidateForm.get('registrationDate').touched || candidateForm.get('registrationDate').dirty) 
+                    && candidateForm.get('registrationDate').invalid">
+                    <div *ngIf="candidateForm.get('registrationDate').errors.required">
+                      Registration Date should be specified
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Test Link Sent?'}">
+                    </ng-container>
+                  </span>
+                  <select class="form-control input-style" formControlName="isTestLinkSent">
+                    <option [ngValue]=false>No</option>
+                    <option [ngValue]=true>Yes</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Has Attempted Test?'}">
+                    </ng-container>
+                  </span>
+                  <select class="form-control input-style" formControlName="hasAttempted">
+                    <option [ngValue]=false>No</option>
+                    <option [ngValue]=true>Yes</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}"></ng-container>
+                  </span>
+                  <select class="form-control input-style" [compareWith]="compareFn" formControlName="result">
+                    <option [ngValue]="null">Select</option>
+                    <option *ngFor="let result of candidateResultList" [ngValue]="result.value">
+                      {{result.value}}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-12 col-md-12">
+                  <span *ngIf="!isViewMode || resumeURL">
+                    <hr class="hr-swabhav-style">
+                    <div class="form-group row">
+                      <h4><span class="col-sm-2 col-form-label">
+                          <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Resume'}">
+                          </ng-container>
+                        </span></h4>
+                      <div class="col-sm-4">
+                        <span class="cursor-pointer-style">
+                          <input *ngIf="!isViewMode" type="file" class="custom-file-input"
+                            (change)="onResourceSelect($event)" id="customFile" value="displayedFileName">
+                          <label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label" for="customFile"
+                            [innerHTML]="displayedFileName"></label>
+                          <button class="btn btn-success custom-file cursor-progress-style" id="uploadingButton"
+                            type="button" *ngIf="isFileUploading">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Uploading file...
+                          </button>
+                          <div *ngIf="resumeURL && !isResumeUploadedToServer" data-toggle="tooltip" data-placement="top"
+                            title="View Resume">
+                            <button class="btn btn-default swabhav-button-round"><a href={{resumeURL}}
+                                target="_blank">View Resume</a></button>
+                          </div>
+                        </span>
+                        <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+                      </div>
+                    </div>
+                  </span>
+                </div>
+              </div>
+            </ng-container>
+            <br>
+            <div class="text-center">
+              <button type="button" *ngIf="!isOperationUpdate && permission?.add" [disabled]="!candidateForm.dirty"
+                class="btn btn-default swabhav-button-round" (click)="onCandidateFormSubmit()">
+                Add Candidate
+              </button>
+              <button type="button" *ngIf="isOperationUpdate && permission?.update" [disabled]="!candidateForm.dirty"
+                class="btn btn-default swabhav-button-round" (click)="onCandidateFormSubmit()">
+                Update Candidate
+              </button>
+              &nbsp;&nbsp;&nbsp;
+              <button type="button" class="btn btn-default swabhav-button-round" (click)="onCloseCandidateForm()">
+                Close Form
+              </button>
+            </div>
+            <br>
+          </form>
+        </div>
+        <ng-container *ngIf="showCandidatesList">
+          <br><br>
+          <div class="display-inline">
+            <div class="font-weight-bold font-xl-style">
+              Candidates -
+              <span class="color-F6430F"> {{totalCandidates}}</span>
+              &nbsp;&nbsp;&nbsp;
+              <button class="btn btn-default filter-button" type="button" *ngIf="isSearchedCandidate"
+                (click)="resetSearchAndGetAllForCandidate()">
+                View All Candidates
+              </button>
+            </div>
+            <div class="float-right">
+              <button *ngIf="permission?.add" class="btn btn-default swabhav-button-round"
+                (click)="onAddNewCandidateButtonClick()">
+                Add New Candidate
+              </button>
+            </div>
+          </div>
+          <br>
+          <div
+            *ngIf="(totalCandidates == 0 && isSearchedCandidate) || (totalCandidates > 0 && !isSearchedCandidate) || (totalCandidates > 0 && isSearchedCandidate)">
+            <button class="btn btn-default filter-button" (click)="drawerCandidate.toggle()">
+              Add Filter <strong>+</strong>
+            </button>
+            <br><br>
+            <div>
+              <span class="search-filter-name-style" *ngFor="let searchFilterField of searchCandidateFilterFieldList">
+                {{searchFilterField.propertyNameText}}
+                <span (click)="deleteSearchCandidateCriteria(searchFilterField.propertyName)"
+                  class="vertical-align-top-icon-style">
+                  <i class="material-icons search-name-delete-icon-style">close</i>
+                </span>
+              </span>
+            </div>
+          </div>
+          <br>
+          <div *ngIf="totalCandidates > 0">
+            <div class="text-right">
+              <span class="pagination-string">
+                Viewing <span class="pagination-numbers">{{paginationStartCandidate}} -
+                  {{paginationEndCandidate}}</span> of
+                <span class="pagination-numbers">{{totalCandidates}}</span>
+              </span>
+            </div>
+            <div class="pagination-flex">
+              <div class="pagination-flex-item-candidate">
+                <div class="form-check">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input switch-style" id="multipleSelectSwitch"
+                      (click)="toggleMultipleSelect()">
+                    <label class="custom-control-label" for="multipleSelectSwitch">
+                      <span class="switch-text-style cursor-pointer-style">Multiple Selection</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="pagination-flex-item-candidate">
+                <div class="pagination-control-flex-item">
+                  <select class="form-control form-control-sm input-style" [(ngModel)]="limitCandidate"
+                    (change)="changePageForCandidate(1)">
+                    <option selected>5</option>
+                    <option>10</option>
+                    <option>20</option>
+                    <option>50</option>
+                  </select> &nbsp;&nbsp;&nbsp;
+                </div>
+                <div class="pagination-control-flex-item">
+                  <ul class="pagination no-padding-left" *ngFor="let candidate of candidateList | paginate: { id:'candidateID',
+                    itemsPerPage: limitCandidate, currentPage: currentPageCandidate, totalItems: totalCandidates }">
+                  </ul>
+                  <pagination-controls responsive="true" maxSize="5" (pageChange)="changePageForCandidate($event)"
+                    id="candidateID">
+                  </pagination-controls>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="multipleSelect">
+              <br>
+              <button class="btn btn-default swabhav-button-round" (click)="OnClickingUpdateMultipleCandidates()">
+                Update Multiple Candidates
+              </button>
+            </div>
+            <br>
+          </div>
+          <div *ngIf="totalCandidates > 0">
+            <div class="row">
+              <div class="form-group col-sm-12 col-md-12">
+                <div class="card table-card-shadow modal-popup-table-card-style">
+                  <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                      <table class="table modal-popup-table-style table-striped">
+                        <tr>
+                          <th *ngIf="multipleSelect">
+                            <label class="checkbox-container">
+                              <input type="checkbox" [checked]="checkCandidatesAdded()"
+                                (change)="setSelectAllCandidates($event.target.checked)">
+                              <span class="checkmark"></span>
+                            </label>
+                          </th>
+                          <th>Sr</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Contact</th>
+                          <th>Address</th>
+                          <th>College</th>
+                          <th>Degree</th>
+                          <th>%/CGPA</th>
+                          <th>Passout</th>
+                          <th>Registration Date</th>
+                          <th>Test Link Sent</th>
+                          <th>Attempted</th>
+                          <th>Result</th>
+                          <th></th>
+                        </tr>
+                        <tbody>
+                          <tr *ngFor="let candidate of candidateList; let i = index">
+                            <td *ngIf="multipleSelect">
+                              <label class="checkbox-container">
+                                <input type="checkbox"
+                                  [checked]="checkCandidateAdded(candidate.campusTalentRegistrationID)"
+                                  (change)="addCandidateToList($event.target.checked,candidate)">
+                                <span class="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>{{(i+1)+(offsetCandidate*limitCandidate)}}</td>
+                            <td>{{candidate.firstName + " " + candidate.lastName}}</td>
+                            <td>{{candidate.email}}</td>
+                            <td>{{candidate.contact}}</td>
+                            <td>{{candidate.fullAddress}}</td>
+                            <td><span *ngIf="candidate.college != null">{{candidate.college}}</span></td>
+                            <td><span *ngIf="candidate.degree != null">{{candidate.degree.name + " "}}</span>
+                              <span
+                                *ngIf="candidate.specialization != null">{{candidate.specialization.branchName}}</span>
+                            </td>
+                            <td>{{candidate.percentage}}</td>
+                            <td>{{candidate.passout}}</td>
+                            <td>{{candidate.registrationDate | date:'longDate'}}</td>
+                            <td>
+                              <span *ngIf="candidate.isTestLinkSent; else noTemplate">
+                                <i class="material-icons green">check</i>
+                              </span>
+                            </td>
+                            <td>
+                              <span *ngIf="candidate.hasAttempted; else notAttemptedTemplate">
+                                <i class="material-icons green">check</i>
+                              </span>
+                            </td>
+                            <td>
+                              <span *ngIf="candidate.result != null; else noResultTemplate">{{candidate.result}}</span>
+                            </td>
+                            <td>
+                              <div class="dropdown">
+                                <span id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                  aria-expanded="false">
+                                  <i class="material-icons">more_vert</i>
+                                </span>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  <a class="dropdown-item dropdown-style" *ngIf="candidate.resume!=null"
+                                    href={{candidate.resume}} target="_blank">
+                                    <span class="vertical-align-top-icon-style"><i
+                                        class="material-icons">description</i></span>
+                                    Resume
+                                  </a>
+                                  <span class="dropdown-item disabled-dropdown-style" *ngIf="candidate.resume==null">
+                                    <span class="vertical-align-top-icon-style"><i
+                                        class="material-icons">description</i></span>
+                                    No Resume
+                                  </span>
+                                  <a class="dropdown-item dropdown-style" (click)="OnViewCandidateButtonClick(i)">
+                                    <span class="vertical-align-top-icon-style"><i
+                                        class="material-icons">visibility</i></span>
+                                    View
+                                  </a>
+                                  <a class="dropdown-item dropdown-style" *ngIf="permission?.delete"
+                                    (click)="deleteCandidate(candidate.campusTalentRegistrationID,candidate.resume)">
+                                    <span class="vertical-align-top-icon-style"><i
+                                        class="material-icons">delete</i></span>
+                                    Delete
+                                  </a>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="totalCandidates == 0">
+            <div class="card">
+              <div class="card-body not-found-card-style">
+                <h2>No Candidates Found</h2>
+              </div>
+            </div>
+            <br>
+          </div>
+        </ng-container>
+      </div>
+      <div class="text-center">
+        <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+          (click)="modal.dismiss('Cross click')">Close</button>
+      </div>
+    </div>
+  </mat-drawer-container>
+</ng-template>
+
+
+<!-- Delete Campus Drive Confirmation -->
+<ng-template #deleteCampusDriveModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Confirmation
+      <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+        (click)="modal.dismiss('Cross click')">
+        <span class="vertical-align-top-icon-style">
+          <i class="material-icons modal-popup-close-icon-style">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <br>
+    <div class="text-center">
+      <div class="delete-text-style">
+        Are you sure you want to delete this campus drive?
+      </div>
+    </div>
+    <br>
+    <div class="text-center">
+      <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+      &nbsp;&nbsp;&nbsp;
+      <button type="button" class="btn btn-default swabhav-button-round"
+        (click)="modal.dismiss('Close click')">No</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<!--Update Multiple Candidate-->
+<ng-template #updateMultipleCandidateModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Update Multiple Candidates
+    </div>
+    <br>
+    <form [formGroup]="updateMultipleCandidateForm">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Test Link Sent?'}">
+            </ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="isTestLinkSent">
+            <option [ngValue]=null>Select</option>
+            <option [ngValue]=false>No</option>
+            <option [ngValue]=true>Yes</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Has Attempted?'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="hasAttempted">
+            <option [ngValue]=null>Select</option>
+            <option [ngValue]=false>No</option>
+            <option [ngValue]=true>Yes</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Result'}"></ng-container>
+          </span>
+          <select class="form-control input-style" [compareWith]="compareFn" formControlName="result">
+            <option [ngValue]="null">Select</option>
+            <option *ngFor="let result of candidateResultList" [ngValue]="result.value">
+              {{result.value}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </form>
+    <div class="text-center">
+      <button type="button" class="btn btn-default swabhav-button-round"
+        (click)="updateMultipleCandidateFunction()">Update</button>
+      &nbsp;&nbsp;&nbsp;
+      <button type="button" (click)="modal.dismiss('Close click')"
+        class="btn btn-default swabhav-button-round">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Test Link -->
+<!-- <div class="modal fade" id="sendTestLink">
+  <div class="modal-dialog  modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Send Test Link</h4>
+        <button type="button" class="close" data-dismiss="modal"><i class="material-icons">highlight_off</i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-6">
+            <label for="comment">Technology Stack:</label>
+            <ng-select [items]="technologies" bindLabel="technology" placeholder="Select Technology" appendTo="body"
+              multiple="true" [searchable]="true" [clearable]="true" [(ngModel)]="selectedtechnology">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                <input id="item-{{index}}" type="checkbox" [(ngModel)]="item$.selected" /> {{item.technology}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-6">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Send Test URL</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            Test History:
+          </div>
+          <div class="form-group col-sm-12 col-md-12">
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr class="bg-green">
+                    <th>sr</th>
+                    <th>Date</th>
+                    <th>Technology</th>
+                    <th>Test Link</th>
+                    <th>Exam Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>13/03/2011</td>
+                    <td>Golang, Java</td>
+                    <td>https://swabhavtechlabs.test?testid=23456&invitationcode=1234&talentcode=9876</td>
+                    <td>Pass</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>13/03/2017</td>
+                    <td>Golang, Java</td>
+                    <td>https://swabhavtechlabs.test?testid=23456&invitationcode=1234&talentcode=9876</td>
+                    <td>Just Pass</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>13/03/2016</td>
+                    <td>Golang, Java</td>
+                    <td>https://swabhavtechlabs.test?testid=23456&invitationcode=1234&talentcode=9876</td>
+                    <td>Fail</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="reset" class="btn btn-default">Reset</button>
+      </div>
+
+    </div>
+  </div>
+</div> -->
+
+
+<!-- Test Link -->
+<!-- <div class="modal fade" id="StudentRegistrationLink">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Student Registration Link</h4>
+        <button type="button" class="close" data-dismiss="modal"><i class="material-icons">highlight_off</i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            <textarea type="text" class="form-control"
+              placeholder="www.swabhavtechlabs.com/register?collegeid=20971FH&&campusid=87876NHG8757&&instance=98765jkjgjh"
+              disabled rows="5"></textarea>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <button type="button" class="btn btn-secondary" data-toggle="tooltip" title="Copy Link to ClipBoard"
+              (click)="copyToClipBoard()">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div> -->

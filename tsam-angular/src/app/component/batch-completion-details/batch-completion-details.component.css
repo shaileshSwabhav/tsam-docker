@@ -1,0 +1,115 @@
+.heading-text .heading-text-style1 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #f6430f;
+}
+
+.heading-text-style2 {
+  font-weight: 600;
+  color: #f6430f;
+}
+
+.heading-text-style3 {
+  font-weight: bold;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.center {
+  align-content: center;
+}
+
+.head-icon {
+  width: 132px;
+  height: 132px;
+  margin: 0 39px 35px 0;
+  padding: 46px;
+}
+
+.heading-text {
+  width: 989px;
+  height: 143px;
+  margin: 34px 0 50px 52px;
+  padding: 11px 159px 30px 184px;
+  font-size: 25px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #414141;
+}
+
+.row-container {
+  padding-top: 2%;
+}
+
+.heading-style {
+  font-size: 30px;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  font-weight: 600;
+}
+
+.label-style {
+  font-size: 20px;
+}
+.next-button-style {
+  width: 10%;
+  float: right;
+  margin-right: 5%;
+}
+
+/* STAR RATING */
+.star {
+  font-size: 300%;
+  color: #b0c4de;
+}
+
+.star-fill {
+  color: #fee440;
+}
+
+.red-box-style {
+  background-color: #ffeaea;
+  color: #f80309;
+  border-radius: 20px;
+}
+
+.green-box-style {
+  background-color: #e5fdf0;
+  color: #36b98c;
+  border-radius: 20px;
+}
+
+.yellow-box-style {
+  background-color: #faeed9;
+  color: #ed9511;
+  border-radius: 20px;
+}
+
+.wordwrap {
+  white-space: pre-wrap; /* CSS3 */
+  white-space: -moz-pre-wrap; /* Firefox */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* IE */
+}
+
+.table-td-center-align {
+  vertical-align: middle;
+}
+
+.input-style-date {
+  width: auto;
+}
+
+.error-dialog {
+  width: 170px;
+}

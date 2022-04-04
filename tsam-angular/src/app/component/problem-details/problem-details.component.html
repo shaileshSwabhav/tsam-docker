@@ -1,0 +1,210 @@
+<app-master-navbar></app-master-navbar>
+
+
+
+<ng-template #answeredTemplate>
+    <div class="text-center color-EE3733 font-weight-bold font-lg-style">
+        You have answered this question
+    </div>
+    <br><br>
+</ng-template>
+
+<div class="container-fluid">
+    <div *ngIf="problem" class="page-margin">
+        <button class="btn btn-default swabhav-button-square" (click)="redirectToProblemOfTheDay()">
+            Back
+        </button>
+        <br><br>
+
+        <!-- Problem card list -->
+        <div *ngIf="problemList?.length > 0" class="row">
+            <ng-container *ngFor="let problem of problemList; let i = index">
+                <div class="form-group col-sm-4 col-md-3">
+                    <div [ngClass]="problem.problemClass" (click)="onProblemLabelClick(problem.id)">
+                        <div class="card-body">
+                            <div>{{problem.label}}</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <!-- Problem details -->
+        <div class="color-757575 font-weight-bold font-lg-style">
+            <span>Attempted By: </span>
+            <span class="color-EE3733">{{problem.attemptedByCount}}</span>
+            &nbsp;&nbsp;&nbsp;
+            <span> Solved By: </span>
+            <span class="color-EE3733">{{problem.solvedByCount}}</span>
+            &nbsp;&nbsp;&nbsp;
+            <span> Success Rate: </span>
+            <span class="color-EE3733">{{problem.successRatio}}%</span>
+            &nbsp;&nbsp;&nbsp;
+            <span> Score: </span>
+            <span class="color-EE3733">{{problem.score}}</span>
+        </div>
+
+        <!-- Header and timer -->
+        <div class="heading-style">
+            {{problem.label}}
+            <span class="level"> (Level <span [ngClass]="problem.levelClass">{{problem.levelName}})</span>
+            </span>
+            <div *ngIf="showTimer" class="float-right submit-and-end">
+                Submit & End Test
+            </div>
+            <div *ngIf="showTimer" class="float-right timer">
+                2 Hrs 20 Mins 30 Secs
+            </div>
+        </div>
+
+        <!-- Question -->
+        <div class="color-757575 font-md-style" [innerHTML]="problem.question">
+        </div>
+        <br>
+
+        <!-- Problem deatils for problem with solution(s) -->
+        <ng-container *ngIf="!problem.hasOptions">
+            <div [innerHTML]="problem.example">
+            </div>
+            <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                Constraints :
+            </div>
+            <div [innerHTML]="problem.constraints">
+                {{problem.constraints}}
+            </div>
+            <ng-container *ngIf="problem.testCases">
+                <div *ngFor="let testCase of problem.testCases;let i = index">
+                    <ng-container *ngIf="testCase.isActive && !testCase.isHidden">
+                        <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                            Sample Input {{i+1}}:
+                        </div>
+                        <div class="question-box">
+                            {{testCase.input}}
+                        </div>
+                        <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                            Sample Output {{i+1}}:
+                        </div>
+                        <div class="question-box">
+                            {{testCase.output}}
+                        </div>
+                        <ng-container *ngIf="testCase.explanation">
+                            <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                                Explanation of Sample Input {{i+1}}:
+                            </div>
+                            <div class="question-box">
+                                {{testCase.explanation}}
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="problem.comment">
+                <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                    Also note :
+                </div>
+                <div class="question-box">
+                    {{problem.comment}}
+                </div>
+            </ng-container>
+        </ng-container>
+
+        <!-- ************************************** SOLUTIONS ************************************** -->
+
+        <!-- Show solutions button if question has solutions -->
+        <ng-container *ngIf="!isSolutionViewed && problem.solutions?.length > 0 && searchDateInString">
+            <button class="btn btn-default swabhav-button-square" (click)="onViewSolutionsClick()">
+                View Solution
+            </button>
+            <br><br>
+        </ng-container>
+
+        <!-- Solutions for question having solutions -->
+        <ng-container *ngIf="!problem.hasOptions && problem.solutions?.length > 0 && isSolutionViewed">
+            <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                Solution :
+            </div>
+            <div>
+                <ul ngbNav #nav="ngbNav" [destroyOnHide]="false" class="nav-tabs ul-space-even-style">
+                    <li *ngFor="let language of solutionLanguageList" [ngbNavItem]="language.id"
+                        (click)="onLanguageTabClick(language.id)" class="list-active-link-style">
+                        <a ngbNavLink class="tab-link-style">{{language.name}}</a>
+                        <ng-template ngbNavContent>
+                        </ng-template>
+                    </li>
+                </ul>
+                <div>
+                    <app-code-editor #codeEditorSolution (childToParentEvent)="receiveChildValues($event)">
+                    </app-code-editor>
+                </div>
+                <br>
+            </div>
+        </ng-container>
+
+        <!-- Before submitting answer -->
+        <ng-container *ngIf="isSolution && !problem.isAnswered && !searchDateInString">
+            <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                Please type your answer in the compiler box
+            </div>
+        </ng-container>
+
+        <!-- After submitting answer -->
+        <ng-container *ngIf="isSolution && problem.isAnswered">
+            <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                You have already answered in this language
+            </div>
+        </ng-container>
+
+        <!-- Code editor for answer -->
+        <ng-container
+            *ngIf="!problem.hasOptions && (!searchDateInString || (problem.isAnswered && searchDateInString))">
+            <app-code-editor #codeEditorAnswer (childToParentEvent)="receiveChildValues($event)"></app-code-editor>
+        </ng-container>
+
+
+        <!-- ************************************** OPTIONS ************************************** -->
+
+        <!-- Show correct option button if question has options -->
+        <ng-container *ngIf="!isOptionViewed && problem.hasOptions && searchDateInString">
+            <button class="btn btn-default swabhav-button-square" (click)="onViewCorrectOptionClick()">
+                View Correct Option
+            </button>
+            <br><br>
+        </ng-container>
+
+        <!-- Correct option -->
+        <ng-container *ngIf="searchDateInString && problem.hasOptions && isOptionViewed">
+            <div class="color-757575 font-md-style color-212121 font-weight-bold">
+                Correct Option :
+            </div>
+            <div class="question-box" [innerHTML]="correctOption.option">
+            </div>
+        </ng-container>
+
+        <!-- Display all options -->
+        <ng-container
+            *ngIf="problem.hasOptions && ((!searchDateInString) || (searchDateInString && problem.isAnswered))">
+            <div class="row">
+                <ng-container *ngFor="let option of problem.options; let i = index">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div [ngClass]="option.optionClass" (click)="onOptionCliick(option)">
+                            <div class="card-body">
+                                <div [innerHTML]="option.option"></div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <br>
+
+            <!-- Submit buton for options -->
+            <div *ngIf="!problem.isAnswered; else answeredTemplate" class="text-center">
+                <button class="btn btn-default swabhav-button-round" (click)="onSubmitOptionButtonClick()">
+                    Submit
+                </button>
+            </div>
+
+        </ng-container>
+
+        <br>
+    </div>
+</div>

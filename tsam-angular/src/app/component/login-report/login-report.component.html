@@ -1,0 +1,346 @@
+<app-master-navbar></app-master-navbar>
+
+
+<ng-template #dashTemplate>
+    <div><strong> - </strong></div>
+</ng-template>
+
+<div class="container-fluid margin-2pt">
+    <div class="card">
+        <!-- <div class="card-header">
+            <button type="button" class="btn btn-success" (click)="showSearch=!showSearch">
+                {{showSearch ? 'Hide Search' : 'Show Search'}}
+            </button>
+        </div> -->
+        <!-- *ngIf="showSearch" -->
+        <div class="card-body search-bar padding">
+            <form [formGroup]="loginReportSearchForm">
+                <div class="filter-by-field row">
+                    <!-- <div class="form-group col-sm-6 col-md-3">
+                        <label>First Name:</label>
+                        <input type="text" formControlName="firstName" class="form-control input-style" placeholder="eg: John">
+                    </div>
+                    <div class="form-group col-sm-6 col-md-3">
+                        <label>Last Name:</label>
+                        <input type="text" formControlName="lastName" class="form-control input-style" placeholder="eg: Doe">
+                    </div> -->
+                    <!-- <div class="form-group col-sm-6 col-md-2">
+                        <label>Duration:</label>
+                        <select class="form-control input-style" formControlName="duration">
+                            <option [ngValue]=null>Select Duration</option>
+                            <option [ngValue]=1>Last 24 hours</option>
+                            <option [ngValue]=7>Last Week</option>
+                            <option [ngValue]=14>Last Fortnight</option>
+                            <option [ngValue]=30>Last Month</option>
+                        </select>
+                    </div> -->
+                    <div class="form-group col-sm-3 col-md-2">
+                        <label class="filter-form-label">From Date:</label>
+                        <input type="date" formControlName="fromDate" class="form-control input-style">
+                    </div>
+                    <div class="form-group col-sm-3 col-md-2">
+                        <label class="filter-form-label">To Date:</label>
+                        <input type="date" formControlName="toDate" class="form-control input-style">
+                    </div>
+                    <div class="form-group col-sm-3 col-md-3">
+                        <label class="filter-form-label">Role:</label>
+                        <select class="form-control input-style" formControlName="role">
+                            <option [ngValue]="null" disabled>Select Role</option>
+                            <option *ngFor="let role of roleList" [ngValue]="role">{{role.roleName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-3 col-md-3">
+                        <label class="filter-form-label">Is Active:</label>
+                        <select class="form-control input-style" formControlName="isActive">
+                            <option [ngValue]="null">Select Status</option>
+                            <option [ngValue]="'1'">Active</option>
+                            <option [ngValue]="'0'">Inactive</option>
+                        </select>
+                    </div>
+                    <ng-container *ngIf="loginReportSearchForm.get('role')?.value?.roleName == 'Talent'">
+                        <div class="form-group col-sm-3 col-md-3">
+                            <label class="filter-form-label">Course:</label>
+                            <ng-select [items]="courseList" bindValue="id" bindLabel="name" placeholder="Select Course"
+                                [searchable]="true" [clearable]="true" formControlName="courseID"
+                                class="ng-select-style"
+                                (change)="getBatchList(loginReportSearchForm.get('courseID').value)" appendTo="body">
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                        <div class="form-group col-sm-3 col-md-3">
+                            <label class="filter-form-label">Batch:</label>
+                            <ng-select [items]="batchList" bindValue="id" bindLabel="batchName"
+                                placeholder="Select Batch" [searchable]="true" [clearable]="true"
+                                formControlName="batchID" class="ng-select-style" [loading]="isBatchLoading"
+                                appendTo="body">
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    {{item.batchName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </ng-container>
+                </div>
+            </form>
+            <div class="d-flex justify-content-end align-items-center">
+                <button type="reset" class="btn btn-default swabhav-light-orange-text material-icons-button"
+                    (click)="resetSearchForm()">Reset
+                </button>
+                <button type="button" class="btn btn-sm filter-button material-icons-button"
+                    [disabled]="!loginReportSearchForm.dirty" (click)="searchLoginReport(false)">Search
+                </button> &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+    </div>
+
+    <div class="card margin-2pt">
+        <div class="card-header">
+            <div class="totalLabel float-right">{{paginationString}}</div>
+            <div class="totalLabel">
+                Total Login Reports: {{totalReports|| 0}}
+            </div>
+            <div class="display-inline">
+                <div class="form-group col-sm-6 col-md-6">
+                    <div class="row">
+                        <select class="form-control input-style col-sm-3 col-md-2 mr-2" [disabled]="disableButton"
+                            [(ngModel)]="limit" (change)="changePage(1)">
+                            <option disabled>per page</option>
+                            <option selected>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select>
+                        <select class=" form-control input-style col-sm-4 col-md-3 pagination-dropdwon-style mr-2"
+                            [(ngModel)]="weekIndex" (change)="getWeeklyReport()">
+                            <option disabled>Select week</option>
+                            <option value="0">This Week</option>
+                            <option value="1">Last Week</option>
+                            <option value="2">Last to Last Week</option>
+                            <option value="null" disabled hidden>N/A</option>
+                        </select>
+                        <button class="btn btn-sm filter-button material-icons-button" type="button" *ngIf="isSearched"
+                            (click)="resetSearchAndGetAll()">
+                            View All Reports
+                        </button>
+                    </div>
+                </div>
+                <ul class="pagination" *ngFor="let report of loginReports | paginate: { id:'reportID',
+                    itemsPerPage: limit, currentPage: currentPage, totalItems: totalReports }">
+                </ul>
+                <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="reportID">
+                </pagination-controls>
+            </div>
+        </div>
+        <div *ngIf="isReportLoaded; else noReport" class="card-body padding-0pt">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan=2 class="align-middle">Sr. No</th>
+                            <th rowspan=2 class="align-middle">Login Name</th>
+                            <th colspan=2 class="align-middle">Last Login</th>
+                            <th rowspan=2 class="align-middle">Current Login Time</th>
+                            <th rowspan=2 class="align-middle">Login Count</th>
+                            <th rowspan=2 class="align-middle">Total Hours</th>
+                        </tr>
+                        <tr>
+                            <th>Login Time</th>
+                            <th>Logout Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let report of loginReports; let i = index">
+                            <td class="text-center">{{(i+1)+(offset*limit)}}</td>
+                            <td class="text-center"><strong>{{report.loginName}}</strong></td>
+                            <td class="text-center">
+                                <div *ngIf="report.lastLoginTime; else dashTemplate">
+                                    {{report.lastLoginTime | date:'medium'}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.lastLogoutTime; else dashTemplate">
+                                    {{report.lastLogoutTime | date:'medium'}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.loginTime; else dashTemplate">
+                                    {{report.loginTime | date:'medium'}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-default fake-link"
+                                    (click)="onLoginCountClick(report)">
+                                    {{report.loginCount}}
+                                </button>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.totalHours != ''; else dashTemplate">
+                                    {{report.totalHours.substring(0, 8)}}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Report Not Found -->
+    <ng-template #noReport>
+        <div class="container full-h">
+            <br />
+            <br />
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-8 mx-auto">
+                    <div class="jumbotron">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Login Report Not Found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+</div>
+
+<app-master-footer></app-master-footer>
+
+
+
+<ng-template #loginReportModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div class="modal-title">
+            <h4 class="modal-title">{{loginName}}</h4>
+        </div>
+        <button type="button" class="close btn btn-default" (click)="modal.dismiss('Cross click')">
+            <i class="material-icons">highlight_off</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="card margin-2pt" *ngIf="isCredentialReportLoaded; else noReport">
+            <div class="card-header">
+                <div class="totalLabel float-right">{{credentialPaginationString}}</div>
+                <div class="totalLabel">
+                    Total Credential Login Reports: {{totalCredentialReports|| 0}}
+                </div>
+                <div class="display-inline">
+                    <div class="form-group col-sm-6 col-md-6">
+                        <div class="row">
+                            <!-- changePage(1) change of credentialLimit will set the credentialOffset to 0 -->
+                            <select class="form-control input-style col-sm-2 col-md-3" [disabled]="disableButton"
+                                [(ngModel)]="credentialLimit" (change)="changeCredentialPage(1)">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <ul class="pagination"
+                        *ngFor="let report of credentialLoginReports | paginate: { id:'credentialReportID',
+                        itemsPerPage: credentialLimit, currentPage: credentialCurrentPage, totalItems: totalCredentialReports }">
+                    </ul>
+                    <pagination-controls responsive="true" maxSize="5" (pageChange)="changeCredentialPage($event)"
+                        id="credentialReportID">
+                    </pagination-controls>
+                </div>
+            </div>
+            <div class="card-body padding-0pt">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Sr. No</th>
+                                <th class="text-left">Login Time</th>
+                                <th class="text-left">Logout Time</th>
+                                <th class="text-left">Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let report of credentialLoginReports; let i = index">
+                                <td class="text-left">{{(i+1)+(credentialOffset*credentialLimit)}}</td>
+                                <td class="text-left">{{report.loginTime | date:'medium'}}</td>
+                                <td class="text-left">{{report.logoutTime | date:'medium'}}</td>
+                                <td class="text-left">{{report.totalHours.substring(0, 8)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button class="btn btn-danger" type="button" (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+
+</ng-template>
+
+
+
+<ng-template #loginReportFormModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div class="modal-title">
+            <h4 class="modal-title">Login Report</h4>
+        </div>
+        <button type="button" class="close btn btn-default" (click)="modal.dismiss('Cross click')">
+            <i class="material-icons">highlight_off</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <form [formGroup]="loginReportForm">
+            <fieldset disabled="disabled">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="form-group">
+                            <label>Login Name:</label>
+                            <input type="text" class="form-control input-style" formControlName="loginName">
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <label>Role Name:</label>
+                            <input type="text" class="form-control input-style" formControlName="roleName">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <label>Login Time:</label>
+                            <input type="text" class="form-control input-style" formControlName="loginTime">
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <label>Logout Time:</label>
+                            <input type="text" class="form-control input-style" formControlName="logoutTime">
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <label>Total Hours:</label>
+                            <input type="text" class="form-control input-style" formControlName="totalHours">
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button class="btn btn-danger" type="button" (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+
+</ng-template>

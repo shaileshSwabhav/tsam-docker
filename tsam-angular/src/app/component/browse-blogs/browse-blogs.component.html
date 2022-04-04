@@ -1,0 +1,375 @@
+<app-master-navbar></app-master-navbar>
+
+<div class="container-fluid">
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+
+        <ul ngbNav #nav="ngbNav" [destroyOnHide]="true" class="nav-tabs ul-space-even-style"
+            (onChange)="onTabChange($event)">
+
+            <!-- Trending Blogs -->
+            <li [ngbNavItem]="1" (click)="onTabChange(1)" class="list-active-link-style">
+                <a ngbNavLink class="font-xl-style tab-link-style">
+                    <span>
+                        Trending Blogs
+                        <span class="vertical-align-top-icon-style">
+                            <i class="material-icons tab-icon-style">trending_up</i>
+                        </span>
+                    </span>
+                </a>
+                <ng-template ngbNavContent>
+
+                    <br><br>
+
+                    <div class="font-weight-bold font-xl-style">
+                        Blogs -
+                        <span class="color-F6430F"> {{totalTrendingBlogSnippets}}</span>
+                    </div>
+
+                    <br><br>
+
+                    <div *ngIf="selectedBlogTopicList.length > 0">
+                        <span class="font-weight-bold font-lg-style">
+                            Searched By Topics:
+                        </span>
+                        &nbsp;&nbsp;&nbsp;
+
+                        <span class="search-filter-name-pod-style" *ngFor="let blogTopic of selectedBlogTopicList">
+                            {{blogTopic.name}}
+                            <span (click)="onBlogTopicClick(blogTopic, false)" class="vertical-align-top-icon-style">
+                                <i class="material-icons blog-topic-name-icon-style">close</i>
+                            </span>
+                        </span>
+
+                        <br><br>
+                    </div>
+
+                    <!-- Blog Snippets -->
+                    <div *ngIf="totalTrendingBlogSnippets > 0">
+                        <div *ngFor="let blogSnippet of blogSnippetList">
+                            <div class="d-flex justify-content-between align-items-center flex-row cursor-pointer-style"
+                                (click)="redirectToBlogDetails(blogSnippet.id)">
+                                <div class="left-of-left-panel">
+                                    <div>
+                                        <span class="profile-image-container">
+                                            <img class="profile-image" src={{blogSnippet.author.image}} alt="">
+                                        </span>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <span class="font-weight-bold">
+                                            {{blogSnippet.author.firstName + " " + blogSnippet.author.lastName}}
+                                        </span>
+                                        &nbsp;&nbsp;
+                                        &#183;
+                                        &nbsp;&nbsp;
+                                        <span class="color-757575">
+                                            {{blogSnippet.publishedDate | date:'dd MMM, yyyy'}}
+                                        </span>
+                                    </div>
+                                    <div class="blog-title-style">
+                                        {{blogSnippet.title}}
+                                    </div>
+                                    <div class="blog-description-style">
+                                        {{blogSnippet.description}}
+                                    </div>
+                                    <div>
+                                        <span class="color-757575 font-sm-style">
+                                            {{blogSnippet.timeToRead}} min read
+                                        </span>
+                                        &nbsp;&nbsp;
+                                        &#183;
+                                        &nbsp;&nbsp;
+                                        <span *ngFor="let blogTopic of blogSnippet.blogTopics">
+                                            <span class="badge swabhav-badge-style">
+                                                {{blogTopic.name}}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span data-toggle="tooltip" data-placement="top" title="Happy"
+                                            class="vertical-align-bottom-icon-style">
+                                            <i class="material-icons">
+                                                <span class="slap-clap-icon-style">sentiment_satisfied_alt</span>
+                                            </i>
+                                        </span>
+                                        <span class="font-md-style color-D63C2A">
+                                            {{blogSnippet.clapCount}}
+                                        </span>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <span data-toggle="tooltip" data-placement="top" title="Happy"
+                                            class="vertical-align-bottom-icon-style">
+                                            <i class="material-icons">
+                                                <span class="slap-clap-icon-style">mood_bad</span>
+                                            </i>
+                                        </span>
+                                        <span class="font-md-style color-D63C2A">
+                                            {{blogSnippet.slapCount}}
+                                        </span>
+
+                                    </div>
+                                </div>
+                                <div class="banner-image-container">
+                                    <img class="blog-banner-image-style" src={{blogSnippet.bannerImage}} alt="">
+                                </div>
+                            </div>
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="page-margin">
+                        <div class="d-flex justify-content-between align-items-center flex-row">
+                            <div class="d-flex justify-content-between align-items-center flex-row">
+                                <div class="font-weight-bold font-xl-style">
+                                    Blogs -
+                                    <span class="color-F6430F"> {{totalTrendingBlogSnippets}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="totalTrendingBlogSnippets > 0"
+                                class="d-flex justify-content-between align-items-start flex-row">
+                                <div class="d-flex">
+                                    <select class="form-control form-control-sm input-style"
+                                        [(ngModel)]="limitForTrending" (change)="changePageForTrendingBlogs(1)">
+                                        <option selected>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>50</option>
+                                    </select> &nbsp;&nbsp;&nbsp;
+                                </div>
+                                &nbsp;&nbsp;
+                                &#183;
+                                &nbsp;&nbsp;
+                                <div class="d-flex">
+                                    <span class="text-right font-md-style">
+                                        Viewing <span class="font-weight-bold color-F6430F">{{paginationStart}} -
+                                            {{paginationEnd}}</span> of
+                                        <span class="font-weight-bold color-F6430F">{{totalTrendingBlogSnippets}}</span>
+                                    </span>
+                                </div>
+                                &nbsp;&nbsp;
+                                &#183;
+                                &nbsp;&nbsp;
+                                <div class="d-flex">
+                                    <ul class="pagination no-padding-left"
+                                        *ngFor="let blogSnippet of blogSnippetList | paginate: { id:'blogSnippetID',
+                                        itemsPerPage: limitForTrending, currentPage: currentPageForTrending, totalItems: totalTrendingBlogSnippets }">
+                                    </ul>
+                                    <pagination-controls responsive="true" maxSize="5"
+                                        (pageChange)="changePageForTrendingBlogs($event)" id="blogSnippetID">
+                                    </pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="totalTrendingBlogSnippets == 0">
+                        <div class="card">
+                            <div class="card-body not-found-card-style">
+                                <h2>No Trending Blogs Found</h2>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </li>
+
+            <!-- Latest Blogs -->
+            <li [ngbNavItem]="2" (click)="onTabChange(2)" class="list-active-link-style">
+                <a ngbNavLink class="font-xl-style tab-link-style">
+                    <span>
+                        Latest Blogs
+                        <span class="vertical-align-top-icon-style">
+                            <i class="material-icons tab-icon-style">new_releases</i>
+                        </span>
+                    </span>
+                </a>
+                <ng-template ngbNavContent>
+
+                    <br><br>
+
+                    <div class="font-weight-bold font-xl-style">
+                        Blogs -
+                        <span class="color-F6430F"> {{totalLatestBlogSnippets}}</span>
+                    </div>
+
+                    <br><br>
+
+                    <div *ngIf="selectedBlogTopicList.length > 0">
+                        <span class="font-weight-bold font-lg-style">
+                            Searched By Topics:
+                        </span>
+                        &nbsp;&nbsp;&nbsp;
+
+                        <span class="search-filter-name-pod-style" *ngFor="let blogTopic of selectedBlogTopicList">
+                            {{blogTopic.name}}
+                            <span (click)="onBlogTopicClick(blogTopic, false)" class="vertical-align-top-icon-style">
+                                <i class="material-icons blog-topic-name-icon-style">close</i>
+                            </span>
+                        </span>
+
+                        <br><br>
+                    </div>
+
+                    <!-- Blog Snippets -->
+                    <div *ngIf="totalLatestBlogSnippets > 0">
+                        <div *ngFor="let blogSnippet of blogSnippetList">
+                            <div class="d-flex justify-content-between align-items-center flex-row cursor-pointer-style"
+                                (click)="redirectToBlogDetails(blogSnippet.id)">
+                                <div class="left-of-left-panel">
+                                    <div>
+                                        <span class="profile-image-container">
+                                            <img class="profile-image" src={{blogSnippet.author.image}} alt="">
+                                        </span>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <span class="font-weight-bold">
+                                            {{blogSnippet.author.firstName + " " + blogSnippet.author.lastName}}
+                                        </span>
+                                        &nbsp;&nbsp;
+                                        &#183;
+                                        &nbsp;&nbsp;
+                                        <span class="color-757575">
+                                            {{blogSnippet.publishedDate | date:'dd MMM, yyyy'}}
+                                        </span>
+                                    </div>
+                                    <div class="blog-title-style">
+                                        {{blogSnippet.title}}
+                                    </div>
+                                    <div class="blog-description-style">
+                                        {{blogSnippet.description}}
+                                    </div>
+                                    <div>
+                                        <span class="color-757575 font-sm-style">
+                                            {{blogSnippet.timeToRead}} min read
+                                        </span>
+                                        &nbsp;&nbsp;
+                                        &#183;
+                                        &nbsp;&nbsp;
+                                        <span *ngFor="let blogTopic of blogSnippet.blogTopics">
+                                            <span class="badge swabhav-badge-style">
+                                                {{blogTopic.name}}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span data-toggle="tooltip" data-placement="top" title="Happy"
+                                            class="vertical-align-bottom-icon-style">
+                                            <i class="material-icons">
+                                                <span class="slap-clap-icon-style">sentiment_satisfied_alt</span>
+                                            </i>
+                                        </span>
+                                        <span class="font-md-style color-D63C2A">
+                                            {{blogSnippet.clapCount}}
+                                        </span>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <span data-toggle="tooltip" data-placement="top" title="Happy"
+                                            class="vertical-align-bottom-icon-style">
+                                            <i class="material-icons">
+                                                <span class="slap-clap-icon-style">sentiment_satisfied_alt</span>
+                                            </i>
+                                        </span>
+                                        <span class="font-md-style color-D63C2A">
+                                            {{blogSnippet.slapCount}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="banner-image-container">
+                                    <img class="blog-banner-image-style" src={{blogSnippet.bannerImage}} alt="">
+                                </div>
+                            </div>
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="page-margin">
+                        <div class="d-flex justify-content-between align-items-center flex-row">
+                            <div class="d-flex justify-content-between align-items-center flex-row">
+                                <div class="font-weight-bold font-xl-style">
+                                    Blogs -
+                                    <span class="color-F6430F"> {{totalLatestBlogSnippets}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="totalLatestBlogSnippets > 0"
+                                class="d-flex justify-content-between align-items-start flex-row">
+                                <div class="d-flex">
+                                    <select class="form-control form-control-sm input-style"
+                                        [(ngModel)]="limitForLatest" (change)="changePageForLatestBlogs(1)">
+                                        <option selected>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>50</option>
+                                    </select> &nbsp;&nbsp;&nbsp;
+                                </div>
+                                &nbsp;&nbsp;
+                                &#183;
+                                &nbsp;&nbsp;
+                                <div class="d-flex">
+                                    <span class="text-right font-md-style">
+                                        Viewing <span class="font-weight-bold color-F6430F">{{paginationStart}} -
+                                            {{paginationEnd}}</span> of
+                                        <span class="font-weight-bold color-F6430F">{{totalLatestBlogSnippets}}</span>
+                                    </span>
+                                </div>
+                                &nbsp;&nbsp;
+                                &#183;
+                                &nbsp;&nbsp;
+                                <div class="d-flex">
+                                    <ul class="pagination no-padding-left"
+                                        *ngFor="let blogSnippet of blogSnippetList | paginate: { id:'blogSnippetID',
+                                        itemsPerPage: limitForLatest, currentPage: currentPageForLatest, totalItems: totalLatestBlogSnippets }">
+                                    </ul>
+                                    <pagination-controls responsive="true" maxSize="5"
+                                        (pageChange)="changePageForLatestBlogs($event)" id="blogSnippetID">
+                                    </pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="totalLatestBlogSnippets == 0">
+                        <div class="card">
+                            <div class="card-body not-found-card-style">
+                                <h2>No Latest Blogs Found</h2>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </li>
+        </ul>
+        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+        <br><br>
+
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+        <div class="font-weight-bold font-md-style">
+            Recommended Topics
+        </div>
+        <br>
+        <span *ngFor="let blogTopic of blogTopicList">
+            <span class="badge swabhav-badge-style cursor-pointer-style" (click)="onBlogTopicClick(blogTopic, true)">
+                {{blogTopic.name}}
+            </span>
+        </span>
+        <br><br><br>
+        <!-- <div class="font-weight-bold font-md-style">
+            Who to Follow
+        </div>
+        <br>
+        <div *ngFor="let talentSnippet of talentSnippetList">
+            <span class="profile-image-container">
+                <img class="profile-image" src={{talentSnippet.profileImage}} alt="">
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="font-weight-bold">
+                {{talentSnippet.firstName + " " + talentSnippet.lastName}}
+            </span>
+            <div class="color-757575">
+                {{talentSnippet.description}}
+            </div>
+            <br>
+        </div> -->
+    </div>
+</div>
+
+<!-- <app-master-footer></app-master-footer> -->

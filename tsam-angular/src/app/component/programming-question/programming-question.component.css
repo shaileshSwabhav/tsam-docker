@@ -1,0 +1,177 @@
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+a {
+  color:white;
+  text-decoration: none;
+}
+
+.text-size {
+  font-size: large;
+}
+
+.swabhav-badge {
+  background-color: #EE3733;
+  color: #FFFFFF;
+}
+
+table {
+  font-size: small;
+}
+
+.anchor-tag {
+  color: #000;
+  text-decoration: none;
+}
+
+/* DROPDOWN STYLE */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+.filter-form-label {
+  font-size: medium;
+  font-weight: bold;
+  color: #757575;
+}
+
+.search-body{
+  overflow-x: hidden;
+}
+
+/* *******************input styles***************** */
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+/* SIDE NAV */
+.mat-drawer-style {
+  width: 40%;
+  position: fixed;
+}
+
+.mat-drawer-inner-container {
+  overflow: hidden;
+}
+
+.checkbox-label {
+  cursor: pointer;
+}
+
+.not-found{
+  text-align: center;
+  font-weight: bold;
+  color: #D63C2A;
+  border: solid;
+  border-radius: 5px;
+}
+
+.form-header-style{
+  margin-bottom: 1%;
+  color: #000000;
+  font-size: x-large;
+  margin-top: 2%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.close-form-style{
+  color: #757575;
+  font-size: small;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.icon-align{
+  display:inline-flex;
+  vertical-align:top;
+}
+
+.close-icon-form{
+  font-size: 15px;
+  padding-top: 20%;
+  font-weight: bold;
+}
+
+.form-control-label-style{
+  color: #757575;
+  font-size: medium;
+  font-weight: bold;
+}
+
+.form-sub-header-style{
+  color: #F6430F;
+  font-size: x-large;
+  margin-top: 2%;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 2%;
+}
+
+.marked-fields-style{
+  text-align: center;
+  font-size: smaller;
+  margin-right: 5%;
+}
+
+.red-color-style{
+  color: red;
+}
+
+h5{
+  font-size: large;
+  font-weight: bold;
+}
+
+.example-box{
+  width: 70%;
+}
+
+.card-style{
+  border: solid #FC6E26;
+  margin-left: 10px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.bulb-color{
+  color: #FFC107;
+}
+
+.highlight-style{
+  background-color: #FFEAEA;
+}
+
+.left-panel{
+  float: left;
+  width: 65%;
+}
+
+.right-panel{
+  float: right;
+  width: 35%;
+}
+
+.no-float-style{
+  clear: both;
+}
+
+  

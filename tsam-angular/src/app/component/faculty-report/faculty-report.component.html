@@ -1,0 +1,188 @@
+<app-master-navbar></app-master-navbar>
+
+
+
+<!-- ZERO COUNT TEMPLATE -->
+<ng-template #naTemplate>
+    <span class="btn btn-default no-link">-</span>
+</ng-template>
+
+
+<div class="container-fluid margin-2pt">
+
+    <div class="row">
+        <select class="form-control col-sm-4 col-md-2 input-margin" [(ngModel)]="weekIndex"
+            (change)="onWeekSelectClick()">
+            <option disabled>Select week</option>
+            <option value="-7">Last Week</option>
+            <option value="0">This Week</option>
+            <option value="7">Next Week</option>
+            <option value="null" disabled hidden>N/A</option>
+        </select>
+        &nbsp;&nbsp;&nbsp;
+        <input type="date" [(ngModel)]="userDate" class="form-control col-sm-4 col-md-2 input-margin"
+            (change)="onDateSelectClick()" min="2001-01-01" step="7" onkeydown="return false">
+
+    </div>
+    <br />
+
+    <div class="card">
+        <div class="card-body padding-0pt">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center heading">Faculty</th>
+                            <th class="text-center heading">Monday</th>
+                            <th class="text-center heading">Tuesday</th>
+                            <th class="text-center heading">Wednesday</th>
+                            <th class="text-center heading">Thursday</th>
+                            <th class="text-center heading">Friday</th>
+                            <th class="text-center heading">Saturday</th>
+                            <th class="text-center heading">Sunday</th>
+                            <th class="text-center heading">Total Batch Hours</th>
+                            <th class="text-center heading">Total Training Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let report of facultyReport; let i = index">
+                            <td class="text-center align-middle">
+                                <strong>{{report.faculty.firstName}} {{report.faculty.lastName}}</strong>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.monday; else naTemplate">
+                                    <div *ngFor="let monday of report.monday">
+                                        <span class="badge badge-custom-dark-blue">{{monday.batchName}}</span>
+                                        <div *ngFor="let timing of monday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.tuesday; else naTemplate">
+                                    <div *ngFor="let tuesday of report.tuesday">
+                                        <span class="badge badge-custom-dark-blue">{{tuesday.batchName}}</span>
+                                        <div *ngFor="let timing of tuesday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.wednesday; else naTemplate">
+                                    <div *ngFor="let wednesday of report.wednesday">
+                                        <span class="badge badge-custom-dark-blue">{{wednesday.batchName}}</span>
+                                        <div *ngFor="let timing of wednesday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.thursday; else naTemplate">
+                                    <div *ngFor="let thursday of report.thursday">
+                                        <span class="badge badge-custom-dark-blue">{{thursday.batchName}}</span>
+                                        <div *ngFor="let timing of thursday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.friday; else naTemplate">
+                                    <div *ngFor="let friday of report.friday">
+                                        <span class="badge badge-custom-dark-blue">{{friday.batchName}}</span>
+                                        <div *ngFor="let timing of friday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.saturday; else naTemplate">
+                                    <div *ngFor="let saturday of report.saturday">
+                                        <span class="badge badge-custom-dark-blue">{{saturday.batchName}}</span>
+                                        <div *ngFor="let timing of saturday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="report.sunday; else naTemplate">
+                                    <div *ngFor="let sunday of report.sunday">
+                                        <span class="badge badge-custom-dark-blue">{{sunday.batchName}}</span>
+                                        <div *ngFor="let timing of sunday.batchTimings">
+                                            <span class="badge badge-custom-light-blue">
+                                                {{utilService.formatTimeString(timing.fromTime)}} -
+                                                {{utilService.formatTimeString(timing.toTime)}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div *ngIf="doesWorkingHoursExist(report.workingHours); else naTemplate">
+                                    <div *ngFor="let recipient of report.workingHours | keyvalue">
+                                        <span>
+                                            <span
+                                                class="badge badge-custom-dark-blue">{{recipient.value.batchName}}</span>
+                                            -
+                                            <strong>
+                                                {{recipient.value.totalHours}} Hours
+                                            </strong>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div
+                                    *ngIf="report.totalTrainingHours && report.totalTrainingHours != 0; else naTemplate">
+                                    <strong>{{report.totalTrainingHours}} Hours
+                                        <!-- {{report.totalTrainingHours % 2}} -->
+                                    </strong>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <strong>Total Daily Hours</strong>
+                            </td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(MONDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(TUESDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(WEDNESDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(THURSDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(FRIDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(SATURDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalWorkingHours(SUNDAY)}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalBatchHours()}} Hours</strong></td>
+                            <td class="text-center"><strong>{{assignTotalHours()}} Hours</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<app-master-footer></app-master-footer>

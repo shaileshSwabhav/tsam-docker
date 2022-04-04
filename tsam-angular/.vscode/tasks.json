@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "tsam-angular",
+      "type": "shell",
+      "command": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve",
+      "problemMatcher": []
+    }
+  ]
+}

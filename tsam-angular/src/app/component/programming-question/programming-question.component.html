@@ -1,0 +1,620 @@
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="form-control-label-style"><span class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="search-body">
+      <div class="filter-header">
+        Edit Filters&nbsp;&nbsp;&nbsp;
+        <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+        <div class="float-right">
+          <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+            <i class="material-icons close-icon material-icons-button">close</i>
+          </button>
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <form [formGroup]="programmingQuestionSearchForm">
+        <div class="search-bar padding">
+          <div class="row filter-by-field">
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Label:</label>
+              <input class="form-control input-style" type="text" formControlName="label" placeholder="eg: Recursion">
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Status</label>
+              <select class="form-control input-style" formControlName="isActive">
+                <option [ngValue]="null">Select Status</option>
+                <option [ngValue]="'1'">Active</option>
+                <option [ngValue]="'0'">Inactive</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Programming Question Type:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="programmingType">
+                <option [ngValue]="null" disabled>Select Type</option>
+                <option *ngFor="let type of programmingQuestionTypeList" [ngValue]="type.programmingType">
+                  {{type.programmingType}}</option>
+              </select>
+            </div>
+            <!-- <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Programming Concept:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="programmingConcept">
+                <option [ngValue]="null" disabled>Select Type</option>
+                <option *ngFor="let concept of programmingConcepts" [ngValue]="concept.name">
+                  {{concept.name}}</option>
+              </select>
+            </div> -->
+          </div>
+        </div>
+      </form>
+
+      <br>
+
+      <div class="text-center">
+        <button type="button" class="btn btn-submit-swabhav material-icons-button"
+          [disabled]="!programmingQuestionSearchForm.dirty" (click)="searchAndCloseDrawer()">
+          Search <i class="inline-icon material-icons">search</i>
+        </button>
+      </div>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Programming Questions: <span class="swabhav-light-orange-text">{{totalProgrammingQuestion ||
+              0}}</span></h1>
+        </div>
+
+        <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission.add"
+          (click)="onAddNewQuestionClick()">Add New Programming Question <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalProgrammingQuestion > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalProgrammingQuestion}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+        <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+            (click)="resetSearchAndGetAll()">View All Programming Question
+          </button>
+        </div>
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let question of programmingQuestions | paginate: { id:'programmingPageID', 
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalProgrammingQuestion }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="programmingPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card-body swabhav-shadow padding-0pt"
+        *ngIf="totalProgrammingQuestion > 0; else noProgrammingQuestions">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr class="text-center">
+                <th>No.</th>
+                <th class="text-left">Label</th>
+                <th>Programming Question Type(s)</th>
+                <th>Programming Concept(s)</th>
+                <th>Level</th>
+                <th>Score</th>
+                <th>Time Required</th>
+                <th>Has Options</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center" *ngFor="let question of programmingQuestions;let i = index">
+                <td>{{(i+1)+(offset*limit)}}</td>
+                <td class="color-F26A00 font-weight-bold text-left">{{question.label}}</td>
+                <td>
+                  <span *ngFor="let programmingQuestionType of question.programmingQuestionTypes">
+                    <span class="badge swabhav-badge-style">
+                      {{programmingQuestionType.programmingType}}
+                    </span>&nbsp;
+                  </span>
+                </td>
+                <td>
+                  <span *ngFor="let programmingConcept of question.programmingConcept">
+                    <span class="badge swabhav-badge-style">
+                      {{programmingConcept.name}}
+                    </span>&nbsp;
+                  </span>
+                </td>
+                <td class="font-weight-bold">
+                  <span class="badge"
+                    [ngClass]='question.level===1?"badge easy-level-badge": (question.level===2?"badge medium-level-badge":(question.level===3?"badge hard-level-badge":""))'>
+                    {{utilService.getValueByKey(question.level, programmingQuestionLevel)}}
+                  </span>
+                </td>
+                <td>{{question.score}}</td>
+                <td>{{question.timeRequired | minute}}</td>
+                <td>{{question.hasOptions ? 'Yes' : 'No'}}</td>
+                <td>
+                  <div *ngIf="question.isActive; else inActive">
+                    <span class="badge badge-success">Active</span>
+                  </div>
+                  <ng-template #inActive>
+                    <span class="badge badge-danger">Inactive</span>
+                  </ng-template>
+                </td>
+                <td class="text-left">
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-element" type="button" id="dropdownMenuButton"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="material-icons material-icons-button"><strong>more_vert</strong></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <button *ngIf="!question.hasOptions" type="button"
+                        class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="getSolutionsForSelectedquestion(question.id)">
+                        <i class="inline-icon material-icons-outlined">question_answer</i> Solutions
+                      </button>
+                      <button *ngIf="!question.hasOptions" type="button"
+                        class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="getTestCasesForSelectedquestion(question.id)">
+                        <i class="inline-icon material-icons-outlined">speed</i> Test Cases
+                      </button>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="onViewProgrammingQuestionClick(question)">
+                        <i class="inline-icon material-icons-outlined">visibility</i> View
+                      </button>
+                      <button *ngIf="question.hasAnyTalentAnswered" type="button"
+                        class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="updateIsActive(!question.isActive, question.id)">
+                        <span *ngIf="question.isActive"><i class="inline-icon material-icons-outlined">toggle_off</i>
+                          Change to inactive</span>
+                        <span *ngIf="!question.isActive"><i class="inline-icon material-icons-outlined">toggle_on</i>
+                          Change to active</span>
+                      </button>
+                      <button class="dropdown-item btn btn-default btn-dropdown" *ngIf="permission.delete" type="button"
+                        (click)="onDeleteProgrammingQuestionClick(question.id)">
+                        <i class="inline-icon material-icons">delete</i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Programming Questions Not Found -->
+      <ng-template #noProgrammingQuestions>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Programming Questions Not Found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+
+      <br>
+
+      <div *ngIf="totalProgrammingQuestion > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalProgrammingQuestion}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-end align-items-center flex-row flex-wrap">
+      
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let question of programmingQuestions | paginate: { id:'programmingPageID', 
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalProgrammingQuestion }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="programmingPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+
+      <br>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+<!-- Programming Question Modal -->
+<ng-template #programmingQuestionModal let-modal>
+  <app-programming-question-modal [programmingQuestion]="selectedQuestion"
+    [isViewClicked]="isViewClicked" [isUpdateClicked]="isUpdateClicked"
+    (dismissModalEvent)="dismissProgrammingQuestinModal()" (addEvent)="programmingQuestionAdded($event)"
+    (questionUpdatedEvent)="updateProgrammingQuestion($event)">
+  </app-programming-question-modal>
+</ng-template>
+
+
+<!-- Delete Modal -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Comfirmation</h4>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="button"><i
+        class="material-icons close-icon material-icons-button">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want you to delete this programming question?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button"
+      (click)="modal.dismiss('Cross click');">No
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Add Programming Question Solution -->
+<ng-template #solutionFormModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Programming Question Solutions
+      <div class="close-form-style float-right" (click)="modal.dismiss('Cross click')">
+        <span class="icon-align">
+          <i class="material-icons close-icon-form">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <div *ngIf="showSolutionForm" class="marked-fields-style"><span class="red-color-style"><strong>*</strong></span>
+      marked fields are mandatory</div>
+    <br>
+    <div *ngIf="showSolutionForm">
+      <form [formGroup]="solutionForm">
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-4">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Programming Language'}">
+              </ng-container>
+            </span>
+            <ng-select [items]="programmingLanguageList" bindLabel="name" placeholder="Select" appendTo="body"
+              [searchable]="true" [clearable]="true" formControlName="programmingLanguage" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.name}}
+              </ng-template>
+            </ng-select>
+            <div class="alert alert-danger" *ngIf="(solutionForm.get('programmingLanguage').touched || solutionForm.get('programmingLanguage').dirty) 
+              && solutionForm.get('programmingLanguage').invalid">
+              <div *ngIf="solutionForm.get('programmingLanguage').errors.required">
+                Programming Language must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-12 col-md-12">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Solution'}"></ng-container>
+            </span>
+            <textarea type="text" class="form-control input-style" formControlName="solution"
+              placeholder="Type the solution here..." rows="10">
+            </textarea>
+            <div class="alert alert-danger" *ngIf="(solutionForm.get('solution').touched || solutionForm.get('solution').dirty) 
+              && solutionForm.get('solution').invalid">
+              <div *ngIf="solutionForm.get('solution').errors.required">
+                Solution must be specified
+              </div>
+              <div *ngIf="solutionForm.get('solution').errors.maxlength">
+                Solution can have maximum 2000 characters
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="center-style">
+          <button type="button" *ngIf="!isOperationSolutionUpdate && permission.add" [disabled]="!solutionForm.dirty"
+            class="btn btn-default swabhav-button-round" (click)="validateSolutionForm()">Add Solution</button>
+          <button type="button" *ngIf="isOperationSolutionUpdate && permission.update" [disabled]="!solutionForm.dirty"
+            class="btn btn-default swabhav-button-round" (click)="validateSolutionForm()">Update Solution</button>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-default swabhav-button-round" (click)="showSolutionForm=false">Close
+            Form</button>
+        </div>
+        <br>
+      </form>
+    </div>
+    <div *ngIf="!showSolutionForm" class="row">
+      <div class="form-group col-sm-6 col-md-4">
+        <button *ngIf="permission.add" type="button" class="btn btn-default swabhav-button-round"
+          (click)="onAddNewSolutionButtonClick()">
+          Add Solution
+        </button>
+      </div>
+    </div>
+    <div *ngIf="solutionList.length > 0">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <div class="card card-shadow card-style-others">
+            <div class="card-body padding-0pt">
+              <div class="table-responsive">
+                <table class="table other-table-style">
+                  <tr>
+                    <th>Sr</th>
+                    <th>Language</th>
+                    <th>Solution</th>
+                    <th *ngIf="permission.update">Update</th>
+                    <th *ngIf="permission.delete">Delete</th>
+                  </tr>
+                  <tbody>
+                    <tr *ngFor="let solution of solutionList; let i = index">
+                      <td>{{i+1}}</td>
+                      <td>{{solution.solution.substr(0,100)}}...</td>
+                      <td>{{solution.programmingLanguage.name}}</td>
+                      <td *ngIf="permission.update">
+                        <span (click)="onUpdateSolutionButtonClick(i)">
+                          <i class="material-icons edit-icon-style">edit</i>
+                        </span>
+                      </td>
+                      <td *ngIf="permission.delete">
+                        <span (click)="deleteSolution(solution.id)">
+                          <i class="material-icons edit-icon-style">delete</i>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="solutionList.length==0">
+      <div class="card">
+        <div class="card-body not-found">
+          <h2>No Programming Question Solutions Found</h2>
+        </div>
+      </div>
+      <br>
+    </div>
+    <div class="center-style">
+      <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+        (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Add Programming Question Test Case -->
+<ng-template #testCaseFormModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Programming Question Test Cases
+      <div class="close-form-style float-right" (click)="modal.dismiss('Cross click')">
+        <span class="icon-align">
+          <i class="material-icons close-icon-form">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <div *ngIf="showTestCaseForm" class="marked-fields-style"><span class="red-color-style"><strong>*</strong></span>
+      marked fields are mandatory</div>
+    <br>
+    <div *ngIf="showTestCaseForm">
+      <form [formGroup]="testCaseForm">
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Sample Input:</label>
+            <textarea class="form-control input-style" rows="2" formControlName="input"
+              placeholder="Sample Input...."></textarea>
+            <div class="alert alert-danger" *ngIf="(testCaseForm.get('input').touched||
+              testCaseForm.get('input').dirty) && testCaseForm.get('input').invalid">
+              <div *ngIf="testCaseForm.get('input').errors.required">
+                Sample Input must be specified
+              </div>
+              <div *ngIf="testCaseForm.get('input').errors.maxlength">
+                Sample Input can have maximum 500 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-12 col-md-12">
+            <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Sample Output:</label>
+            <textarea class="form-control input-style" rows="2" formControlName="output"
+              placeholder="Sample Output...."></textarea>
+            <div class="alert alert-danger" *ngIf="(testCaseForm.get('output').touched||
+              testCaseForm.get('output').dirty) && testCaseForm.get('output').invalid">
+              <div *ngIf="testCaseForm.get('output').errors.required">
+                Sample Output must be specified
+              </div>
+              <div *ngIf="testCaseForm.get('output').errors.maxlength">
+                Sample Output can have maximum 500 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-12 col-md-12">
+            <label class="filter-form-label">Explanation of Sample Input:</label>
+            <textarea class="form-control input-style" rows="2" formControlName="explanation"
+              placeholder="Explanation of sample input...."></textarea>
+            <div class="alert alert-danger" *ngIf="(testCaseForm.get('explanation').touched||
+              testCaseForm.get('explanation').dirty) && testCaseForm.get('explanation').invalid">
+              <div *ngIf="testCaseForm.get('explanation').errors.maxlength">
+                Explanation can have maximum 500 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-4">
+            <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Is Active ?:</label>
+            <select class="form-control input-style" formControlName="isActive">
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(testCaseForm.get('isActive').touched||
+              testCaseForm.get('isActive').dirty) && testCaseForm.get('isActive').invalid">
+              <div *ngIf="testCaseForm.get('isActive').errors.required">
+                Test case status must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-4">
+            <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Is Hidden ?:</label>
+            <select class="form-control input-style" formControlName="isHidden">
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(testCaseForm.get('isHidden').touched||
+              testCaseForm.get('isHidden').dirty) && testCaseForm.get('isHidden').invalid">
+              <div *ngIf="testCaseForm.get('isHidden').errors.required">
+                Test case hidden status must be specified
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="center-style">
+          <button type="button" *ngIf="!isOperationTestCaseUpdate && permission.add" [disabled]="!testCaseForm.dirty"
+            class="btn btn-default swabhav-button-round" (click)="validateTestCaseForm()">Add Test Case</button>
+          <button type="button" *ngIf="isOperationTestCaseUpdate && permission.update" [disabled]="!testCaseForm.dirty"
+            class="btn btn-default swabhav-button-round" (click)="validateTestCaseForm()">Update Test Case</button>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-default swabhav-button-round" (click)="showTestCaseForm=false">Close
+            Form</button>
+        </div>
+        <br>
+      </form>
+    </div>
+    <div *ngIf="!showTestCaseForm" class="row">
+      <div class="form-group col-sm-6 col-md-4">
+        <button *ngIf="permission.add" type="button" class="btn btn-default swabhav-button-round"
+          (click)="onAddNewTestCaseButtonClick()">
+          Add Test Case
+        </button>
+      </div>
+    </div>
+    <div *ngIf="testCaseList.length > 0">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <div class="card card-shadow card-style-others">
+            <div class="card-body padding-0pt">
+              <div class="table-responsive">
+                <table class="table other-table-style">
+                  <tr>
+                    <th>Sr</th>
+                    <th>Input</th>
+                    <th>Output</th>
+                    <th>Explanation</th>
+                    <th>Active</th>
+                    <th>Hidden</th>
+                    <th *ngIf="permission.update">Update</th>
+                    <th *ngIf="permission.delete">Delete</th>
+                  </tr>
+                  <tbody>
+                    <tr *ngFor="let testCase of testCaseList; let i = index">
+                      <td>{{i+1}}</td>
+                      <td>{{testCase.input}}</td>
+                      <td>{{testCase.output}}</td>
+                      <td>{{testCase.explanation}}</td>
+                      <td>
+                        <span *ngIf="testCase.isActive; else inActive">
+                          Active
+                        </span>
+                        <ng-template #inActive>
+                          <span>
+                            InActive
+                          </span>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <span *ngIf="testCase.isHidden; else hidden">
+                          Yes
+                        </span>
+                        <ng-template #hidden>
+                          <span>
+                            No
+                          </span>
+                        </ng-template>
+                      </td>
+                      <td *ngIf="permission.update">
+                        <span (click)="onUpdateTestCaseButtonClick(i)">
+                          <i class="material-icons edit-icon-style">edit</i>
+                        </span>
+                      </td>
+                      <td *ngIf="permission.delete">
+                        <span (click)="deleteTestCase(testCase.id)">
+                          <i class="material-icons edit-icon-style">delete</i>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="testCaseList.length==0">
+      <div class="card">
+        <div class="card-body not-found">
+          <h2>No Programming Question Test Cases Found</h2>
+        </div>
+      </div>
+      <br>
+    </div>
+    <div class="center-style">
+      <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+        (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+  </div>
+</ng-template>

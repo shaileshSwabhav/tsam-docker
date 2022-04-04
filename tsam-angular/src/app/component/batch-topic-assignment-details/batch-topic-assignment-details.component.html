@@ -1,0 +1,929 @@
+<app-master-navbar></app-master-navbar>
+
+<div class="top-panel-style">
+	<div class="top-panel-left">
+		<span>
+			<span class="vertical-align-bottom-icon-style">
+				<i class="material-icons cursor-pointer-style font-weight-bold 
+				font-20-style" (click)="goBack()">arrow_back_ios</i>
+			</span>
+			&nbsp;&nbsp;
+			<span class="font-md-style">
+				Assignment Scores
+			</span>
+		</span>
+	</div>
+
+	<div class="top-panel-center">
+		<!-- #niranjan add assignment condition here -->
+		<ng-container [ngTemplateOutlet]="isTalentView? showAssignmentList : showTalentList">
+		</ng-container>
+	</div>
+</div>
+<ng-template #showTalentList>
+	<span>
+		<select class="form-control input-style dropdown-style" [(ngModel)]="selectedTalent"
+			(change)="onTalentChange()">
+			<option *ngFor="let talent of batchTalents" [ngValue]="talent">
+				{{talent.firstName + " " + talent.lastName}}
+			</option>
+		</select>
+	</span>
+</ng-template>
+<ng-template #showAssignmentList>
+	<span>
+		<select class="form-control input-style dropdown-style" [(ngModel)]="selectedAssignment"
+			(change)="onAssignmentChange()">
+			<option *ngFor="let assignment of allAssignments" [ngValue]="assignment">
+				{{assignment?.programmingQuestion?.label}}
+			</option>
+		</select>
+	</span>
+</ng-template>
+
+<br>
+<!-- #Niranjan add submissions condition -->
+<div *ngIf="batchTalents?.length > 0 else noTalentAssignment">
+	<div class="container-fluid">
+		<div class="row">
+
+			<!-- Side Panel -->
+			<div class="col-md-4">
+				<div class="card white-card-shadow-style h-100">
+					<div class="card-body">
+						<div class="font-weight-bold font-lg-style">
+							Assignment List
+							<span class="float-right btn" id="upDownArrow" (click)="swapView()">
+								&uarr;&darr;
+							</span>
+						</div>
+						<br><br>
+
+						<!-- Unchecked Assignments -->
+						<ng-container
+							[ngTemplateOutlet]="isTalentView? showTalentNamesOnLeft :  showAssignmentSubmissionsOnLeft">
+						</ng-container>
+
+						<!-- assignment list template start -->
+
+						<ng-template #showAssignmentSubmissionsOnLeft>
+							<!-- Unchecked assignments -->
+							<div class="pointer tasklist-box-style unchecked-box-style"
+								[ngStyle]="uncheckedAssignments?.length>0? {}:{'pointer-events':'none'}"
+								(click)="showUncheckedAssignments = !showUncheckedAssignments">
+								<span>
+									<i *ngIf="uncheckedAssignments.length>0" class="arrow-unchecked mr-1"
+										[ngClass]="showUncheckedAssignments? 'arrow-down mb-1' : 'arrow-left'">
+									</i>
+								</span>
+								<span>
+									Unchecked Submissions:
+									{{uncheckedAssignments?.length}}
+								</span>
+							</div>
+							<br>
+							<ng-container [ngTemplateOutlet]="assignmentTableTemplate"
+								[ngTemplateOutletContext]="{assignmentList: uncheckedAssignments}"
+								*ngIf="showUncheckedAssignments">
+							</ng-container>
+
+							<!-- Pending Assignments -->
+							<div class="pointer tasklist-box-style tasklist-box-style pending-box-style"
+								[ngStyle]="pendingAssignments?.length>0? {}:{'pointer-events':'none'}"
+								(click)="showPendingAssignments = !showPendingAssignments">
+								<span>
+									<i *ngIf="pendingAssignments.length>0" class="arrow-pending mr-1"
+										[ngClass]="showPendingAssignments? 'arrow-down mb-1' : 'arrow-left'">
+									</i>
+								</span>
+								<span>
+									Pending Submissions: {{pendingAssignments?.length}}
+								</span>
+							</div>
+							<br>
+							<ng-container [ngTemplateOutlet]="assignmentTableTemplate"
+								[ngTemplateOutletContext]="{assignmentList: pendingAssignments}"
+								*ngIf="showPendingAssignments">
+							</ng-container>
+
+							<!-- Completed Assignments -->
+							<div class="pointer tasklist-box-style completed-box-style"
+								[ngStyle]="completedAssignments?.length>0? {}:{'pointer-events':'none'}"
+								(click)="showCompletedAssignments = !showCompletedAssignments">
+								<span>
+									<i *ngIf="completedAssignments.length>0" class="arrow-completed mr-1"
+										[ngClass]="showCompletedAssignments? 'arrow-down mb-1' : 'arrow-left'"></i>
+								</span>
+								<span>
+									Completed Submissions: {{completedAssignments?.length}}
+								</span>
+							</div>
+							<br>
+							<ng-container [ngTemplateOutlet]="assignmentTableTemplate" [ngTemplateOutletContext]="{assignmentList: completedAssignments,
+							showSubmittedOn : true}" *ngIf="showCompletedAssignments">
+							</ng-container>
+						</ng-template>
+						<!-- assignment list template end -->
+
+						<!-- talent list template start -->
+
+						<ng-template #showTalentNamesOnLeft>
+							<!-- Unchecked -->
+							<div class="pointer tasklist-box-style unchecked-box-style"
+								[ngStyle]="uncheckedTalents?.length>0? {}:{'pointer-events':'none'}"
+								(click)="showUnchecked = !showUnchecked">
+								<span><i *ngIf="uncheckedTalents.length>0"
+										[ngClass]="showUnchecked? 'arrow-down mb-1' : 'arrow-left'"
+										class="arrow-unchecked mr-1"></i></span>
+								<span>
+									Unchecked: {{uncheckedTalents?.length}}
+								</span>
+							</div>
+							<br>
+							<ng-container *ngIf="showUnchecked" [ngTemplateOutlet]="talentTableTemplate"
+								[ngTemplateOutletContext]="{talentList: uncheckedTalents}">
+							</ng-container>
+
+							<!-- Pending -->
+							<div class="pointer tasklist-box-style pending-box-style"
+								[ngStyle]="pendingTalents?.length>0? {}:{'pointer-events':'none'}"
+								(click)="showPending = !showPending">
+								<span><i *ngIf="pendingTalents.length>0"
+										[ngClass]="showPending? 'arrow-down mb-1' : 'arrow-left'"
+										class="arrow-pending mr-1"></i></span>
+								<span>
+									Pending: {{pendingTalents?.length}}
+								</span>
+							</div>
+							<br>
+							<ng-container [ngTemplateOutlet]="talentTableTemplate"
+								[ngTemplateOutletContext]="{talentList: pendingTalents}" *ngIf="showPending">
+							</ng-container>
+
+							<!-- Completed -->
+							<div class="pointer tasklist-box-style completed-box-style"
+								[ngStyle]="completedTalents?.length>0? {}:{'pointer-events':'none'}"
+								(click)="showCompleted = !showCompleted">
+								<span><i *ngIf="completedTalents.length>0"
+										[ngClass]="showCompleted? 'arrow-down mb-1' : 'arrow-left'"
+										class="arrow-completed mr-1"></i></span>
+								<span>
+									Completed: {{completedTalents?.length}}
+								</span>
+							</div>
+							<br>
+							<ng-container [ngTemplateOutlet]="talentTableTemplate"
+								[ngTemplateOutletContext]="{talentList: completedTalents}" *ngIf="showCompleted">
+							</ng-container>
+						</ng-template>
+						<!-- talent template end -->
+					</div>
+				</div>
+			</div>
+
+			<!-- Main Content -->
+			<div class="col-md-8">
+				<br>
+				<div>
+					<span class="font-weight-bold font-lg-style">
+						<span class="cursor-pointer-style"
+							[ngClass]="{'primary': isQuestionSelected==true, 'color-BDBDBD' : isQuestionSelected==false }"
+							(click)="isQuestionSelected=true;updateURL">
+							Assignment Details
+						</span>
+						<span class="color-BDBDBD">
+							|
+						</span>
+						<span class="cursor-pointer-style"
+							[ngClass]="{'primary': isQuestionSelected==false, 'color-BDBDBD' : isQuestionSelected==true }"
+							(click)="showStudentAnswer()">
+							Student's Answer
+						</span>
+					</span>
+				</div>
+				<br>
+				<!-- {
+    "id": "1b0828db-104a-43e6-b5f0-246636c54b93",
+    "label": "AWS - selectedAssignment 1",
+    "question": "<p>Develop and Deploy&nbsp;Serverless User Authentication backend with AWS APIGateway, Lambda Functions, DynamoDB and Deploy</p>\n",
+    "example": "<p>With the help of these APIs any customer can register himself, as well as login to the system.</p>\n",
+    "constraints": "<p>NA</p>\n",
+    "comment": null,
+    "hasOptions": false,
+    "isActive": true,
+    "level": 2,
+    "score": 5,
+    "timeRequired": 6,
+    "programmingQuestionTypes": null,
+    "programmingConcept": null,
+    "options": null,
+    "solutionCount": 0,
+    "hasAnyTalentAnswered": false
+} -->
+				<!-- Question Part -->
+				<div *ngIf="selectedAssignment && isQuestionSelected">
+					<div class="row">
+						<div class="col-md-5">
+							<span>
+								<span>
+									<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Label'}">
+									</ng-container>
+								</span>
+							</span>
+							<span class="font-weight-bold color-757575 font-sm-style">
+								{{selectedAssignment?.programmingQuestion?.label}}
+							</span>
+						</div>
+						<div class="col-md-4">
+							<span>
+								<span>
+									<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Assigned'}">
+									</ng-container>
+								</span>
+							</span>
+							<span class="font-weight-bold color-757575 font-sm-style">
+								{{selectedAssignment?.assignedDate | date:'EEEE, MMM d, y'}}
+							</span>
+						</div>
+						<div class="col-md-3">
+							<span class="swabhav-light-orange-text">
+								<label class="font-sm-style font-weight-bold"> Due:</label>
+							</span>
+							<span class="font-weight-bold color-757575 font-sm-style">
+								{{selectedAssignment?.dueDate | date:'EEEE, MMM d, y'}}
+							</span>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-2">
+							<span>
+								<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Level'}">
+								</ng-container>
+							</span>
+							<span class="font-weight-bold color-757575 font-sm-style">
+								{{selectedAssignment?.programmingQuestion?.level}}
+							</span>
+						</div>
+						<div class="col-md-2">
+							<span>
+								<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Status'}">
+								</ng-container>
+							</span>
+							<span class="font-weight-bold color-757575 font-sm-style"
+								[ngClass]="selectedAssignment?.programmingQuestion?.isActive? 'green':'red'">
+								{{selectedAssignment?.programmingQuestion?.isActive? 'Active' : 'Inactive'}}
+							</span>
+						</div>
+						<div class="col-md-2">
+							<div class="row no-padding-style">
+								<div class="col-md-5 row no-padding-style">
+									<span>
+										<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Score'}">
+										</ng-container>
+									</span>
+								</div>
+
+								<div class="col-md-3 no-padding-style text-center">
+									<span class="font-xl-style swabhav-light-orange-text">
+										{{selectedAssignment?.programmingQuestion?.score}}
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class=" col-md-3">
+							<div class="row no-padding-style">
+								<div class="col-md-5 row no-padding-style">
+									<span>
+										<ng-container
+											*ngTemplateOutlet="fieldNameCompulsary; context:{name:'Duration'}">
+										</ng-container>
+									</span>
+								</div>
+								<div class="col-md-3 no-padding-style color-757575 text-center">
+									<span class="font-xl-style">
+										{{selectedAssignment?.programmingQuestion?.timeRequired}}
+									</span>
+									Hours
+								</div>
+								<!-- <div class="col-md-1 no-padding-style color-757575 text-center font-weight-bold">
+								:
+							</div>
+							<div class="col-md-3 no-padding-style color-757575 text-center">
+								<div class="font-xl-style">
+									{{selectedAssignment?.programmingQuestion?.durationInMinutes}}
+								</div>
+								<div>
+									Minutes
+								</div>
+							</div> -->
+							</div>
+						</div>
+						<div class="col-md-3">
+							<span class="mr-2">
+								<ng-container
+									*ngTemplateOutlet="fieldNameCompulsary; context:{name:'Total Submissions'}">
+								</ng-container>
+							</span>
+							<span class="primary">
+								<label
+									class="font-sm-style font-weight-bold"><strong>{{selectedAssignment?.submissions?.length}}</strong></label>
+							</span>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-2 no-padding-style">
+							<span>
+								<span>
+									<ng-container
+										*ngTemplateOutlet="fieldNameCompulsary; context:{name:'Problem Statement'}">
+									</ng-container>
+								</span>
+							</span>
+						</div>
+						<div class="col-md-10">
+							<span class="font-weight-bold color-757575 font-sm-style"
+								[innerHTML]="selectedAssignment?.programmingQuestion?.question">
+							</span>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-2 no-padding-style">
+							<span>
+								<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Examples'}">
+								</ng-container>
+							</span>
+						</div>
+						<span class="col-md-10 font-weight-bold color-757575 font-sm-style"
+							[innerHTML]="selectedAssignment?.programmingQuestion?.example">
+							<!-- {{selectedAssignment?.programmingQuestion}}
+						{{selectedAssignment?.programmingQuestion.score}} -->
+						</span>
+					</div>
+					<!-- <ng-container *ngFor="let example of selectedAssignment?.programmingQuestion?.examples; let i = index"> -->
+
+					<!-- <div>
+								<span class="font-weight-bold color-757575 font-sm-style">
+									Example {{i+1}}:
+								</span>
+							</div>
+							<br>
+							<div class="example-box-style">
+								<span class="font-weight-bold font-sm-style">
+									Input:
+								</span>
+								<span class="font-weight-bold color-757575 font-sm-style">
+									{{example.input}}
+								</span>
+								<br>
+								<span class="font-weight-bold font-sm-style">
+									Output:
+								</span>
+								<span class="font-weight-bold color-757575 font-sm-style">
+									{{example.output}}
+								</span>
+								<br>
+								<ng-container *ngIf="example.explanation">
+									<span class="font-weight-bold font-sm-style">
+										Explanation:
+									</span>
+									<span class="font-weight-bold color-757575 font-sm-style">
+										{{example.explanation}}
+									</span>
+								</ng-container>
+							</div> -->
+					<!-- </ng-container> -->
+					<div class="row">
+						<div class="col-md-2 no-padding-style">
+							<span>
+								<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Constraints'}">
+								</ng-container>
+							</span>
+						</div>
+						<div class="col-md-10">
+							<span class="font-weight-bold color-757575 font-sm-style"
+								[innerHTML]="selectedAssignment?.programmingQuestion?.constraints">
+							</span>
+						</div>
+						<!-- <ul>
+							<li *ngFor="let constraint of selectedAssignment?.programmingQuestion?.constraints; let i = index">
+								<span class="font-weight-bold color-757575 font-sm-style">
+									{{constraint.pointer}}
+								</span>
+							</li>
+						</ul> -->
+					</div>
+				</div>
+
+				<!-- Student's answer part -->
+				<div *ngIf="selectedAssignment && !isQuestionSelected">
+					<div class="row">
+						<div class="col-md-1 no-padding-style">
+							<label class="font-sm-style font-weight-bold">Problem Statement:</label>
+						</div>
+						<div class="col-md-11">
+							<span class="font-weight-bold color-757575 font-sm-style"
+								[innerHTML]="selectedAssignment?.programmingQuestion?.question">
+							</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-1 no-padding-style">
+							<label class="font-sm-style font-weight-bold">Talent:</label>
+						</div>
+						<div class="col-md-11">
+							<span class="font-weight-bold font-sm-style primary">
+								{{selectedTalent?.firstName +" "+ selectedTalent?.lastName}}
+							</span>
+						</div>
+					</div>
+					<div *ngIf="talentAllSubmissions?.length > 0 else noSubmission">
+						<table class="table table-borderless">
+							<thead>
+								<tr class="text-center">
+									<th>Attempt No.</th>
+									<th>Submitted</th>
+									<th>Images</th>
+									<th>Git Link</th>
+									<th>Feedback</th>
+									<th>Score</th>
+								</tr>
+							</thead>
+							<tbody>
+								<ng-container
+									*ngFor="let submission of talentAllSubmissions;let i = index ;let isFirst = first">
+									<tr class="text-center">
+										<td class="font-weight-bold color-757575 font-sm-style">
+											{{talentAllSubmissions.length-i}}
+										</td>
+										<td class="font-weight-bold color-757575 font-sm-style">
+											{{submission.submittedOn | date:'EEE, MMM d, y'}}
+										</td>
+										<td>
+											<img *ngIf="submission.assignmentSubmissionUploads?.length>0;else noLinkTemplate"
+												class="width-50px-style cursor-pointer-style" title="Screenshots"
+												src="assets/icon/colour-icons/image.png" alt="Images"
+												(click)="onImagesClick(submission)">
+										</td>
+										<td>
+											<span *ngIf="submission.githubURL;else noLinkTemplate"
+												class="cursor-pointer-style primary font-weight-bold font-sm-style"
+												title="Github Link"
+												(click)="redirectToexternalLink(submission.githubURL)">
+												Link
+											</span>
+										</td>
+										<td>
+											<!-- If nothing is sent from faculty -->
+
+											<div *ngIf="!submission.isChecked && isFirst">
+												<div>
+													<img class="width-30px-style cursor-pointer-style"
+														title="Give Feedback"
+														(click)="isFirst && openScoringModal(talentAllSubmissions.length-i,submission)"
+														src="assets/icon/colour-icons/comment.png" alt="Give feedback">
+												</div>
+											</div>
+											<div *ngIf="submission.isChecked">
+												<img class="width-30px-style cursor-pointer-style" title="View FeedBack"
+													(click)="openScoringModal(talentAllSubmissions.length-i,submission)"
+													src="assets/course/view.png" alt="See feedback">
+											</div>
+
+											<div *ngIf="!submission.isChecked && !isFirst">
+												<img class="width-30px-style"
+													src="assets/icon/grey-icons/assignment-feedback.png"
+													alt="No feedback">
+											</div>
+										</td>
+										<td>
+											<span *ngIf="submission.score else notScored"
+												class="font-weight-bold font-sm-style">
+												{{submission.score}}/{{selectedAssignment.programmingQuestion.score}}
+											</span>
+											<!-- <img *ngIf="!submission.score" class="width-30px-style cursor-pointer-style"
+												src="assets/icon/grey-icons/Score.png" alt="Give score"> -->
+											<ng-template #notScored>
+												<span class="font-weight-bold color-757575 font-sm-style">
+													Not scored
+												</span>
+											</ng-template>
+										</td>
+									</tr>
+
+									<!-- <button type="button" class="control-btn control-pause">
+										<i class="fa fa-pause" aria-hidden="true">
+										</i>
+									</button>
+									<button type="button" class="control-btn control-play">
+										<i class="fa fa-play control-play" aria-hidden="true">
+										</i>
+									</button>
+								</span> -->
+
+								</ng-container>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Score -->
+<ng-template #scoreModal let-modal>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-6">
+				<label class="font-md-style font-weight-bold">Attempt No:</label>
+				<span class="font-weight-bold color-757575 font-md-style p-2">
+					{{attemptNo}}
+				</span>
+			</div>
+			<div class="ml-auto">
+				<span class="close cursor-pointer-style" (click)="dismissModal('cross click')">
+					<i class="material-icons close-icon">close</i>
+				</span>
+			</div>
+		</div>
+		<form appFocusFirstInvalid [formGroup]="latestSubmissionForm">
+			<fieldset
+				[disabled]="!selectedSubmission.isLatestSubmission || selectedSubmission.isChecked || !permission.add">
+				<div class="row align-items-center mb-3">
+					<div class="col-sm-2">
+						<img src="assets/icon/colour-icons/comment.png" alt="comment" class="width-50px-style">
+					</div>
+					<div class="col-sm-8">
+						<span class="swabhav-light-orange-text">
+							<strong>Add a written feedback:</strong>
+						</span>
+					</div>
+				</div>
+				<div class="mb-4">
+					<!-- below textarea is to prevent autofocus on anyelement -->
+					<textarea style="display: none;"></textarea>
+					<textarea type="text" class="form-control input-style" rows="2" placeholder="Type here..."
+						formControlName="facultyRemarks" appEmptyToNull></textarea>
+					<div class="alert alert-danger"
+						*ngIf="latestSubmissionForm.get('facultyRemarks').errors?.maxlength">
+						Only 1000 characters are allowed
+					</div>
+				</div>
+				<div class="row align-items-center mb-3">
+					<div class="col-sm-2">
+						<img src="assets/icon/colour-icons/microphone.png" alt="mic" class="width-50px-style">
+					</div>
+					<div class="col-sm-8">
+						<span class="swabhav-light-orange-text">
+							<strong>Add a verbal feedback:</strong>
+						</span>
+					</div>
+				</div>
+				<div class="alert alert-danger" *ngIf="latestSubmissionForm.get('facultyRemarks').errors?.required">
+					Please add an audio or text remark.
+				</div>
+				<!-- New mic  -->
+				<div class="row align-items-center ml-2 mb-2">
+					<label class="font-md-style font-weight-bold">Click to start/stop:</label>
+					<span *ngIf="selectedSubmission.facultyVoiceNote" class="ml-2">
+						<audio controls="" preload="metadata">
+							<source [src]="selectedSubmission.facultyVoiceNote" type="audio/wav">
+						</audio>
+					</span>
+					<span class="ml-1">
+						<button type="button" *ngIf="(!selectedSubmission.facultyVoiceNote && selectedSubmission.isChecked) ||
+							(!permission.add && !selectedSubmission.facultyVoiceNote)" class="mic-btn mic-disabled">
+							<i class="fa fa-microphone" aria-hidden="true">
+							</i>
+						</button>
+						<button type="button" *ngIf="!isRecording && !isRecordingStored && !selectedSubmission.facultyVoiceNote && 
+							!selectedSubmission.isChecked && permission.add" class="mic-btn mic-blue" (click)="onStartRecording()">
+							<!-- <div class="mic-pulse-ring">
+					</div> -->
+							<i class="fa fa-microphone" aria-hidden="true">
+							</i>
+						</button>
+						<button type="button" class="mic-btn mic-recording" (click)="onStopRecording()"
+							*ngIf="isRecording">
+							<div class="mic-pulse-ring">
+							</div>
+							<i class="fa fa-microphone" aria-hidden="true">
+							</i>
+						</button>
+					</span>
+					<div *ngIf="isRecording" class="row align-items-center ml-3">
+						<span class="boxContainer">
+							<div class="box box1"></div>
+							<div class="box box2"></div>
+							<div class="box box3"></div>
+							<div class="box box4"></div>
+							<div class="box box5"></div>
+						</span>
+						<span class="font-md-style ml-2">
+							<strong>{{timerDisplay}}</strong>
+						</span>
+						<span class="ml-1" (click)="onCancelRecording()">
+							<i id="cancelRecording" class="material-icons close-icon">close</i>
+						</span>
+					</div>
+					<div *ngIf="isRecordingStored" class="row align-items-center ml-2">
+						<audio class="audio-player" crossorigin="anonymous" [src]="audioUrl" preload="metadata" controls
+							autoplay></audio>
+						<!-- <button type="button" class="btn btn-default delete-button-style button-width-style ml-2"
+						(click)="onDeleteRecording()">
+						Delete
+					</button> -->
+						<div class="ml-1">
+							<img class="width-30px-style cursor-pointer-style" (click)="onDeleteRecording()"
+								src="assets/icon/colour-icons/delete.png" alt="Delete recording">
+						</div>
+					</div>
+				</div>
+
+				<br />
+				<div *ngIf="latestSubmissionForm.get('isAccepted').value">
+					<div class="row align-items-center">
+						<div class="col-sm-2">
+							<img src="assets/icon/colour-icons/checklist.png" alt="comment" class="width-50px-style">
+						</div>
+						<div class="col-sm-8">
+							<span id="ratingMessage" class="font-weight-bold color-F6430F">Please rate the candidate on
+								their
+								conceptual
+								understanding (?/10):</span>
+						</div>
+					</div>
+					<br />
+					<table class="table table-borderless conceptTable ml-5">
+						<tbody *ngIf="talentConceptRatingForm.controls.length>0">
+							<ng-container formArrayName="talentConceptRatings"
+								*ngFor="let conceptRating of talentConceptRatingForm.controls; let i = index;">
+								<ng-container [formGroupName]="i">
+									<!-- <tr *ngFor="let modConcept of moduleConcepts; let i = index"> -->
+									<tr>
+										<td class="font-md-style font-weight-bold">
+											<span>
+												{{i+1}}. <span class="font-lg-style font-weight-bold">
+													{{moduleConcepts[i]?.programmingConcept?.name}}
+												</span>
+											</span>
+										</td>
+										<td class="left-align">
+											<span>
+												<input type="button" value="-" class="score-input button-minus"
+													data-field="quantity"
+													[disabled]="!selectedSubmission.isLatestSubmission || selectedSubmission.isChecked"
+													(click)="onMinusButtonClick(conceptRating.get('score'))">
+												<input type="number" step="1" max="10" value="1" name="quantity"
+													(input)="calculateAssignmentScore()"
+													class="score-input quantity-field" appAllowNumbersOnly upperLimit=10
+													formControlName="score">
+												<input type="button" value="+" class="score-input button-plus"
+													data-field="quantity"
+													[disabled]="!selectedSubmission.isLatestSubmission || selectedSubmission.isChecked"
+													(click)="onPlusButtonClick(conceptRating.get('score'))">
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="100%" class="alert alert-danger alert-max-width"
+											*ngIf="conceptRating.get('score').invalid">
+											<span *ngIf="conceptRating.get('score').errors.required">
+												Score is required.
+											</span>
+											<span *ngIf="conceptRating.get('score').errors.max">
+												Max score is 10
+											</span>
+											<span *ngIf="conceptRating.get('score').errors.min">
+												Min score is 1
+											</span>
+										</td>
+									</tr>
+								</ng-container>
+							</ng-container>
+							<tr>
+								<td>
+									<label class="font-lg-style font-weight-bold">Total Score:</label>
+								</td>
+								<td class="left-align">
+									<span class="swabhav-light-orange-text font-weight-bold font-md-style p-4">
+										{{assignmentScore}}/{{selectedAssignment.programmingQuestion.score}}
+									</span>
+								</td>
+							</tr>
+							<tr class="alert alert-warning" *ngIf="delayPenalty !== 0">
+								<td colspan="100%">
+									Penalty of {{delayPenalty}}% has been given due to late submission
+								</td>
+							</tr>
+							<!-- <ng-container *ngFor="let assignment of assignmentList;let i = index">
+					<tr [ngClass]="{'selected-row': assignment?.id === selectedAssignment?.id }"
+						(click)="onAssignmentChange(assignment)">
+						<td class="text-center">
+							{{i+1}}
+						</td>
+						<td>
+							{{assignment?.programmingQuestion?.label}}
+						</td>
+						<td class="text-center">
+							<ng-container [ngTemplateOutlet]="!showSubmittedOn? showDue : showSubmitted">
+							</ng-container>
+						</td>
+						<ng-template #showDue>
+							{{assignment?.dueDate| date:'EEE,MMM d'}}
+						</ng-template>
+						<ng-template #showSubmitted>
+							{{assignment?.submittedOn| date:'EEE,MMM d'}}
+						</ng-template>
+					</tr>
+				</ng-container> -->
+						</tbody>
+					</table>
+				</div>
+				<br>
+				<div class="row align-items-center">
+					<span class="col-sm-2">
+						<img src="assets/icon/colour-icons/100_percent.png" alt="100%" class="width-50px-style">
+					</span>
+					<div class="col-sm-10">
+						<label class="font-sm-style font-weight-bold">Is this assignment completed?</label>
+						<label class="p-2 ml-2">
+							<input type="radio" name="isAccepted" id="option1" autocomplete="off"
+								formControlName="isAccepted" [value]="false">
+							No
+						</label>
+						<label class="p-2">
+							<input type="radio" name="isAccepted" id="option2" autocomplete="off"
+								formControlName="isAccepted" [value]="true">
+							Yes
+						</label>
+					</div>
+					<div class="alert alert-danger alert-max-width" *ngIf="(latestSubmissionForm.get('isAccepted').dirty ||
+									latestSubmissionForm.get('isAccepted').touched) && latestSubmissionForm.get('isAccepted').invalid">
+						<span *ngIf="latestSubmissionForm.get('isAccepted').errors.required">
+							Choose whether assignment is completed or not.
+						</span>
+					</div>
+				</div>
+			</fieldset>
+			<br />
+			<div class="text-center">
+				<button type="submit"
+					*ngIf="selectedSubmission.isLatestSubmission && !selectedSubmission.isChecked && permission.add"
+					class="modal-btn btn btn-default swabhav-button-round mr-2" (click)="onSubmit()">
+					Submit
+				</button>
+				<button type="button" class="modal-btn btn btn-default delete-button-style ml-2"
+					(click)="dismissModal('Cancel clicked')">
+					Cancel
+				</button>
+			</div>
+		</form>
+	</div>
+
+</ng-template>
+
+
+<ng-template #noTalentAssignment>
+	<div class="col-sm-12 col-md-8 mx-auto" *ngIf="ongoingOperations == 0">
+		<br />
+		<br />
+		<div class="jumbotron">
+			<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+				<h2>No talents or assignments.</h2>
+			</div>
+		</div>
+	</div>
+</ng-template>
+
+<ng-template #noSubmission>
+	<div class="col-sm-12 col-md-8 mx-auto" *ngIf="ongoingOperations == 0">
+		<br />
+		<br />
+		<div class="jumbotron">
+			<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+				<h2>No submissions for this assignment yet.</h2>
+			</div>
+		</div>
+	</div>
+</ng-template>
+
+<!-- Assigment table template -->
+<ng-template #assignmentTableTemplate let-assignmentList="assignmentList" let-showSubmittedOn="showSubmittedOn">
+
+	<table class="table table-borderless table-hover" *ngIf="assignmentList?.length > 0">
+		<thead>
+			<tr>
+				<th>Sr No.</th>
+				<th>Assignment Name</th>
+				<th *ngIf="!showSubmittedOn else showSubmitted">Due</th>
+				<ng-template #showSubmitted>
+					<th>Submitted</th>
+				</ng-template>
+			</tr>
+		</thead>
+		<tbody>
+			<ng-container *ngFor="let assignment of assignmentList;let i = index">
+				<tr [ngClass]="{'selected-row': assignment?.id === selectedAssignment?.id }"
+					(click)="onAssignmentChange(assignment)">
+					<td class="text-center">
+						{{i+1}}
+					</td>
+					<td>
+						{{assignment?.programmingQuestion?.label}}
+					</td>
+					<td class="text-center">
+						<ng-container [ngTemplateOutlet]="!showSubmittedOn? showDue : showSubmitted">
+						</ng-container>
+					</td>
+					<ng-template #showDue>
+						{{assignment?.dueDate| date:'EEE,MMM d'}}
+					</ng-template>
+					<ng-template #showSubmitted>
+						{{assignment?.submittedOn| date:'EEE,MMM d'}}
+					</ng-template>
+				</tr>
+			</ng-container>
+		</tbody>
+	</table>
+</ng-template>
+
+<ng-template #talentTableTemplate let-talentList="talentList">
+
+	<table class="table table-borderless table-hover" *ngIf="talentList?.length > 0">
+		<!-- ngif #niranjan -->
+		<thead>
+			<tr>
+				<th>Sr No.</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+			</tr>
+		</thead>
+		<tbody>
+			<ng-container *ngFor="let talent of talentList;let i = index">
+				<tr [ngClass]="{'selected-row': talent.id === selectedTalent?.id }" (click)="onTalentChange(talent)">
+					<td class="text-center">
+						{{i+1}}
+					</td>
+					<td class="font-weight-bold">
+						{{talent.firstName}}
+					</td>
+					<td class="font-weight-bold">
+						{{talent.lastName}}
+					</td>
+				</tr>
+			</ng-container>
+		</tbody>
+	</table>
+</ng-template>
+
+<!-- Compulsary field template -->
+<ng-template #fieldNameCompulsary let-name="name">
+	<label class="font-sm-style font-weight-bold"><span class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<!-- No Link template -->
+<ng-template #noLinkTemplate>
+	-
+</ng-template>
+
+
+<!-- Images -->
+<ng-template #imagesModal let-modal>
+
+	<div class="modal-body">
+		<div class="d-flex justify-content-end">
+			<span class="close" (click)="dismissModal()">
+				<i class="material-icons close-icon">close</i>
+			</span>
+		</div>
+		<ngb-carousel>
+			<ng-template *ngFor="let image of selectedSubmission.assignmentSubmissionUploads;let i = index" ngbSlide>
+				<div class='row'>
+					<div class='text-center col-lg-12 col-md-12 col-sm-12 col-12 '>
+						<div class="picsum-img-wrapper">
+							<img [src]="image.imageURL" alt="Random first slide">
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="row">
+					<div class="text-center col-lg-12 col-md-12 col-sm-12 col-12">
+						<h2>{{image.description}}</h2>
+					</div>
+				</div>
+				<br>
+				<!-- <div class="picsum-img-wrapper">
+					<img [src]="image.imageURL" alt="Random first slide">
+				</div>
+				<br>
+				<div class="carousel-caption d-none d-md-block">
+					<h2>{{image.description}}</h2>
+				</div> -->
+			</ng-template>
+		</ngb-carousel>
+	</div>
+</ng-template>

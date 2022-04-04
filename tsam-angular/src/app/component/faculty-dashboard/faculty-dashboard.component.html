@@ -1,0 +1,727 @@
+<app-master-navbar></app-master-navbar>
+
+
+<!-- N/A Template -->
+<ng-template #naTemplate>N/A</ng-template>
+
+<!-- N/A Table Template -->
+<ng-template #naTableTemplate>
+	<td>N/A</td>
+</ng-template>
+
+<!-- Zero Template -->
+<ng-template #zeroTemplate>0</ng-template>
+
+<!-- TEMPLATE FOR WORK SCHEDULE TIME TABLE -->
+<ng-template let-batches="batches" #timeTableTemplate>
+	<td *ngFor="let batch of batches">
+		<span class="swabhav-light-orange-text"><strong>{{batch.batchName}}</strong></span>
+		<div *ngFor="let timing of batch.batchTimings">
+			<span class="swabhav-light-orange-text">
+				{{utilService.formatTimeString(timing.fromTime)}} -
+				{{utilService.formatTimeString(timing.toTime)}}
+			</span>
+		</div>
+	</td>
+</ng-template>
+
+
+<div class="container-fluid p-3 margin-2pt">
+
+	<!-- FACULTY ALL BATCH DETAILS -->
+	<div class="row d-flex flex-row justify-content-center">
+		<div class="card card-body swabhav-shadow col-sm-6 col-md-4 col-lg-2" (click)="redirectToBatches(ONGOINGBATCHES)">
+			<div class="d-flex justify-content-between align-items-center flex-wrap">
+				<div class="d-flex justify-content-between">
+					<label class="swabhav-title-text">Ongoing Batches</label>
+				</div>
+				<div class="swabhav-light-orange-text count-text">
+					<div class="d-flex">
+						<div *ngIf="batchDetails?.ongoingBatches; else zeroTemplate">
+							<label>{{batchDetails?.ongoingBatches}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card card-body swabhav-shadow col-sm-6 col-md-4 col-lg-2 margin-count-left" (click)="redirectToBatches(UPCOMINGBATCHES)">
+			<div class="d-flex justify-content-between align-items-center flex-wrap">
+				<div class="d-flex justify-content-between">
+					<label class="swabhav-title-text">Upcoming Batches</label>
+				</div>
+				<div class="swabhav-light-orange-text count-text">
+					<div class="d-flex">
+						<div *ngIf="batchDetails?.upcomingBatches; else zeroTemplate">
+							<label>{{batchDetails?.upcomingBatches}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card card-body swabhav-shadow col-sm-6 col-md-4 col-lg-3 margin-count-left">
+			<div class="d-flex justify-content-between align-items-center flex-wrap">
+				<div class="d-flex justify-content-between">
+					<label class="swabhav-title-text">Completed Training Hrs</label>
+				</div>
+				<div class="swabhav-light-orange-text count-text">
+					<div class="d-flex">
+						<div *ngIf="batchDetails?.completedTrainingHrs; else zeroTemplate">
+							<label class="group-name-font">{{batchDetails?.completedTrainingHrs | minute}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card card-body swabhav-shadow col-sm-6 col-md-4 col-lg-2 margin-count-left" (click)="redirectToTalents()">
+			<div class="d-flex justify-content-between align-items-center flex-wrap">
+				<div class="d-flex justify-content-between">
+					<label class="swabhav-title-text">Total Students</label>
+				</div>
+				<div class="swabhav-light-orange-text count-text">
+					<div class="d-flex">
+						<div *ngIf="batchDetails?.totalStudents; else zeroTemplate">
+							<label>{{batchDetails?.totalStudents}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card card-body swabhav-shadow col-sm-6 col-md-4 col-lg-2 margin-count-left" (click)="redirectToBatches(COMPLETEDBATCHES)">
+			<div class="d-flex justify-content-between align-items-center flex-wrap">
+				<div class="d-flex justify-content-between">
+					<label class="swabhav-title-text">Finished Batches</label>
+				</div>
+				<div class="swabhav-light-orange-text count-text">
+					<div class="d-flex">
+						<div *ngIf="batchDetails?.finishedBatches; else zeroTemplate">
+							<label>{{batchDetails?.finishedBatches}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<br>
+	<br>
+
+	<div class="row margin-left">
+		<!-- TASK LIST -->
+		<div class="card swabhav-shadow col-sm-12 col-md-7">
+			<div class="card-body d-flex flex-column justify-content-between">
+				<div>
+					<h3 class="card-title"><strong>Task List</strong></h3>
+					<div class="card-text">
+						<ul ngbNav #navTaskList="ngbNav" [(activeId)]="taskListTab" [destroyOnHide]="true"
+							class="nav-tabs justify-content-around" (onChange)="onTaskListChange($event)">
+							<li [ngbNavItem]="1">
+								<a ngbNavLink (click)="onTaskListChange(1)">Today</a>
+								<ng-template ngbNavContent>
+									<div *ngIf="facultyTimesheetActivity && facultyTimesheetActivity.length > 0; else noTodayTimesheet">
+										<div class="d-flex flex-wrap justify-content-around task-list-margin">
+											<div *ngFor="let timesheet of facultyTimesheetActivity; let i = index"
+												class="d-flex flex-column margin-bottom">
+												<div *ngIf="timesheet?.isCompleted; else notCompleted" title="{{timesheet?.activity}}">
+													<div class="activity-text-success">
+														<div class="module">
+															<p>{{(timesheet?.activity.length >= 35) ?
+																((timesheet?.activity).substring(0, 35) + "...") :
+																timesheet?.activity}}</p>
+														</div>
+														<div class="activity-inner-success"></div>
+														<div class="activity-count-success">
+															{{((i + 1) > 10 ? (i + 1) : "0" + (i + 1))}}
+														</div>
+													</div>
+													<div class="d-flex justify-content-center">
+														<span class="material-icons-outlined activity-success-icon">task_alt</span>
+													</div>
+													<div class="d-flex justify-content-center">
+														<span class="activity-success-icon">Completed</span>
+													</div>
+												</div>
+												<ng-template #notCompleted>
+													<div class="activity-text-secondary" title="{{timesheet?.activity}}">
+														<div class="module">
+															<p>{{(timesheet?.activity.length >= 35 ) ?
+																((timesheet?.activity).substring(0, 35) + "...") :
+																timesheet?.activity}}</p>
+														</div>
+														<div class="activity-inner-secondary"></div>
+														<div class="activity-count-secondary">
+															{{((i + 1) > 10 ? (i + 1) : "0" + (i + 1))}}
+														</div>
+													</div>
+													<div class="d-flex justify-content-center">
+														<span class="material-icons-outlined activity-pending-icon">task_alt</span>
+													</div>
+													<div class="d-flex justify-content-center">
+														<span class="activity-pending-icon">Not Completed</span>
+													</div>
+												</ng-template>
+											</div>
+										</div>
+									</div>
+									<ng-template #noTodayTimesheet>
+										<div class="container full-h">
+											<br />
+											<br />
+											<div class="d-flex align-items-center full-h">
+												<div class="col-sm-12 col-md-8 mx-auto">
+													<div class="jumbotron">
+														<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+															<h4><strong>Today's activities not found</strong></h4>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</ng-template>
+								</ng-template>
+							</li>
+							<li [ngbNavItem]="2">
+								<a ngbNavLink (click)="onTaskListChange(2)">Pending</a>
+								<ng-template ngbNavContent>
+									<div *ngIf="facultyTimesheetActivity && facultyTimesheetActivity.length > 0; else noTodayTimesheet">
+										<div class="d-flex flex-wrap justify-content-around task-list-margin">
+											<div *ngFor="let timesheet of facultyTimesheetActivity; let i = index"
+												class="d-flex flex-column margin-bottom">
+												<div class="activity-text-secondary" title="{{timesheet?.activity}}">
+													<div class="module">
+														<p>{{(timesheet?.activity.length >= 35 ) ?
+															((timesheet?.activity).substring(0, 35) + "...") :
+															timesheet?.activity}}</p>
+													</div>
+													<div class="activity-inner-secondary"></div>
+													<div class="activity-count-secondary">
+														{{((i + 1) > 10 ? (i + 1) : "0" + (i + 1))}}
+													</div>
+												</div>
+												<div class="d-flex justify-content-center">
+													<span class="material-icons-outlined activity-pending-icon">task_alt</span>
+												</div>
+												<div class="d-flex justify-content-center">
+													<span class="activity-pending-icon">Not Completed</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<ng-template #noTodayTimesheet>
+										<div class="container full-h">
+											<br />
+											<br />
+											<div class="d-flex align-items-center full-h">
+												<div class="col-sm-12 col-md-8 mx-auto">
+													<div class="jumbotron">
+														<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+															<h4><strong>Pending activities not found</strong></h4>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</ng-template>
+								</ng-template>
+							</li>
+						</ul>
+						<div [ngbNavOutlet]="navTaskList" class="mt-2"></div>
+					</div>
+				</div>
+				<div class="d-flex justify-content-center">
+					<button type="button" class="btn btn-sm btn-submit-swabhav material-icons-button"
+						(click)="redirectToTimesheet()">
+						View Timesheet <i class="inline-icon material-icons">search</i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- WORK SCHEDULE -->
+		<div class="card card-body swabhav-shadow work-margin">
+			<div class="d-flex justify-content-between align-items-baseline">
+				<h3 class="card-title"><strong>{{workScheduleLabel}}</strong></h3>
+				<div class="d-flex">
+					<button type="button" [ngClass]="isTimetableVisible ? 'btn btn-default swabhav-light-orange-text' : 
+            'btn btn-default material-icons-button'" (click)="onTimetableClick()">
+						<i class="material-icons-button material-icons-outlined">calendar_today</i>
+					</button> &nbsp;&nbsp;&nbsp;
+					<button type="button" [ngClass]="isPiechartVisible ? 'btn btn-default swabhav-light-orange-text' : 
+            'btn btn-default material-icons-button'" (click)="onPiechartClick()">
+						<i class="material-icons-button material-icons-outlined">timelapse</i>
+					</button>
+				</div>
+			</div>
+
+			<!-- Time Table -->
+			<div *ngIf="isTimetableVisible">
+				<div class="table-responsive">
+					<table class="table table-sm table-borderless">
+						<tbody class="small-font">
+							<ng-container *ngFor="let report of facultyTimeTable">
+								<tr>
+									<td class="align-middle"><label class="day-title">Mon</label></td>
+									<div *ngIf="report.monday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.monday}">
+										</ng-container>
+									</div>
+								</tr>
+								<tr>
+									<td class="align-middle"><label class="day-title">Tue</label></td>
+									<div *ngIf="report.tuesday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.tuesday}">
+										</ng-container>
+									</div>
+								</tr>
+								<tr>
+									<td class="align-middle"><label class="day-title">Wed</label></td>
+									<div *ngIf="report.wednesday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.wednesday}">
+										</ng-container>
+									</div>
+								</tr>
+								<tr>
+									<td class="align-middle"><label class="day-title">Thurs</label></td>
+									<div *ngIf="report.thursday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.thursday}">
+										</ng-container>
+									</div>
+								</tr>
+								<tr>
+									<td class="align-middle"><label class="day-title">Fri</label></td>
+									<div *ngIf="report.friday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.friday}">
+										</ng-container>
+									</div>
+								</tr>
+								<tr>
+									<td class="align-middle"><label class="day-title">Sat</label></td>
+									<div *ngIf="report.saturday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.saturday}">
+										</ng-container>
+									</div>
+								</tr>
+								<tr>
+									<td class="align-middle"><label class="day-title">Sun</label></td>
+									<div *ngIf="report.sunday; else naTableTemplate">
+										<ng-container [ngTemplateOutlet]="timeTableTemplate"
+											[ngTemplateOutletContext]="{batches:report.sunday}">
+										</ng-container>
+									</div>
+								</tr>
+							</ng-container>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Piechart -->
+			<div *ngIf="isPiechartVisible">
+				<div *ngIf="timesheetPiechart && timesheetPiechart.length > 0; else noPiechartData">
+					<div class="chart-display">
+						<canvas baseChart [datasets]="piechartData" [labels]="piechartLabels" [chartType]="piechartType"
+							[options]="piechartOptions" [plugins]="piechartPlugins" [colors]="piechartColors"
+							[legend]="piechartLegend">
+						</canvas>
+					</div>
+				</div>
+			</div>
+			<ng-template #noPiechartData>
+				<div class="container full-h">
+					<br />
+					<br />
+					<div class="d-flex align-items-center full-h">
+						<div class="col-sm-12 col-md-8 mx-auto">
+							<div class="jumbotron">
+								<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+									<h4><strong>Piechart data not found</strong></h4>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</ng-template>
+		</div>
+	</div>
+
+	<br>
+	<br>
+
+	<div class="row margin-left">
+		<div class="card card-body swabhav-shadow col-12">
+			<h3 class="card-title"><strong>Mentor Batch Details</strong></h3>
+			<div *ngIf="ongoingBatchDetails; else noMentorBatchDetails" class="card-text">
+				<div class="row card-margin margin-left" *ngFor="let details of ongoingBatchDetails">
+					<div class="card card-body swabhav-card-border col-sm-6 col-md-4 col-lg-2 margin-course-name">
+						<div class="d-flex justify-content-between align-items-center flex-wrap">
+							<div class="d-flex justify-content-between">
+								<label class="swabhav-title-text">Course Name</label>
+							</div>
+							<div class="details-count-flex-item">
+								<label class="swabhav-light-orange-text count-text-2">
+									<div *ngIf="details?.courseName; else zeroTemplate">
+										{{details?.courseName}}
+									</div>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="card card-body swabhav-card-border col-sm-6 col-md-4 col-lg-2 margin-batch-left">
+						<div class="d-flex justify-content-between align-items-center flex-wrap">
+							<div class="d-flex justify-content-between">
+								<label class="swabhav-title-text">Batch Name</label>
+							</div>
+							<div class="details-count-flex-item">
+								<label class="swabhav-light-orange-text count-text-2">
+									<div *ngIf="details?.batchName; else zeroTemplate">
+										{{details?.batchName}}
+									</div>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="card card-body swabhav-card-border col-sm-6 col-md-4 col-lg-2 margin-batch-left">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between">
+								<label class="swabhav-title-text">Total Session</label>
+							</div>
+							<div class="details-count-flex-item">
+								<label class="swabhav-light-orange-text count-text text-wrap">
+									<div *ngIf="details?.totalSession; else zeroTemplate">
+										{{details?.totalSession}}
+									</div>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="card card-body swabhav-card-border col-sm-6 col-md-4 col-lg-2 margin-batch-left">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between">
+								<label class="swabhav-title-text">Pending Session</label>
+							</div>
+							<div class="details-count-flex-item">
+								<label class="swabhav-light-orange-text count-text text-wrap">
+									<div *ngIf="details?.pendingSession; else zeroTemplate">
+										{{details?.pendingSession}}
+									</div>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="card card-body swabhav-card-border col-sm-6 col-md-4 col-lg-2 margin-batch-left">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between">
+								<label class="swabhav-title-text">Total Students</label>
+							</div>
+							<div class="details-count-flex-item">
+								<label class="swabhav-light-orange-text count-text text-wrap">
+									<div *ngIf="details?.totalStudents; else zeroTemplate">
+										{{details?.totalStudents}}
+									</div>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<ng-template #noMentorBatchDetails>
+				<div class="container full-h">
+					<br />
+					<br />
+					<div class="d-flex align-items-center full-h">
+						<div class="col-sm-12 col-md-8 mx-auto">
+							<div class="jumbotron">
+								<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+									<h4><strong>Mentor batch details not found</strong></h4>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</ng-template>
+		</div>
+	</div>
+
+	<br>
+	<br>
+
+	<div class="row margin-left">
+		<div class="card card-body swabhav-shadow col-12">
+			<h3 class="card-title"><strong>Student Details</strong></h3>
+			<div *ngIf="ongoingBatchDetails; else noStudentDetails" class="card-text">
+				<ul ngbNav #navStudentDetails="ngbNav" [(activeId)]="studentDetailsTab" [destroyOnHide]="true"
+					class="nav-tabs justify-content-around" (navChange)="onStudentDetailsTabChange($event)">
+					<ng-container *ngFor="let details of ongoingBatchDetails; let i = index">
+						<li [ngbNavItem]="(i+1)">
+							<a ngbNavLink (click)="onStudentDetailsTabChange(i+1)">{{details?.batchName}}</a>
+							<ng-template ngbNavContent>
+								<div class="row card-margin margin-left" *ngIf="feedback?.keywords?.length > 0; else noStudentsFound">
+									<div class="table-responsive">
+										<table class="table table-borderless table-hover">
+											<thead>
+												<tr>
+													<th>Student Name</th>
+													<th>Personality Type</th>
+													<th>Talent Type</th>
+													<th>Interview Rating</th>
+													<ng-container *ngFor="let keyword of feedback?.keywords; let i = index">
+														<th>{{keyword.name}}</th>
+													</ng-container>
+													<th>Overall</th>
+												</tr>
+											</thead>
+											<tbody>
+												<ng-container *ngFor="let feedback of feedback.talentFeedback; let i = index">
+													<tr>
+														<td>{{feedback.firstName}} {{feedback.lastName}}</td>
+														<td class="text-center">
+															<div *ngIf="feedback.personalityType; else naTemplate">
+																{{feedback.personalityType}}
+															</div>
+														</td>
+														<td class="text-center">
+															<div *ngIf="feedback.talentType; else naTemplate">
+																{{utilService.getValueByKey(feedback.talentType,talentTypeList)}}
+															</div>
+														</td>
+														<td class="text-center">
+															<div *ngIf="feedback.interviewRating > 0; else naTemplate">
+																{{feedback && feedback.interviewRating | number:'1.2-2'}}
+															</div>
+														</td>
+														<ng-container *ngFor="let keywordScore of feedback?.sessionFeedback; let j = index">
+															<td class="text-center swabhav-light-orange-text">
+																{{keywordScore.keywordScore | number:'1.2-2'}}
+															</td>
+														</ng-container>
+														<td class="text-center">{{feedback.score | number:'1.2-2'}}</td>
+													</tr>
+												</ng-container>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<ng-template #noStudentsFound>
+									<div class="container full-h">
+										<br />
+										<br />
+										<div class="d-flex align-items-center full-h">
+											<div class="col-sm-12 col-md-8 mx-auto">
+												<div class="jumbotron">
+													<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+														<h4>Talent details not found</h4>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</ng-template>
+								<!-- <div class="row card-margin margin-left">
+									<div class="table-responsive">
+										<table class="table table-hover table-borderless">
+											<thead>
+												<tr>
+													<th>Student Name</th>
+													<th>Personality Type</th>
+													<th>Talent Type</th>
+													<th>Interview Rating</th>
+													<ng-container *ngFor="let group of feebackKeyword; let i = index">
+														<th>Group {{group.groupName}}</th>
+													</ng-container>
+													<th>Overall</th>
+												</tr>
+											</thead>
+											<tbody>
+												<ng-container *ngFor="let performance of batchTalentPerformanceDetails; let i = index">
+													<tr>
+														<td>{{performance.firstName}} {{performance.lastName}}</td>
+														<td>
+															<div *ngIf="performance.personalityType; else naTemplate">
+																{{performance.personalityType}}
+															</div>
+														</td>
+														<td>
+															<div *ngIf="performance.talentType; else naTemplate">
+																{{utilService.getValueByKey(performance.talentType,
+																talentTypeList)}}
+															</div>
+														</td>
+														<td>
+															<div *ngIf="performance.interviewRating > 0; else naTemplate">
+																{{performance && performance.interviewRating |
+																number:'1.2-2'}}
+															</div>
+														</td>
+														<ng-container *ngFor="let groupScore of performance.feedbackKeywords; let j = index">
+															<td class="text-left swabhav-light-orange-text">
+																<div *ngIf="groupScore.feedbackScore?.length > 0; else naTemplate">
+																	<label class="cursor-pointer swabhav-light-orange-text"
+																		(click)="showGroupScore(performance, groupScore)">
+																		<strong>{{calculateAvgGroupScore(groupScore) |
+																			number:'1.2-2'}}</strong>
+																	</label>
+																</div>
+															</td>
+														</ng-container>
+														<td class="swabhav-dark-orange-text"><strong>{{performance &&
+																performance.score | number:'1.2-2'}}</strong></td>
+													</tr>
+													<ng-container *ngFor="let groupScore of performance.feedbackKeywords; let j = index">
+														<tr *ngIf="groupScore?.showGroupDetails">
+															<td class="text-center group-name-font swabhav-light-orange-text cell-border">
+																<strong>Group {{groupScore.groupName}}</strong>
+															</td>
+															<td colspan="8" class="cell-border">
+																<div class="d-flex flex-row justify-content-around">
+																	<div *ngFor="let scores of groupScore.feedbackScore">
+																		<div class="d-flex">
+																			{{scores.keyword}}
+																		</div>
+																		<div class="d-flex flex-row justify-content-start">
+																			{{scores.keywordScore | number:'1.2-2'}}
+																		</div>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</ng-container>
+												</ng-container>
+											</tbody>
+										</table>
+									</div>
+
+									<ng-template #noBatchDetails>
+										<div class="container full-h">
+											<br />
+											<br />
+											<div class="d-flex align-items-center full-h">
+												<div class="col-sm-12 col-md-8 mx-auto">
+													<div class="jumbotron">
+														<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+															<h4>Talent details not found</h4>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</ng-template>
+								</div> -->
+							</ng-template>
+						</li>
+					</ng-container>
+
+				</ul>
+
+				<div [ngbNavOutlet]="navStudentDetails" class="mt-2"></div>
+
+				<!-- <ul class="nav justify-content-around">
+                    <li class="nav-item" *ngFor="let details of ongoingBatchDetails">
+                        <button class="btn btn-default nav-link material-icons-button" (click)="getBatchTalent(details?.batchID)">
+                          <span [ngClass]="details?.batchID == batchTalentPerformanceDetails[0]?.batchID ? 
+                                'swabhav-light-orange-text' : 'student-list-batch-text'">
+                              {{details?.batchName}}
+                            </span>
+                        </button>
+                    </li>
+                </ul> -->
+
+			</div>
+			<ng-template #noStudentDetails>
+				<div class="container full-h">
+					<br />
+					<br />
+					<div class="d-flex align-items-center full-h">
+						<div class="col-sm-12 col-md-8 mx-auto">
+							<div class="jumbotron">
+								<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+									<h4><strong>Student details not found</strong></h4>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</ng-template>
+		</div>
+	</div>
+
+
+	<br>
+	<br>
+
+	<div class="row margin-left">
+		<!-- Mentor GRAPH -->
+		<div class="card card-body swabhav-shadow col-sm-12 col-md-7">
+			<h3 class="card-title"><strong>Mentor Success Graph</strong></h3>
+			<div *ngIf="ongoingBatchDetails; else noSuccessGraph" class="card-text">
+				<ul ngbNav #navMentorSuccess="ngbNav" [(activeId)]="mentorTab" [destroyOnHide]="true"
+					class="nav-tabs justify-content-around" (onChange)="onMentorTabChange($event)">
+					<ng-container *ngFor="let details of ongoingBatchDetails; let i = index">
+						<li [ngbNavItem]="(i+1)">
+							<a ngbNavLink (click)="onMentorTabChange(i+1)">{{details?.batchName}}</a>
+							<ng-template ngbNavContent>
+								<div class="chart-display">
+									<canvas baseChart [datasets]="barchartData" [labels]="barchartLabels" [options]="barchartOptions"
+										[plugins]="barchartPlugins" [legend]="barchartLegend" [chartType]="barchartType"
+										[colors]="barchartColors">
+									</canvas>
+								</div>
+								<!-- <ngx-charts-bar-vertical
+                                    [view]="barChartView" [scheme]="barChartColorScheme" [results]="multi" [gradient]="gradient"
+                                    [xAxis]="showXAxis" [yAxis]="showYAxis" [legend]="showBarLegend" [barPadding]="barPadding"
+                                    [showXAxisLabel]="showXAxisLabel" [showYAxisLabel]="showYAxisLabel"
+                                    [xAxisLabel]="xAxisLabel" [yAxisLabel]="yAxisLabel" [showGridLines]="showGridLines">
+                                </ngx-charts-bar-vertical> -->
+
+							</ng-template>
+						</li>
+					</ng-container>
+				</ul>
+				<div [ngbNavOutlet]="navMentorSuccess" class="mt-2"></div>
+			</div>
+			<ng-template #noSuccessGraph>
+				<div class="container full-h">
+					<br />
+					<br />
+					<div class="d-flex align-items-center full-h">
+						<div class="col-sm-12 col-md-8 mx-auto">
+							<div class="jumbotron">
+								<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+									<h4><strong>Graph details not found</strong></h4>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</ng-template>
+		</div>
+
+		<!-- STUDENT FEEDBACK -->
+		<div class="card card-body swabhav-shadow work-margin">
+			<h3 class="card-title"><strong>Feedback and Queries</strong></h3>
+			<div class="card-text">
+				<div>
+					<h4 class="swabhav-light-orange-text"><strong>Shivam Sharma</strong></h4>
+					<span class="text-muted feedback-type-text">Feedback on teaching</span>
+					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, obcaecati</p>
+				</div>
+				<div>
+					<h4 class="swabhav-light-orange-text"><strong>Shivam Sharma</strong></h4>
+					<p class="text-muted feedback-type-text">Feedback on teaching</p>
+					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, obcaecati</p>
+				</div>
+				<div>
+					<h4 class="swabhav-light-orange-text"><strong>Shivam Sharma</strong></h4>
+					<p class="text-muted feedback-type-text">Feedback on teaching</p>
+					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, obcaecati</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<app-master-footer></app-master-footer>

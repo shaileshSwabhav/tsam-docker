@@ -1,0 +1,1266 @@
+<app-master-navbar></app-master-navbar>
+
+<!-- Batch Dropdown -->
+<div class="top-panel-style">
+    <div class="d-flex justify-content-center">
+    <select [(ngModel)]="selectedBatchID" class="form-control input-style talent-dropdown-style" (change)="onBathcesForTalentChange()">
+        <option *ngFor="let batchesForTalent of batchesForTalentList" [ngValue]="batchesForTalent.id">{{batchesForTalent.course.name}}</option>
+    </select>
+    </div>
+</div>
+
+<!-- N/A Table Template -->
+<ng-template #naTableTemplate>
+    <td>N/A</td>
+</ng-template>
+
+<div class="container-fluid">
+    <div class="standard-page-margin">
+
+        <br>
+
+        <!-- Course Progress Bar -->
+        <div class="row">
+            <div class="form-group col-sm-12 col-md-8">
+                <div class="card my-course-card-style h-100">
+                    <div class="card-body course-progress-card-body-style">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img width="150" src="assets/icon/talent-dashboard/welcomeback.png" alt="Welcome back">
+                            </div>
+                            <div class="col-md-5">
+                                <div class="font-weight-bold color-F6430F font-xl-style">
+                                    Welcome Back, {{firstName}}!
+                                </div>
+                                <br>
+                                <div class="font-weight-bold color-212121 font-sm-style">
+                                    Congratulations, here's your progress
+                                </div>
+                            </div>
+                            <ng-container *ngIf="batchTalentDetails && batchSessionList.length > 0">
+                                <div class="col-md-4">
+                                    <circle-progress [percent]="batchTalentDetails.courseCompletedPercentage"
+                                        [radius]="75" [space]="-10" [outerStrokeGradient]="true" [outerStrokeWidth]="10"
+                                        [outerStrokeColor]="'#867af9'" [outerStrokeGradientStopColor]="'#6a5deb'"
+                                        [innerStrokeColor]="'#e7e8ea'" [innerStrokeWidth]="10" [animateTitle]="false"
+                                        [animationDuration]="1000" [showBackground]="false" [startFromZero]="false"
+                                        [subtitle]="'Course Completed'" [subtitleFontSize]="15"
+                                        [subtitleColor]="'#161616'" [unitsFontSize]="'20'"></circle-progress>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Details -->
+            <ng-container *ngIf="batchTalentDetails && batchSessionList.length > 0">
+                <div class="form-group col-sm-12 col-md-4">
+                    <div class="card my-course-card-style padding-0-style h-100">
+                        <div class="card-body">
+                            <div class="font-weight-bold font-md-style">
+                                Batch Details
+                            </div>
+                            <br>
+                            <!-- <div class="row">
+                                <div class="col-2">
+                                    <img width="40" src="assets/icon/talent-dashboard/coursedetails.png"
+                                        alt="Welcome back">
+                                </div>
+                                <div class="col-10">
+                                    <div *ngFor="let batchTiming of batchTalentDetails.batchTimings">
+                                        <div class="row font-sm-style color-757575">
+                                            <div class="col-2 padding-0-style text-right">
+                                                {{batchTiming.day?.day.substr(0,3)}}&nbsp;&nbsp;|
+                                            </div>
+                                            <div class="col-10 padding-0-style">
+                                                &nbsp;&nbsp;{{batchTiming.fromTime}} - {{batchTiming.toTime}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <!-- <br> -->
+                            <div class="link-style batch-progress-link-style cursor-pointer-style"
+                                (click)="redirectToTalentBatchDetails('My Progress Report','My Performance')">
+                                <img class="width-30px-style" src="assets/icon/colour-icons/business-report.png"
+                                    alt="Google meet">
+                                &nbsp;&nbsp;
+                                <span class="font-sm-style color-FFFFFF">
+                                    Watch your batch progress
+                                </span>
+                            </div>
+                            <br>
+                            <ng-container *ngIf="batchTalentDetails.batchMeetLink">
+                                <div class="link-style meet-link-style cursor-pointer-style"
+                                    (click)="redirectToMeetLink()">
+                                    <img class="width-30px-style" src="assets/icon/talent-dashboard/google-meet.png"
+                                        alt="Google meet">
+                                    &nbsp;&nbsp;
+                                    <span class="font-sm-style color-FFFFFF">
+                                        Join the session now
+                                    </span>
+                                </div>
+                                <br>
+                            </ng-container>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <ng-container *ngIf="batchTalentDetails.batchTelegramLink">
+                                        <div class="link-style telegram-link-style cursor-pointer-style"
+                                            (click)="redirectToTelegramLink()">
+                                            <img class="width-30px-style"
+                                                src="assets/icon/talent-dashboard/telegramicon.png" alt="Telegram">
+                                            &nbsp;&nbsp;
+                                            <span class="font-sm-style color-FFFFFF">
+                                                Message your mentor
+                                            </span>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="view-more-style margin-top-30-style">
+                                        <span class="cursor-pointer-style" (click)="redirectToTalentBatchDetails()">View
+                                            More</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <ng-container *ngIf="batchSessionList.length == 0">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="text-center">
+                        <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+                        <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+                        <br>
+                        <div class="font-lg-style text-center">
+                            No Session Plan Found
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="batchSessionList.length > 0">
+            <div class="row">
+                <div class="form-group col-sm-12 col-md-8">
+
+                    <ng-container *ngIf="batchTalentDetails">
+                        <div class="row">
+
+                            <!-- Attendance -->
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div class="card my-course-card-style h-100">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img class="width-80px-style margin-top-10-style"
+                                                    src="assets/icon/talent-dashboard/attendance.png" alt="Telegram">
+                                            </div>
+                                            <div class="col-md-8 text-center">
+                                                <div class="count-box-style">
+                                                    <span
+                                                        class="count-text-style">{{batchTalentDetails.sessionsAttendedCount}}</span>
+                                                    <span
+                                                        class="count-total-text-style">/{{batchTalentDetails.totalSessionsCompleted}}</span>
+                                                </div>
+                                                <div class="color-757575">
+                                                    Attendance
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Session Completed -->
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div class="card my-course-card-style h-100">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img class="width-80px-style margin-top-10-style"
+                                                    src="assets/icon/talent-dashboard/sessions.png" alt="Telegram">
+                                            </div>
+                                            <div class="col-md-8 text-center">
+                                                <div class="count-box-style">
+                                                    <span
+                                                        class="count-text-style">{{batchTalentDetails.totalSessionsCompleted}}</span>
+                                                    <span
+                                                        class="count-total-text-style">/{{batchTalentDetails.totalSessionsCount}}</span>
+                                                </div>
+                                                <div class="color-757575">
+                                                    Sessions Completed
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Assignments Completed -->
+                            <div class="form-group col-sm-12 col-md-6 no-margin-style">
+                                <div class="card my-course-card-style h-100">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img class="width-80px-style margin-top-10-style"
+                                                    src="assets/icon/talent-dashboard/assignments.png" alt="Telegram">
+                                            </div>
+                                            <div class="col-md-8 text-center">
+                                                <div class="count-box-style">
+                                                    <span
+                                                        class="count-text-style">{{totalAssignmentsCompletedCount}}</span>
+                                                    <span
+                                                        class="count-total-text-style">/{{totalBatchAssignmentCount}}</span>
+                                                </div>
+                                                <div class="color-757575">
+                                                    Assignments Completed
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Hours Completed -->
+                            <div class="form-group col-sm-12 col-md-6 no-margin-style">
+                                <div class="card my-course-card-style h-100">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img class="width-80px-style margin-top-10-style"
+                                                    src="assets/icon/talent-dashboard/hourscompleted.png"
+                                                    alt="Telegram">
+                                            </div>
+                                            <div class="col-md-8 text-center">
+                                                <div class="count-box-style">
+                                                    <span
+                                                        class="count-text-style">{{batchTalentDetails.totalCompletedHours}}</span>
+                                                    <span
+                                                        class="count-total-text-style">/{{batchTalentDetails.totalHours}}</span>
+                                                </div>
+                                                <div class="color-757575">
+                                                    Hours Completed
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <!-- Weekly Score -->
+                <div class="form-group col-sm-12 col-md-2">
+                    <div class="card my-course-card-style h-100" [ngClass]="{'green-background-style': (weeklyAssignmentAverage >7.5 || weeklyAssignmentAverageInString == '-'), 
+                        'orange-background-style': (weeklyAssignmentAverage <=7.5 && weeklyAssignmentAverage > 5),
+                        'red-background-style': weeklyAssignmentAverage <=5}">
+                        <div class="card-body">
+                            <div class="font-weight-bold font-sm-style color-FFFFFF text-center">
+                                Weekly Assignment Score
+                            </div>
+                            <br>
+                            <div class="weekly-number-style color-FFFFFF">
+                                {{weeklyAssignmentAverageInString}}
+                            </div>
+                            <br><br>
+                            <div class="text-center">
+                                <img class="width-60px-style" src="assets/icon/talent-dashboard/assignments.png"
+                                    alt="Telegram">
+                            </div>
+                            <ng-container *ngIf="weeklyAssignmentAverageInString != '-'">
+                                <div class="text-center color-FFFFFF font-weight-bold">
+                                    <span>
+                                        {{weeklyAssignmentAverage > 7.5? 'Good going!' : weeklyAssignmentAverage > 5 ?
+                                        'You can do better' : 'You need improvement' }}
+                                    </span>
+                                </div>
+                            </ng-container>
+                            <!-- <div class="text-center">
+                                <span class="font-lg-style up-down-number-backgorund-style">
+                                    <span *ngIf="(thisWeekScore-previousWeekScore)>=0;else negativeDifference" class="green font-weight-bold">
+                                        <span class="vertical-align-bottom-icon-style">
+                                            <i class="material-icons">arrow_upward</i>
+                                        </span>
+                                        {{(thisWeekScore-previousWeekScore)/previousWeekScore*100 | number: '2.0-1'}}%
+                                    </span>
+                                    <ng-template #negativeDifference>
+                                        <span class="red font-weight-bold">
+                                            <span class="vertical-align-bottom-icon-style">
+                                                <i class="material-icons">arrow_downward</i>
+                                            </span>
+                                            {{((thisWeekScore-previousWeekScore)/previousWeekScore*100)*-1 | number: '2.0-1'}}%
+                                        </span>
+                                    </ng-template>
+                                </span>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Rating -->
+                <ng-container *ngIf="facultyToTalentFeedbackLists">
+                    <div class="form-group col-sm-12 col-md-2">
+                        <div class="card my-course-card-style h-100" [ngClass]="{'green-background-style': facultyFeedbackForTalentThisWeek >7.5, 
+                            'orange-background-style': (facultyFeedbackForTalentThisWeek <=7.5 && facultyFeedbackForTalentThisWeek > 5),
+                            'red-background-style': facultyFeedbackForTalentThisWeek <=5}">
+                            <div class="card-body">
+                                <div class="font-weight-bold font-sm-style color-FFFFFF text-center">
+                                    {{currentBatchStatus==BATCH_STAUS_ONGOING? 'Weekly Feedback Rating' : 'Overall
+                                    Feedback Rating'}}
+                                </div>
+                                <div *ngIf="!isFacultyFeddbackForTalentThisAndPreviousWeekPresent">
+                                    <br>
+                                </div>
+                                <div class="weekly-number-style color-FFFFFF">
+                                    {{facultyFeedbackForTalentThisWeekInSttring}}
+                                </div>
+                                <br>
+                                <ng-container *ngIf="isFacultyFeddbackForTalentThisAndPreviousWeekPresent">
+                                    <div class="text-center">
+                                        <div class="font-lg-style up-down-number-backgorund-style">
+                                            <span
+                                                *ngIf="(facultyFeedbackForTalentThisWeek-facultyFeedbackForTalentPreviousWeek)>=0;else negativeDifference"
+                                                class="green font-weight-bold">
+                                                <span class="vertical-align-bottom-icon-style">
+                                                    <i class="material-icons">arrow_upward</i>
+                                                </span>
+                                                {{(facultyFeedbackForTalentThisWeek-facultyFeedbackForTalentPreviousWeek)/facultyFeedbackForTalentPreviousWeek*100
+                                                | number: '2.0-1'}}%
+                                            </span>
+                                            <ng-template #negativeDifference>
+                                                <span class="red font-weight-bold">
+                                                    <span class="vertical-align-bottom-icon-style">
+                                                        <i class="material-icons">arrow_downward</i>
+                                                    </span>
+                                                    {{((facultyFeedbackForTalentThisWeek-facultyFeedbackForTalentPreviousWeek)/facultyFeedbackForTalentPreviousWeek*100)*-1
+                                                    | number: '2.0-1'}}%
+                                                </span>
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <br>
+                                <div class="text-center">
+                                    <img class="width-60px-style" src="assets/icon/talent-dashboard/star.png"
+                                        alt="Telegram">
+                                </div>
+                                <div class="text-center color-FFFFFF font-weight-bold">
+                                    <span>
+                                        {{facultyFeedbackForTalentThisWeek > 7.5? 'Good going!' :
+                                        facultyFeedbackForTalentThisWeek > 5 ? 'You can do better' : 'You need
+                                        improvement' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+            </div>
+        </ng-container>
+
+        <!-- Task List -->
+        <ng-container *ngIf="currentBatchStatus==BATCH_STAUS_ONGOING && batchSessionList.length > 0">
+            <div class="card my-course-card-style">
+                <div class="card-body">
+                    <div class="text-center">
+                        <img class="width-80px-style" src="assets/icon/talent-dashboard/tasklist.png" alt="Telegram">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="font-weight-bold font-lg-style">
+                            Your Task List
+                        </span>
+                    </div>
+                    <br>
+                    <div class="row">
+
+                        <!-- Pending Feedbacks -->
+                        <div class="col-sm-12 col-md-3">
+                            <div class="tasklist-box-style pending-box-style cursor-pointer-style"
+                                (click)="redirectToTalentBatchDetails('Feedback','Submit')">
+                                Pending Feedbacks ({{pendingFeedbacksCount}})
+                            </div>
+                            <br>
+                            <ng-container
+                                *ngFor="let pendingFeedback of pendingTalentFeedbackForFacultyList;let i = index">
+                                <div class="card task-list-card-style">
+                                    <div class="card-body task-list-card-body-style">
+                                        <div class="row">
+                                            <div
+                                                class="col-sm-12 col-md-10 font-weight-bold font-sm-style color-212121 padding-right-0-style">
+                                                Due Date: {{pendingFeedback.date | date:'EEE, MMM d, y'}}
+                                            </div>
+                                            <div class="col-sm-12 col-md-2 font-weight-bold color-212121 margin-top-2-style cursor-pointer-style"
+                                                (click)="onTalentFeeddbackToFacultyClick(pendingFeedback)">
+                                                <i class="material-icons forward-icon-style">arrow_forward_ios</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </ng-container>
+                        </div>
+
+                        <!-- Pending Assignments -->
+                        <div class="col-sm-12 col-md-3">
+                            <div class="tasklist-box-style pending-box-style cursor-pointer-style"
+                                (click)="redirectToTalentBatchDetails('Assignments','Submit')">
+                                Pending Assignments ({{pendingAssignmentsCount}})
+                            </div>
+                            <br>
+                            <ng-container
+                                *ngFor="let pendingAssignment of pendingBatchTopicAssignmentList;let i = index">
+                                <div class="card task-list-card-style relative-position-style">
+                                    <div class="card-body task-list-card-body-style">
+                                        <div *ngIf="pendingAssignment.isChecked" class="new-box-style">
+                                            New!
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-sm-12 col-md-10 font-weight-bold font-sm-style color-212121 padding-right-0-style">
+                                                Name: {{pendingAssignment.programmingQuestion.label}}
+                                                <br>
+                                                Due Date: {{pendingAssignment.dueDate | date:'EEE, MMM d, y'}}
+                                            </div>
+                                            <div class="col-sm-12 col-md-2 font-weight-bold color-212121 margin-top-6-style cursor-pointer-style"
+                                                (click)="redirectTalentbatchDetails(pendingAssignment.id,'Assignments','Submit')">
+                                                <i class="material-icons forward-icon-style">arrow_forward_ios</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </ng-container>
+                        </div>
+
+                        <!-- Submitted Assignments -->
+                        <div class="col-sm-12 col-md-3">
+                            <div class="tasklist-box-style submitted-box-style cursor-pointer-style"
+                                (click)="redirectToTalentBatchDetails('Assignments','Submit')">
+                                Submitted ({{submittedAssignmentsCount}})
+                            </div>
+                            <br>
+                            <ng-container
+                                *ngFor="let submittedAssignment of submittedBatchTopicAssignmentList;let i = index">
+                                <div class="card task-list-card-style">
+                                    <div class="card-body task-list-card-body-style">
+                                        <div class="row">
+                                            <div
+                                                class="col-sm-12 col-md-10 font-weight-bold font-sm-style color-212121 padding-right-0-style">
+                                                Name: {{submittedAssignment.programmingQuestion.label}}
+                                                <br>
+                                                Due Date: {{submittedAssignment.dueDate | date:'EEE, MMM d, y'}}
+                                            </div>
+                                            <div class="col-sm-12 col-md-2 font-weight-bold color-212121 margin-top-6-style cursor-pointer-style"
+                                                (click)="redirectTalentbatchDetails(submittedAssignment.id,'Assignments','Submit')">
+                                                <i class="material-icons forward-icon-style">arrow_forward_ios</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </ng-container>
+                        </div>
+
+                        <!-- Completed Assignments -->
+                        <div class="col-sm-12 col-md-3">
+                            <div class="tasklist-box-style completed-box-style cursor-pointer-style"
+                                (click)="redirectToTalentBatchDetails('Assignments','Submit')">
+                                Completed ({{completedAssignmentsCount}})
+                            </div>
+                            <br>
+                            <ng-container
+                                *ngFor="let completedAssignment of completedBatchTopicAssignmentList;let i = index">
+                                <div class="card task-list-card-style">
+                                    <div class="card-body task-list-card-body-style">
+                                        <div class="row">
+                                            <div
+                                                class="col-sm-12 col-md-10 font-weight-bold font-sm-style color-212121 padding-right-0-style">
+                                                Name: {{completedAssignment.programmingQuestion.label}}
+                                                <br>
+                                                Due Date: {{completedAssignment.dueDate | date:'EEE, MMM d, y'}}
+                                            </div>
+                                            <div class="col-sm-12 col-md-2 font-weight-bold color-212121 margin-top-6-style cursor-pointer-style"
+                                                (click)="redirectTalentbatchDetails(completedAssignment.id,'Assignments','Submit')">
+                                                <i class="material-icons forward-icon-style">arrow_forward_ios</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <br>
+
+        <!-- Session Plan -->
+        <ng-container *ngIf="batchSessionList.length > 0">
+            <div class="card my-course-card-style">
+                <div class="card-body">
+                    <div class="text-center">
+                        <img class="width-80px-style" src="assets/icon/talent-dashboard/agenda.png" alt="Telegram">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="font-weight-bold font-lg-style">
+                            Session Plan
+                        </span>
+                    </div>
+                    <ng-container *ngIf="batchSessionList.length > 0">
+                        <app-batch-session-plan #batchSessionPlanTemplate
+                            (isUpdatedEmitter)="isCurrentBatchSessionPlanUpdated()">
+                        </app-batch-session-plan>
+                    </ng-container>
+                    <br>
+                    <div class="view-more-style">
+                        <span class="cursor-pointer-style"
+                            (click)="redirectToTalentBatchDetails('Sessions', 'Session Plan')">View All</span>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <br>
+
+        <div class="row">
+
+            <!-- Weekly Rating -->
+            <ng-container *ngIf="facultyToTalentFeedbackLists">
+                <div class="form-group col-md-9 col-sm-12">
+                    <div class="card my-course-card-style h-100">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <img class="width-80px-style" src="assets/icon/talent-dashboard/trophy.png"
+                                    alt="Telegram">
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <span class="font-weight-bold font-lg-style">
+                                    Your Weekly Feedback Rating Card
+                                </span>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <ng-container
+                                    *ngFor="let facultyToTalentFeedback of facultyToTalentFeedbackLists.thisWeekFeedbacks;">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="font-sm-style font-weight-bold text-center">
+                                            {{facultyToTalentFeedback.question}}
+                                        </div>
+                                        <div class="weekly-number-style">
+                                            {{facultyToTalentFeedback.answer}}
+                                        </div>
+                                        <br>
+                                        <ng-container *ngIf="isFacultyFeddbackForTalentThisAndPreviousWeekPresent">
+                                            <div class="text-center">
+                                                <span class="font-lg-style up-down-number-backgorund-style">
+                                                    <span
+                                                        *ngIf="facultyToTalentFeedback.difference>=0;else negativeDifference"
+                                                        class="green font-weight-bold">
+                                                        <span class="vertical-align-bottom-icon-style">
+                                                            <i class="material-icons">arrow_upward</i>
+                                                        </span>
+                                                        {{facultyToTalentFeedback.percent | number: '2.0-1'}}%
+                                                    </span>
+                                                    <ng-template #negativeDifference>
+                                                        <span class="red font-weight-bold">
+                                                            <span class="vertical-align-bottom-icon-style">
+                                                                <i class="material-icons">arrow_downward</i>
+                                                            </span>
+                                                            {{facultyToTalentFeedback.percent*-1 | number: '2.0-1'}}%
+                                                        </span>
+                                                    </ng-template>
+                                                </span>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- Leaderboard -->
+            <ng-container
+                *ngIf="facultyFeedbackForTalentLeaderBoard.length > 0 && currentBatchStatus==BATCH_STAUS_ONGOING">
+                <div class="form-group col-md-3 col-sm-12">
+                    <div class="card my-course-card-style h-100">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <span class="font-weight-bold font-lg-style">
+                                    Leaderboard
+                                </span>
+                            </div>
+                            <br>
+                            <ng-container *ngFor="let leader of facultyFeedbackForTalentLeaderBoard">
+                                <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <img class="width-60px-style" src={{leader.imageURL}} alt="Telegram">
+                                    </div>
+                                    <div class="form-group col-md-9">
+                                        <div>
+                                            Name: {{leader.firstName + " " + leader.lastName}}
+                                        </div>
+                                        <div>
+                                            Place: {{leader.rank}}
+                                        </div>
+                                        <div class="font-weight-bold">
+                                            Rating: {{leader.rating}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </ng-container>
+                            <div class="view-more-style">
+                                <span class="cursor-pointer-style"
+                                    (click)="redirectToTalentBatchDetails('Feedback', 'Leaderboard')">View All</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <br><br>
+
+    </div>
+</div>
+
+<!-- Talent feedback for faculty -->
+<ng-template #talentFeedbackToFacultyModal let-modal>
+    <app-talent-feedback-modal #talentFeedback [batchSessionID]="selectedBatchSessionForTalentFeedbackID"
+        [topics]="selectedBatchSessionForTalentFeedbackTopics" [batchID]="selectedBatchID"
+        [batchSessionDate]="selectedBatchSessionForTalentFeedbackDate"
+        [sessionNumber]="selectedBatchSessionForTalentFeedbackSessionNumber" [faculty]="selectedBatchSessionFaculty"
+        (isSuccessfulEmitter)="receiveIsFeedbackAddSuccessful($event)">
+    </app-talent-feedback-modal>
+</ng-template>
+
+<!-- ******************************************** NOT IN USE CURRENTLY ********************************************* -->
+<!-- Ongoing Courses -->
+<!-- <div class="heading-style">Ongoing courses</div> -->
+<ng-container *ngFor="let onGoingCourse of onGoingCourseList; let i = index">
+    <div class="row">
+        <div class="form-group col-sm-3 col-md-2">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Course Name
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{onGoingCourse.name}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Batch Name
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{onGoingCourse.batchName}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Mentor
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{onGoingCourse.faculty?.firstName + " " + onGoingCourse.faculty?.lastName}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Sessions Completed
+                        </div>
+                        <div
+                            class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-xxl-style cursor-pointer-style">
+                            {{onGoingCourse.completedSessions}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Sessions Remaining
+                        </div>
+                        <div
+                            class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-xxl-style cursor-pointer-style">
+                            {{onGoingCourse.totalSessions - onGoingCourse.completedSessions}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Start Date
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{onGoingCourse.startDate | date:'dd MMM, yyyy'}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            End Date
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{onGoingCourse.endDate | date:'dd MMM, yyyy'}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="form-group col-sm-3 col-md-2">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Fees
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            <span class="rupee">&#x20b9;</span>&nbsp;{{onGoingCourse.feesInString}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</ng-container>
+
+<!-- <div class="row"> -->
+<!-- Task List -->
+<!-- <div class="form-group col-sm-12 col-md-7">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body">
+                <div class="font-weight-bold font-lg-style">Task List</div>
+            </div>
+        </div>
+    </div> -->
+
+<!-- WORK SCHEDULE -->
+<!-- <div class="form-group col-sm-12 col-md-5">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body work-margin">
+                <div class="font-weight-bold font-lg-style">{{workScheduleLabel}}</div> -->
+
+<!-- Time Table -->
+<!-- <div *ngIf="isTimetableVisible">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-borderless">
+                            <tbody class="font-sm-style">
+                                <ng-container *ngIf="talentTimeTable">
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Mon</label></td>
+                                        <div *ngIf="talentTimeTable.monday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.monday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Tue</label></td>
+                                        <div *ngIf="talentTimeTable.tuesday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.tuesday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Wed</label></td>
+                                        <div *ngIf="talentTimeTable.wednesday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.wednesday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Thurs</label></td>
+                                        <div *ngIf="talentTimeTable.thursday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.thursday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Fri</label></td>
+                                        <div *ngIf="talentTimeTable.friday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.friday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Sat</label></td>
+                                        <div *ngIf="talentTimeTable.saturday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.saturday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle"><label class="color-757575">Sun</label></td>
+                                        <div *ngIf="talentTimeTable.sunday; else naTableTemplate">
+                                            <ng-container [ngTemplateOutlet]="timeTableTemplate"
+                                                [ngTemplateOutletContext]="{batches:talentTimeTable.sunday}">
+                                            </ng-container>
+                                        </div>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> -->
+
+<!-- Piechart -->
+<!-- <div *ngIf="isPiechartVisible">
+                    <div *ngIf="timesheetPiechart && timesheetPiechart.length > 0; else noPiechartData">
+                        <div class="chart-display">
+                            <canvas baseChart
+                                [datasets]="piechartData" [labels]="piechartLabels" [chartType]="piechartType"
+                                [options]="piechartOptions" [plugins]="piechartPlugins" 
+                                [colors]="piechartColors" [legend]="piechartLegend">
+                            </canvas>
+                        </div>
+                    </div>
+                </div> -->
+<!-- <ng-template #noPiechartData>
+                    <div class="container full-h">
+                        <br />
+                        <br />
+                        <div class="d-flex align-items-center full-h">
+                        <div class="col-sm-12 col-md-8 mx-auto">
+                            <div class="jumbotron">
+                            <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                <h4><strong>Piechart data not found</strong></h4>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- Finished courses -->
+<!-- <div class="heading-style">Finished courses</div> -->
+<ng-container *ngFor="let finishedCourse of finishedCourseList; let i = index">
+    <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Course Name
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{finishedCourse.name}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Batch Name
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{finishedCourse.batchName}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Mentor
+                        </div>
+                        <div class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-lg-style text-center">
+                            {{finishedCourse.faculty?.firstName + " " + finishedCourse.faculty?.lastName}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 px-0 color-212121 font-weight-bold font-sm-style">
+                            Sessions Completed
+                        </div>
+                        <div
+                            class="col-sm-12 col-md-6 px-0 color-F6430F font-weight-bold font-xxl-style cursor-pointer-style">
+                            {{finishedCourse.completedSessions}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<!-- Problem of the day -->
+<!-- <ng-container *ngIf="problemList.length > 0">
+    <div class="heading-style">Problem of the day</div>
+    <div class="row">
+        <ng-container *ngFor="let problem of problemList; let i = index">
+            <div class="form-group col-sm-4 col-md-3">
+                <div class="card problem-card-style h-100">
+                    <div class="card-body">
+                        <div>{{problem.label}}</div>
+                        <br>
+                        <div class="text-center">
+                            <span class="color-F6430F font-weight-bold font-sm-style cursor-pointer-style"
+                                (click)="redirectToProblemDetails(problem.id)">
+                                Solve Now
+                                <span class="vertical-align-top-icon-style"><i
+                                        class="material-icons modal-popup-close-icon-style">arrow_right_alt</i></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+    <div>
+        <div class="float-right">
+            <button class="btn btn-default swabhav-button-square" type="button" (click)="redirectToProblemOfTheDay()">
+                View All
+            </button>
+        </div>
+    </div>
+    <br>
+    <br>
+</ng-container> -->
+
+<!-- Practice -->
+<ng-container *ngIf="conceptList.length > 0">
+    <div class="heading-style">Practice</div>
+    <div class="row">
+        <ng-container *ngFor="let concept of conceptList; let i = index">
+            <div class="form-group col-sm-6 col-md-4">
+                <div class="card practice-card-style h-100">
+                    <div class="card-body">
+                        <img class="main-topic-image" src={{concept.logo}} alt="">
+                        <br><br>
+                        <div class="color-212121 font-weight-bold font-lg-style">{{concept.name}}</div>
+                        <br>
+                        <!-- <div class="color-F6430F font-weight-bold font-sm-style cursor-pointer-style" [innerHTML]="concept.description">...</div>
+                        <br> -->
+                        <div>
+                            <span class="color-F6430F font-weight-bold font-sm-style cursor-pointer-style"
+                                (click)="redirectToPractice()">
+                                View
+                                <span class="vertical-align-top-icon-style"><i
+                                        class="material-icons modal-popup-close-icon-style">arrow_right_alt</i></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>
+
+<!-- Leaderboard -->
+<!-- <div *ngIf="performerList.length > 0">
+    <div class="heading-style">Leaderboard</div>
+    <table class="leader-board-table-style">
+        <tr class="color-757575">
+            <th class="font-lg-style">Star Performers</th>
+            <th class="font-lg-style">Rewards</th>
+            <th class="font-lg-style">Score</th>
+            <th class="font-lg-style">Rank</th>
+        </tr>
+        <tr *ngFor="let performer of performerList; let i = index">
+            <td class="color-212121 font-weight-bold">
+                <img class="leader-image" src={{performer.image}} alt="">
+                &nbsp;&nbsp;&nbsp;{{performer.firstName + " " + performer.lastName}}
+            </td>
+            <td><img class="medals" src={{leader.rewards}} alt=""></td>
+            <td class="color-212121 font-weight-bold">{{performer.totalScore}}</td>
+            <td class="color-212121 font-weight-bold">{{performer.rank}}</td>
+        </tr>
+    </table>
+</div> -->
+
+<!-- Courses we provide -->
+<!-- <div class="heading-style">Courses we provide</div> -->
+<div class="row">
+    <ng-container *ngFor="let course of courseList; let i = index">
+        <div class="form-group col-sm-4 col-md-2 text-center">
+            <div *ngIf="course.isEnrolled > 0; else notApplied">
+                <div class="circle-applied cursor-pointer-style" (click)="redirectToMyCourses()">
+                    <img class="course-logo" src={{course.logo}} alt="">
+                </div>
+            </div>
+            <ng-template #notApplied>
+                <div class="circle-not-applied cursor-pointer-style" (click)="redirectToCourseDetails(course.id)">
+                    <img class="course-logo" src={{course.logo}} alt="">
+                </div>
+            </ng-template>
+            <div *ngIf="course.isEnrolled > 0; else notAppliedName" class="course-name-applied">
+                {{course.name}}
+            </div>
+            <ng-template #notAppliedName>
+                <div class="course-name-not-applied">
+                    {{course.name}}
+                </div>
+            </ng-template>
+            <div *ngIf="course.isEnrolled > 0" class="color-D63C2A font-weight-bold font-sm-style">
+                Your have enrolled for this Course
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<app-master-footer></app-master-footer>
+
+<!-- Agenda -->
+<!-- <ng-container *ngIf="batchSessionList.length > 0">
+            <div class="card my-course-card-style">
+                <div class="card-body">
+                    <div class="text-center">
+                        <img class="width-80px-style" src="assets/icon/talent-dashboard/agenda.png" alt="Telegram">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <span *ngIf="currentBatchSession">
+                            <span class="font-lg-style">
+                                <span class="font-weight-bold">
+                                    {{isSessionToday? "Today\'s Agenda" : "Agenda For"}}:
+                                </span> 
+                                {{currentBatchSession.startDate | date:'dd MMMM, yyyy'}}
+                            </span>
+                            &nbsp;&nbsp;&nbsp;
+                            <span *ngIf="!(currentBatchSession.order==1)">
+                                <i class="material-icons font-20-style cursor-pointer-style" 
+                                    (click)="onNextPreviousSessionClick(false)">arrow_back_ios</i>
+                            </span>
+                            <span *ngIf="!(currentBatchSession.order==batchSessionList.length)">
+                                <i class="material-icons font-20-style cursor-pointer-style" 
+                                    (click)="onNextPreviousSessionClick(true)">arrow_forward_ios</i>
+                            </span>
+                        </span>
+                        <span *ngIf="!currentBatchSession">
+                            <span class="font-lg-style">
+                                <span class="font-weight-bold">
+                                    All Sessions
+                                </span> 
+                            </span>
+                        </span>
+                    </div>
+
+                    <div *ngIf="isSessionPresent;else sessionsNotFound">
+                        <br>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Session No.</th>
+                                        <th>Name</th>
+                                        <th class="text-center" *ngIf="currentBatchStatus==BATCH_STAUS_UPCOMING">Date</th>
+                                        <th class="text-center">Hours</th>
+                                        <th class="text-center">Sub Sessions</th>
+                                        <th class="text-center">Assignments</th>
+                                        <th class="text-center">Projects</th>
+                                        <th class="text-center">Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngFor="let sessions of tempBatchSessionList;let i = index">
+                                        <tr class="striped-tr">
+                                            <td *ngIf="currentBatchStatus==BATCH_STAUS_ONGOING" class="text-center">
+                                                <span class="vertical-align-top-icon-style">
+                                                    <i *ngIf="sessions.session.subSessions && sessions.session.subSessions.length != 0" class="material-icons-outlined">
+                                                        expand_more
+                                                    </i>
+                                                    {{sessions.order}}
+                                                </span>
+                                            </td>
+                                            <td *ngIf="currentBatchStatus!=BATCH_STAUS_ONGOING" class="text-nowrap">
+                                                <button type="button" class="btn btn-default" (click)="sessions.session.viewSubSessionClicked=!sessions.session.viewSubSessionClicked"
+                                                    *ngIf="sessions.session.subSessions && sessions.session.subSessions.length != 0; else noBatchSession">
+                                                    <i class="material-icons-outlined material-icons-button inline-icon">
+                                                        {{sessions.session.viewSubSessionClicked ? 'expand_more' : 'chevron_right'}}
+                                                    </i> {{i+1}}
+                                                </button>
+                                                <ng-template #noBatchSession>
+                                                    <label class="no-sub-session">{{i+1}}</label>
+                                                </ng-template>
+                                            </td>
+                                            <td class="text-wrap">
+                                                <dl>
+                                                    <dt>
+                                                        <img src="assets/icon/colour-icons/sessions.png" width="30">
+                                                        {{sessions.session && sessions.session?.name}}
+                                                    </dt>
+                                                </dl> 
+                                            </td>
+                                            <td class="text-center" *ngIf="currentBatchStatus==BATCH_STAUS_UPCOMING">
+                                                {{sessions.startDate | date:'dd MMM, yyyy'}}
+                                            </td>
+                                            <td class="text-center">{{sessions.session && sessions.session?.hours}}</td>
+                                            <td class="text-center">{{sessions?.session?.subSessions.length}}</td>
+                                            <td class="text-center">Assignments</td>
+                                            <td class="text-center">Projects</td>
+                                            <td class="text-center" title="Feedback can be given when you have have attended the session">
+                                                <button class="btn" [disabled]="!sessions.isCompleted && !sessions.isAttendanceGiven" (click)="onTalentFeeddbackToFacultyClick(sessions)"
+                                                    *ngIf="!sessions.isFeedbackGiven;else feedbackGiven">
+                                                    <img src="assets/icon/grey-icons/review.png" alt="feedback pending" width="30">
+                                                </button>
+                                                <ng-template #feedbackGiven>
+                                                    <img src="assets/icon/colour-icons/review.png" alt="feedback given" width="30">
+                                                </ng-template>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="sessions.session.viewSubSessionClicked">
+                                            <td colspan="7" class="no-background-tr-style">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-sm-12">
+                                                        <table class="table table-background-style">
+                                                            <thead>
+                                                                <tr class="no-background-tr-style">
+                                                                    <th class="text-center">Order</th>
+                                                                    <th>Name</th>
+                                                                    <th class="text-center">Total Mins</th>
+                                                                    <th class="text-center">Output</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <ng-container *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let even = even">
+                                                                    <tr *ngIf="even" class="no-background-tr-style"> 
+                                                                        <td class="text-center">{{j+1}}</td>
+                                                                        <td>
+                                                                            <div class="row">
+                                                                                <div class="col-md-2">
+                                                                                    <img src="assets/icon/colour-icons/sub-sessions.png" width="30">
+                                                                                </div>
+                                                                                <div class="col-md-10">
+                                                                                    <span>{{subSession.name}}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="text-center">{{subSession.hours != null ? subSession.hours*60 : '-'}}</td>
+                                                                        <td class="text-center">{{subSession.studentOutput}}</td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-12" *ngIf="sessions.session.subSessions.length > 1">
+                                                        <table class="table table-borderless">
+                                                            <thead>
+                                                                <tr class="no-background-tr-style">
+                                                                    <th class="text-center">Order</th>
+                                                                    <th>Name</th>
+                                                                    <th class="text-center">Total Mins</th>
+                                                                    <th>Output</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <ng-container *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let odd = odd">
+                                                                    <tr *ngIf="odd" class="no-background-tr-style">
+                                                                        <td class="text-center">{{j+1}}</td>
+                                                                        <td>
+                                                                            <div class="row">
+                                                                                <div class="col-md-2">
+                                                                                    <img src="assets/icon/colour-icons/sub-sessions.png" width="30">
+                                                                                </div>
+                                                                                <div class="col-md-10">
+                                                                                    <span>{{subSession.name}}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="text-center">{{subSession.hours != null ? subSession.hours*60 : '-'}}</td>
+                                                                        <td class="text-center">{{subSession.studentOutput}}</td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="view-more-style" (click)="redirectToTalentBatchDetails('Sessions', 'Session Plan')">
+                        View All
+                    </div>
+                
+                    <ng-template #sessionsNotFound>
+                        <br />
+                        <br />
+                        <br />
+                        <div class="col-sm-12 col-md-8 mx-auto">
+                            <div class="jumbotron">
+                                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                    <h2>Session not assigned to batch</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </ng-container> -->
+
+<!-- TEMPLATE FOR WORK SCHEDULE TIME TABLE -->
+<!-- <ng-template let-batches="batches" #timeTableTemplate>
+    <td *ngFor="let batch of batches">
+        <span class="swabhav-light-orange-text"><strong>{{batch.batchName}}</strong></span>
+        <div *ngFor="let timing of batch.batchTimings">
+            <span class="swabhav-light-orange-text">
+                {{utilService.formatTimeString(timing.fromTime)}} - 
+                    {{utilService.formatTimeString(timing.toTime)}}
+            </span>
+        </div>
+    </td>
+</ng-template> -->

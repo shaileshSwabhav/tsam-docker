@@ -1,0 +1,493 @@
+<!-- No module logo template -->
+<ng-template #noModuleLogo>
+	<img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<div class="container-fluid" *ngIf="!isFeedback&&(tabToBeOpen==COMPLETEDOPERATION||tabToBeOpen==ATTENDANCEOPERATION)">
+	<div class="row row-container">
+		<div class="col-2">
+			<span class="head-icon"> <img src="assets/icon/colour-icons/completedmodal.png" width="100"></span>
+		</div>
+
+		<div class="col-10">
+			<div class="swabhav-light-orange-text heading-style">
+				Hooray! Today’s session has been successfully completed, {{facultyName}}!
+			</div>
+
+			<br>
+
+			<div class="d-flex label-style">
+				<label><strong>Date: </strong></label> &nbsp;
+				<label>{{sessionDate}}</label>
+			</div>
+
+			<br>
+
+			<div class="d-flex justify-content-start">
+
+				<br>
+
+				<div class="d-flex label-style">
+					<label><strong>Batch Name: </strong></label> &nbsp;
+					<label>{{batchName}}</label>
+				</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&ensp;&emsp;
+
+			</div>
+
+			<br>
+
+			<div class="heading-style">Today’s session completed:</div>
+
+			<br>
+
+			<div *ngIf="tabToBeOpen==COMPLETEDOPERATION&&pendingModules.length>0&&!isNextClicked">
+
+				<div class="swabhav-light-orange-text heading-style">Pending From Yesterday</div>
+				<div *ngFor="let module of pendingModules;let i = index">
+					<div class="d-flex justify-content-start align-items-baseline">
+
+						<div>
+							<div class="col-2">
+								<ng-container *ngIf="module.logo;else noModuleLogo">
+									<img src="{{module.logo}}" width="50">
+								</ng-container>
+							</div>
+							<div class="col-10 font-weight-bold font-lg-style">
+								<div>
+									<div>
+										Module: {{module.moduleName}}
+									</div>
+								</div>
+							</div>
+
+							<br>
+
+							<div class="ml-5">
+								<div *ngFor="let topic of module?.moduleTopics; let j = index">
+
+									<div class=" col-10 pt-3 pb-1 font-weight-bold font-md-style">
+										Topic: {{topic.topicName}}
+									</div>
+
+									<div class="table-responsive">
+										<table class="table table-sm table-borderless">
+											<thead>
+												<tr class="text-center">
+													<th><label class="checkbox-container">
+															<input type="checkbox"
+																[checked]="isAllSubTopicMarked(topic)"
+																(change)="markAllPendingSessionAsDone(topic)">
+															<span class="checkmark"></span>
+														</label></th>
+													<th><strong>Order</strong></th>
+													<th class="text-left px-5"><strong>Name</strong></th>
+													<th><strong>Total Mins</strong></th>
+												</tr>
+											</thead>
+											<tbody>
+												<ng-container *ngFor="let subTopic of topic?.subTopics;let i = index">
+													<tr class="text-center">
+														<td class="text-center table-td-center-align">
+															<label class="checkbox-container">
+																<input type="checkbox"
+																	[checked]="isSubTopicmarked(subTopic.id)"
+																	(change)="markSessionAsDone(topic.id,subTopic.id)">
+																<span class="checkmark"></span>
+															</label>
+														</td>
+														<td class="table-td-center-align">
+															{{subTopic.batchSessionTopic.order}}</td>
+														<td class="text-left table-td-center-align">
+															<img src="assets/icon/colour-icons/sub-sessions.png"
+																width="30">&nbsp;&nbsp;{{subTopic.topicName}}
+														</td>
+														<td class="table-td-center-align">{{subTopic.totalTime}}</td>
+													</tr>
+												</ng-container>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<br>
+
+				<div>
+					<button type="submit" [disabled]="sessionMarkAsDone.length<1" (click)="onNextClick()"
+						class="btn btn-default text-nowrap swabhav-button-round next-button-style mb-2">Next&nbsp;&nbsp;&nbsp;&nbsp;<i
+							class="inline-icon material-icons-outlined">
+							arrow_forward_ios
+						</i>
+					</button>
+				</div>
+			</div>
+
+			<!-- on next click -->
+			<div
+				*ngIf="(isNextClicked&&pendingModules.length>0)||(tabToBeOpen==COMPLETEDOPERATION&&pendingModules.length<1)">
+				<div class="swabhav-light-orange-text heading-style">Agenda</div>
+				<div *ngFor="let module of completedModules;let i = index">
+
+					<!-- <div class="swabhav-light-orange-text heading-style">Pending From Yesterday</div> -->
+					<div class="d-flex justify-content-start align-items-baseline">
+
+						<div>
+							<div class="col-2">
+								<ng-container *ngIf="module.logo;else noModuleLogo">
+									<img src="{{module.logo}}" width="50">
+								</ng-container>
+							</div>
+							<div class="col-10 font-weight-bold font-md-style">
+								<div>
+									<div>
+										Module: {{module.moduleName}}
+									</div>
+								</div>
+							</div>
+							<br>
+
+							<div *ngFor="let topic of module?.moduleTopics; let j = index">
+
+								<div class=" col-10 pt-3 pb-1 font-weight-bold font-md-style">
+									Topic: {{topic.topicName}}
+								</div>
+
+
+								<div class="table-responsive">
+									<table class="table table-sm table-borderless">
+										<thead>
+											<tr class="text-center">
+												<th><label class="checkbox-container">
+														<input type="checkbox" [checked]="isAllSubTopicMarked(topic)"
+															(change)="markAllPendingSessionAsDone(topic)">
+														<span class="checkmark"></span>
+													</label></th>
+												<th><strong>Order</strong></th>
+												<th class="text-left px-5"><strong>Name</strong></th>
+												<th><strong>Total Mins</strong></th>
+											</tr>
+										</thead>
+										<tbody>
+											<ng-container *ngFor="let subTopic of topic?.subTopics;let i = index">
+												<tr class="text-center">
+													<td class="text-left table-td-center-align">
+														<label class="checkbox-container">
+															<input type="checkbox"
+																[checked]="isSubTopicmarked(subTopic.id)"
+																(change)="markSessionAsDone(topic.id,subTopic.id)">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="table-td-center-align">{{subTopic.order}}</td>
+													<td class="text-left table-td-center-align">
+														<img src="assets/icon/colour-icons/sub-sessions.png"
+															width="30">&nbsp;&nbsp;{{subTopic.topicName}}
+													</td>
+													<td class="table-td-center-align">{{subTopic.totalTime}}</td>
+												</tr>
+											</ng-container>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br><br><br>
+				<!-- tommorrow session -->
+				<div *ngIf="nextSessionModules.length>0">
+					<div class="swabhav-light-orange-text heading-style">
+						<label class="checkbox-container">
+							<input type="checkbox" (change)="toggleTommorrow()">
+							<span class="checkmark"></span>
+						</label>Did you complete subtopics early from tomorrow’s session?
+					</div>
+					<br>
+					<div *ngIf="isTommorrowSessionCompleted">
+
+						<div *ngFor="let module of nextSessionModules;let i = index">
+							<!-- <div class="swabhav-light-orange-text heading-style">Pending From Yesterday</div> -->
+							<div class="d-flex justify-content-start align-items-baseline">
+								<div class="row">
+									<div class="col-2">
+										<ng-container *ngIf="module.logo;else noModuleLogo">
+											<img src="{{module.logo}}" width="50">
+										</ng-container>
+									</div>
+									<div class="col-10 font-weight-bold font-md-style">
+										<div>
+											<div>
+												Module: {{module.moduleName}}
+											</div>
+										</div>
+									</div>
+									<br>
+
+									<div *ngFor="let topic of module?.moduleTopics; let j = index">
+
+										<div class=" col-10 pt-3 pb-1 font-weight-bold font-md-style">
+											Topic: {{topic.topicName}}
+										</div>
+
+
+										<div class="table-responsive">
+											<table class="table table-sm table-borderless">
+												<thead>
+													<tr class="text-center">
+														<th><label class="checkbox-container">
+																<input type="checkbox"
+																	[checked]="isAllSubTopicMarked(topic)"
+																	(change)="markAllPendingSessionAsDone(topic)">
+																<span class="checkmark"></span>
+															</label></th>
+														<th><strong>Order</strong></th>
+														<th class="text-left px-5"><strong>Name</strong></th>
+														<th><strong>Total Mins</strong></th>
+													</tr>
+												</thead>
+												<tbody>
+													<ng-container
+														*ngFor="let subTopic of topic?.subTopics;let i = index">
+														<tr class="text-center">
+															<td class="text-center table-td-center-align">
+																<label class="checkbox-container">
+																	<input type="checkbox"
+																		[checked]="isSubTopicmarked(subTopic.id)"
+																		(change)="markSessionAsDone(topic.id,subTopic.id)">
+																	<span class="checkmark"></span>
+																</label>
+															</td>
+															<td class="table-td-center-align">{{subTopic.order}}
+															</td>
+															<td class="text-left table-td-center-align">
+																<img src="assets/icon/colour-icons/sub-sessions.png"
+																	width="30">&nbsp;&nbsp;{{subTopic.topicName}}
+															</td>
+															<td class="table-td-center-align">{{subTopic.totalTime}}
+															</td>
+														</tr>
+													</ng-container>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div>
+					<button type="submit" [disabled]="sessionMarkAsDone.length<1" (click)="openAttendance()"
+						class="btn btn-default swabhav-button-round text-nowrap next-button-style">Next&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="inline-icon material-icons-outlined">arrow_forward_ios</i>
+					</button>
+				</div>
+				<!-- use css margin instead -->
+				<br>
+				<br><br><br><br><br><br>
+			</div>
+
+			<div *ngIf="tabToBeOpen==ATTENDANCEOPERATION&&isTalentsLoaded">
+				<form [formGroup]="sessionTalentAttendanceForm">
+					<div class="swabhav-light-orange-text heading-style">Share Today's Attendance Report:</div>
+					<div class="table-responsive">
+						<table class="table table-borderless">
+							<thead>
+								<tr>
+									<th class="text-center">Sr No.</th>
+									<th class="text-center">Attended</th>
+									<th>Student Name</th>
+									<!-- <th class="text-center">Sessions Attended</th> -->
+								</tr>
+							</thead>
+							<tbody>
+								<ng-container formArrayName="talentAttendance"
+									*ngFor="let attendanceControl of talentAttendanceControlArray.controls;let i = index">
+									<ng-container [formGroupName]="i">
+										<tr>
+											<td class="text-center">{{i+1}}</td>
+											<td class="text-center">
+												<div class="form-group form-check">
+													<label class="form-check-label">
+														<label class="checkbox-container">
+															<input type="checkbox"
+																[checked]="attendanceControl.get('isPresent').value"
+																(change)="attendanceControl.get('isPresent').setValue(!attendanceControl.get('isPresent').value)">
+															<span class="checkmark"></span>
+														</label>
+													</label>
+												</div>
+											</td>
+											<td>{{batchTalents[i].firstName + ' ' +
+												batchTalents[i].lastName}}</td>
+											<!-- <td class="text-center">{{batchTalents[i].sessionsAttendedCount}}</td> -->
+										</tr>
+									</ng-container>
+								</ng-container>
+							</tbody>
+						</table>
+					</div>
+				</form>
+				<div class="d-flex row justify-content-end pb-5">
+					<button type="submit" (click)="openFeedback()"
+						class="btn btn-default swabhav-button-round text-nowrap next-button-style">Next&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="inline-icon material-icons-outlined">arrow_forward_ios</i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Student feedback for present students -->
+<div class="container-fluid" *ngIf="(tabToBeOpen==FEEDBACKOPERATION)&&isFeedback">
+	<app-faculty-talent-feedback (sendToHome)="sendToSessionPlan()" (sendToNext)="submitFeedback()">
+	</app-faculty-talent-feedback>
+</div>
+
+
+
+<div class="container-fluid" *ngIf="(tabToBeOpen==ASSIGNMENTOPERATION)&&!isFeedback">
+
+	<ng-template #NoAssignmentsFound>
+		<br />
+		<br />
+		<div class="d-flex align-items-center full-h">
+			<div class="col-sm-12 col-md-8 mx-auto">
+				<div class="jumbotron">
+					<div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+						<h2>No Assignments Found</h2>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<br />
+		<div class="d-flex row justify-content-center pb-5">
+
+			<button type="submit" (click)="sendToSessionPlan()"
+				class="btn btn-default text-nowrap swabhav-button-round center">Navigate Home&nbsp;&nbsp;&nbsp;&nbsp;
+				<i class="inline-icon material-icons-outlined">home</i>
+			</button>
+		</div>
+	</ng-template>
+
+	<div class="row d-flex align-items-center">
+		<div class="col-sm-2 pt-5">
+			<img src="assets/course/assignment.png" alt="feedback" class="feedback-img-icon" width="70%">
+		</div>
+		<div class="col-sm-10 h2">
+			<label class="swabhav-light-orange-text"><strong>Select Assignments for the following
+					session:</strong></label>
+		</div>
+	</div>
+
+
+	<div class="d-flex justify-content-around">
+		<div class="d-flex h4">
+			<label><strong>Session Date: </strong></label> &nbsp;
+			<label>{{sessionDate | date: 'fullDate'}}</label>
+		</div>
+	</div>
+
+	<br>
+
+	<div class="container">
+		<br>
+		<!-- <div *ngFor="let subTopic of assignment?.subTopics;let k = index"> -->
+		<div *ngIf="assignments.length>0;else NoAssignmentsFound">
+
+			<!-- <div class="col-2">
+				<div class="h6 text-nowrap">
+					<strong>
+						Topic: {{assignment.topicName}}
+					</strong>
+				</div>
+			</div> -->
+
+			<div>
+				<div class="table-responsive">
+					<table class="table table-sm table-borderless">
+						<thead>
+							<tr class="text-center">
+								<th></th>
+								<th><strong>Topic Name</strong></th>
+								<th><strong>Order</strong></th>
+								<th class="text-left">Assignment Name</th>
+								<th><strong>Difficulty</strong></th>
+								<!-- <th><strong>Total Mins</strong></th> -->
+								<th>Due Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ng-container *ngFor="let topic of assignments; let j = index">
+								<tr class="text-center">
+									<td class="table-td-center-align">
+										<label class="checkbox-container">
+											<input type="checkbox" (change)="updateAssignment(topic)">
+											<span class="checkmark"></span>
+										</label>
+									</td>
+									<td class="table-td-center-align">
+										{{topic.topic.topicName}}
+									</td>
+									<td class="table-td-center-align">
+										{{j+1}}
+									</td>
+									<td class="text-left table-td-center-align">
+										{{topic.programmingQuestion?.label}}
+									</td>
+									<td class="table-td-center-align">
+										<div class="tasklist-box-style wordwrap" [ngClass]="{'green-box-style': topic?.programmingQuestion?.level==1,
+													'yellow-box-style': topic?.programmingQuestion?.level==2,
+													'red-box-style': topic?.programmingQuestion?.level==3}">
+											{{(topic?.programmingQuestion?.level == 1) ? "Easy" :
+											(topic?.programmingQuestion?.level==2) ? "Medium" : "Hard"}}
+										</div>
+									</td>
+									<td>
+										<div
+											class="table-td-center-align d-flex flex-column align-items-center justify-content-center">
+											<input type="date" class="form-control input-style input-style-date"
+												[disabled]="!isAssignmentMarked(topic.id)" [(ngModel)]="topic.dueDate"
+												[min]="sessionDate">
+											<div class="alert alert-danger input-style-date error-dialog"
+												*ngIf="isAssignmentMarked(topic.id)&&topic.dueDate==null">
+												Due Date must be specified
+											</div>
+										</div>
+										<!-- <input type="date" nbInput appEmptyToNull placeholder="Enter Due Date of Assignment" > -->
+									</td>
+								</tr>
+							</ng-container>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<br>
+			<div class="d-flex row justify-content-end pb-5">
+				<button type="submit" (click)="sendToSessionPlan()" class="btn btn-default text-nowrap swabhav-button-round">
+					<i class="inline-icon material-icons-outlined">home</i>
+					&nbsp;&nbsp;
+					Navigate Home
+				</button>
+				&nbsp;&nbsp;&nbsp;
+				<button type="submit" [disabled]="!isAssignmentsValid()" (click)="addAssignments()"
+					class="btn btn-default text-nowrap swabhav-button-round next-button-style">Submit&nbsp;&nbsp;&nbsp;&nbsp;
+					<i class="inline-icon material-icons-outlined">arrow_forward_ios</i>
+				</button>
+			</div>
+		</div>
+		<br>
+		<!-- </div> -->
+	</div>
+	
+
+</div>
+
+
+
+<app-master-footer></app-master-footer>

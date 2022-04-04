@@ -1,0 +1,343 @@
+.heading-style{
+    color: #707070;
+    font-size: x-large;
+    font-weight: bold;
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+.problem-card-style{
+    border: solid #D63C2A;
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.practice-card-style{
+    box-shadow: 5px 10px 8px #00000029;
+    border: none;
+    background-color: #FFFFFF;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.main-topic-image{
+    width: 20%;
+}
+
+.leader-image{
+    margin-top: 1%;
+    border-radius: 50% 50% 50% 50%;
+    width: 40px;
+    margin-bottom: 1%;
+    margin-left: 1%;
+    border: 2pt solid #D63C2A;
+}
+
+.circle-applied {
+    height: 100px;
+    width: 100px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    display: inline-block;
+    border: thick solid rgba(246, 67, 15, 0.59);
+    text-align: center;
+    padding-top: 10%;
+}
+
+.circle-not-applied {
+    height: 100px;
+    width: 100px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    display: inline-block;
+    border: thick solid #E2E2E2;
+    text-align: center;
+    padding-top: 10%;
+}
+
+.course-logo{
+    max-width: 70%;
+}
+
+.course-name-applied{
+    color: #F6430F;
+    font-size: medium;
+    font-weight: bold;
+    padding-top: 10%;
+}
+
+.course-name-not-applied{
+    color: #757575;
+    font-size: medium;
+    font-weight: bold;
+    padding-top: 10%;
+}
+
+.my-course-card-style{
+    box-shadow: 0 0 15px #f6430f26;
+    border: none;
+    background-color: #FFFFFF;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.task-list-card-style{
+    box-shadow: 2px 2px 5px #aaaaaa;
+    background-color: #FFFFFF;
+    padding-left: 5%;
+    padding-right: 5%;
+    border-radius: 10px;
+}
+
+.work-margin {
+    margin-left: 3%;
+}
+
+.work-flex-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.work-icon-flex-item {
+    display: flex;
+}
+
+.progress-bar-custom {
+    background-color: #FF7000BF;
+}
+
+.image-fit-style{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.course-progress-card-body-style{
+    padding-bottom: 0;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+    border-radius: 30px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+  
+.ng-select.ng-select-disabled>.ng-select-container {
+    border-radius: 30px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+
+.width-30px-style{
+    width: 30px;
+}
+
+.width-80px-style{
+    width: 80px;
+}
+
+.width-60px-style{
+    width: 60px;
+}
+
+.meet-link-style{
+    background: #fd7522;
+}
+
+.telegram-link-style{
+    background: #20a4e2;
+}
+
+.batch-progress-link-style{
+    background: #593dc1;
+}
+
+.link-style{
+    border-radius: 30px;
+    width: fit-content;
+    padding: 7px 20px 7px;
+}
+
+.count-text-style{
+    color: #F6430F;
+    font-size: 4em;
+}
+
+.count-total-text-style{
+    color: #414141;
+    font-size: 2.5em;
+}
+
+.count-box-style{
+    margin-top: 30px;
+}
+
+.no-margin-style{
+    margin: 0;
+}
+
+.weekly-number-style{
+    font-size: 4em;
+    margin-top: 20%;
+    text-align: center;
+}
+
+.tasklist-box-style{
+    border-radius: 30px;
+    font-weight: bold;
+    padding: 7px;
+    text-align: center;
+}
+
+.pending-box-style{
+    background-color: #ffeaea;
+    color: #f80309;
+}
+
+.submitted-box-style{
+    background-color: #e5f6fd;
+    color: #61abde;
+}
+
+.completed-box-style{
+    background-color: #e5fdf0;
+    color: #36b98c;
+}
+
+.task-list-card-body-style{
+    padding: 5px;
+}
+
+.forward-icon-style{
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.margin-top-6-style{
+    margin-top: 6%;
+}
+
+.margin-top-2-style{
+    margin-top: 2%;
+}
+
+.relative-position-style{
+    position: relative;
+}
+
+/* .new-box-style{
+    right: 0;
+    top: -10%;
+
+
+    border-radius: 30px;
+    background-color: #fd5b5b;
+    color: #ffffff;
+    padding: 1px;
+    position: absolute;
+} */
+
+.new-box-style{
+    right: 5%;
+    top: -15%;
+    border-radius: 30px;
+    background-color: #fd5b5b;
+    color: #ffffff;
+    padding: 1px;
+    width: 20%;
+    position: absolute;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.font-20-style{
+    font-size: 20px;
+}
+
+.no-sub-session {
+    margin-left: 43%;
+}
+
+.no-background-tr-style{
+ background: white !important;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+  background-color: #ebd0ca;
+}
+
+.red-background-style{
+    background-color: #f80309;
+}
+
+.orange-background-style{
+    background-color: #fd7522;
+}
+
+.green-background-style{
+    background-color: #36b98c;
+}
+
+.up-down-number-backgorund-style{
+    padding: 2px;
+    background: white;
+    border-radius: 10px;
+}
+
+.view-more-style{
+    font-size: smaller;
+    color: #757575;
+    text-decoration: underline;
+    font-weight: bold;
+    text-align: right;
+}
+
+.margin-top-30-style{
+    margin-top: 30%;
+}
+
+.padding-0-style{
+    padding: 0;
+}
+
+.padding-right-0-style{
+    padding-right: 0;
+}
+
+.margin-top-10-style{
+    margin-top: 10px;
+}
+
+.talent-dropdown-style {
+    display: inline;
+    text-align: center;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.top-panel-style {
+    background-color: #f26d00;
+    color: white;
+    padding: 5px;
+}
+
+.input-style {
+    width: 18%;
+    color: black;
+    border-color: #fc6e26;
+    border-width: 1.5px;
+    letter-spacing: normal;
+    font-weight: 500;
+    font-size: medium;
+    text-align: center;
+    height: 33px;
+}
+
+
+

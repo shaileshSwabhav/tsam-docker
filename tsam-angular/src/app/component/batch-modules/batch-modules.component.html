@@ -1,0 +1,860 @@
+<!-- Zero template -->
+<ng-template #zeroTemplate>
+  <span>0</span>
+</ng-template>
+
+<!-- Drag template -->
+<ng-template #dragHandleTmpl>
+  <svg class="bi bi-list handle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd"
+      d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+      clip-rule="evenodd" />
+  </svg>
+</ng-template>
+
+<div class="container-fluid mt-n5">
+  <div class="course-tab-selector" *ngIf="activeModuleTab==1 && isFaculty">
+    <div class="item">
+      <img class="item" src="assets/course/Modules.png" width="100">
+      <span
+        class="font-weight-bold swabhav-light-orange-text text-nowrap d-flex justify-content-center padding-text">SELECT
+        MODULES</span>
+    </div>
+    <div class="mat-progress-bar">
+      <mat-progress-bar mode="determinate" value="{{progress1}}"></mat-progress-bar>
+    </div>
+    <div class="item">
+      <img class="item" [src]="progress1==100? 'assets/course/topics.png':'assets/course/topicsgrey.png' " width="100">
+      <span [ngClass]="progress1==100? 'font-weight-bold swabhav-light-orange-text text-nowrap d-flex justify-content-center padding-text': 
+              'tab-unselected-text text-nowrap d-flex justify-content-center padding-text' ">SELECT THE TOPICS &
+        SUBTOPICS</span>
+    </div>
+    <div class="mat-progress-bar">
+      <mat-progress-bar mode="determinate" value="{{progress2}}"></mat-progress-bar>
+    </div>
+    <div class="item">
+      <img class="item"
+        [src]="progress2==100? 'assets/icon/colour-icons/order.png':'assets/icon/grey-icons/ordergrey.png' "
+        width="100">
+      <span [ngClass]="progress2==100? 'font-weight-bold swabhav-light-orange-text text-nowrap d-flex justify-content-center padding-text':
+              'tab-unselected-text text-nowrap d-flex justify-content-center padding-text' ">CHANGE ORDER</span>
+    </div>
+  </div>
+</div>
+
+<!-- (changeToProgress1)="changeProgress1()" (redirectToCourse)="redirectToCourseDetails()" -->
+<!-- <ng-container *ngIf="isCourseLoaded && progress1==0 && isCourseModule">
+        <app-course-module >
+        </app-course-module>
+      </ng-container> -->
+
+<!-- (createCourseModuleClick)="resetToCourseModule()" (changeProgress2)="changeProgress2()"
+      (changeToModules)="changeProgress()" (changeToTopics)="changeProgress1()" -->
+
+<!-- <ng-container *ngIf="progress1==100 && isCourseModule">
+        <app-course-module-topic>
+        </app-course-module-topic>
+      </ng-container> -->
+
+<br><br>
+
+<div class="container-fluid m-2" *ngIf="activeModuleTab==1 && progress1==0">
+  <ng-container *ngIf="courseModules?.length > 0; else noModules">
+    <div class="row d-flex align-items-center m-2">
+      <div class="col-sm-1">
+        <img src="assets/course/Modules.png" width="80">
+      </div>
+      <div class="col">
+        <h1>Total Modules: {{totalCourseModules}}</h1>
+      </div>
+    </div>
+
+    <form [formGroup]="batchModuleForm">
+      <div class="table-responsive">
+        <table class="table table-borderless table-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th><strong>Sr No.</strong></th>
+              <th><strong>Module</strong></th>
+              <th><strong>Faculty</strong></th>
+              <th><strong>Order</strong></th>
+              <th><strong>Start Date</strong></th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="batchModules"
+              *ngFor="let batchModuleForm of batchModuleControlArray.controls; let i=index">
+              <ng-container [formGroupName]="i">
+                <tr>
+                  <td>
+                    <label class="form-check-label">
+                      <label class="checkbox-container"
+                        [ngClass]="moduleIDList.includes(batchModuleForm.get('moduleID').value) ? 'disabled': ''">
+                        <input type="checkbox" [disabled]="moduleIDList.includes(batchModuleForm.get('moduleID').value)"
+                          (change)="toggleModule(batchModuleForm)" [checked]="batchModuleForm.get('isMarked').value" />
+                        <span class="checkmark"></span>
+                      </label>
+                    </label>
+                  </td>
+                  <td>{{courseModules[i].order}}</td>
+                  <td class="text-left">
+                    <img [src]="courseModules[i].module?.logo" alt="" width="30">
+                    &nbsp;&nbsp;
+                    {{courseModules[i].module?.moduleName}}
+                  </td>
+                  <td>
+                    <select class="form-control input-style" formControlName="facultyID">
+                      <option [ngValue]="null" disabled>Select Faculty</option>
+                      <option *ngFor="let faculty of facultyList" [ngValue]="faculty.id">
+                        {{faculty.firstName}} {{faculty.lastName}}
+                      </option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(batchModuleForm?.get('facultyID')?.touched || 
+                          batchModuleForm?.get('facultyID')?.dirty) && batchModuleForm?.get('facultyID')?.invalid">
+                      <div *ngIf="batchModuleForm?.get('facultyID')?.errors.required">
+                        Faculty must be specified
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input type="number" appAllowNumbersOnly formControlName="order"
+                      class="form-control input-style input-style" min="1" placeholder="Eg. 1">
+                    <div class="alert alert-danger"
+                      *ngIf="(batchModuleForm?.get('order')?.touched || batchModuleForm?.get('order')?.dirty) && batchModuleForm?.get('order')?.invalid">
+                      <div *ngIf="batchModuleForm?.get('order')?.errors.required">
+                        Order must be specified
+                      </div>
+                      <div *ngIf="batchModuleForm?.get('order')?.errors.min">
+                        Order must be greater than 1
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input type="date" appEmptyTONull formControlName="startDate"
+                      class="form-control input-style input-style">
+                    <div class="alert alert-danger"
+                      *ngIf="(batchModuleForm?.get('startDate')?.touched || batchModuleForm?.get('startDate')?.dirty) && batchModuleForm?.get('startDate')?.invalid">
+                      <div *ngIf="batchModuleForm?.get('startDate')?.errors?.required">
+                        Start date must be specified
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Batch timings form -->
+                <ng-container *ngIf="batchModuleForm.get('isMarked').value">
+                  <tr class="unstriped-tr">
+                    <td colspan="10">
+                      <div class="row">
+                        <div class="col-12">
+                          <label class="font-weight-bold"><span>
+                              <label class="form-check-label">
+                                <label class="checkbox-container">
+                                  <input type="checkbox" (change)="toggleModuleTimingValidators(i)"
+                                    [checked]="batchModuleForm.get('isModuleTimingMarked').value" />
+                                  <span class="checkmark"></span>
+                                </label>
+                              </label>
+                            </span> Module Timings:</label>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <ng-container *ngIf="batchModuleForm.get('isModuleTimingMarked').value">
+                            <div class="row">
+                              <div class="col-12">
+                                <ng-container formArrayName="moduleTimings"
+                                  *ngFor="let moduleTimingForm of getModuleTimingControlArray(i).controls; let j=index">
+                                  <ng-container [formGroupName]="j">
+                                    <button type="button" class="btn btn-border"
+                                      [ngClass]="{'selected-day': moduleTimingForm.get('isMarked').value}"
+                                      (click)="onModuleTimeChange(i, j, moduleTimingForm)">
+                                      {{moduleTimingForm.get('day').value?.day?.substr(0,1)}}
+                                    </button>
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </div>
+                        <div class="col-6" *ngIf="getTotalDays(i)>1">
+                          <div class="col-sm-6 col-md-12 no-padding-style">
+                            <div class="form-check no-padding-style">
+                              <label class="form-check-label">
+                                <label class="checkbox-container">
+                                  <input type="checkbox" [checked]="batchModuleForm.get('isApplyToAllSessions').value"
+                                    (change)="onApplyToAllModulesClick(i)">
+                                  <span class="checkmark"></span>
+                                </label>
+                                <span class="font-sm-style text-nowrap">Apply it
+                                  to all sessions</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <br>
+
+                      <ng-container formArrayName="moduleTimings" class="row"
+                        *ngFor="let moduleTimingForm of getModuleTimingControlArray(i).controls; let j=index">
+                        <ng-container [formGroupName]="j">
+                          <div *ngIf="moduleTimingForm.get('isMarked').value" class="row">
+                            <div class="form-group col-sm-3 col-md-2">
+                              <div class="day-text text-right">
+                                {{moduleTimingForm.get('day').value?.day}}:
+                              </div>
+                            </div>
+                            <div class="form-group col-sm-2 col-md-2">
+                              <input type="time" class="form-control input-style" formControlName="fromTime">
+                              <div class="alert alert-danger"
+                                *ngIf="(moduleTimingForm.get('fromTime').touched 
+                                || moduleTimingForm.get('fromTime').dirty) && moduleTimingForm.get('fromTime').invalid">
+                                <div *ngIf="moduleTimingForm.get('fromTime').errors.required">
+                                  Module start time must be specified
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-1 col-md-1">
+                              <div class="day-text text-center">To</div>
+                            </div>
+                            <div class="form-group col-sm-2 col-md-2">
+                              <input type="time" class="form-control input-style" formControlName="toTime">
+                              <div class="alert alert-danger" *ngIf="(moduleTimingForm.get('toTime').touched 
+                                || moduleTimingForm.get('toTime').dirty) && moduleTimingForm.get('toTime').invalid">
+                                <div *ngIf="moduleTimingForm.get('toTime').errors.required">
+                                  Module end time must be specified
+                                </div>
+                              </div>
+                              <div class="alert alert-danger" *ngIf="moduleTimingForm.get('toTime').touched && moduleTimingForm.get('toTime').dirty
+                                && moduleTimingForm.get('toTime').value == moduleTimingForm.get('fromTime').value">
+                                Start time and end time cannot be same
+                              </div>
+                            </div>
+                            <div class="col-sm-2 col-md-1 no-padding-style text-center">
+                              <img *ngIf="getModuleTimingControlArray(i).controls.length > 1"
+                                (click)="deleteModuleTiming(i, j)" src="assets/icon/colour-icons/delete.png" width="20"
+                                class="cursor-pointer-style">
+                            </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </ng-container>
+  <button type="button" class="btn mt-2 btn-sm btn-submit-swabhav material-icons-button next-button float-right"
+    [disabled]="!batchModuleForm.dirty" (click)="validateBatchModule()" *ngIf="activeModuleTab == 1&&isFaculty">
+    Next </button>
+  <button type="button" class="btn mt-2 btn-sm btn-submit-swabhav material-icons-button next-button float-right"
+    [disabled]="!batchModuleForm.dirty" (click)="validateBatchModule()" *ngIf="activeModuleTab == 1&&isAdmin">
+    Submit </button>
+</div>
+
+<br><br>
+
+<div class="container-fluid" *ngIf="activeModuleTab==2">
+  <ng-container *ngIf="batchModules?.length > 0; else noModules">
+    <div class="row d-flex align-items-center m-2">
+      <div class="col-sm-1">
+        <img src="assets/course/Modules.png" width="80">
+      </div>
+      <div class="col">
+        <h1>Total Modules: {{totalBatchModules}}</h1>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-borderless table-striped">
+        <thead>
+          <tr>
+            <th class="text-center"><strong>Order</strong></th>
+            <th><strong>Module</strong></th>
+            <th><strong>Faculty</strong></th>
+            <th><strong>Start Date</strong></th>
+            <th><strong>Delete</strong></th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let batchModule of batchModules; let i = index">
+            <tr>
+              <td class="text-center algin-middle">
+                <button type="button" class="btn btn-default" (click)="batchModule.showDetails=!batchModule.showDetails"
+                  *ngIf="batchModule.moduleTimings?.length > 0; else noExpand">
+                  <i class="material-icons-outlined material-icons-button inline-icon">
+                    {{batchModule.showDetails ? 'expand_more' : 'chevron_right'}}
+                  </i> {{batchModule.order}}
+                </button>
+                <ng-template #noExpand>
+                  <label class="no-sub-session">{{batchModule.order}}</label>
+                </ng-template>
+              </td>
+              <td class="text-left">
+                <img [src]="batchModule?.module?.logo" alt="" width="30"> &nbsp;&nbsp;
+                {{batchModule.module?.moduleName}}
+              </td>
+              <td>{{batchModule.faculty?.firstName}} {{batchModule.faculty?.lastName}}</td>
+              <td>{{batchModule.startDate | date:'longDate' || "-"}}</td>
+              <td>
+                <button type="button" class="btn btn-default" (click)="onDeleteModuleClick(batchModule.id)">
+                  <img src="assets/icon/colour-icons/delete.png" alt="delete" width="30">
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="batchModule.showDetails" class="unstriped-tr">
+              <td class="algin-middle" colspan="7">
+                <div class="row">
+                  <div class="col-md-6 col-sm-12" *ngIf="batchModule.moduleTimings.length > 0">
+                    <table class="table table-borderless table-unstriped">
+                      <thead>
+                        <tr>
+                          <th class="text-center"><strong>Day</strong></th>
+                          <th class="text-center"><strong>From Time</strong></th>
+                          <th class="text-center"><strong>To Time</strong></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container
+                          *ngFor="let moduleTiming of batchModule.moduleTimings; let j = index; let even = even">
+                          <tr *ngIf="even">
+                            <td class="text-center algin-middle">{{moduleTiming.day.day}}
+                            </td>
+                            <td class="text-center algin-middle">{{moduleTiming.fromTime}}</td>
+                            <td class="text-center algin-middle">{{moduleTiming.toTime }}</td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-6 col-sm-12" *ngIf="batchModule.moduleTimings.length > 1">
+                    <table class="table table-borderless table-unstriped">
+                      <thead>
+                        <tr>
+                          <th class="text-center"><strong>Day</strong></th>
+                          <th class="text-center"><strong>From Time</strong></th>
+                          <th class="text-center"><strong>To Time</strong></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container
+                          *ngFor="let moduleTiming of batchModule.moduleTimings; let j = index; let odd = odd">
+                          <tr *ngIf="odd">
+                            <td class="text-center algin-middle">{{moduleTiming.day.day}}
+                            </td>
+                            <td class="text-center algin-middle">{{moduleTiming.fromTime }}</td>
+                            <td class="text-center algin-middle">{{moduleTiming.toTime }}</td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+</div>
+
+
+<ng-template #noModules>
+  <div class="container full-h">
+    <br />
+    <br />
+    <div class="d-flex align-items-center full-h">
+      <div class="col-sm-12 col-md-8 mx-auto">
+        <div class="jumbotron">
+          <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+            <h2>Modules not found</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Delete Batch Comfirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title">Comfirmation</h3>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want you to delete this {{entity}}.
+        {{waitingListMessage}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer[disabled]="disableButton" -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button" (click)="modal.dismiss();">No
+    </button>
+  </div>
+
+</ng-template>
+
+<div class="container-fluid" *ngIf="activeModuleTab==1&&(progress1==100||progress2==100)">
+  <app-session-plan-update (changeTab)="changeTabs($event)"></app-session-plan-update>
+</div>
+
+
+<!-- <div class="container-fluid" *ngIf="activeModuleTab==1">
+
+  <div class="card module-tab-menu-style">
+    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex"
+      (selectedTabChange)="onModuleTabClick($event.index)">
+      <ng-container *ngFor="let courseModuleTab of courseModuleTabList;let i = index">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <div>
+              <ng-container *ngIf="courseModuleTab?.module?.logo; else logoNotFound">
+                <img width="40" src={{courseModuleTab?.module?.logo}}>
+              </ng-container>
+              <ng-template #logoNotFound>
+                <img width="40" src="assets/icon/grey-icons/Score.png">
+              </ng-template>
+              <br><br>
+              <div>{{courseModuleTab?.module?.moduleName}}</div>
+            </div>
+          </ng-template>
+        </mat-tab>
+      </ng-container>
+    </mat-tab-group>
+  </div>
+
+  <div class="container-fluid" *ngIf="!isReordering &&activeModuleTab==1 && progress1==100">
+    
+
+
+
+
+    <div *ngIf="selectedCourseModule[0]?.moduleTopics?.length > 0">
+
+
+      <br>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-borderless">
+          <thead>
+            <tr class="text-center">
+              <th></th>
+              <th>Sr No.</th>
+              <th class="text-left">Topics</th>
+              <th>Sub Topics</th>
+              <th>Total Approx Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let topic of selectedCourseModule[0]?.moduleTopics;let i = index">
+              <tr class="striped-tr text-center">
+                <td class="table-td-center-align">
+                  <label class="checkbox-container" [ngClass]="topic?.batchSessionTopicIsCompleted?'disabled':''">
+                     [checked]="isSubTopicmarked(subTopic.id)"
+                            (change)="markSessionAsDone(topic.id,subTopic.id)"
+                    <input type="checkbox"
+                      [checked]="topic?.batchSessionTopicIsCompleted || topic.isChecked" [(ngModel)]="topic.isChecked"
+                      [disabled]="topic?.batchSessionTopicIsCompleted" (click)="toggleAllSubTopics(topic)">
+                    <span class="checkmark"></span>
+                  </label>
+                </td>
+                <td class="text-nowrap table-td-center-align">
+                  <ng-container *ngIf="!isReordering">
+                    <button type="button" class="btn btn-default" (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                      *ngIf="topic.subTopics && topic.subTopics.length != 0;else noSubTopics">
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                      </i> {{i+1}}
+                    </button>
+                  </ng-container>
+
+                  <ng-container *ngIf="isReordering">
+                                    <button type="button" class="btn btn-default"
+                                        (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                                        *ngIf="topic.topicProgrammingQuestions?.length!=0; else noSubTopics">
+                                        <i class="material-icons-outlined material-icons-button inline-icon">
+                                            {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                                        </i> {{i+1}}
+                                    </button>
+                                </ng-container> 
+
+                  <ng-template #noSubTopics>
+                    <label class="no-sub-session">{{i+1}}</label>
+                  </ng-template>
+
+                </td>
+                <td class="text-left table-td-center-align">
+                  <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                  {{topic.topicName}}
+                </td>
+                <td class="text-left">
+                    <dl>
+                      <dt>
+                        <img src="assets/course/topics.png" width="30">
+                        &nbsp;&nbsp;{{topic.topicName}}
+                      </dt>
+                    </dl>
+                  </td> 
+                <td class="table-td-center-align">{{topic.subTopics?.length}}</td>
+                <td class="table-td-center-align">
+                  {{topic.totalTime | minute}}
+                </td>
+              </tr>
+              <tr *ngIf="topic.isTopicClicked">
+                <ng-container *ngIf="!isReordering">
+                  <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                    <ng-container [ngTemplateOutlet]="subTopicsTemplate"
+                      [ngTemplateOutletContext]="{moduleTopic:topic}">
+                    </ng-container>
+                  </td>
+                </ng-container>
+                 <ng-container *ngIf="isReordering">
+                                <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                                    <ng-container [ngTemplateOutlet]="assignmentTemplate"
+                                        [ngTemplateOutletContext]="{topic:topic}">
+                                    </ng-container>
+                                </td>
+                            </ng-container>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div *ngIf="selectedCourseModule[0]?.moduleTopics?.length == 0">
+      <br><br>
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Topics Found</h2>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn mt-2 btn-sm btn-submit-swabhav material-icons-button next-button float-right"
+      (click)="changeTabs(2)" *ngIf="activeModuleTab == 1 && !isReordering"> Next </button>
+
+     <button type="button" class="btn mt-2 btn-sm btn-submit-swabhav material-icons-button next-button float-right"
+        (click)="activeModuleTab=3" *ngIf="activeModuleTab == 1 && isReordering"> Next </button>
+  </div>
+
+  <ng-template let-moduleTopic="moduleTopic" #subTopicsTemplate>
+    <div class="row">
+      <div class="col-md-6 col-sm-12" *ngIf="moduleTopic?.subTopics?.length > 0">
+        <table class="table table-borderless table-unstriped">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="text-center">Order</th>
+              <th>Sub-Topic</th>
+              <th class="text-center">Approx Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let subTopic of moduleTopic.subTopics; let even = even">
+              <tr *ngIf="even">
+                <td class="text-left table-td-center-align">
+                  <label class="checkbox-container" [ngClass]="subTopic?.batchSessionTopicIsCompleted?'disabled':''">
+                    <input type="checkbox"
+                      [checked]="subTopic?.batchSessionTopicIsCompleted ||subTopic.isChecked" [(ngModel)]="subTopic.isChecked"
+                      [disabled]="subTopic?.batchSessionTopicIsCompleted"
+                      (click)="toggleSubTopics(subTopic?.id,subTopic,moduleTopic)">
+                    <span class="checkmark"></span>
+                  </label>
+                </td>
+                <td class="text-center table-td-center-align">{{subTopic.order}}</td>
+                <td class="table-td-center-align">
+                  <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                  {{subTopic.topicName}}
+                </td>
+                <td class="text-center table-td-center-align">{{subTopic.totalTime | minute}}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-6 col-sm-12" *ngIf="moduleTopic?.subTopics?.length > 1">
+        <table class="table table-borderless table-unstriped">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="text-center">Order</th>
+              <th>Sub-Topic</th>
+              <th class="text-center">Approx Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let subTopic of moduleTopic.subTopics; let odd = odd">
+              <tr *ngIf="odd">
+                <td class="text-left table-td-center-align">
+                  <label class="checkbox-container" [ngClass]="subTopic?.batchSessionTopicIsCompleted?'disabled':''">
+                    [checked]="isSubTopicmarked(subTopic.id)"
+                                            (change)="markSessionAsDone(topic.id,subTopic.id)"
+                                             [checked]="subTopic.isChecked" 
+                    <input type="checkbox" [checked]="subTopic.isChecked"
+                      [disabled]="subTopic?.batchSessionTopicIsCompleted"
+                      (click)="toggleSubTopics(subTopic?.id,subTopic,moduleTopic)">
+                    <span class="checkmark"></span>
+                  </label>
+                </td>
+                <td class="text-center table-td-center-align">{{subTopic.order}}</td>
+                <td class="table-td-center-align">
+                  <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                  {{subTopic.topicName}}
+                </td>
+                <td class="text-center table-td-center-align">{{subTopic.totalTime | minute}}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
+
+
+
+
+  <div *ngIf="isReordering && activeModuleTab==1&& progress2==100">
+
+
+    <br><br>
+
+    <div *ngIf="selectedOrderedCourseModules[0]?.moduleTopics?.length > 0;else noTopics">
+      <div class="table-responsive">
+        <table class="table table-striped table-borderless">
+          <tr class="text-center">
+            <th></th>
+            <th>Order</th>
+            <th class="text-left">Topics</th>
+            <th>Sub Topics</th>
+            <th>Approx Time</th>
+          </tr>
+          <tbody cdkDropList
+            (cdkDropListDropped)="onDropTopicsTableRow($event,selectedOrderedCourseModules[0]?.moduleTopics)">
+            <ng-container *ngFor="let topic of selectedOrderedCourseModules[0]?.moduleTopics; let i = index">
+              <tr class="striped-tr text-center" cdkDrag cdkDragLockAxis="y">
+                <td class="cursor-pointer-style">
+                  <div class="drag-handle">
+                    <ng-container [ngTemplateOutlet]="dragHandleTmpl"></ng-container>
+                  </div>
+                </td>
+                <td class="text-nowrap table-td-center-align">
+                  <button type="button" class="btn btn-default" (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                    *ngIf="topic.subTopics && topic.subTopics.length != 0; else noExpand">
+                    <i class="material-icons-outlined material-icons-button inline-icon">
+                      {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                    </i> {{i+1}}
+                  </button>
+                  <ng-template #noExpand>
+                    <label class="no-sub-session">{{i+1}}</label>
+                  </ng-template>
+                </td>
+                <td class="table-td-center-align text-left">
+                  <img src="assets/course/topics.png" width="30">
+                  &nbsp;&nbsp;
+                  {{topic.topicName}}
+                </td>
+                <td class="table-td-center-align">
+                  <span *ngIf="topic.subTopics && topic.subTopics.length > 0;else zeroTemplate">
+                    {{topic.subTopics.length}}
+                  </span>
+                </td>
+                <td class="table-td-center-align">
+                  {{topic.totalTime | minute}}
+                </td>
+              </tr>
+              <tr *ngIf="topic.isTopicClicked && topic.subTopics && topic.subTopics.length > 0">
+                <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                  <table class="table">
+                    <thead>
+                      <tr class="no-background-tr-style text-center">
+                        <th></th>
+                        <th>Order</th>
+                        <th class="text-left">Sub Topics</th>
+                       <th>Assignments</th>
+                        <th>Approx Time</th>
+                      </tr>
+                    </thead>
+                    <tbody cdkDropList (cdkDropListDropped)="onDropTopicsTableRow($event,topic.subTopics)">
+                      <ng-container *ngFor="let subTopic of topic.subTopics; let j = index">
+                        <tr class="no-background-tr-style text-center" cdkDrag cdkDragLockAxis="y">
+                          <td class="cursor-pointer-style">
+                            <div class="drag-handle">
+                              <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                              </ng-container>
+                            </div>
+                          </td>
+                          <td class="text-nowrap table-td-center-align">
+                            {{j+1}}
+                          </td>
+                          <td class="text-left table-td-center-align">
+                            <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                            {{subTopic.topicName}}
+                          </td>
+                          <td class="table-td-center-align">
+                                                        {{subTopic.topicProgrammingQuestions?.length}}</td> 
+                          <td class="table-td-center-align">
+                            {{subTopic.totalTime | minute}}
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+     <div
+            *ngIf="selectedOrderedCourseModules[0]?.moduleTopics?.length == 0"> 
+    <ng-template #noTopics>
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Topics Found</h2>
+        </div>
+      </div>
+
+    </ng-template>
+    <br>
+
+    <div class="float-right">
+      
+      &nbsp;&nbsp;
+      <button type="button" class="btn btn-default swabhav-button-round button-style" (click)="processBatchSessions()">
+        Submit
+      </button>
+    </div>
+
+  </div>
+
+</div> -->
+
+
+<!-- <div class="container-fluid" *ngIf="activeModuleTab==3">
+
+    <div class="row">
+        <div class="col-12 center">
+            <span class="selection-face">
+                <img src="../../../assets/icon/colour-icons/angry.png" alt="" srcset="" width="80">
+            </span>
+            <span class="session-selection-title">
+                Your Session plan already seems to be created!
+            </span>
+        </div>
+
+        <div class="col-12 center">
+            <p class="session-selection-heading">
+                What would you like to do from the two options?
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="between-session-plan">
+            <p class="img-session">
+                <img src="../../../assets/icon/colour-icons/in-between.png" alt="" srcset="" width="80">
+            </p>
+            <p class="Add-the-selected-modules-in-between-the-current-session-plan">
+                Add the selected modules in-between the
+                current session plan
+            </p>
+            <button class="Area">
+                <label>
+                    Select
+                </label>
+            </button>
+        </div>
+    
+        <div class="end-session-plan">
+            <p class="img-session">
+                <img src="../../../assets/icon/colour-icons/at-the-end.png" alt="" srcset="" width="80">
+            </p>
+            <p class="Add-the-selected-modules-towards-the-end-of-the-current-session-plan">
+                Add the selected modules towards the
+                end of session plan
+            </p>
+            <button class="Area">
+                <label>
+                    Select
+                </label>
+            </button>
+    
+        </div>
+    </div>
+</div> -->
+
+
+
+<!-- <ng-template let-topic="topic" #assignmentTemplate>
+    <ng-template #noAssignments>
+        <br><br>
+        <div class="container full-h">
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-12 mx-auto">
+                    <div class="jumbotron">
+                        <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Assignments not found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-container *ngIf="topic.topicProgrammingQuestions?.length>0; else noAssignments">
+
+        <table class="table assignment-table-style">
+            <thead>
+                <tr class="no-background-tr-style text-center">
+                    <th></th>
+                    <th>Order</th>
+                    <th class="text-left">Assignment Name</th>
+                    <th>Total Mins</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let assignment of topic.topicProgrammingQuestions; let k = index;">
+                    <tr class="no-background-tr-style text-center">
+                        <td class="text-left table-td-center-align">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
+                        <td class="table-td-center-align">{{k+1}}</td>
+                        <td class="text-left table-td-center-align">
+                            <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                            {{assignment.programmingQuestion?.label}}
+                        </td>
+
+                        <td class="table-td-center-align">{{assignment.programmingQuestion?.timeRequired}}</td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </ng-container>
+
+</ng-template> -->

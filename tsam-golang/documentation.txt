@@ -1,0 +1,23 @@
+Gorilla mux doesn't support adding routes concurrently 
+https://github.com/gorilla/mux/issues/441
+
+
+# can't use config in ignore because upload requires it (git) can be done in future. 
+# config.env 
+
+
+
+
+
+
+
+SAVE_ASSOCIATIONS	          AutoSave associations or not
+ASSOCIATION_AUTOUPDATE	    AutoUpdate associations or not
+ASSOCIATION_AUTOCREATE	    AutoCreate associations or not
+ASSOCIATION_SAVE_REFERENCE	AutoSave associations reference or not
+
+
+#Notes:
+
+Add header :
+use web> response > SetNewHeader to add new header.

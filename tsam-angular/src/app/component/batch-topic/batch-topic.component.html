@@ -1,0 +1,888 @@
+<!-- Zero template -->
+<ng-template #zeroTemplate>
+    <span>0</span>
+</ng-template>
+
+<!-- Drag template -->
+<ng-template #dragHandleTmpl>
+    <svg class="bi bi-list handle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+            d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+            clip-rule="evenodd" />
+    </svg>
+</ng-template>
+
+<!-- No module logo template -->
+<ng-template #noModuleLogo>
+    <img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<!-- Batch Details Section Template -->
+<ng-template #batchDetailSection let-batchDetails="batchDetails">
+    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 batch-details-section-style">
+        <img width="50" src={{batchDetails.fieldImage}}>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="font-lg-style">
+            {{batchDetails.fieldName}}:
+        </span>
+        <span class="font-lg-style font-weight-bold color-F6430F">
+            {{batchDetails.fieldValue}}
+        </span>
+    </div>
+</ng-template>
+
+<!-- Create a session plan template -->
+<ng-template #createSessionPlanTemplate>
+    <div class="row">
+        <div class="col-1">
+            <img width="60" src="assets/icon/colour-icons/session-plan.png">
+        </div>
+        <div class="col-11">
+            <div class="color-F6430F font-weight-bold font-lg-style margin-top-style">
+                Create a Session Plan
+            </div>
+            <div class="color-757575 font-weight-bold font-sm-style margin-top-style">
+                See which students are already in your class, manage their list.
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Course Module Tabs -->
+<ng-template #batchModuleTabs let-batchModuleTabs="batchModuleTabs">
+    <div class="card module-tab-menu-style">
+        <mat-tab-group mat-align-tabs="center" (selectedTabChange)="onModuleTabClick($event)">
+            <ng-container *ngFor="let batchModuleTab of batchModuleTabs;let i = index">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <div>
+                            <img width="40" src={{batchModuleTab.imageURL}}>
+                            <br><br>
+                            <div>{{batchModuleTab.moduleName}}</div>
+                        </div>
+                    </ng-template>
+                </mat-tab>
+            </ng-container>
+        </mat-tab-group>
+    </div>
+</ng-template>
+
+<!-- Step One :- Create a session plan -->
+<ng-template #stepOne>
+    <ng-container *ngIf="isFaculty">
+        <div class="text-center">
+            <div>
+                <img width="100" src="assets/icon/colour-icons/session-plan.png">
+            </div>
+            <br><br>
+            <div>
+                <span class="create-roadmap-style cursor-pointer-style" (click)="onCreateSessionPlanClick()">
+                    <img width="20" src="assets/course/createroadmap.png" alt="Create Session Plan">
+                    &nbsp;
+                    Create a session plan
+                </span>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="!isFaculty">
+        <div class="text-center">
+            <div>
+                <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+            </div>
+            <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+            <div class="font-lg-style text-center">Faculty hasn't yet created a session plan for this batch</div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<!-- Step Two :- Fill remaining details of batch -->
+<ng-template #stepTwo>
+
+    <!-- Headers -->
+    <ng-template *ngTemplateOutlet="createSessionPlanTemplate"></ng-template>
+    <br><br>
+    <div class="font-weight-bold font-lg-style">
+        Step 1: Verify/Update the Batch details
+    </div>
+
+    <br>
+
+    <!-- Batch form -->
+    <form [formGroup]="batchForm">
+
+        <div class="row">
+            <!-- <div class="form-group col-sm-4 col-md-2">
+                <label class="font-weight-bold"><span class="red">*</span> Batch Start Date:</label>
+                <input type="date" class="form-control input-style" formControlName="startDate">
+                <div class="alert alert-danger" *ngIf="(batchForm.get('startDate').touched || batchForm.get('startDate').dirty)
+                    && batchForm.get('startDate').invalid">
+                    <div *ngIf="batchForm.get('startDate').errors.required">
+                        Batch Start Date must be specified
+                    </div>
+                </div>
+            </div> -->
+            <div class="form-group col-sm-4 col-md-2" *ngIf="!isFaculty">
+                <label class="font-weight-bold"><span class="red">*</span> Faculty:</label>
+                <select class="form-control input-style" [compareWith]="compareFn" formControlName="faculty">
+                    <option [ngValue]="null" disabled>Select</option>
+                    <option *ngFor="let faculty of facultyList" [ngValue]="faculty">{{faculty.firstName}}
+                        {{faculty.lastName}}
+                    </option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(batchForm.get('faculty').touched || batchForm.get('faculty').dirty)
+                    && batchForm.get('faculty').invalid">
+                    <div *ngIf="batchForm.get('faculty').errors.required">
+                        Faculty must be specified
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-sm-4 col-md-3">
+                <label class="font-weight-bold"><span class="red">*</span> Batch Status:</label>
+                <select class="form-control input-style" formControlName="batchStatus">
+                    <option [ngValue]="null" disabled>Select</option>
+                    <option *ngFor="let status of batchStatusList" [ngValue]="status.value">{{status.value}}</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(batchForm.get('batchStatus').touched || batchForm.get('batchStatus').dirty)
+                    && batchForm.get('batchStatus').invalid">
+                    <div *ngIf="batchForm.get('batchStatus').errors.required">
+                        Status must be specified
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-sm-4 col-md-3">
+                <label class="font-weight-bold">Meet Link:</label>
+                <input type="text" class="form-control input-style" formControlName="meetLink"
+                    placeholder="eg: https://meet.google.com/">
+            </div>
+        </div>
+    </form>
+
+    <br>
+
+    <!-- Batch Module Tabs -->
+    <div class="card module-tab-menu-style">
+        <mat-tab-group mat-align-tabs="center" (selectedTabChange)="onBatchModuleTabClickForBatchModuleTimings($event)"
+            [(selectedIndex)]="selectedBatchModuleIndex">
+            <ng-container *ngFor="let batchModuleTab of batchModuleTabList;let i = index">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <div>
+                            <img width="40" src={{batchModuleTab.imageURL}}>
+                            <br><br>
+                            <div>{{batchModuleTab.moduleName}}</div>
+                            <div>
+                                <img *ngIf="batchModuleTab.isComplete" width="20"
+                                    src="assets/icon/colour-icons/check.png">
+                                <img *ngIf="!batchModuleTab.isComplete" width="20" src="assets/course/roadmaperror.png">
+                            </div>
+                        </div>
+                    </ng-template>
+                </mat-tab>
+            </ng-container>
+        </mat-tab-group>
+    </div>
+
+    <br>
+
+    <form [formGroup]="batchModuleTimingsForm">
+
+        <!-- Previous batch module's estimated end date -->
+        <ng-container *ngIf="previousBatchModule.length > 0 && selectedBatchModuleIndex == 0 && previousBatchModule[0]?.estimatedEndDate">
+            <div class="font-weight-bold font-md-style">
+                Previous batch module's estimated end date for 
+                {{previousBatchModule[0]?.module.moduleName}}:
+                <span class="color-F6430F">
+                    {{previousBatchModule[0]?.estimatedEndDate | date:'EEEE, MMM d, y'}}
+                </span>
+            </div>
+            <br>
+        </ng-container>
+
+        <!-- Note for sequential modules -->
+        <ng-container *ngIf="selectedBatchModuleIndex > 0">
+            <div class="font-weight-bold font-md-style">
+               Note: If you want the session plan to be sequential then do not provide the start date for this module.
+            </div>
+            <br>
+        </ng-container>
+
+        <!-- Start Date -->
+        <div class="row">
+            <div class="form-group col-2">
+                <label class="font-weight-bold"><span *ngIf="selectedBatchModule?.isFirst" class="red">*</span> Module
+                    Start Date:</label>
+                <input type="date" class="form-control input-style" formControlName="startDate">
+                <div class="alert alert-danger" *ngIf="(batchModuleTimingsForm.get('startDate').touched || batchModuleTimingsForm.get('startDate').dirty)
+                    && batchModuleTimingsForm.get('startDate').invalid">
+                    <div *ngIf="batchModuleTimingsForm.get('startDate').errors.required">
+                        Module Start Date must be specified
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Day selection -->
+        <div class="row">
+            <div class="col-12">
+                <label class="font-weight-bold"><span class="red">*</span> No of sessions in a week:</label>
+                &nbsp;&nbsp;
+                <span class="day-style" [ngClass]="{'selected-day-style': day.isSelected==true}"
+                    *ngFor="let day of dayList" (click)="onDayClick(day)">
+                    {{day?.day?.substr(0,1)}}
+                </span>
+            </div>
+        </div>
+        <div class="alert alert-danger" *ngIf="batchModuleTimings.length == 0">
+            Batch session days must be selected
+        </div>
+
+        <br>
+
+        <!-- Batch timings form -->
+        <div class="row">
+            <div class="col-12" *ngIf="batchModuleTimings.length > 0">
+                <label class="font-weight-bold"><span class="red">*</span> Session Timings For:</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="container">
+                    <div formArrayName="batchModuleTimings"
+                        *ngFor="let time of batchModuleTimings.controls;let i = index">
+                        <ng-container [formGroupName]="i">
+                            <div class="row">
+                                <div class="form-group col-sm-4 col-md-2">
+                                    <div class="day-text-style text-right">
+                                        {{time.get('day').value?.day}}:
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-5 col-md-4">
+                                    <input type="time" class="form-control input-style" formControlName="fromTime"
+                                        (change)="onBatchTimeChange(i)">
+                                    <div class="alert alert-danger" *ngIf="(time.get('fromTime').touched || time.get('fromTime').dirty)
+                                        && time.get('fromTime').invalid">
+                                        <div *ngIf="time.get('fromTime').errors.required">
+                                            Session start time must be specified
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 col-md-1">
+                                    <div class="day-text-style text-center">
+                                        To
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-5 col-md-4">
+                                    <input type="time" class="form-control input-style" formControlName="toTime"
+                                        (change)="onBatchTimeChange(i)">
+                                    <div class="alert alert-danger" *ngIf="(time.get('toTime').touched || time.get('toTime').dirty)
+                                        && time.get('toTime').invalid">
+                                        <div *ngIf="time.get('toTime').errors.required">
+                                            Session end time must be specified
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-danger" *ngIf="time.get('toTime').value != null && 
+                                        time.get('toTime').value == time.get('fromTime').value">
+                                        Start time and end time cannot be same
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 col-md-1 no-padding-style text-center">
+                                    <img *ngIf="batchModuleTimings.controls.length > 1"
+                                        (click)="deleteBatchTimingInBatchForm(i)"
+                                        src="assets/icon/colour-icons/delete.png" alt="delete module" width="20"
+                                        class="cursor-pointer-style">
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <ng-container *ngIf="batchModuleTimings.length > 0">
+                <div class="col-6">
+                    <div class="col-sm-12 col-md-12 no-padding-style">
+                        <div class="form-check no-padding-style">
+                            <label class="form-check-label">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" (change)="onApplyToAllSessionsClick()"
+                                        formControlName="isApplyToAllSessions">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <span class="font-sm-style">Apply it to all sessions in this module</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+        </div>
+
+        <!-- Next Back button -->
+        <div class="float-right">
+            <button type="button" class="btn btn-default back-button-style button-style"
+                (click)="goBackOneStep()">Back</button>
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round button-style"
+                (click)="validateAllBatchRelatedForms()">
+                Next
+            </button>
+        </div>
+
+    </form>
+</ng-template>
+
+<!-- Step Three :- View and change order of the modules -->
+<ng-template #stepThree>
+
+    <!-- Headers -->
+    <ng-template *ngTemplateOutlet="createSessionPlanTemplate"></ng-template>
+    <br><br>
+    <div class="header-style">
+        <div class="font-weight-bold font-lg-style">
+            <!-- Step 2: View the Modules selected/Change the order of the modules by dragging and dropping -->
+            Step 2: View the Modules selected
+        </div>
+    </div>
+
+    <br><br>
+
+    <!-- Module List Table -->
+    <div *ngIf="totalModules > 0">
+        <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+                <tr class="text-center">
+                    <!-- <th></th> -->
+                    <th>Order</th>
+                    <th class="text-left">Module Name</th>
+                    <th>Topics</th>
+                    <th>Sub Topics</th>
+                    <th>Concepts</th>
+                    <th>Approx Time</th>
+                </tr>
+                <!-- <tbody cdkDropList (cdkDropListDropped)="onDropModulesTableRow($event)"> -->
+                <tbody>
+                    <!-- <tr cdkDrag *ngFor="let batchModule of batchModuleList; let i = index" 
+                        class="color-414141 text-center" cdkDragLockAxis="y"> -->
+                    <tr *ngFor="let batchModule of batchModuleList; let i = index" class="color-414141 text-center">
+                        <!-- <td class="cursor-pointer-style">
+                            <div class="drag-handle">
+                                <ng-container [ngTemplateOutlet]="dragHandleTmpl"></ng-container>
+                            </div>
+                        </td> -->
+                        <td class="table-td-center-align">{{batchModule.order}}</td>
+                        <td class="table-td-center-align text-left">
+                            <ng-container *ngIf="batchModule.module?.logo;else noModuleLogo">
+                                <img [src]="batchModule.module.logo" width="30">
+                            </ng-container>
+                            &nbsp;&nbsp;
+                            {{batchModule.module?.moduleName}}
+                        </td>
+                        <td>
+                            {{batchModule.module?.moduleTopics?.length}}
+                        </td>
+                        <td>
+                            {{batchModule.module?.subTopicCount}}
+                        </td>
+                        <td>
+                            {{batchModule.module?.conceptCount}}
+                        </td>
+                        <td>
+                            {{batchModule.module.approxTime | minute}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div *ngIf="totalModules == 0">
+        <div class="card">
+            <div class="card-body not-found-card-style">
+                <h2>No Modules Found</h2>
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <!-- Next Back button -->
+    <div class="float-right">
+        <!-- <button type="button" class="btn btn-default back-button-style button-style"
+            (click)="goToStepTwoFromStepThree()">Back</button>
+        &nbsp;&nbsp; -->
+        <button *ngIf="totalModules > 0" type="button" class="btn btn-default swabhav-button-round button-style"
+            (click)="goToStepFour()">
+            Next
+        </button>
+    </div>
+
+</ng-template>
+
+<!-- Add/Remove Topics and Sub Topics -->
+<ng-template #stepFour>
+
+    <!-- Headers -->
+    <ng-template *ngTemplateOutlet="createSessionPlanTemplate"></ng-template>
+    <br><br>
+    <div class="font-weight-bold font-lg-style">
+        Step 3: Add/Remove Topics and Sub Topics
+    </div>
+
+    <br>
+
+    <!-- Course Module Tabs -->
+    <ng-template *ngTemplateOutlet="batchModuleTabs; context: {batchModuleTabs: batchModuleTabList}">
+    </ng-template>
+
+    <br>
+
+    <!-- Topics table -->
+    <div *ngIf="selectedBatchModule && selectedBatchModule.moduleTopics && selectedBatchModule.moduleTopics.length > 0">
+        <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+                <tr class="text-center">
+                    <th>Select</th>
+                    <th>Sr No</th>
+                    <th class="text-left">Topics</th>
+                    <th>Sub Topics</th>
+                    <th>Approx Time</th>
+                </tr>
+                <tbody>
+                    <ng-container *ngFor="let topic of selectedBatchModule.moduleTopics; let i = index">
+                        <tr class="striped-tr text-center">
+                            <td class="table-td-center-align">
+                                <div class="form-check no-padding-style">
+                                    <label class="form-check-label">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" [(ngModel)]="topic.isSelected"
+                                                (change)="onTopicSelectedChange(topic,null)">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-nowrap table-td-center-align">
+                                <button type="button" class="btn btn-default"
+                                    (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                                    *ngIf="topic.subTopics && topic.subTopics.length != 0; else noExpand">
+                                    <i class="material-icons-outlined material-icons-button inline-icon">
+                                        {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                                    </i> {{i+1}}
+                                </button>
+                                <ng-template #noExpand>
+                                    <label class="no-sub-session">{{i+1}}</label>
+                                </ng-template>
+                            </td>
+                            <td class="table-td-center-align text-left">
+                                <img src="assets/course/topics.png" width="30">
+                                &nbsp;&nbsp;
+                                {{topic.topicName}}
+                            </td>
+                            <td class="table-td-center-align">
+                                <span *ngIf="topic.subTopics && topic.subTopics.length > 0;else zeroTemplate">
+                                    {{topic.subTopics.length}}
+                                </span>
+                            </td>
+                            <td class="table-td-center-align">
+                                {{topic.totalTime | minute}}
+                            </td>
+                        </tr>
+                        <tr *ngIf="topic.isTopicClicked && topic.subTopics && topic.subTopics.length > 0">
+                            <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                                <table class="table">
+                                    <thead>
+                                        <tr class="no-background-tr-style text-center">
+                                            <th></th>
+                                            <th>Sr No</th>
+                                            <th class="text-left">Sub Topics</th>
+                                            <th>Assignments</th>
+                                            <th>Approx Time</th>
+                                            <!-- <th>Order</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ng-container *ngFor="let subTopic of topic.subTopics; let j = index">
+                                            <tr class="no-background-tr-style text-center">
+                                                <td class="table-td-center-align">
+                                                    <div class="form-check no-padding-style">
+                                                        <label class="form-check-label">
+                                                            <label class="checkbox-container">
+                                                                <input type="checkbox" [(ngModel)]="subTopic.isSelected"
+                                                                    (change)="onTopicSelectedChange(topic,subTopic)">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-nowrap table-td-center-align">
+                                                    {{j+1}}
+                                                </td>
+                                                <td class="text-left table-td-center-align">
+                                                    <img src="assets/icon/colour-icons/sub-sessions.png"
+                                                        width="30">&nbsp;&nbsp;
+                                                    {{subTopic.topicName}}
+                                                </td>
+                                                <td class="table-td-center-align">
+                                                    {{subTopic.topicProgrammingQuestions?.length}}</td>
+                                                <td class="table-td-center-align">
+                                                    {{subTopic.totalTime | minute}}
+                                                </td>
+                                                <!-- <td class="table-td-center-align">
+                                                    <div class="order-style">
+                                                        <input type="number" appAllowNumbersOnly class="form-control input-style text-center" 
+                                                            [(ngModel)]="subTopic.order" placeholder="eg: 1">
+                                                    </div>
+                                                </td> -->
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div
+        *ngIf="selectedBatchModule && selectedBatchModule.moduleTopics && selectedBatchModule.moduleTopics.length == 0">
+        <div class="card">
+            <div class="card-body not-found-card-style">
+                <h2>No Topics Found</h2>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Next Back button -->
+    <div class="float-right">
+        <button type="button" class="btn btn-default back-button-style button-style"
+            (click)="goToStepThreeFromStepFour()">Back</button>
+        &nbsp;&nbsp;
+        <button type="button" class="btn btn-default swabhav-button-round button-style" (click)="goToStepFive()">
+            Next
+        </button>
+    </div>
+
+</ng-template>
+
+<!-- Preview and change order of topics and sub topics -->
+<ng-template #stepFive>
+
+    <!-- Headers -->
+    <ng-template *ngTemplateOutlet="createSessionPlanTemplate"></ng-template>
+    <br><br>
+    <div class="font-weight-bold font-lg-style">
+        Step 4: Change Order of Topics and Sub Topics
+    </div>
+
+    <br>
+
+    <!-- Course Module Tabs -->
+    <ng-template *ngTemplateOutlet="batchModuleTabs; context: {batchModuleTabs: selectedCourseModuleTabList}">
+    </ng-template>
+
+    <br>
+
+    <!-- Topics table -->
+    <div *ngIf="selectedBatchModule && selectedBatchModule.moduleTopics && selectedBatchModule.moduleTopics.length > 0">
+        <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+                <tr class="text-center">
+                    <th></th>
+                    <th>Order</th>
+                    <th class="text-left">Topics</th>
+                    <th>Sub Topics</th>
+                    <th>Approx Time</th>
+                </tr>
+                <tbody cdkDropList (cdkDropListDropped)="onDropTopicsTableRow($event,selectedBatchModule.moduleTopics)">
+                    <ng-container *ngFor="let topic of selectedBatchModule.moduleTopics; let i = index">
+                        <tr class="striped-tr text-center" cdkDrag cdkDragLockAxis="y">
+                            <td class="cursor-pointer-style">
+                                <div class="drag-handle">
+                                    <ng-container [ngTemplateOutlet]="dragHandleTmpl"></ng-container>
+                                </div>
+                            </td>
+                            <td class="text-nowrap table-td-center-align">
+                                <button type="button" class="btn btn-default"
+                                    (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                                    *ngIf="topic.subTopics && topic.subTopics.length != 0; else noExpand">
+                                    <i class="material-icons-outlined material-icons-button inline-icon">
+                                        {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                                    </i> {{i+1}}
+                                </button>
+                                <ng-template #noExpand>
+                                    <label class="no-sub-session">{{i+1}}</label>
+                                </ng-template>
+                            </td>
+                            <td class="table-td-center-align text-left">
+                                <img src="assets/course/topics.png" width="30">
+                                &nbsp;&nbsp;
+                                {{topic.topicName}}
+                            </td>
+                            <td class="table-td-center-align">
+                                <span *ngIf="topic.subTopics && topic.subTopics.length > 0;else zeroTemplate">
+                                    {{topic.subTopics.length}}
+                                </span>
+                            </td>
+                            <td class="table-td-center-align">
+                                {{topic.totalTime | minute}}
+                            </td>
+                        </tr>
+                        <tr *ngIf="topic.isTopicClicked && topic.subTopics && topic.subTopics.length > 0">
+                            <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                                <table class="table">
+                                    <thead>
+                                        <tr class="no-background-tr-style text-center">
+                                            <th></th>
+                                            <th>Order</th>
+                                            <th class="text-left">Sub Topics</th>
+                                            <th>Assignments</th>
+                                            <th>Approx Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody cdkDropList
+                                        (cdkDropListDropped)="onDropTopicsTableRow($event,topic.subTopics)">
+                                        <ng-container *ngFor="let subTopic of topic.subTopics; let j = index">
+                                            <tr class="no-background-tr-style text-center" cdkDrag cdkDragLockAxis="y">
+                                                <td class="cursor-pointer-style">
+                                                    <div class="drag-handle">
+                                                        <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                                                        </ng-container>
+                                                    </div>
+                                                </td>
+                                                <td class="text-nowrap table-td-center-align">
+                                                    {{j+1}}
+                                                </td>
+                                                <td class="text-left table-td-center-align">
+                                                    <img src="assets/icon/colour-icons/sub-sessions.png"
+                                                        width="30">&nbsp;&nbsp;
+                                                    {{subTopic.topicName}}
+                                                </td>
+                                                <td class="table-td-center-align">
+                                                    {{subTopic.topicProgrammingQuestions?.length}}</td>
+                                                <td class="table-td-center-align">
+                                                    {{subTopic.totalTime | minute}}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div
+        *ngIf="selectedBatchModule && selectedBatchModule.moduleTopics && selectedBatchModule.moduleTopics.length == 0">
+        <div class="card">
+            <div class="card-body not-found-card-style">
+                <h2>No Topics Found</h2>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Next Back button -->
+    <div class="float-right">
+        <button type="button" class="btn btn-default back-button-style button-style"
+            (click)="goToStepFourFromStepFive()">Back</button>
+        &nbsp;&nbsp;
+        <button type="button" class="btn btn-default swabhav-button-round button-style" (click)="goToStepSix()">
+            Next
+        </button>
+    </div>
+
+</ng-template>
+
+<!-- Add and Update Assignments -->
+<ng-template #stepSix>
+
+    <!-- Headers -->
+    <ng-template *ngTemplateOutlet="createSessionPlanTemplate"></ng-template>
+    <br><br>
+    <div class="font-weight-bold font-lg-style">
+        Step 5: Add and Update Assignments
+    </div>
+
+    <br>
+
+    <!-- Course Module Tabs -->
+    <ng-template *ngTemplateOutlet="batchModuleTabs; context: {batchModuleTabs: selectedCourseModuleTabList}">
+    </ng-template>
+
+    <br>
+
+    <!-- Topics table -->
+    <div *ngIf="selectedBatchModule && selectedBatchModule.moduleTopics && selectedBatchModule.moduleTopics.length > 0">
+        <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+                <tr class="text-center">
+                    <th>Order</th>
+                    <th class="text-left">Topic Name</th>
+                    <!-- <th class="text-left">Sub Topics</th> -->
+                    <th>Assignments</th>
+                    <th>Approx Time</th>
+                </tr>
+                <tbody>
+                    <ng-container *ngFor="let topic of selectedBatchModule.moduleTopics; let i = index">
+                        <tr class="no-background-tr-style text-center">
+                            <td class="text-nowrap table-td-center-align">
+                                <button type="button" class="btn btn-default"
+                                    (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                                    *ngIf="topic.topicProgrammingQuestions && topic.topicProgrammingQuestions.length != 0; else noExpand">
+                                    <i class="material-icons-outlined material-icons-button inline-icon">
+                                        {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                                    </i> {{i+1}}
+                                </button>
+                                <ng-template #noExpand>
+                                    <label class="no-sub-session">{{i+1}}</label>
+                                </ng-template>
+                            </td>
+                            <td class="text-left table-td-center-align">
+                                {{topic.topicName}}
+                            </td>
+                            <!-- <td class="text-left table-td-center-align">
+                                {{topic.parentTopicName}}
+                            </td>
+                            <td class="text-left table-td-center-align">
+                                <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                                {{subTopic.topicName}}
+                            </td> -->
+                            <td class="table-td-center-align">{{topic.topicProgrammingQuestions?.length}}</td>
+                            <td class="table-td-center-align">
+                                {{topic.totalTime | minute}}
+                            </td>
+                        </tr>
+                        <tr
+                            *ngIf="topic.isTopicClicked && topic.topicProgrammingQuestions && topic.topicProgrammingQuestions.length > 0">
+                            <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                                <table class="table">
+                                    <thead>
+                                        <tr class="no-background-tr-style text-center">
+                                            <th>
+                                                <div class="form-check no-padding-style">
+                                                    <label class="form-check-label">
+                                                        <label class="checkbox-container">
+                                                            <input type="checkbox"
+                                                                [(ngModel)]="topic.isAllQuestionsSelected"
+                                                                (click)="onProgrammingQuestionSelectedChange(topic,-1)">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </label>
+                                                </div>
+                                            </th>
+                                            <th class="text-left">Assignment Name</th>
+                                            <th>Difficulty</th>
+                                            <!-- <th>Required Days</th> -->
+                                            <th>Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ng-container
+                                            *ngFor="let topicProgrammingQuestion of topic.topicProgrammingQuestions; let j = index">
+                                            <tr class="no-background-tr-style text-center">
+                                                <td class="table-td-center-align">
+                                                    <div class="form-check no-padding-style">
+                                                        <label class="form-check-label">
+                                                            <label class="checkbox-container">
+                                                                <input type="checkbox"
+                                                                    [(ngModel)]="topicProgrammingQuestion.isSelected"
+                                                                    (click)="onProgrammingQuestionSelectedChange(topic,j)">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-left table-td-center-align">
+                                                    <img src="assets/course/assignment.png" width="30">&nbsp;&nbsp;
+                                                    {{topicProgrammingQuestion?.programmingQuestion?.label}}
+                                                </td>
+                                                <td class="table-td-center-align">
+                                                    <div class="tasklist-box-style"
+                                                        [ngClass]="{'green-box-style': topicProgrammingQuestion?.programmingQuestion?.difficulty=='Easy',
+                                                        'yellow-box-style': topicProgrammingQuestion?.programmingQuestion?.difficulty=='Medium',
+                                                        'red-box-style': topicProgrammingQuestion?.programmingQuestion?.difficulty=='Hard'}">
+                                                        {{topicProgrammingQuestion?.programmingQuestion?.difficulty}}
+                                                    </div>
+                                                </td>
+                                                <!-- <td class="table-td-center-align">
+                                                    <div class="order-style">
+                                                        <input type="number" appAllowNumbersOnly class="form-control input-style text-center" 
+                                                            [(ngModel)]="topicProgrammingQuestion.days" placeholder="eg: 1">
+                                                    </div>
+                                                    <div class="order-style alert alert-danger" *ngIf="topicProgrammingQuestion.days < 1">
+                                                        Required days cannot be lesser than 1
+                                                    </div>
+                                                </td> -->
+                                                <td class="table-td-center-align">
+                                                    {{topicProgrammingQuestion?.programmingQuestion?.score}}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div
+        *ngIf="selectedBatchModule && selectedBatchModule.moduleTopics && selectedBatchModule.moduleTopics.length == 0">
+        <div class="card">
+            <div class="card-body not-found-card-style">
+                <h2>No Topics Found</h2>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Create a session plan button -->
+    <div class="float-right">
+        <button type="button" class="btn btn-default back-button-style button-style"
+            (click)="goToStepFiveFromStepSix()">Back</button>
+        &nbsp;&nbsp;
+        <div class="create-session-plan-style">
+            <span class="create-roadmap-style cursor-pointer-style" (click)="createSessionPlan()">
+                <img width="20" src="assets/course/createroadmap.png" alt="Create Session Plan">
+                &nbsp;
+                Create a session plan
+            </span>
+        </div>
+    </div>
+
+</ng-template>
+
+<!-- Session Plan -->
+<ng-template #tempSessionPlan>
+    <app-batch-session-plan>
+    </app-batch-session-plan>
+</ng-template>
+
+<!--  Main container -->
+<div class="container-fluid standard-page-margin page-width-style">
+    <!-- <div class="font-weight-bold font-lg-style color-F6430F text-center">
+        Session Plan
+    </div> -->
+
+    <!-- Batch Details Section -->
+    <ng-container *ngIf="batchSessionList.length == 0">
+        <div class="row">
+            <ng-container *ngFor="let batchDetails of batchDetailsList; let i = index">
+                <ng-template *ngTemplateOutlet="batchDetailSection; context: {batchDetails: batchDetails}">
+                </ng-template>
+            </ng-container>
+        </div>
+        <br><br>
+    </ng-container>
+
+    <!-- Step Template -->
+    <ng-template *ngTemplateOutlet="selectedTemplateName"></ng-template>
+
+</div>

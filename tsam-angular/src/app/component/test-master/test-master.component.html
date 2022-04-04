@@ -1,0 +1,276 @@
+<app-master-navbar></app-master-navbar>
+
+<div class="container-fluid margin-2pt">
+  <form>
+    <div class="card">
+      <div class="card-header">
+        <button class="btn btn-primary float-right" data-toggle="modal" data-target="#questionManipulation"
+          (click)="onQuestionAddButtonClick()">Add New
+          Talent</button>
+      </div>
+      <div class=" card-body search-bar padding">
+        <div class="search-input">
+          <div class="form-group">
+            <div class="input-group mb-3 input-group-lg">
+              <input type="text" class="form-control" placeholder="Search">
+              <div class="input-group-append">
+                <span class="input-group-text"><i class="material-icons">search</i></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-by-field row">
+          <div class="form-group col-sm-6 col-md-3">
+            <label for="sel1">Question Type:</label>
+            <select class="form-control " id="sel1">
+              <option class="list-group-item">Select Question Type</option>
+              <option *ngFor="let questionty of questionTypes" value="questionty">{{questionty.type}}</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-6 col-md-3">
+            <label for="sel1">Question Level</label>
+            <select class="form-control " id="sel1">
+              <option class="list-group-item">Select Question level</option>
+              <option *ngFor="let difflevel of questiondifficulty" value="difflevel">{{difflevel.level}}</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-6 col-md-3">
+            <label for="sel1">Subject</label>
+            <select class="form-control " id="sel1">
+              <option>Select Subject</option>
+              <option *ngFor="let subject of subjects" value="subject">{{subject.subject}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="float-right">
+          <button class="btn btn-success" type="submit">Search</button> &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-secondary" type="reset">Reset</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="card margin-2pt">
+    <div class="card-header">
+      <div class="totalLabel">
+        Total Question : {{questionlist.length || 0}}
+      </div>
+      <div class="display-inline">
+        <div class="form-group col-sm-6 col-md-6">
+          <div class="row">
+            <select class="form-control col-sm-4 col-md-3">
+              <option>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+          </div>
+        </div>
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">Previous</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-body padding-0pt">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Question ID</th>
+              <th>Question Type</th>
+              <th>Difficulty level</th>
+              <th>Subject</th>
+              <th>Question</th>
+              <th>Total Option/Test Case</th>
+              <th>Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let question of questionlist;let ind = index">
+              <td>{{ind+1}}</td>
+              <td>{{question.questionID}}</td>
+              <td>{{question.questionType.type}}</td>
+              <td>{{question.difficulty.level}}</td>
+              <td>{{question.subject.subject}}</td>
+              <td>{{question.question}}</td>
+              <td>{{question.options.length}}</td>
+              <td><button class="btn btn-default" type="button" data-toggle="modal" data-target="#questionManipulation"
+                  (click)="onQuestionEditButtonClick(question.questionID)"><i class="material-icons">create</i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<app-master-footer></app-master-footer>
+
+<!-- Question Add Or Update. -->
+<div class="modal fade" id="questionManipulation">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">{{modelHeader}}</h4>
+        <button type="button" class="close" data-dismiss="modal"><i class="material-icons">highlight_off</i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form [formGroup]="questionform">
+          <div class="row">
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label for="sel1">Question:</label>
+                <input type="text" class="form-control" formControlName="question" placeholder="Enter Question">
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label for="sel1">Question Type:</label>
+              <select class="form-control" [compareWith]="compareFn" formControlName="questionType">
+                <option *ngFor="let type of questionTypes" [ngValue]="type">{{type.type}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label for="sel1">Question Difficulty Level:</label>
+              <select class="form-control" [compareWith]="compareFn" formControlName="difficulty">
+                <option *ngFor="let difflevel of questiondifficulty" [ngValue]="difflevel">{{difflevel.level}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label for="sel1">Question Subject:</label>
+              <select class="form-control" [compareWith]="compareFn" formControlName="subject">
+                <option *ngFor="let subject of subjects" [ngValue]="subject">{{subject.subject}}</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <div class="row" formArrayName="options" *ngFor="let option of optionControl.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <div class="form-group col-sm-6 col-md-6">
+                  <label for="sel1">{{fieldlabel}}:</label>
+                  <input type="text" class="form-control" formControlName="option" placeholder="Enter {{fieldlabel}}">
+                </div>
+                <div class="form-group col-sm-6 col-md-6" *ngIf="isQuestionTypeProgram() == false">
+                  <label for="sel1">Select Status:</label>
+                  <select class="form-control" [compareWith]="compareFn" formControlName="status">
+                    <option *ngFor="let flag of flags" [ngValue]="flag">{{flag.status}}</option>
+                  </select>
+                </div>
+              </ng-container>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-6">
+                <button class="btn btn-primary" (click)="addNewOption()">+ Add {{fieldlabel}}</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" (click)="formAction()">{{modelActionType}}</button>
+        <button type="reset" class="btn btn-default">reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Send Test Link
+<div class="modal" id="SendTestLink">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      Modal Header
+      <div class="modal-header">
+        <h4 class="modal-title">Send Test Link</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      Modal body
+      <div class="modal-body">
+        <form [formGroup]="addEnquiry">
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-4">
+              <label for="sel1">Select Talent:</label>
+              <select class="form-control ">
+                <option>Select Talent Serial Number</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      Modal footer
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Send Test Link</button>
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div> -->
+
+
+<!-- Send Message
+<div class="modal" id="sendMessage">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      Modal Header
+      <div class="modal-header">
+        <h4 class="modal-title">Send Message</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      Modal body
+      <div class="modal-body">
+        <form [formGroup]="addEnquiry">
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-4">
+              <label for="sel1">Select Talent:</label>
+              <select class="form-control ">
+                <option>Select Talent Serial Number</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-12 col-lg-12">
+              <label for="comment">Message:</label>
+              <textarea class="form-control" rows="5" id="comment" placeholder="Type Message Here...."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      Modal footer
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Send Email</button>
+        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Send WhatsApp</button>
+        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Send SMS</button>
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div> -->

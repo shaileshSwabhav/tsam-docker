@@ -1,0 +1,45 @@
+.btn:hover:enabled {
+  transform: scale(1.1);
+}
+
+.material-icons:hover {
+  transform: scale(1.3);
+}
+
+.inline {
+  display: flex;
+  flex-direction: row;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+a, a:hover{
+  color:white;
+  text-decoration: none;
+}
+
+.no-link{
+  font-weight: 900;
+  cursor: default;
+}
+
+.heading {
+  font-weight: 900;
+  font-size: medium
+}
+
+.badge-custom-dark-blue {
+    background-color: #035397;
+    color: white;
+}
+
+.badge-custom-light-blue {
+  background-color: #5089C6;
+  color: white;
+}
+
+.input-margin {
+  margin-left: 2%;
+}

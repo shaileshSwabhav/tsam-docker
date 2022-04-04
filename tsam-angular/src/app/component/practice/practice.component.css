@@ -1,0 +1,75 @@
+.arrow{
+    display:inline-flex;
+    vertical-align:top;
+}
+
+.close-style{
+    color: #757575;
+    font-size: small;
+    font-weight: bold;
+    cursor: pointer;
+    transform: none;
+}
+
+.icon-style{
+    font-size: 15px;
+    padding-top: 30%;
+    font-weight: bold;
+    transform: none;
+}
+
+.heading-style{
+    color: #707070;
+    font-size: x-large;
+    font-weight: bold;
+    margin-bottom: 2%;
+    margin-top: 2%;
+} 
+
+.help-icon-style{
+    padding-top: 50%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.practice-card-style{
+    border: solid #D63C2A;
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.practice-card-shadow {
+    padding: 10px;
+    box-shadow: 5px 10px 8px #00000029;
+}
+
+.practice-card-body-style{
+    padding-top: 0%;
+    padding-bottom: 0%;
+}
+
+.main-topic-image{
+    width: 5%;
+}
+
+.sub-topic-name-header{
+    margin-bottom: 1%;
+    color: #D63C2A;
+    font-size: large;
+    margin-top: 2%;
+    font-weight: bold;
+}
+
+.practice-diasbled-card-style{
+    border: solid #BDBDBD;
+    color: #757575;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+}
+
+
+
+

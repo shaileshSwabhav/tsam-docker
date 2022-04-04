@@ -1,0 +1,27 @@
+i{
+  cursor: pointer;
+}
+
+.banner-image-style{
+  width: 70%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+

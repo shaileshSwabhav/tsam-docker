@@ -1,0 +1,554 @@
+<ng-template #freeTemplate>
+  <span class="sub-details free">Free</span>
+</ng-template>
+
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label class="filter-form-label">{{name}}:</label>
+</ng-template>
+
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="search-body">
+      <div class="filter-header">
+        Edit Filters&nbsp;&nbsp;&nbsp;
+        <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+        <div class="float-right">
+          <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+            <i class="material-icons close-icon close-icon">close</i>
+          </button>
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <form [formGroup]="eventSearchForm">
+        <div class="col-md-12 col-sm-12">
+          <div class="search-bar padding">
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-6 col-md-6">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Title'}"></ng-container>
+                <input type="text" class="form-control input-style" formControlName="title" placeholder="eg: Java">
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Online'}"></ng-container>
+                <select class="form-control input-style" formControlName="isOnline">
+                  <option [ngValue]="null">Select Status</option>
+                  <option [ngValue]="'1'">Yes</option>
+                  <option [ngValue]="'0'">No</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Active'}"></ng-container>
+                <select class="form-control input-style" formControlName="isActive">
+                  <option [ngValue]="null">Select Status</option>
+                  <option [ngValue]="'1'">Active</option>
+                  <option [ngValue]="'0'">Closed</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}"></ng-container>
+                <input type="date" class="form-control input-style" formControlName="fromDate">
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To Date'}"></ng-container>
+                <input type="date" class="form-control input-style" formControlName="toDate">
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Registration Date'}">
+                </ng-container>
+                <input type="date" class="form-control input-style" formControlName="lastRegistrationDate">
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <br>
+
+      <div class="text-center">
+        <button type="button" class="btn btn-submit-swabhav material-icons-button" [disabled]="!eventSearchForm.dirty"
+          (click)="searchAndCloseDrawer()">Search <i class="inline-icon material-icons">search</i>
+        </button>
+      </div>
+    </div>
+
+  </mat-drawer>
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+
+    <div class="container-fluid margin-2pt">
+
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Events: <span class="swabhav-light-orange-text">{{totalEvents || 0}}</span></h1>
+        </div>
+
+        <button *ngIf="permission?.add" type="button" class="btn btn-submit-swabhav material-icons-button"
+          (click)="onAddClick()">Add New Event <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalEvents > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalEvents}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row">
+        <div class="d-flex justify-content-between align-items-center flex-row">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-sm filter-button material-icons-button" *ngIf="isSearched"
+            (click)="resetSearchAndGetAll()">View All
+            Events</button>
+        </div>
+        <div class="d-flex justify-content-between align-items-start flex-row">
+          <div class="d-flex">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex">
+            <ul class="pagination" *ngFor="let event of events | paginate: { id:'eventPageID',
+                itemsPerPage: limit, currentPage: currentPage, totalItems: totalEvents }">
+            </ul>
+            <pagination-controls autoHide="true" responsive="true" maxSize="5" (pageChange)="changePage($event)"
+              id="eventPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card-deck" *ngIf="totalEvents > 0; else noEvents">
+        <ng-container *ngFor="let event of events; let i = index">
+          <div class="card card-shadow card-style px-0 pt-0 col-sm-6 col-md-4">
+            <div class="event-image-container">
+              <div class="circle">
+                <span class="people-completed-number">
+                  <span *ngIf="event.totalRegistrations; else noRegistration">
+                    {{event.totalRegistrations}}
+                  </span>
+                  <ng-template #noRegistration>0</ng-template>
+                </span>
+                <br>
+                <div class="people-have-text">people have</div>
+                <br>
+                <div class="completed-text">registered</div>
+              </div>
+              <div *ngIf="event.eventImage; else defaultLogo">
+                <img class="event-image" src={{event.eventImage}} alt="">
+              </div>
+              <ng-template #defaultLogo>
+                <img class="event-image" src="assets/images/default-course.png" alt="">
+              </ng-template>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div class="event-name">Workshop on {{event.title}}</div>
+              <br>
+              <div class="description">{{event.description}}</div>
+              <br>
+              <div class="row">
+                <div class="col-sm-6 col-md-3">
+                  <div class="sub-header">Event Date</div>
+                  <div class="sub-details">
+                    {{event.fromDate | date:'shortDate'}} - {{event.toDate | date:'shortDate'}}
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <div class="sub-header">Time</div>
+                  <div class="sub-details">{{utilService.formatTimeString(event.fromTime)}} -
+                    {{utilService.formatTimeString(event.toTime)}}</div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <div class="sub-header">Entry Fee</div>
+                  <div *ngIf="event.entryFee != 0; else freeTemplate" class="sub-details">
+                    <span>{{event.entryFee | currency:'INR'}}</span>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <div class="sub-header">Venue</div>
+                  <div class="sub-details">
+                    <div *ngIf="event.isOnline; else showVenue">Online</div>
+                    <ng-template #showVenue> <span class="sub-details">{{event.state?.name}}</span></ng-template>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between align-items-baseline">
+                <div>
+                  <label class="date-header">Last date of Registration</label>
+                  <span class="date-details"> {{event.lastRegistrationDate | date:'dd MMM, yyyy'}}</span>
+                </div>
+                <div>
+                  <button type="button" class="btn btn-default" (click)="onViewClick(event)">
+                    <i class="material-icons material-icons-button">visibility</i>
+                  </button> &nbsp;&nbsp;&nbsp;
+                  <button type="button" class="btn btn-default" *ngIf="permission?.delete"
+                    (click)="onDeleteClick(event.id)">
+                    <i class="material-icons material-icons-button red">delete</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+
+      <!-- Events Not Found -->
+      <ng-template #noEvents>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Events not found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+
+  </mat-drawer-content>
+</mat-drawer-container>
+
+
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Event Form Modal -->
+<ng-template #eventFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+        {{isViewClicked? 'Event Details': isUpdateClicked ? 'Update Event' : 'Add Event' }}
+        <button *ngIf="isViewClicked && permission?.update" class="btn btn-default material-icons-button" type="button"
+          (click)="onUpdateClick()"><i class="material-icons grey-icon">create</i></button>
+      </h4><span *ngIf="!isViewClicked"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="eventForm">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-6">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Title'}"></ng-container>
+          <input type="text" class="form-control input-style" formControlName="title" placeholder="eg: Java">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('title').dirty || eventForm.get('title').touched) && eventForm.get('title').errors">
+            <span *ngIf="eventForm.get('title').errors.required">
+              Title must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Entry Fee'}"></ng-container>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="entryFee"
+            placeholder="eg: 100">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('entryFee').dirty || eventForm.get('entryFee').touched) && eventForm.get('entryFee').errors">
+            <span *ngIf="eventForm.get('entryFee').errors.required">
+              Entry Fee must be specified
+            </span>
+            <span *ngIf="eventForm.get('entryFee').errors.min">
+              Entry Fee cannot be less than 0
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'From Date'}"></ng-container>
+          <input type="date" class="form-control input-style" formControlName="fromDate">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('fromDate').dirty || eventForm.get('fromDate').touched) && eventForm.get('fromDate').errors">
+            <span *ngIf="eventForm.get('fromDate').errors.required">
+              From Date must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'To Date'}"></ng-container>
+          <input type="date" class="form-control input-style" formControlName="toDate">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('toDate').dirty || eventForm.get('toDate').touched) && eventForm.get('toDate').errors">
+            <span *ngIf="eventForm.get('toDate').errors.required">
+              To Date must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Registration Date'}"></ng-container>
+          <input type="date" class="form-control input-style" formControlName="lastRegistrationDate">
+          <div class="alert alert-danger" *ngIf="(eventForm.get('lastRegistrationDate').dirty || 
+            eventForm.get('lastRegistrationDate').touched) && eventForm.get('lastRegistrationDate').errors">
+            <span *ngIf="eventForm.get('lastRegistrationDate').errors.required">
+              Last registration Date must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'From Time'}"></ng-container>
+          <input type="time" class="form-control input-style" formControlName="fromTime">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('fromTime').dirty || eventForm.get('fromTime').touched) && eventForm.get('fromTime').errors">
+            <span *ngIf="eventForm.get('fromTime').errors.required">
+              From Time must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'To Time'}"></ng-container>
+          <input type="time" class="form-control input-style" formControlName="toTime">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('toTime').dirty || eventForm.get('toTime').touched) && eventForm.get('toTime').errors">
+            <span *ngIf="eventForm.get('toTime').errors.required">
+              From time must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Total Hours (In minutes)'}">
+          </ng-container>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="totalHours"
+            placeholder="eg: 10">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('totalHours').dirty || eventForm.get('totalHours').touched) && eventForm.get('totalHours').errors">
+            <span *ngIf="eventForm.get('totalHours').errors.required">
+              Total Hours must be specified
+            </span>
+            <span *ngIf="eventForm.get('entryFee').errors.min">
+              Total Hours cannot be less than 1
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Event Status'}"></ng-container>
+          <select class="form-control input-style" formControlName="eventStatus">
+            <option [ngValue]="null" disabled>Select Status</option>
+            <option *ngFor="let status of eventStatusList" [ngValue]="status.value">{{status.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(eventForm.get('eventStatus').touched || eventForm.get('eventStatus').dirty)
+                && eventForm.get('eventStatus').invalid">
+            <div *ngIf="eventForm.get('eventStatus').errors.required">
+              Event Status must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Online'}"></ng-container>
+          <select class="form-control input-style" formControlName="isOnline">
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(eventForm.get('isOnline').touched || eventForm.get('isOnline').dirty)
+              && eventForm.get('isOnline').invalid">
+            <div *ngIf="eventForm.get('isOnline').errors.required">
+              Whether event is online or offline must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Active'}"></ng-container>
+          <select class="form-control input-style" formControlName="isActive">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Closed</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(eventForm.get('isActive').touched || eventForm.get('isActive').dirty)
+              && eventForm.get('isActive').invalid">
+            <div *ngIf="eventForm.get('isActive').errors.required">
+              Event Active status must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-12">
+          <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Event Meeting Link'}"></ng-container>
+          <input type="text" class="form-control input-style" formControlName="eventMeetingLink"
+            placeholder="Meeting Link">
+        </div>
+        <div class="form-group col-sm-12 col-md-12">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Description'}"></ng-container>
+          <textarea type="text" class="form-control input-style" formControlName="description" rows="2"
+            placeholder="eg: Event Description..."></textarea>
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('description').dirty || eventForm.get('description').touched) && eventForm.get('description').errors">
+            <span *ngIf="eventForm.get('description').errors.required">
+              Description must be specified
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row col-sm-12 col-md-12">
+        <h1 class="swabhav-light-orange-text"><strong>Location Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Address'}"></ng-container>
+          <textarea type="text" class="form-control input-style" formControlName="address"
+            placeholder="eg: Mumbai"></textarea>
+          <div class="alert alert-danger" *ngIf="(eventForm.get('address').dirty ||eventForm.get('address').touched) 
+                && eventForm.get('address').invalid">
+            <span *ngIf="eventForm.get('address').errors.required">
+              Address must be specified
+            </span>
+            <span *ngIf="eventForm.get('address').errors.pattern">
+              Address should only have alphabet , / number.
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country'}"></ng-container>
+          <select class="form-control input-style" [compareWith]="compareFn"
+            (change)="getStateList(eventForm.get('country').value.id)" formControlName="country" #country>
+            <option [ngValue]="null" disabled>Select Country</option>
+            <option *ngFor="let country of countryList" [ngValue]="country">{{country.name}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(eventForm.get('country').dirty || eventForm.get('country').touched) 
+                && eventForm.get('country').invalid">
+            <span *ngIf="eventForm.get('country').errors.required">
+              Country must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'State'}"></ng-container>
+          <ng-select [items]="stateList" bindLabel="name" placeholder="Select State" appendTo="body" [searchable]="true"
+            [clearable]="true" formControlName="state" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(eventForm.get('state').dirty || eventForm.get('state').touched) 
+                && eventForm.get('state').invalid">
+            <span *ngIf="eventForm.get('state').errors.required">
+              State must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+          <input type="text" class="form-control input-style" formControlName="city" placeholder="eg: Mumbai">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('city').dirty || eventForm.get('city').touched) && eventForm.get('city').errors">
+            <span *ngIf="eventForm.get('city').errors.required">
+              City must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'PIN Code'}"></ng-container>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="pinCode"
+            placeholder="eg: 401104">
+          <div class="alert alert-danger"
+            *ngIf="(eventForm.get('pinCode').dirty || eventForm.get('pinCode').touched) && eventForm.get('pinCode').errors">
+            <span *ngIf="eventForm.get('pinCode').errors.required">
+              Pincode must be specified
+            </span>
+            <span *ngIf="eventForm.get('pinCode').errors.pattern">
+              Pincode must be of 6 digit
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- span is used to hide the border as well -->
+      <span *ngIf="!isViewClicked || eventForm.get('eventImage')?.value">
+        <hr>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label filter-form-label">Event Image:</label>
+          <div class="col-sm-4">
+            <span class="custom-file custom-file-border">
+              <input *ngIf="!isViewClicked" type="file" class="custom-file-input" (change)="onResourceSelect($event)"
+                id="customFile" value="displayedImageName">
+              <label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label" for="customFile"
+                [innerHTML]="displayedImageName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isImageUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading Image...
+              </button>
+              <div *ngIf="eventForm.get('eventImage')?.value && !isImageUploadedToServer" data-toggle="tooltip"
+                data-placement="top" title="View eventImage">
+                <button *ngIf="isViewClicked" class="btn btn-submit-swabhav material-icons-button">
+                  <a [href]="eventForm.get('eventImage').value" target="_blank">View Event Image</a>
+                </button>
+              </div>
+            </span>
+            <!-- should add view uploaded eventImage using a eventImage variable after cleaning. -->
+            <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+          </div>
+        </div>
+      </span>
+
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="dismissFormModal(modal)">Close</button>
+    <button type="button" *ngIf="!isViewClicked" class="btn btn-submit-swabhav material-icons-button"
+      [disabled]="!eventForm.dirty" (click)="validate()">
+      {{isUpdateClicked ? 'Update Event' : 'Add Event'}}
+    </button>
+  </div>
+
+</ng-template>
+
+<!-- Delete Modal -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Comfirmation</h4>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="button"><i
+        class="material-icons close-icon material-icons-button">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want you to delete this event?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button"
+      (click)="modal.dismiss('Cross click');">No
+    </button>
+  </div>
+
+</ng-template>

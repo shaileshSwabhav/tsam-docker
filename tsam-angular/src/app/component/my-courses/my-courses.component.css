@@ -1,0 +1,98 @@
+.course-certificate{
+  text-align: center;
+  color: #EE3733;
+  font-size: small;
+  font-weight: bold;
+  border: 1.5px solid #EE3733;
+  border-radius: 30px;
+  padding: 2%;
+  cursor: pointer;
+}
+
+.course-certificate-disabled{
+  text-align: center;
+  color: #BDBDBD;
+  font-size: small;
+  font-weight: bold;
+  border: 1.5px solid #BDBDBD;
+  border-radius: 30px;
+  padding: 2%;
+  cursor:not-allowed
+}
+
+.view-now-button-style{
+  display: inline;
+  float: right;
+  margin-bottom: 10%;
+}
+
+.progress-bar-custom {
+  /* width: 100%; */
+  background-color: #FF7000BF;
+}
+
+.date-header-style{
+  color: #BDBDBD;
+  font-size: small;
+  font-weight: bold;
+  margin-bottom: -10%
+}
+
+.course-card-body-margin{
+  padding-bottom: 0%;
+}
+
+.my-courses-heading-style{
+  color: #707070;
+  font-size: x-large;
+  font-weight: bold;
+  margin-bottom: 2%;
+  margin-top: 2%;
+}
+
+.course-image{
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.course-image-container{
+  position: relative;
+}
+
+.circle {
+  height: 70px;
+  width: 70px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+  box-shadow: 5px 10px 8px #00000029;
+  left: 10px;
+  top: 10px;
+}
+
+.people-completed-number{
+  top: 10px;
+  color: #EE3733;
+  font-weight: bold;
+  left: 30px;
+  position: absolute;
+}
+
+.people-have-text{
+  color: #212121;
+  font-weight: bold;
+  font-size: x-small;
+  position: absolute;
+  left: 10px;
+  top: 25px;
+}
+
+.completed-text{
+  color: #212121;
+  font-weight: bold;
+  font-size: x-small;
+  position: absolute;
+  left: 11px;
+}

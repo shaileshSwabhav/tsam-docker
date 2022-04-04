@@ -1,0 +1,526 @@
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="filter-form-label"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label class="filter-form-label">{{name}}:</label>
+</ng-template>
+
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="assignmentSearchForm">
+      <div class="row filter-by-field">
+        <div class="form-group col-sm-12">
+          <label class="filter-form-label">Title:</label>
+          <input type="text" class="form-control input-style" formControlName="title" placeholder="eg: Java">
+        </div>
+        <div class="form-group col-sm-12">
+          <label class="filter-form-label">Programming Assignment Type:</label>
+          <select class="form-control input-style" formControlName="programmingAssignmentType">
+            <option [ngValue]="null">Select Assignment Type</option>
+            <option *ngFor="let type of assignmentType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <br>
+
+    <div class="text-center">
+      <button type="button" class="btn btn-submit-swabhav material-icons-button"
+        [disabled]="!assignmentSearchForm.dirty" (click)="searchAndCloseDrawer()">
+        Search <i class="inline-icon material-icons">search</i>
+      </button>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Assignments: <span class="swabhav-light-orange-text">{{totalAssignments || 0}}</span></h1>
+        </div>
+
+        <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission?.add"
+          (click)="onAddClick()">Add New Assignment <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalAssignments > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalAssignments}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+        <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+            (click)="resetSearchAndGetAll()">View All Assignment
+          </button> &nbsp;&nbsp;&nbsp;
+          <button *ngIf="isNavigated" class="btn filter-button material-icons-button" (click)="onAssignClick()"
+            [disabled]="assignedCourseAssignments.length == 0">
+            Assign Course Assignment
+          </button>
+        </div>
+        <form [formGroup]="assignmentSearchForm">
+          <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+            <div class="d-flex flex-wrap">
+              <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+              <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="d-flex flex-wrap">
+              <ul class="pagination" *ngFor="let assignment of programmingAssignments | paginate: { id:'assignmentPageID',
+                itemsPerPage: assignmentSearchForm.get('limit')?.value, currentPage: (+assignmentSearchForm.get('offset')?.value + 1),
+                totalItems: totalAssignments }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                id="assignmentPageID">
+              </pagination-controls>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <br>
+
+      <div class="card-body padding-0pt swabhav-shadow" *ngIf="isAssignmentLoaded; else noAssignment">
+        <!-- <form [formGroup]="courseAssignmentForm"> -->
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th *ngIf="isNavigated">
+                  <label class="form-check-label">
+                    <label class="checkbox-container">
+                      <input type="checkbox" [checked]="checkAllAssignmentsAdded()" (change)="addAllAssignments()"
+                        id="select-all-checkbox" />
+                      <span class="checkmark"></span>
+                    </label>
+                  </label>
+                </th>
+                <th><strong>No.</strong></th>
+                <th><strong>Title</strong></th>
+                <th><strong>Type</strong></th>
+                <th><strong>Time Required</strong></th>
+                <th><strong>Level</strong></th>
+                <th><strong>Score</strong></th>
+                <th>View</th>
+                <th *ngIf="!isNavigated && permission && permission?.delete">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let assignment of programmingAssignments; let i = index">
+                <td *ngIf="isNavigated">
+                  <!-- <input type="checkbox" class="form-check-input checkbox-margin" (change)="toggleAssignment($event, assignment.id)"
+                      [checked]="checkAssignmentAdded(assignment.id)" id="checkboxNoLabel"> -->
+                  <label class="form-check-label">
+                    <label class="checkbox-container">
+                      <input type="checkbox" [checked]="checkAssignmentAdded(assignment.id)"
+                        (change)="toggleAssignment(assignment.id)" />
+                      <span class="checkmark"></span>
+                    </label>
+                  </label>
+                </td>
+                <td>{{(i+1)+(assignmentSearchForm.get('offset')?.value*assignmentSearchForm.get('limit')?.value)}}</td>
+                <td class="swabhav-light-orange-text"><strong>{{assignment.title}}</strong></td>
+                <td>{{assignment.programmingAssignmentType}}</td>
+                <td>{{assignment.timeRequired}}</td>
+                <td>{{assignment.complexityLevel}}</td>
+                <td>{{assignment.score}}</td>
+                <td>
+                  <button class="btn btn-default" (click)="onViewClick(assignment)">
+                    <i class="inline-icon material-icons">visibility</i>
+                  </button>
+                </td>
+                <td *ngIf="!isNavigated && permission && permission?.delete">
+                  <button class="btn btn-default" (click)="onDeleteClick(assignment.id)">
+                    <i class="inline-icon material-icons red">delete</i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- </form> -->
+      </div>
+
+      <ng-template #noAssignment>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Assignment Not Found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+
+<ng-template #assignmentFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+        {{isViewMode? 'Assignment Details': isUpdateMode ? 'Update Assignment' : 'Add Assignment' }}
+        <button type="button" *ngIf="!isNavigated && isViewMode && permission?.update" class="btn material-icons-button"
+          (click)="onUpdateClick()"><i class="material-icons grey-icon">create</i>
+        </button>
+      </h4>
+      <span *ngIf="!isViewMode"><span class="red">* </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="assignmentForm">
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-4">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Title'}"></ng-container>
+          <input type="text" class="form-control input-style" formControlName="title" placeholder="eg: Java">
+          <div class="alert alert-danger"
+            *ngIf="(assignmentForm.get('title').dirty || assignmentForm.get('title').touched) && assignmentForm.get('title').errors">
+            <span *ngIf="assignmentForm.get('title').errors.required">
+              Title must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Type'}"></ng-container>
+          <select class="form-control input-style" formControlName="programmingAssignmentType"
+            (change)="onAssignmentTypeChange()">
+            <option [ngValue]="null" disabled>Select Type</option>
+            <option *ngFor="let type of assignmentType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('programmingAssignmentType').dirty || assignmentForm.get('programmingAssignmentType').touched) 
+								&& assignmentForm.get('programmingAssignmentType').errors">
+            <span *ngIf="assignmentForm.get('programmingAssignmentType').errors.required">
+              Programming assignment type must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Time Required'}"></ng-container>
+          <div class="row">
+            <!-- </div> -->
+            <div class="form-group col-sm-3 col-md-6">
+              <!-- <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Time Required:</label> -->
+              <input type="number" formControlName="timeHour" appAllowNumbersOnly class="form-control input-style"
+                placeholder="hr">
+              <div class="alert alert-danger" *ngIf="(assignmentForm.get('timeHour').touched||
+                assignmentForm.get('timeHour').dirty)&&assignmentForm.get('timeHour').invalid">
+                <div *ngIf="assignmentForm.get('timeHour').errors.required">
+                  Time Required for solving programming question must be specified
+                </div>
+                <div *ngIf="assignmentForm.get('timeHour').errors?.min">
+                  Hours required must be greater than equal to zero
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-6">
+              <!-- <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Min:</label> -->
+              <input type="number" formControlName="timeMin" appAllowNumbersOnly class="form-control input-style"
+                placeholder="min">
+              <div class="alert alert-danger" *ngIf="(assignmentForm.get('timeMin').touched||
+                assignmentForm.get('timeMin').dirty)&&assignmentForm.get('timeMin').invalid">
+                <div *ngIf="assignmentForm.get('timeMin').errors.required">
+                  Time Required for solving programming question must be specified
+                </div>
+                <div *ngIf="assignmentForm.get('timeMin').errors?.min">
+                  Minutes required must be greater than equal to zero
+                </div>
+                <div *ngIf="assignmentForm.get('timeMin').errors?.max">
+                  Minutes required must be less than equal to 59
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Complexity Level'}"></ng-container>
+          <select class="form-control input-style" formControlName="complexityLevel">
+            <option [ngValue]="null" disabled>Select Complexity Level</option>
+            <option *ngFor="let level of complexityLevel" [ngValue]="level.key">{{level.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('complexityLevel').dirty 
+						|| assignmentForm.get('complexityLevel').touched) && assignmentForm.get('complexityLevel').invalid">
+            <div *ngIf="assignmentForm.get('complexityLevel').errors.required">
+              Complexity level must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-2 col-md-2">
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Score'}"></ng-container>
+          <input type="number" class="form-control input-style" formControlName="score" placeholder="eg: 10">
+          <div class="alert alert-danger" *ngIf="(assignmentForm.get('score').dirty || assignmentForm.get('score').touched) 
+						&& assignmentForm.get('score').errors">
+            <span *ngIf="assignmentForm.get('score').errors.required">
+              Score must be specified
+            </span>
+            <span *ngIf="assignmentForm.get('score').errors.min">
+              Score should be greater than 0.
+            </span>
+          </div>
+        </div>
+        <ng-container *ngIf="assignmentForm.get('programmingAssignmentType').value == CODING">
+          <div class="form-group col-sm-6 col-md-4">
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Programming Question'}"></ng-container>
+            <ng-select [items]="programmingQuestionList" bindLabel="label" placeholder="Select Programming Question"
+              appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+              formControlName="programmingQuestion" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.label}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </ng-container>
+      </div>
+      <ng-container *ngIf="assignmentForm.get('programmingAssignmentType').value == READING">
+        <div *ngIf="subTasks.controls.length > 0" class="row col-sm-12 col-md-12 d-flex justify-content-center">
+          <h1 class="swabhav-light-orange-text"><strong>Assignment Sub Task</strong></h1>
+        </div>
+        <div formArrayName="programmingAssignmentSubTask" *ngFor="let subTask of subTasks.controls;let i = index">
+          <ng-container [formGroupName]="i">
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <h3><strong>Sub Task: {{i+1}}</strong>
+                  <button *ngIf="subTasks.controls.length > 1 && !isViewMode" type="button"
+                    class="float-right btn btn-sm material-icons-button" style="cursor: pointer;"
+                    (click)="deleteSubTask(i)"><i class="material-icons red material-icons-button close-icon">close</i>
+                  </button>
+                </h3>
+              </div>
+              <div class="form-group col-sm-3 col-md-4">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Resource'}"></ng-container>
+                <ng-select [items]="resourcesList" bindLabel="resourceName" bindValue="id" placeholder="Select Resource"
+                  appendTo="body" [searchable]="true" [clearable]="true" formControlName="resourceID"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.resourceName}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(subTask.get('resourceID').dirty || subTask.get('resourceID').touched) 
+                  && subTask.get('resourceID').errors">
+                  <span *ngIf="subTask.get('resourceID').errors.required">
+                    Resource must be specified
+                  </span>
+                </div>
+              </div>
+              <!-- <div class="form-group col-sm-4 col-md-3">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Source'}"></ng-container>
+                <select class="form-control input-style" formControlName="source">
+                  <option [ngValue]="null">Select Source</option>
+                  <option *ngFor="let source of sourceList" [ngValue]="source.value">{{source.value}}</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(subTask.get('source').dirty || subTask.get('source').touched) 
+                  && subTask.get('source').errors">
+                  <span *ngIf="subTask.get('source').errors.required">
+                    Source must be specified
+                  </span>
+                </div>
+              </div> -->
+              <!-- <div class="form-group col-sm-4 col-md-4">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Source URL'}"></ng-container>
+                <input type="text" class="form-control input-style" formControlName="sourceURL" placeholder="eg: Enter source url">
+              </div> -->
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-12">
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Description'}"></ng-container>
+                <ckeditor [config]="ckConfig" formControlName="description"></ckeditor>
+                <div class="alert alert-danger" *ngIf="(subTask.get('description').dirty || subTask.get('description').touched) 
+                  && subTask.get('description').errors">
+                  <span *ngIf="subTask.get('description').errors.required">
+                    Description must be specified
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div class="float-right">
+          <button class="btn filter-button btn-sm material-icons-button" *ngIf="!isViewMode"
+            (click)="createSubTaskForm()">Add Sub Task
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- <div class="form-group col-sm-12">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Task Description'}"></ng-container>
+          <ckeditor [config]="ckConfig" formControlName="taskDescription"></ckeditor>
+				</div>
+				<div class="form-group col-sm-12">
+					<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Additional Comments'}"></ng-container>
+          <ckeditor [config]="ckConfig" formControlName="additionalComments"></ckeditor>
+				</div> -->
+
+
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="reset"
+      (click)="modal.dismiss()">Close</button>
+    <button type="submit" *ngIf="!isViewMode" class="btn btn-submit-swabhav material-icons-button"
+      [disabled]="!assignmentForm.dirty" (click)="validateAssignmentForm()">
+      {{isUpdateMode ? 'Update Assignment' : 'Add Assignment'}}
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Add course assignment modal -->
+<ng-template #addCourseAssignmentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="modal-title display-2">Add Course Assignment</h2>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button">
+      <i class="material-icons close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="courseAssignmentForm">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th class="text-center">Title</th>
+              <th class="text-center">Order</th>
+              <th class="text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="courseAssignments"
+              *ngFor="let assignmentControl of assignmentControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <tr>
+                  <td class="text-nowrap text-center">{{i+1}}</td>
+                  <td class="text-center">
+                    <strong>{{assignmentControl.get('programmingAssignment').value.title}}</strong>
+                  </td>
+                  <td class="text-center">
+                    <div class="col-md-4">
+                      <input type="number" appAllowNumbersOnly class="form-control input-style" placeholder="Eg: 1"
+                        formControlName="order">
+                      <!-- <input type="date"  class="form-control input-style" formControlName="order"> -->
+                      <div class="alert alert-danger" *ngIf=" (assignmentControl.get('order').dirty || 
+                        assignmentControl.get('order').touched) && assignmentControl.get('order').invalid">
+                        <div *ngIf="assignmentControl.get('order').errors.required">
+                          Order must be specified
+                        </div>
+                        <div *ngIf="assignmentControl.get('order').errors.min">
+                          Order must be greater than 0
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <select class="form-control input-style" formControlName="isActive">
+                      <option [ngValue]="null">Select Active/Inactive</option>
+                      <option [ngValue]="true">Active</option>
+                      <option [ngValue]="false">Inactive</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf=" (assignmentControl.get('isActive').dirty || 
+                      assignmentControl.get('isActive').touched) && assignmentControl.get('isActive').invalid">
+                      <div *ngIf="assignmentControl.get('isActive').errors.required">
+                        Is active must be specified
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text fixed-btn"
+      (click)="modal.dismiss()">Close</button>
+    <button type="submit" class="btn swabhav-button-square fixed-btn" (click)="validateCourseAssignment()"
+      [disabled]='!courseAssignmentForm.dirty'>Save
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Talent Confirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Delete Confirmation</h4>
+    <button type="button" class="close material-icons-button" (click)="modal.dismiss()" class="btn btn-default"
+      type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want to delete this assignment?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button"
+      (click)="modal.dismiss('Close click')">No
+    </button>
+  </div>
+
+</ng-template>
+
+<app-master-footer></app-master-footer>

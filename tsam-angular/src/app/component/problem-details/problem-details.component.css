@@ -1,0 +1,111 @@
+.page-margin{
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-top: 2%;
+}
+
+.heading-style{
+  color: #000000;
+  font-size: x-large;
+  font-weight: bold;
+  margin-bottom: 2%;
+  margin-top: 2%;
+}
+
+.question-box{
+  background-color: #CDE9FC;
+  border-radius: 10px;
+  padding: 10px 10px 10px 10px;
+  border: 1.5px solid #004370;
+  font-size: medium;
+  font-weight: bold;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+.submit-and-end{
+  color: #000000;
+  border: 1.5px solid #CDA700;
+  background-color: #FFE05C;
+  font-size: small;
+  font-weight: bold;
+  padding: 0.5%;
+  border-radius: 5px;
+}
+
+.timer{
+  border: 1px solid;
+  color: #D63C2A;
+  border-radius: 30px;
+  font-size: small;
+  font-weight: bold;
+  margin-right: 2%;
+  box-shadow: 5px 3px 5px #feababab;
+  padding: 0.5%;
+  border-color: white;
+}
+
+.problem-selected-card-style{
+  border: solid #D63C2A;
+  color: #000000;
+  text-align: center;
+  font-weight: bold;
+  font-size: medium;
+}
+
+.problem-disabled-card-style{
+  border: solid #BDBDBD;
+  color: #757575;
+  text-align: center;
+  font-size: medium;
+  cursor: pointer;
+}
+
+.problem-option-card-style{
+  border: solid #D63C2A;
+  color: #000000;
+  text-align: center;
+  font-weight: bold;
+  font-size: medium;
+}
+
+.selected-option-style{
+  background-color: #FFB2B0;
+  border: #D63C2A solid;
+  font-weight: bold;
+  box-shadow: 5px 10px 8px #00000029;
+  cursor: default;
+  font-size: medium;
+  text-align: center;
+  border-radius: 50px;
+}
+
+.option-style{
+  border: #D63C2A solid;
+  font-size: medium;
+  font-weight: bold;
+  color: #EE3733;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 50px;
+}
+
+.option-style:hover{
+  transform: scale(1.05);
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}

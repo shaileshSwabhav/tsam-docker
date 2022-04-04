@@ -1,0 +1,97 @@
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+  
+.ng-select.ng-select-disabled>.ng-select-container {
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.table-td-center-align{
+  vertical-align: middle;
+}
+  
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.margin-left {
+  margin-left: 10%;
+}
+
+.btn-width {
+  width: 15%;
+}
+
+.table-striped > tbody > .unstriped-tr > td {
+  background-color: #fff;
+}
+
+.table-unstriped  > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #fff;
+}
+
+.text-logo {
+  color: #fff;
+  text-decoration: none;
+}
+
+.icon-align {
+  display: inline-grid;
+}
+
+.delete-icon-align {
+  display: inline-table;
+}
+
+.left-margin {
+  margin-left: 3%;
+}
+.assignments-grey{
+  -webkit-filter: grayscale(100%) !important;
+	filter: grayscale(100%) !important;
+}
+.assignments-color{
+  -webkit-filter: grayscale(0) !important;
+	filter: grayscale(0) !important;
+}
+
+.header-style {
+  display: flex;
+}
+
+.header-left-style {
+  margin-left: auto;
+}
+
+.total-module-style{
+  margin-top: 4px;
+}
+
+.top-margin-10-style{
+  margin-top: 10px;
+}
+
+.concept-style{
+  padding: 5px;
+  border: 1.5px solid #F6430F;
+  border-radius: 30px;
+  margin-left: 10px;
+}
+
+.time-placeholder{
+  padding:-100%;
+  border-width: 0.5px;
+  font-size: large;
+}
+  

@@ -1,0 +1,180 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid margin-2pt">
+  <form [formGroup]="searchForm">
+    <div class="card">
+      <div class="card-header">
+        <button class="btn btn-primary float-right" (click)="onAddRoleClick();openRoleFormModal(roleFormModal)">
+          Add New Role</button>
+      </div>
+
+      <div class=" card-body search-bar padding">
+        <div class="filter-by-field row">
+          <div class="form-group col-sm-6 col-md-3">
+            <label>Role:</label>
+            <input type="text" class="form-control" formControlName="roleName" placeholder="Enter role">
+          </div>
+          <div class="form-group col-sm-6 col-md-3">
+            <label>Level:</label>
+            <input type="number" appAllowNumbersOnly class="form-control" formControlName="level"
+              placeholder="Enter level">
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="float-right">
+          <button class="btn btn-success" type="submit" (click)="search()">Search</button> &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-secondary" type="button" (click)="reset()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
+  <div class="card margin-2pt">
+    <div class="card-header">
+      <div class="totalLabel">
+        <label>Total Roles : </label> {{totalRoles || 0}}
+      </div>
+      <div class=" row display-inline">
+        <select class="form-control col-sm-1 col-md-1" [(ngModel)]="limit" (change)="changePage(1)">
+          <option selected>5</option>
+          <option>10</option>
+          <option>20</option>
+          <option>50</option>
+        </select>
+        <button class="btn btn-primary" type="button" *ngIf="searched" (click)="reset()">
+          View All Roles
+        </button>
+        <ul class="pagination" *ngFor="let role of roles | paginate: { id:'roleId',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalRoles }">
+        </ul>
+        <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="roleId">
+        </pagination-controls>
+      </div>
+      <div class="card-body padding-0pt">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Role</th>
+                <th>Level</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let role of roles;">
+                <td>{{roles.indexOf(role)+1}}</td>
+                <td>{{role.roleName}}</td>
+                <td>{{role.level}}</td>
+                <td data-toggle="tooltip" data-placement="top" title="Update Role">
+                  <button type="button" (click)="onUpdateRoleClick(role.id);openRoleFormModal(roleFormModal)"
+                    class="btn"><i class="material-icons">create</i></button>
+                </td>
+                <td data-toggle="tooltip" data-placement="top" title="Delete Role">
+                  <button type="button"
+                    (click)="assignSelectedRoleId(role.id);openDeleteConfirmationModal(deleteConfirmationModal)"
+                    class="btn"><i class="material-icons red">delete</i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer" *ngIf="roles.length>0">
+        Total Role: {{totalRoles}}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Add New Role -->
+  <ng-template #roleFormModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <h4>{{modalHeader}}</h4>
+        <span class="red">*
+        </span>marked fields are mandatory
+      </div>
+      <button type="button" (click)="close();modal.dismiss('Cross click')" class="close" class="btn btn-default"
+        type="reset"><i class="material-icons">highlight_off</i></button>
+    </div>
+
+    <!-- Modal body -->
+    <form [formGroup]="roleForm">
+      <div class="modal-body">
+        <!-- <div class="row" *ngIf="isRoleUpadteClick == true">
+            <div class="form-group col-sm-6 col-md-6">
+              <label for="sel1">Role Code:</label>
+              <input type="text" class="form-control" formControlName="rolecode" placeholder="Enter Role Code" disabled>
+            </div>
+          </div> -->
+        <div class="row">
+          <div class="col-sm-6 col-md-6">
+            <div class="form-group">
+              <label><span class="red">*</span>Role</label>
+              <input type="text" class="form-control" formControlName="roleName" placeholder="Enter Role">
+              <div class="alert alert-danger" *ngIf="(roleForm.get('roleName').touched||roleForm.get('roleName').dirty)
+                  &&roleForm.get('roleName').invalid">
+                Role name must be specified
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-6">
+            <div class="form-group">
+              <label><span class="red">*</span>Level</label>
+              <input type="number" appAllowNumbersOnly class="form-control" formControlName="level"
+                placeholder="Enter level">
+              <div class="alert alert-danger" *ngIf="(roleForm.get('level').touched||roleForm.get('level').dirty)
+                  &&roleForm.get('level').invalid">
+                Level must be specified
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" [disabled]="!roleForm.dirty"
+          (click)="validate()">{{modalButton}}</button>
+        <button type="submit" class="btn btn-secondary" type="reset">Reset</button>
+      </div>
+
+    </form>
+
+  </ng-template>
+
+
+  <!-- Delete Role Confirmation -->
+  <ng-template #deleteConfirmationModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h4 class="modal-title">Confirmation</h4>
+      <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default"
+        type="submit"><i class="material-icons">highlight_off</i></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          Are you Sure want to Delete this Role ?
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-danger" (click)="deleteRole()">Yes</button>
+      <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click')">No</button>
+    </div>
+
+  </ng-template>
+</div>

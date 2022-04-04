@@ -1,0 +1,60 @@
+<div class="container full-h">
+  <div class="d-flex align-items-center full-h">
+    <div class="col-sm-12 col-md-8 mx-auto">
+      <div class="jumbotron">
+        <div class="form-group col-sm-12 col-md-12 col-lg-12">
+          <h1>Login</h1>
+        </div>
+        <form [formGroup]="loginForm">
+          <div class="input-group mb-3 col-sm-12 col-md-12 col-lg-12 input-group-lg">
+            <div class="input-group-prepend">
+              <button class="btn btn-primary d-flex align-items-center" disabled type="button"><i
+                  class="material-icons">perm_identity</i></button>
+            </div>
+            <input type="text" class="form-control f-m" formControlName="email" autocomplete="email"
+              placeholder="Username">
+          </div>
+          <div class="input-group mb-3 col-sm-12 col-md-12 col-lg-12 invalid-input invalid-input"
+            *ngIf="formcontrol.email.errors && formcontrol.email.touched">
+            <div *ngIf="formcontrol.email.errors.required">
+              Username Required.
+            </div>
+          </div>
+          <div class="input-group mb-3 col-sm-12 col-md-12 col-lg-12 input-group-lg">
+            <input type="{{input}}" class="form-control f-m" formControlName="password" autocomplete="current-password"
+              placeholder="Enter password">
+            <!-- <div class="input-group-prepend">
+              <span class="input-group-text"><i class="material-icons">visibility</i></span>
+            </div> -->
+            <div class="input-group-append">
+              <button class="btn btn-primary d-flex align-items-center" (click)="visibilityToggle()" type="button"><i
+                  class="material-icons">{{visibility}}</i></button>
+            </div>
+          </div>
+          <div class="input-group mb-3 col-sm-12 col-md-12 col-lg-12 invalid-input"
+            *ngIf="formcontrol.password.errors && formcontrol.password.touched">
+            <div *ngIf="formcontrol.password.errors.required">
+              Password Required.
+            </div>
+          </div>
+          <div class="form-group col-sm-12 col-md-12 col-lg-12">
+            <button type="submit" (click)="userLogin()" [disabled]="loginForm.invalid || clicked"
+              class="btn btn-primary w-30">Login</button>
+          </div>
+        </form>
+      </div>
+      <div *ngIf="isLocal===true">
+        <button class="btn btn-secondary mr-1" (click)="userLogin('mitali@swabhavtechlabs.com','mitu')">Mitali</button>
+        <button class="btn btn-secondary mr-1" (click)="userLogin('god@father.com','god')">God</button>
+        <button class="btn btn-secondary mr-1"
+          (click)="userLogin('kannan@swabhavtechlabs.com','kannan')">Kannan</button>
+        <button class="btn btn-secondary mr-1"
+          (click)="userLogin('niranjan@swabhavtechlabs.com','god')">Faculty</button>
+        <button class="btn btn-secondary mr-1" (click)="userLogin('aditi@swabhavtechlabs.com','aditi')">Aditi</button>
+        <button class="btn btn-secondary mr-1" (click)="userLogin('sejalvijaynaik@gmail.com','Sej@1234')">Sejal</button>
+        <button class="btn btn-secondary mr-1"
+          (click)="userLogin('shetty.niranjan4@gmail.com','god')">Talent</button>
+      </div>
+    </div>
+  </div>
+</div>

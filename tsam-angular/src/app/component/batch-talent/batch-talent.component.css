@@ -1,0 +1,23 @@
+.align-left-style {
+    float: left;
+    width:33.33333%;
+    text-align:left;
+}
+.align-center-style {
+    float: left;
+    width:33.33333%;
+    text-align:center;
+}
+
+.clear-style{
+    clear: both;
+}
+
+.table-icon-image-style{
+    cursor: pointer;
+    width: 25px;
+}
+
+.table-icon-image-disabled-style{
+    width: 25px;
+}

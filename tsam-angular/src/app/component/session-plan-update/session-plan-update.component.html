@@ -1,0 +1,320 @@
+<!-- Zero template -->
+<ng-template #zeroTemplate>
+    <span>0</span>
+</ng-template>
+
+<!-- Drag template -->
+<ng-template #dragHandleTmpl>
+    <svg class="bi bi-list handle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+            d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+            clip-rule="evenodd" />
+    </svg>
+</ng-template>
+
+<div class="container-fluid">
+
+    <div class="card module-tab-menu-style">
+        <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex"
+            (selectedTabChange)="onModuleTabClick($event.index)">
+            <ng-container *ngFor="let courseModuleTab of courseModuleTabList;let i = index">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <div>
+                            <ng-container *ngIf="courseModuleTab?.module?.logo; else logoNotFound">
+                                <img width="40" src={{courseModuleTab?.module?.logo}}>
+                            </ng-container>
+                            <ng-template #logoNotFound>
+                                <img width="40" src="assets/icon/grey-icons/Score.png">
+                            </ng-template>
+                            <br><br>
+                            <div>{{courseModuleTab?.module?.moduleName}}</div>
+                        </div>
+                    </ng-template>
+                </mat-tab>
+            </ng-container>
+        </mat-tab-group>
+    </div>
+
+    <div class="container-fluid" *ngIf="!isReordering">
+
+        <div *ngIf=" selectedCourseModule[0]?.moduleTopics?.length> 0">
+
+
+            <br>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-borderless">
+                    <thead>
+                        <tr class="text-center">
+                            <th></th>
+                            <th>Sr No.</th>
+                            <th class="text-left">Topics</th>
+                            <th>Sub Topics</th>
+                            <th>Total Approx Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let topic of selectedCourseModule[0]?.moduleTopics;let i = index">
+                            <tr class="striped-tr text-center">
+                                <td class="table-td-center-align">
+                                    <label class="checkbox-container"
+                                        [ngClass]="topic?.batchSessionTopicIsCompleted?'disabled':''">
+                                        <input type="checkbox"
+                                            [checked]="topic?.batchSessionTopicIsCompleted || topic.isChecked"
+                                            [(ngModel)]="topic.isChecked"
+                                            [disabled]="topic?.batchSessionTopicIsCompleted"
+                                            (click)="toggleAllSubTopics(topic)">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td class="text-nowrap table-td-center-align">
+                                    <ng-container *ngIf="!isReordering">
+                                        <button type="button" class="btn btn-default"
+                                            (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                                            *ngIf="topic.subTopics && topic.subTopics.length != 0;else noSubTopics">
+                                            <i class="material-icons-outlined material-icons-button inline-icon">
+                                                {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                                            </i> {{i+1}}
+                                        </button>
+                                    </ng-container>
+
+
+                                    <ng-template #noSubTopics>
+                                        <label class="no-sub-session">{{i+1}}</label>
+                                    </ng-template>
+
+                                </td>
+                                <td class="text-left table-td-center-align">
+                                    <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                                    {{topic.topicName}}
+                                </td>
+
+                                <td class="table-td-center-align">{{topic.subTopics?.length}}</td>
+                                <td class="table-td-center-align">
+                                    {{topic.totalTime | minute}}
+                                </td>
+                            </tr>
+                            <tr *ngIf="topic.isTopicClicked">
+                                <ng-container *ngIf="!isReordering">
+                                    <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                                        <ng-container [ngTemplateOutlet]="subTopicsTemplate"
+                                            [ngTemplateOutletContext]="{moduleTopic:topic}">
+                                        </ng-container>
+                                    </td>
+                                </ng-container>
+
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- No topics found -->
+        <div *ngIf="selectedCourseModule[0]?.moduleTopics?.length == 0">
+            <br><br>
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Topics Found</h2>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn mt-2 btn-sm btn-submit-swabhav material-icons-button next-button float-right"
+            (click)="changeTabs(2)" *ngIf="!isReordering"> Next </button>
+
+
+
+        <ng-template let-moduleTopic="moduleTopic" #subTopicsTemplate>
+            <div class="row">
+                <div class="col-md-6 col-sm-12" *ngIf="moduleTopic?.subTopics?.length > 0">
+                    <table class="table table-borderless table-unstriped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="text-center">Order</th>
+                                <th>Sub-Topic</th>
+                                <th class="text-center">Approx Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let subTopic of moduleTopic.subTopics; let even = even">
+                                <tr *ngIf="even">
+                                    <td class="text-left table-td-center-align">
+                                        <label class="checkbox-container"
+                                            [ngClass]="subTopic?.batchSessionTopicIsCompleted?'disabled':''">
+                                            <input type="checkbox"
+                                                [checked]="subTopic?.batchSessionTopicIsCompleted ||subTopic.isChecked"
+                                                [(ngModel)]="subTopic.isChecked"
+                                                [disabled]="subTopic?.batchSessionTopicIsCompleted"
+                                                (click)="toggleSubTopics(subTopic?.id,subTopic,moduleTopic)">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center table-td-center-align">{{subTopic.order}}</td>
+                                    <td class="table-td-center-align">
+                                        <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                                        {{subTopic.topicName}}
+                                    </td>
+                                    <td class="text-center table-td-center-align">{{subTopic.totalTime | minute}}</td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6 col-sm-12" *ngIf="moduleTopic?.subTopics?.length > 1">
+                    <table class="table table-borderless table-unstriped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="text-center">Order</th>
+                                <th>Sub-Topic</th>
+                                <th class="text-center">Approx Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let subTopic of moduleTopic.subTopics; let odd = odd">
+                                <tr *ngIf="odd">
+                                    <td class="text-left table-td-center-align">
+                                        <label class="checkbox-container"
+                                            [ngClass]="subTopic?.batchSessionTopicIsCompleted?'disabled':''">
+                                            <input type="checkbox" [checked]="subTopic.isChecked"
+                                                [disabled]="subTopic?.batchSessionTopicIsCompleted"
+                                                (click)="toggleSubTopics(subTopic?.id,subTopic,moduleTopic)">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center table-td-center-align">{{subTopic.order}}</td>
+                                    <td class="table-td-center-align">
+                                        <img src="assets/icon/colour-icons/sub-sessions.png" width="30">&nbsp;&nbsp;
+                                        {{subTopic.topicName}}
+                                    </td>
+                                    <td class="text-center table-td-center-align">{{subTopic.totalTime | minute}}</td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </ng-template>
+
+    </div>
+
+    <div *ngIf="isReordering">
+        <br><br>
+        <!-- Topics table -->
+        <div *ngIf="selectedOrderedCourseModules[0]?.moduleTopics?.length > 0;else noTopics">
+            <div class="table-responsive">
+                <table class="table table-striped table-borderless">
+                    <tr class="text-center">
+                        <th></th>
+                        <th>Order</th>
+                        <th class="text-left">Topics</th>
+                        <th>Sub Topics</th>
+                        <th>Approx Time</th>
+                    </tr>
+                    <tbody cdkDropList
+                        (cdkDropListDropped)="onDropTopicsTableRow($event,selectedOrderedCourseModules[0]?.moduleTopics)">
+                        <ng-container
+                            *ngFor="let topic of selectedOrderedCourseModules[0]?.moduleTopics; let i = index">
+                            <tr class="striped-tr text-center" cdkDrag cdkDragLockAxis="y">
+                                <td class="cursor-pointer-style">
+                                    <div class="drag-handle">
+                                        <ng-container [ngTemplateOutlet]="dragHandleTmpl"></ng-container>
+                                    </div>
+                                </td>
+                                <td class="text-nowrap table-td-center-align">
+                                    <button type="button" class="btn btn-default"
+                                        (click)="topic.isTopicClicked=!topic.isTopicClicked"
+                                        *ngIf="topic.subTopics && topic.subTopics.length != 0; else noExpand">
+                                        <i class="material-icons-outlined material-icons-button inline-icon">
+                                            {{topic.isTopicClicked ? 'expand_more' : 'chevron_right'}}
+                                        </i> {{i+1}}
+                                    </button>
+                                    <ng-template #noExpand>
+                                        <label class="no-sub-session">{{i+1}}</label>
+                                    </ng-template>
+                                </td>
+                                <td class="table-td-center-align text-left">
+                                    <img src="assets/course/topics.png" width="30">
+                                    &nbsp;&nbsp;
+                                    {{topic.topicName}}
+                                </td>
+                                <td class="table-td-center-align">
+                                    <span *ngIf="topic.subTopics && topic.subTopics.length > 0;else zeroTemplate">
+                                        {{topic.subTopics.length}}
+                                    </span>
+                                </td>
+                                <td class="table-td-center-align">
+                                    {{topic.totalTime | minute}}
+                                </td>
+                            </tr>
+                            <tr *ngIf="topic.isTopicClicked && topic.subTopics && topic.subTopics.length > 0">
+                                <td colspan="100%" class="no-background-tr-style table-margin-left-style">
+                                    <table class="table">
+                                        <thead>
+                                            <tr class="no-background-tr-style text-center">
+                                                <th></th>
+                                                <th>Order</th>
+                                                <th class="text-left">Sub Topics</th>
+                                                <th>Approx Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody cdkDropList
+                                            (cdkDropListDropped)="onDropTopicsTableRow($event,topic.subTopics)">
+                                            <ng-container *ngFor="let subTopic of topic.subTopics; let j = index">
+                                                <tr class="no-background-tr-style text-center" cdkDrag
+                                                    cdkDragLockAxis="y">
+                                                    <td class="cursor-pointer-style">
+                                                        <div class="drag-handle">
+                                                            <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                                                            </ng-container>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-nowrap table-td-center-align">
+                                                        {{j+1}}
+                                                    </td>
+                                                    <td class="text-left table-td-center-align">
+                                                        <img src="assets/icon/colour-icons/sub-sessions.png"
+                                                            width="30">&nbsp;&nbsp;
+                                                        {{subTopic.topicName}}
+                                                    </td>
+                                                    <td class="table-td-center-align">
+                                                        {{subTopic.totalTime | minute}}
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <ng-template #noTopics>
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Topics Found</h2>
+                </div>
+            </div>
+
+        </ng-template>
+        <br>
+
+        <!-- Next Back button -->
+        <div class="float-right">
+            <!-- <button type="button" class="btn btn-default back-button-style button-style"
+              (click)="">Back</button> -->
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round button-style"
+                (click)="processBatchSessions()">
+                Submit
+            </button>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,67 @@
+<app-master-navbar></app-master-navbar>
+
+<!-- CourseDropDown -->
+<form [formGroup]="courseSelectionForm">
+  <div class="top-panel-style">
+    <span class="material-icons back-button cursor-pointer-style" *ngIf="isCourseModule"
+      (click)="redirectToCourseDetails()">
+      arrow_back_ios
+    </span>
+    <div class="d-flex justify-content-center">
+
+      <select formControlName="courseID" class="form-control input-style talent-dropdown-style"
+        (change)="changedCourse()" [attr.disabled]="isCourseModule ? 'disabled' : null">
+
+        <option *ngFor="let course of courseList" [ngValue]="course.id">{{course.name}}</option>
+      </select>
+    </div>
+  </div>
+</form>
+
+
+
+<app-course-details (showCourseModule)="toggleCourseModule()" *ngIf="!isCourseModule"></app-course-details>
+
+<div class="course-tab-selector" *ngIf="isCourseModule">
+  <div class="item">
+    <img class="item" src="assets/course/Modules.png" width="100">
+    <span class="font-weight-bold swabhav-light-orange-text text-nowrap d-flex justify-content-center padding-text">ADD
+      MODULES</span>
+  </div>
+  <div class="mat-progress-bar">
+    <mat-progress-bar mode="determinate" value="{{progress1}}"></mat-progress-bar>
+  </div>
+  <div class="item">
+    <img class="item" [src]="progress1==100? 'assets/course/topics.png':'assets/course/topicsgrey.png' " width="100">
+    <span [ngClass]="progress1==100? 'font-weight-bold swabhav-light-orange-text text-nowrap d-flex justify-content-center padding-text': 
+        'tab-unselected-text text-nowrap d-flex justify-content-center padding-text' ">VIEW THE TOPICS &
+      SUBTOPICS</span>
+  </div>
+  <div class="mat-progress-bar">
+    <mat-progress-bar mode="determinate" value="{{progress2}}"></mat-progress-bar>
+  </div>
+  <div class="item">
+    <img class="item" [src]="progress2==100? 'assets/course/assignment.png':'assets/course/assignmentsgrey.png' "
+      width="100">
+    <span [ngClass]="progress2==100? 'font-weight-bold swabhav-light-orange-text text-nowrap d-flex justify-content-center padding-text':
+        'tab-unselected-text text-nowrap d-flex justify-content-center padding-text' ">View ASSIGNMENTS</span>
+  </div>
+</div>
+
+
+<ng-container *ngIf="isCourseLoaded && progress1==0 && isCourseModule">
+  <app-course-module (changeToProgress1)="changeProgress1()" (redirectToCourse)="redirectToCourseDetails()">
+  </app-course-module>
+</ng-container>
+
+<ng-container *ngIf="progress1==100 && isCourseModule">
+  <app-course-module-topic (createCourseModuleClick)="resetToCourseModule()" (changeProgress2)="changeProgress2()"
+    (changeToModules)="changeProgress()" (changeToTopics)="changeProgress1()">
+  </app-course-module-topic>
+</ng-container>
+
+<!-- <ng-container *ngIf="progress1==100&& progress2==100">
+    <app-course-module-topic></app-course-module-topic>
+</ng-container> -->
+
+<app-master-footer></app-master-footer>

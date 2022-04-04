@@ -1,0 +1,26 @@
+.padding {
+  padding: 1% 0.5% 1% 0.5%;
+}
+
+
+.fc-height-6vh {
+  height: 6vh;
+}
+
+.fc-height-4vh {
+  height: 5vh;
+}
+
+.inline-search-icon {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-by-field {
+  margin-top: 2%;
+}
+
+.totalLabel{
+  font-weight: 500;
+  font-size: larger;
+}

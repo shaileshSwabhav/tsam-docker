@@ -1,0 +1,131 @@
+<div class="container-fluid">
+
+  <div class="d-flex justify-content-center">
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-2">
+        <img src="assets/icon/colour-icons/feedbackmodal.png" alt="feedback" class="feedback-img-icon" width="90%">
+      </div>
+      <div class="col-sm-10">
+        <h1 class="swabhav-light-orange-text"><strong>Rate performance for the following talents:</strong></h1>
+        <label><strong>Rating for all questions must be specified </strong></label> &nbsp;
+
+        <form [formGroup]="feedbackTypeForm">
+          <select class="form-control d-flex justify-content-center input-style input-width"
+            formControlName="feedbackType"
+            (change)="onFeedbackTypeChange()">
+            <option [value]="FACULTY_SESSION_FEEDBACK">{{FACULTY_SESSION_FEEDBACK}}</option>
+            <option [value]="FACULTY_SESSION_FEEDBACK_NON_TECH">{{FACULTY_SESSION_FEEDBACK_NON_TECH}}</option>
+          </select>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid mt-5" *ngIf="feedbackForm">
+    <ng-container *ngIf="talents.length > 0 && facultyFeedbackQuestions.length > 0; else FeedbackGiven">
+
+      <div class="table-responsive">
+        <form [formGroup]="feedbackForm">
+          <table class="table table-sm table-borderless">
+            <thead>
+              <tr class="text-center">
+                <th></th>
+                <th *ngFor="let question of facultyFeedbackQuestions;let i = index">
+                  <strong>{{question.question}}</strong>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr formArrayName="feedbacks" *ngFor="let feedbackControl of feedbackArray.controls;let j = index">
+                <ng-container [formGroupName]="j">
+                  <td>
+                    {{feedbackControl.get('talentFirstName').value+"
+                    "+feedbackControl.get('talentLastName').value}}
+                  </td>
+
+                  <ng-container formArrayName="feedbackQuestions"
+                    *ngFor="let feedbackQuestion of feedbackControl.get('feedbackQuestions').controls;let k = index">
+                    <td class="text-center" [formGroupName]="k">
+                      <div class="d-flex justify-content-center">
+                        <ng-container *ngIf="facultyFeedbackQuestions[k].options.length >=2; else noOptions">
+                          <select class="form-control d-flex justify-content-center input-style input-width"
+                            formControlName="optionID"
+                            (change)="onFacultyFeedbackChange(feedbackQuestion, facultyFeedbackQuestions[k].options)">
+                            <option [ngValue]="null" disabled>Select Option</option>
+                            <option *ngFor="let option of facultyFeedbackQuestions[k].options" [ngValue]="option.id">
+                              {{option.value}}
+                            </option>
+                          </select>
+                        </ng-container>
+                      </div>
+
+                      <ng-template #noOptions>
+                        <div class="row">
+                          <div class="form-group col-12">
+                            <textarea class="form-control rounded-0" formControlName="answer"
+                              id="exampleFormControlTextarea2" rows="2" placeholder="Enter your answer"></textarea>
+                            <div class="alert alert-danger"
+                              *ngIf="(feedbackQuestion.get('answer').touched || feedbackQuestion.get('answer').dirty) && feedbackQuestion.get('answer').invalid">
+                              <div *ngIf="feedbackQuestion.get('answer').errors.required">
+                                Answer must be specified
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </td>
+                  </ng-container>
+                </ng-container>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <ng-template #noFeedbackQuestions>
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Feedback Questions Not Found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-submit-swabhav mr-5 mb-5" (click)="validateTalentsFeedbacks()"
+          [disabled]="!feedbackForm?.valid">
+          Submit Feedback
+        </button>
+
+      </div>
+    </ng-container>
+  </div>
+
+  <ng-template #FeedbackGiven>
+    <br />
+    <br />
+    <div class="d-flex align-items-center full-h">
+      <div class="col-sm-12 col-md-8 mx-auto">
+        <div class="jumbotron">
+          <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+            <h2>Feedback Already Given</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <br />
+    <div class="d-flex row justify-content-center pb-5">
+
+      <button type="submit" class="btn btn-default text-nowrap swabhav-button-round center"
+        (click)="navigateHome()">Navigate
+        Home&nbsp;&nbsp;&nbsp;&nbsp;
+        <i class="inline-icon material-icons-outlined">home</i>
+      </button>
+    </div>
+  </ng-template>
+</div>

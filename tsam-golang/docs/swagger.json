@@ -1,0 +1,1703 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Short Description",
+        "title": "Talent Sourcing and Mentoring (TSAM)",
+        "contact": {
+            "name": "Swabhav Techlabs",
+            "email": "info@swabhavtechlabs.com"
+        },
+        "license": {
+            "name": "Apache 2.0"
+        },
+        "version": "1.0"
+    },
+    "host": "swabhav-tsam.herokuapp.com",
+    "basePath": "/api/v1/tsam",
+    "paths": {
+        "/channel": {
+            "post": {
+                "description": "Add New Channel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "description": "Add Channel",
+                        "name": "channel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Channel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channelid}": {
+            "get": {
+                "description": "Return Channel By ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "channel ID",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Channel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Channel By Channel ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Channel ID For Update",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Channel",
+                        "name": "channel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Channel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Channel By ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "channel ID",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{limit}/{offset}": {
+            "get": {
+                "description": "Return All Channels",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "total number of result",
+                        "name": "limit",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "page number",
+                        "name": "offset",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Channel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussion": {
+            "post": {
+                "description": "Add New Discussion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "description": "Add Discussion",
+                        "name": "discussion",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Discussion"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussion/channel/{channelid}/{limit}/{offset}": {
+            "get": {
+                "description": "Return Discussion By Channel ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "total number of result",
+                        "name": "limit",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "page number",
+                        "name": "offset",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Get Discussion By Channel id",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Discussion"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussion/talent/{talentid}": {
+            "get": {
+                "description": "Return Discussion By Talent ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Get Discussion By Talent id",
+                        "name": "talentid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Discussion"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussion/{discussionid}": {
+            "get": {
+                "description": "Return Discussion By Channel ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Get Discussion By Discussion id",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Discussion"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Discussion By Discussion ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "description": "Update Discussion Data",
+                        "name": "discussion",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Discussion"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Discussion ID",
+                        "name": "discussion",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "DeleteDiscussion Discussion By Discussion ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Discussion ID",
+                        "name": "discussion",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/enquiry": {
+            "post": {
+                "description": "Add New Enquiry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "Add New Enquiry",
+                "responses": {
+                    "200": {}
+                }
+            }
+        },
+        "/enquiry/search/{limit}/{offset}": {
+            "post": {
+                "description": "SearchEnquiry Return Enquiries Based On Search Paramater",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "Get Enquiry",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Enquiry"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enquiry/{enquiryid}": {
+            "get": {
+                "description": "GetEnquiry Return Enquiry By Enquiry ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "Get Enquiry",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Enquiry"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Enquiry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "Update Enquiry",
+                "responses": {
+                    "200": {}
+                }
+            },
+            "delete": {
+                "description": "Delete Enquiry By ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "DeleteEnquiry Enquiry",
+                "responses": {
+                    "200": {}
+                }
+            }
+        },
+        "/enquiry/{limit}/{offset}": {
+            "get": {
+                "description": "GetEnquiries Return all Enquiry By Limit and Offset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "Get All Enquiries",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Enquiry"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enquiry/{salespersonid}/{limit}/{offset}": {
+            "get": {
+                "description": "GetEnquiries Return all Enquiry By Limit and Offset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enquiry-Master"
+                ],
+                "summary": "Get All Enquiries",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Enquiry"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reply": {
+            "post": {
+                "description": "Add New Reply",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "description": "Add Reply",
+                        "name": "reply",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Reply"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/reply/discussion/{discussionid}/{limit}/{offset}": {
+            "get": {
+                "description": "Return multiple Reply By Discussion ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "total number of result",
+                        "name": "limit",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "page number",
+                        "name": "offset",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Get ReplyDTO By Discussion id",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.ReplyDTO"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/reply/{replyid}": {
+            "get": {
+                "description": "GetReply Reply By Reply ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Reply ID For Get Reply",
+                        "name": "replyid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Reply"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Reply By Reply ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "description": "Add Reply",
+                        "name": "reply",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Reply"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Reply ID For Update Reply",
+                        "name": "replyid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Reply By Reply ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community-forum"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid.UUID",
+                        "description": "Reply ID For Delete Reply",
+                        "name": "replyid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/talent": {
+            "post": {
+                "description": "Add New Talent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Add New Talent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/login": {
+            "post": {
+                "description": "Login Verify Talent Credential and Return Token with Full Name, Email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "talent-login"
+                ],
+                "parameters": [
+                    {
+                        "description": "Talent email and password",
+                        "name": "talent",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TalentAuth"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/multiple": {
+            "post": {
+                "description": "Add Multiple New Talent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Add New Talents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/register": {
+            "post": {
+                "description": "Register Add New Talent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "talent-login"
+                ],
+                "parameters": [
+                    {
+                        "description": "Talent firstName, email,contact and Password",
+                        "name": "talent",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Talent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/requirement/{requirementID}/talents/{limit}/{offset}": {
+            "get": {
+                "description": "GetTalentsByCompanyRequirement Return All Talents By Company Requirement ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Get Talent By Company Requirement ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/salesperson/{salespersonid}/{limit}/{offset}": {
+            "get": {
+                "description": "GetTalents Return Talent By Sales Person ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Get Talent By Sales Person ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/search/{limit}/{offset}": {
+            "get": {
+                "description": "SearchTalents Return Talents Based On Search Paramater",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Return Talent Based On Search Parameter",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/{limit}/{offset}": {
+            "get": {
+                "description": "GetTalents Return all Talent By Limit and Offset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Get All Talents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/{talentid}": {
+            "get": {
+                "description": "GetTalent Return Talent By Talent ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Return Talent By Talent ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Talent By Talent ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Update Talent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Talent By Talent ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Talent-Master"
+                ],
+                "summary": "Delete Talent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Talent"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "errors.HTTPError": {
+            "type": "object",
+            "properties": {
+                "errorKey": {
+                    "type": "string",
+                    "example": "unable to fetch data"
+                },
+                "httpstatus": {
+                    "type": "integer",
+                    "example": 400
+                }
+            }
+        },
+        "errors.ValidationError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Name must be specified"
+                }
+            }
+        },
+        "model.Academic": {
+            "type": "object",
+            "properties": {
+                "college": {
+                    "type": "string"
+                },
+                "degree": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Degree"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "passout": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "type": "number"
+                }
+            }
+        },
+        "model.CallRecord": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "outcome": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Channel": {
+            "type": "object",
+            "properties": {
+                "channelName": {
+                    "type": "string",
+                    "example": "Golang Developer"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Country": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Degree": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Designation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Discussion": {
+            "type": "object",
+            "properties": {
+                "channel": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Channel"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Question Description"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isSolve": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "question": {
+                    "type": "string",
+                    "example": "Question string"
+                },
+                "talent": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Talent"
+                }
+            }
+        },
+        "model.Enquiry": {
+            "type": "object",
+            "properties": {
+                "academicYear": {
+                    "type": "string"
+                },
+                "academics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Academic"
+                    }
+                },
+                "address": {
+                    "type": "string"
+                },
+                "callRecords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.CallRecord"
+                    }
+                },
+                "city": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "integer"
+                },
+                "country": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Country"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "enquiryDate": {
+                    "type": "string"
+                },
+                "enquiryID": {
+                    "type": "string"
+                },
+                "enquirySource": {
+                    "type": "string"
+                },
+                "enquiryType": {
+                    "type": "string"
+                },
+                "experiences": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Experience"
+                    }
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isExperience": {
+                    "type": "boolean"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "pinCode": {
+                    "type": "integer"
+                },
+                "salePerson": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.State"
+                },
+                "technologies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Technology"
+                    }
+                },
+                "testHistories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.TestHistory"
+                    }
+                }
+            }
+        },
+        "model.Experience": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "designation": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Designation"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "package": {
+                    "type": "number"
+                },
+                "technologies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Technology"
+                    }
+                },
+                "yearOfExperience": {
+                    "type": "number"
+                }
+            }
+        },
+        "model.Reply": {
+            "type": "object",
+            "properties": {
+                "bestReply": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Reply"
+                    }
+                },
+                "discussionID": {
+                    "type": "string",
+                    "example": "cfe25758-f5fe-48f0-874d-e72cd4edd9b9"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "replier": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Talent"
+                },
+                "reply": {
+                    "type": "string",
+                    "example": "Answer Against Question"
+                },
+                "replyID": {
+                    "type": "string",
+                    "example": "cfe25758-f5fe-48f0-874d-e72cd4edd9b9"
+                }
+            }
+        },
+        "model.ReplyDTO": {
+            "type": "object",
+            "properties": {
+                "discussionDTO": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Discussion"
+                },
+                "replyDTO": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Reply"
+                    }
+                }
+            }
+        },
+        "model.Result": {
+            "type": "object",
+            "properties": {
+                "cutoff": {
+                    "type": "integer"
+                },
+                "mark": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.State": {
+            "type": "object",
+            "properties": {
+                "countryID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Talent": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TalentAuth": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Technology": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TestHistory": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Result"
+                },
+                "technologies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Technology"
+                    }
+                },
+                "testType": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

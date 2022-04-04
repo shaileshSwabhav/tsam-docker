@@ -1,0 +1,582 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="userSearchForm">
+                <div class="filter-by-field row">
+                    <!-- <div class="form-group col-sm-4 col-md-4">
+                    <label for="countryID"> Country:</label>
+                    <ng-select formControlName="countryID" placeholder="Select Country">
+                        <ng-option [value]="country.id" *ngFor="let country of countryList">
+                            {{country.name}}
+                        </ng-option>
+                    </ng-select>
+                    </div> -->
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" name="firstName" class="form-control input-style" formControlName="firstName"
+                            placeholder="Enter First Name">
+                        <div class="alert alert-danger" *ngIf="(userSearchForm.get('firstName').touched||userSearchForm.get('firstName').dirty)
+                            &&userSearchForm.get('firstName').invalid">
+                            <div *ngIf=" userSearchForm.get('firstName').errors.maxlength">
+                                First name cannot have more than 100 characters.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" name="lastName" class="form-control input-style" formControlName="lastName"
+                            placeholder="Enter Last Name">
+                        <div class="alert alert-danger" *ngIf="(userSearchForm.get('lastName').touched||userSearchForm.get('lastName').dirty)
+                            &&userSearchForm.get('lastName').invalid">
+                            <div *ngIf=" userSearchForm.get('lastName').errors.maxlength">
+                                Last name cannot have more than 100 characters.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" name="email" class="form-control input-style" formControlName="email"
+                            placeholder="Enter Email">
+                        <div class="alert alert-danger" *ngIf="(userSearchForm.get('email').touched||userSearchForm.get('email').dirty)
+                            &&userSearchForm.get('email').invalid">
+                            <div *ngIf=" userSearchForm.get('email').errors.maxlength">
+                                Email cannot have more than 100 characters.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Role'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="roleID">
+                            <option [ngValue]="null">Select Role</option>
+                            <option *ngFor="let role of allRoles" [ngValue]="role.id">{{role.roleName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Status'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="isActive">
+                            <option [ngValue]="null">Select Status</option>
+                            <option [ngValue]="'1'">Active</option>
+                            <option [ngValue]="'0'">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit" [disabled]="!userSearchForm.dirty"
+                        (click)="searchUsers();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Users -
+                    <span class="color-F6430F"> {{totalUsers}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Users
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" (click)="onAddClick()">
+                        Add New User
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalUsers > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalUsers}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalUsers == 0 && isSearched) || (totalUsers > 0 && !isSearched) 
+                    || (totalUsers > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalUsers > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let user of allUsers | paginate: { id:'userID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalUsers }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="userID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons dropdown-option-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalUsers > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Date of Joining</th>
+                                <th>Date of Birth</th>
+                                <th></th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let user of allUsers; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{user.firstName}}</td>
+                                    <td>{{user.lastName}}</td>
+                                    <td>{{user.contact}}</td>
+                                    <td>{{user.email}}</td>
+                                    <td><span class="badge swabhav-badge-style">{{user.role?.roleName}}</span></td>
+                                    <td>{{user.dateOfJoining | date:'dd MMM, yyyy'}}</td>
+                                    <td>{{user.dateOfBirth | date:'dd MMM, yyyy'}}</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <span id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                                <i class="material-icons">more_vert</i>
+                                            </span>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                                                    *ngIf="user.resume!=null" href={{user.resume}} target="_blank">
+                                                    <span class="vertical-align-top-icon-style"><i
+                                                            class="material-icons dropdown-option-icon-style">description</i></span>
+                                                    Resume
+                                                </a>
+                                                <span class="dropdown-item disabled-dropdown-style"
+                                                    *ngIf="user.resume==null">
+                                                    <span class="vertical-align-top-icon-style"><i
+                                                            class="material-icons dropdown-option-icon-style">description</i></span>
+                                                    No Resume
+                                                </span>
+                                                <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                                                    (click)="onViewClick(user)">
+                                                    <span class="vertical-align-top-icon-style"><i
+                                                            class="material-icons dropdown-option-icon-style">visibility</i></span>
+                                                    View
+                                                </a>
+                                                <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                                                    *ngIf="permission?.delete" (click)="onDeleteClick(user.id)">
+                                                    <span class="vertical-align-top-icon-style"><i
+                                                            class="material-icons dropdown-option-icon-style">delete</i></span>
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalUsers == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Users Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add/Update/View User -->
+<ng-template #userFormModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            {{isViewMode? 'User Details': isOperationUpdate ? 'Update User' : 'Add User' }}
+            <span *ngIf="isViewMode && permission?.update" (click)="onUpdateClick()">
+                <i class="material-icons">create</i>
+            </span>
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="dismissFormModal(modal)">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <div *ngIf="!isViewMode" class="marked-fields-right-style">
+            <span class="red"><strong>*</strong></span>
+            marked fields are mandatory
+        </div>
+        <br>
+        <form [formGroup]="userForm">
+            <div class="row">
+                <div class="form-group col-sm-3 col-md-2" *ngIf="isViewMode || isOperationUpdate">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'User Code'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" nbInput formControlName="code">
+                </div>
+            </div>
+            <div class="form-sub-header-style">Personal Details</div>
+            <div class="row">
+                <div class="col-sm-6 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'First Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="firstName"
+                            placeholder="Enter User Name">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('firstName').touched||userForm.get('firstName').dirty)&&
+                                userForm.get('firstName').invalid">
+                            First name must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="lastName"
+                            placeholder="Enter User Name">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('lastName').touched||userForm.get('lastName').dirty)&&
+                                userForm.get('lastName').invalid">
+                            Last name must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Mobile Number'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" appAllowNumbersOnly class="form-control input-style"
+                            formControlName="contact" placeholder="Enter Contact">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('contact').dirty || userForm.get('contact').touched) 
+                            && userForm.get('contact').invalid">
+                            <span *ngIf="userForm.get('contact').errors.required">
+                                Contact must be specified
+                            </span>
+                            <span *ngIf="userForm.get('contact').errors.pattern">
+                                Contact must be of type 9090909090
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Email Address'}">
+                            </ng-container>
+                        </span>
+                        <input type="email" class="form-control input-style" formControlName="email"
+                            placeholder="Enter Email">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('email').dirty ||userForm.get('email').touched) 
+                            && userForm.get('email').invalid">
+                            <span *ngIf="userForm.get('email').errors.required">
+                                Email must be specified
+                            </span>
+                            <span *ngIf="userForm.get('email').errors.pattern">
+                                Email must be of the type abc@domain.com
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Date of Birth'}">
+                            </ng-container>
+                        </span>
+                        <input type="date" class="form-control input-style" formControlName="dateOfBirth" nbInput
+                            appEmptyToNull placeholder="Enter Date of Birth" max="{{currentDate | date:'yyyy-MM-dd'}}">
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Date of Joining'}">
+                            </ng-container>
+                        </span>
+                        <input type="date" class="form-control input-style" formControlName="dateOfJoining" nbInput
+                            appEmptyToNull placeholder="Enter Date of Joining" max="{{currentDate| date:'yyyy-MM-dd'}}">
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Role'}"></ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="role" [compareWith]="compareFn">
+                        <option [ngValue]="null" disabled>Select Role</option>
+                        <option *ngFor="let role of allRoles" [ngValue]="role">{{role.roleName}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(userForm.get('role').dirty || userForm.get('role').touched) 
+                            && userForm.get('role').invalid">
+                        <span *ngIf="userForm.get('role').errors.required">
+                            User role must be specified
+                        </span>
+                    </div>
+                </div>
+                <div *ngIf="isOperationUpdate || isViewMode" class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Status'}"></ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="isActive">
+                        <option [ngValue]="true">Active</option>
+                        <option [ngValue]="false">Inactive</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(userForm.get('isActive').dirty || userForm.get('isActive').touched) 
+                            && userForm.get('isActive').invalid">
+                        <span *ngIf="userForm.get('isActive').errors.required">
+                            User status must be specified
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-sub-header-style">Location Details</div>
+            <div formGroupName="address" class="row">
+                <div class="col-sm-4 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="countryList" bindLabel="name" placeholder="Select Country" appendTo="body"
+                            [searchable]="true" [clearable]="true" formControlName="country"
+                            (change)="getStateList($event?.id,true)" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(userForm.get('address').get('country').touched||userForm.get('address').get('country').dirty)
+                              &&userForm.get('address').get('country').invalid">
+                            <div *ngIf=" userForm.get('address').get('country').errors.required">
+                                Country must be selected.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'State'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="stateList" bindLabel="name" placeholder="Select State" appendTo="body"
+                            [searchable]="true" [clearable]="true" formControlName="state" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(userForm.get('address').get('state').touched||userForm.get('address').get('state').dirty)
+                          &&userForm.get('address').get('state').invalid">
+                            <div *ngIf=" userForm.get('address').get('country').invalid; else state_required">
+                                You must select a country first.
+                            </div>
+                            <ng-template #state_required>
+                                <div *ngIf=" userForm.get('address').get('state').errors.required">
+                                    State must be selected.
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="city"
+                            placeholder="Enter City">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('address').get('city').touched||userForm.get('address').get('city').dirty)
+                          &&userForm.get('address').get('city').invalid">
+                            <div *ngIf=" userForm.get('address').get('city').errors.required">
+                                City must be specified.
+                            </div>
+                            <div *ngIf=" userForm.get('address').get('city').errors.maxlength">
+                                City name should not be more than 30 characters.
+                            </div>
+                            <div *ngIf=" userForm.get('address').get('city').errors.pattern">
+                                City should only have alphabets.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'PIN Code'}">
+                            </ng-container>
+                        </span>
+                        <input type="number" appAllowNumbersOnly class="form-control input-style"
+                            formControlName="pinCode" placeholder="Enter PIN code">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('address').get('pinCode').touched||userForm.get('address').get('pinCode').dirty)
+                          &&userForm.get('address').get('pinCode').invalid">
+                            <div *ngIf=" userForm.get('address').get('pinCode').errors.required">
+                                PIN Code must be specified.
+                            </div>
+                            <div *ngIf=" userForm.get('address').get('pinCode').errors.pattern">
+                                Enter a valid 6 digit PIN Code.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12">
+                    <div class="form-group">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Address'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="address"
+                            placeholder="Enter Address" rows="2">
+                        <div class="alert alert-danger" *ngIf="(userForm.get('address').get('address').touched||userForm.get('address').get('address').dirty)
+                          &&userForm.get('address').get('address').invalid">
+                            <div *ngIf=" userForm.get('address').get('address').errors.required">
+                                Address must be specified.
+                            </div>
+                            <div *ngIf=" userForm.get('address').get('address').errors.maxlength">
+                                Address should not be more than 100 characters.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- span is used to hide the border as well -->
+            <span *ngIf="!isViewMode || userForm.get('resume').value">
+                <hr class="hr-swabhav-style">
+                <div class="row resume-file-upload-position-style">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Resume'}">
+                        </ng-container>
+                    </span>
+                    <div class="form-group col-sm-4">
+                        <span class="custom-file">
+                            <input *ngIf="!isViewMode" type="file" class="custom-file-input"
+                                (change)="onResourceSelect($event)" id="customFile" value="displayedFileName">
+                            <label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label" for="customFile"
+                                [innerHTML]="displayedFileName"></label>
+                            <button class="btn btn-success custom-file" id="uploadingButton" type="button"
+                                *ngIf="isFileUploading">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Uploading file...
+                            </button>
+                            <div *ngIf="userForm.get('resume')?.value && !isResumeUploadedToServer"
+                                data-toggle="tooltip" data-placement="top" title="View Resume">
+                                <button class="btn btn-default swabhav-button-round">
+                                    <a [href]="userForm.get('resume').value" target="_blank">View Resume</a>
+                                </button>
+                            </div>
+                        </span>
+                        <!-- should add view uploaded resume using a resume variable after cleaning. -->
+                        <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+                    </div>
+                </div>
+            </span>
+            <div class="text-center">
+                <button type="button" (click)="dismissFormModal(modal)"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button type="button" [disabled]="!userForm.dirty || isFileUploading"
+                    class="btn btn-default swabhav-button-round" *ngIf="!isViewMode" (click)="onSubmit()">
+                    {{isOperationUpdate ? 'Update User' : 'Add User'}}
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<!-- Delete User Confirmation -->
+<ng-template #deleteConfirmationModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this user?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,102 @@
+.width-50px-style{
+    width: 50px;
+}
+
+.width-70px-style{
+    width: 70px;
+}
+
+.width-20px-style{
+    width: 20px;
+}
+
+.field-value-style{
+    background-color: #fef9f8;
+    font-size: small;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.field-section-space-style{
+    margin-bottom: 15px;
+}
+
+.create-roadmap-style{
+    color: white;
+    background-color: #439943;
+    border-radius: 30px;
+    padding: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.module-tab-menu-style{
+    box-shadow: 0 0 10px #ccc;
+    margin: 0 auto;
+}
+
+/* active tab */
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+    color:black;
+    background-color: #ffe0da;
+    height: 100px;
+}
+
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color:black;
+    height: 100px;
+}
+
+:host::ng-deep .mat-tab-header {
+    border: none;
+}
+    
+/* ink bar */
+:host::ng-deep .mat-ink-bar {
+    background-color: var(--primary-color,#ffe0da) !important;
+}
+
+.width-60px-style{
+    width: 60px;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+  background-color: #fce9e4;;
+}
+
+.no-background-tr-style{
+    background: white !important;
+}
+    
+.table-margin-left-style{
+    padding-left: 5%;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+  
+.ng-select.ng-select-disabled>.ng-select-container {
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+
+.no-padding-right-style{
+    padding-right: 0;
+}
+
+.no-padding-left-style{
+    padding-left: 0;
+}
+
+.table-td-center-align{
+    vertical-align: middle;
+}

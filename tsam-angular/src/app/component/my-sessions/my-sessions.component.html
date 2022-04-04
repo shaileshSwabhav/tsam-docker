@@ -1,0 +1,86 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="page-margin">
+        <button class="btn btn-default swabhav-button-square" (click)="backToPreviousPage()">
+            Back
+        </button>
+        <div class="heading-style">{{batchName}}</div>
+        <div class="topics-style">Topics :</div>
+        <div class="row">
+            <ng-container *ngFor="let session of sessionList; let i = index">
+                <div class="form-group col-sm-3 col-md-3">
+                    <div [ngClass]="session.class" (click)="onSessionClick(session.id)">
+                        <div class="card-body card-body-style">
+                            <div class="center-content">
+                                <div>{{session.session.name}}</div>
+                            </div>
+                            <br>
+                            <div *ngIf="session.isCompleted && selectedSession.id==session.id" class="selected-feedback"
+                                (click)="redirectToSessionFeedBack(session.batchID,session.id,session.session.name)">
+                                Give Feedback
+                            </div>
+                            <div *ngIf="session.isCompleted && selectedSession.id!=session.id" class="feedback">
+                                Give Feedback
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <br><br>
+        <div class="row">
+            <div class="col-sm-3 col-md-3">
+                <div class="session-name-style">
+                    <ng-container *ngIf="selectedSession">
+                        {{selectedSession.session.name}}
+                    </ng-container>
+                </div>
+                <hr class="sesseion-name-underline">
+                <br>
+                <ng-container *ngFor="let subSession of selectedSubSessionList; let i = index">
+                    <div>
+                        <!-- <button [ngClass]="subSession.class" type="button" (click)="onSubSessionClick(subSession.id)">
+                            {{subSession.name}}
+                        </button> -->
+                        <span [ngClass]="subSession.class" (click)="onSubSessionClick(subSession.id)">
+                            {{subSession.name}}
+                        </span>
+                    </div>
+                </ng-container>
+                <br>
+                <!-- ASSIGNMENTS -->
+                <div *ngIf="selectedSession?.sessionAssignment?.length > 0">
+                    <div class="session-name-style">
+                        <ng-container *ngIf="selectedSession">ASSIGNMENTS</ng-container>
+                    </div>
+                    <hr class="sesseion-name-underline">
+                    <ng-container *ngIf="selectedSession">
+                        <div *ngFor="let assignment of selectedSession?.sessionAssignment; let i = index">
+                            <div class="session-name-style">
+                                <button type="button" [ngClass]="selectedAssignment && 
+                                    title == assignment?.programmingAssignment?.title ?
+                                    'btn btn-default selected-subSession-header' : 'btn btn-default subSession-header'"
+                                    (click)="onAssignmentClick(assignment)">
+                                    {{assignment?.programmingAssignment?.title}}
+                                </button>
+                            </div>
+                            <br>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <div class="col-sm-9 col-md-9 left-border">
+                <div class="subsession-name-style">
+                    <ng-container *ngIf="title">
+                        {{title}}
+                    </ng-container>
+                </div>
+                <!-- {{selectedAssignment | json}} -->
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>

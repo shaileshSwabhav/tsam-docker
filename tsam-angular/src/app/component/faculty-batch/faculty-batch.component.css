@@ -1,0 +1,36 @@
+.padding-0pt {
+  padding: 0px;
+}
+
+
+.inline {
+  display: flex;
+  flex-direction: row;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+
+.rotate {
+  -ms-transform: skewY(20deg);
+  transform: skewY(-20deg);
+}
+
+/* .green-back {
+  background-color: rgb(39, 160, 39);
+}
+
+.warning-back {
+  background-color: rgb(226, 226, 70);
+}
+
+.primary-back {
+  background-color: rgb(16, 74, 209);
+} */
+
+.totalLabel{
+  font-weight: 500;
+  font-size: larger;
+}

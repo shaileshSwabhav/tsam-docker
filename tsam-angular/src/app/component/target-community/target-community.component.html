@@ -1,0 +1,1323 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+
+<ng-template #dashTemplate>
+    <span>-</span>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+        <div class="filter-header">
+            Edit Filters&nbsp;&nbsp;&nbsp;
+            <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+            <div class="float-right" (click)="drawer.toggle()">
+                <span><i class="material-icons filter-close-icon-style">close</i></span>
+            </div>
+        </div>
+        <br>
+        <br>
+        <mat-sidenav-container class="example-container">
+            <mat-sidenav mode="side" opened position="start" class="search-mat-drawer-style">
+                <div class="search-section-group-style">
+                    <div *ngFor="let searchSection of searchSectionList">
+                        <div (click)="onSearchSectionNameClick(searchSection.name)"
+                            [ngClass]="searchSection.isSelected ? 'selected-search-section-name-style' : 'search-section-name-style'">
+                            {{searchSection.name}}
+                        </div>
+                    </div>
+                </div>
+            </mat-sidenav>
+            <mat-sidenav-content class="search-main-content-style">
+                <form [formGroup]="targetCommunitySearchForm">
+                    <div *ngIf="selectedSectionName=='Department'">
+                        <div class="font-weight-bold font-lg-style">Department Details Search</div>
+                        <div class="filter-by-field row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Department'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="departmentID"
+                                    (change)="onDepartmentChangeInSearchForm(targetCommunitySearchForm.get('departmentID').value)">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let department of departmentList" [ngValue]="department">
+                                        {{department.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Function'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="functionID">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let function of targetCommunityFunctionSearchList"
+                                        [ngValue]="function.id">
+                                        {{function.functionName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- <div class="form-group col-sm-4 col-md-3">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Name'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control" formControlName="credentialID">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let credential of credentialSearchList" [ngValue]="credential.id">
+                                        {{credential.firstName + " " + credential.lastName}}
+                                    </option>
+                                </select>
+                            </div> -->
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Faculty'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="facultyID"
+                                    [compareWith]="compareFn">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let faculty of facultyList" [ngValue]="faculty.id">
+                                        {{faculty.firstName + " " + faculty.lastName}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'SalesPerson'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="salesPersonID"
+                                    [compareWith]="compareFn">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let salesPerson of salesPersonList" [ngValue]="salesPerson.id">
+                                        {{salesPerson.firstName + " " + salesPerson.lastName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="selectedSectionName=='Target'">
+                        <div class="font-weight-bold font-lg-style">Target Details Search</div>
+                        <div class="filter-by-field row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Type'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="targetType">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let targetType of targetTypeList" [ngValue]="targetType.value">
+                                        {{targetType.value}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'College(s)'}">
+                                    </ng-container>
+                                </span>
+                                <ng-select [items]="collegeBranchList" bindLabel="branchName" bindValue="id"
+                                    placeholder="Select" appendTo="body" multiple="true" [searchable]="true"
+                                    [clearable]="true" formControlName="collegeIDs" class="ng-select-style">
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        {{item.branchName}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company(s)'}">
+                                    </ng-container>
+                                </span>
+                                <ng-select [items]="companyBranchList" bindLabel="branchName" bindValue="id"
+                                    placeholder="Select" appendTo="body" multiple="true" [searchable]="true"
+                                    [clearable]="true" formControlName="companyIDs" class="ng-select-style">
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        {{item.branchName}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'College/Company Rating'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="rating">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let ratingNumber of ratingNumberList" [ngValue]="ratingNumber">
+                                        {{ratingNumber}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Student Type'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="studentType">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let studentType of studentTypeList" [ngValue]="studentType.value">
+                                        {{studentType.value}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Student Count'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="targetStudentCount" placeholder="eg: 10">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('targetStudentCount').touched 
+                                    || targetCommunitySearchForm.get('targetStudentCount').dirty) 
+                                    && targetCommunitySearchForm.get('targetStudentCount').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('targetStudentCount').errors.min">
+                                        Target Student Count cannot be less than 0
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Target Achieved?'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="isTargetAchieved">
+                                    <option [ngValue]="null">Select</option>
+                                    <option [ngValue]="'0'">No</option>
+                                    <option [ngValue]="'1'">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-by-field row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label class="font-md-style font-weight-bolder-style">Start Date:</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="startDateFromDate"
+                                    placeholder="Enter Start Target Date From">
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label>&nbsp;</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="startDateToDate"
+                                    placeholder="Enter Start Target Date To">
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label class="font-md-style font-weight-bolder-style">End Date:</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="endDateFromDate"
+                                    placeholder="Enter End Target Date From">
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label>&nbsp;</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To'}">
+                                    </ng-container>
+                                </span>
+                                <input type="date" class="form-control input-style" formControlName="endDateToDate"
+                                    placeholder="Enter End Target Date To">
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="selectedSectionName=='Talent'">
+                        <div class="font-weight-bold font-lg-style">Talent Details Search</div>
+                        <div class="filter-by-field row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label>&nbsp;</label>
+                                </div>
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Talent Type'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="talentType">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let talentType of talentTypeList" [ngValue]="talentType.key">
+                                        {{talentType.value}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label>&nbsp;</label>
+                                </div>
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Required Rating'}">
+                                    </ng-container>
+                                </span>
+                                <select class="form-control input-style" formControlName="requiredTalentRating">
+                                    <option [ngValue]="null">Select</option>
+                                    <option *ngFor="let ratingNumber of ratingNumberList" [ngValue]="ratingNumber">
+                                        {{ratingNumber}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label class="font-md-style font-weight-bolder-style">Experience (in years):</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Minimum'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="minExperienceYears" placeholder="eg: 2">
+                                <div class="alert alert-danger"
+                                    *ngIf="(targetCommunitySearchForm.get('minExperienceYears').touched 
+                                    || targetCommunitySearchForm.get('minExperienceYears').dirty) && targetCommunitySearchForm.get('minExperienceYears').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('minExperienceYears').errors.min">
+                                        Minimum Experience in Years cannot be less than 0
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('minExperienceYears').errors.max">
+                                        Minimum Experience in Years cannot be more than 99
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label>&nbsp;</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="maxExperienceYears" placeholder="eg: 2">
+                                <div class="alert alert-danger"
+                                    *ngIf="(targetCommunitySearchForm.get('maxExperienceYears').touched 
+                                    || targetCommunitySearchForm.get('maxExperienceYears').dirty) && targetCommunitySearchForm.get('maxExperienceYears').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('maxExperienceYears').errors.min">
+                                        Maximum Experience in Years cannot be less than 0
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('maxExperienceYears').errors.max">
+                                        Maximum Experience in Years cannot be more than 99
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <div>
+                                    <label>&nbsp;</label>
+                                </div>
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Salary'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersWithDecimal class="form-control input-style"
+                                    formControlName="salary" placeholder="eg: 20000">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('salary').touched || targetCommunitySearchForm.get('salary').dirty) 
+                                    && targetCommunitySearchForm.get('salary').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('salary').errors.min">
+                                        Salary cannot be less than 0
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('salary').errors.max">
+                                        Salary cannot be more than 9999999999
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('salary').errors.pattern">
+                                        Salary can have only two decimal places
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="selectedSectionName=='Valuation'">
+                        <div class="font-weight-bold font-lg-style">Valuation Details Search</div>
+                        <div class="filter-by-field row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'UpSell'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="upSell" placeholder="eg: 100">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('upSell').touched || targetCommunitySearchForm.get('upSell').dirty) 
+                                    && targetCommunitySearchForm.get('upSell').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('upSell').errors.min">
+                                        UpSell cannot be less than 0
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('upSell').errors.max">
+                                        UpSell cannot be more than 1000
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'CrossSell'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="crossSell" placeholder="eg: 100">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('crossSell').touched || targetCommunitySearchForm.get('crossSell').dirty) 
+                                    && targetCommunitySearchForm.get('crossSell').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('crossSell').errors.min">
+                                        CrossSell cannot be less than 0
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('crossSell').errors.max">
+                                        CrossSell cannot be more than 1000
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Referral'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control  input-style"
+                                    formControlName="upSell" placeholder="eg: 100">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('referral').touched || targetCommunitySearchForm.get('referral').dirty) 
+                                    && targetCommunitySearchForm.get('referral').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('referral').errors.min">
+                                        Referral cannot be less than 0
+                                    </div>
+                                    <div *ngIf="targetCommunitySearchForm.get('referral').errors.max">
+                                        Referral cannot be more than 1000
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="selectedSectionName=='Others'">
+                        <div class="font-weight-bold font-lg-style">Other Details Search</div>
+                        <div class="filter-by-field row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Course(s)'}">
+                                    </ng-container>
+                                </span>
+                                <ng-select [items]="courseList" bindLabel="name" bindValue="id" placeholder="Select"
+                                    appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+                                    formControlName="courseIDs" class="ng-select-style">
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        {{item.name}} - <strong>{{item?.courseType}}</strong>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container
+                                        *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Number of batches'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="numberOfBatches" placeholder="eg: 10">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('numberOfBatches').touched 
+                                    || targetCommunitySearchForm.get('numberOfBatches').dirty) 
+                                    && targetCommunitySearchForm.get('numberOfBatches').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('numberOfBatches').errors.min">
+                                        Number of Batches cannot be less than 0
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'hours'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="hours" placeholder="eg: 10">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('hours').touched 
+                                    || targetCommunitySearchForm.get('hours').dirty) 
+                                    && targetCommunitySearchForm.get('hours').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('hours').errors.min">
+                                        Hours cannot be less than 0
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Fees'}">
+                                    </ng-container>
+                                </span>
+                                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                    formControlName="fees" placeholder="eg: 10000">
+                                <div class="alert alert-danger" *ngIf="(targetCommunitySearchForm.get('fees').touched 
+                                    || targetCommunitySearchForm.get('fees').dirty) 
+                                    && targetCommunitySearchForm.get('fees').invalid">
+                                    <div *ngIf="targetCommunitySearchForm.get('fees').errors.min">
+                                        Fees cannot be less than 0
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-default filter-button" type="submit"
+                            [disabled]="!targetCommunitySearchForm.dirty"
+                            (click)="searchTargetCommunities();drawer.toggle()">
+                            Search
+                            <span class="vertical-align-top-icon-style"><i
+                                    class="material-icons search-button-icon-style">search</i></span>
+                        </button>
+                    </div>
+                </form>
+            </mat-sidenav-content>
+        </mat-sidenav-container>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Target Communities -
+                    <span class="color-F6430F"> {{totalTargetCommunities}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Target Communities
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" (click)="onAddNewTargetCommunityClick()">
+                        Add New Target Community
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalTargetCommunities > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalTargetCommunities}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalTargetCommunities == 0 && isSearched) || (totalTargetCommunities > 0 && !isSearched) 
+                    || (totalTargetCommunities > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalTargetCommunities > 0"
+                    class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let targetCommunityFunction of targetCommunityFunctionList| paginate: { id:'targetCommunityFunctionID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalTargetCommunities }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="targetCommunityFunctionID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalTargetCommunities > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>Category</th>
+                                <th>Entity</th>
+                                <th>Name</th>
+                                <th>Rating</th>
+                                <th>Required Rating</th>
+                                <th>Student Type</th>
+                                <th>Talent Type</th>
+                                <th>Experience Years (min)</th>
+                                <th>Experience Years (max)</th>
+                                <th>Course</th>
+                                <th>Hours</th>
+                                <th>Salary</th>
+                                <th>Fees per Student</th>
+                                <th>SalesPerson</th>
+                                <th>Mentor</th>
+                                <th>Number of students</th>
+                                <th>Number of Batches</th>
+                                <th>From Date</th>
+                                <th>To Date</th>
+                                <th>UpSell</th>
+                                <th>CrossSell</th>
+                                <th>Referral</th>
+                                <th>Action</th>
+                                <th>Mark as Achieved</th>
+                                <th>View</th>
+                                <th *ngIf="permission.delete">Delete</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let community of targetCommunityList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{community.function.functionName}}</td>
+                                    <td>{{community.targetType}}</td>
+                                    <td>
+                                        <span
+                                            *ngIf="community.colleges != null && community.colleges?.length > 0; else companiesTemplate">
+                                            <span class="badge swabhav-badge-style"
+                                                *ngFor="let college of community.colleges">
+                                                {{college.branchName}}
+                                            </span>
+                                        </span>
+                                        <ng-template #companiesTemplate>
+                                            <span class="badge swabhav-badge-style"
+                                                *ngFor="let company of community.companies">
+                                                {{company.branchName}}
+                                            </span>
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.rating != null; else dashTemplate">
+                                            {{community.rating}}
+                                        </span>
+                                    </td>
+                                    <td>{{community.requiredTalentRatingInString}}</td>
+                                    <td>{{community.studentType}}</td>
+                                    <td>{{utilService.getValueByKey(community.talentType, talentTypeList)}}</td>
+                                    <td>
+                                        <span *ngIf="community.minExperienceYears != null; else dashTemplate">
+                                            {{community.minExperienceYears}} years
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.maxExperienceYears != null; else dashTemplate">
+                                            {{community.maxExperienceYears}} years
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngFor="let course of community.courses">
+                                            <span class="badge swabhav-badge-style">
+                                                <span
+                                                    class="badge swabhav-badge-nested-style font-sm-style">{{course.name}}</span>
+                                                -
+                                                <span
+                                                    class="badge swabhav-badge-nested-style font-sm-style">{{course.courseType}}</span>
+                                            </span>
+                                            <br>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.hours != null; else dashTemplate">
+                                            {{community.hours}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.salaryInString != null; else dashTemplate">
+                                            {{community.salaryInString}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.feesInString != null; else dashTemplate">
+                                            {{community.feesInString}}
+                                        </span>
+                                    </td>
+                                    <!-- <td>{{community.credential.firstName + " " + community.credential.lastName}}</td> -->
+                                    <td>{{community.salesPerson.firstName + " " + community.salesPerson.lastName}}</td>
+                                    <td>{{community.faculty.firstName + " " + community.faculty.lastName}}</td>
+                                    <!-- <td>
+                                        <span *ngIf="community.faculty; else nofacultyAssigned">
+                                            {{community.faculty.firstName + " " + community.faculty.lastName}}
+                                        </span>
+                                        <ng-template #nofacultyAssigned>
+                                            <span class="badge badge-warning">Not Assigned</span>
+                                        </ng-template>
+                                    </td> -->
+                                    <td>
+                                        <span *ngIf="community.targetStudentCount != null; else dashTemplate">
+                                            {{community.targetStudentCount}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.numberOfBatches != null; else dashTemplate">
+                                            {{community.numberOfBatches}}
+                                        </span>
+                                    </td>
+                                    <td>{{community.targetStartDate | date:'dd MMM, yyyy'}}</td>
+                                    <td>{{community.targetEndDate | date:'dd MMM, yyyy'}}</td>
+                                    <td>
+                                        <span *ngIf="community.upSell != null; else dashTemplate">
+                                            {{community.upSell}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.crossSell != null; else dashTemplate">
+                                            {{community.crossSell}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.referral != null; else dashTemplate">
+                                            {{community.referral}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="community.action != null; else dashTemplate">
+                                            {{community.action}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="community.isTargetAchieved; else notAchieved">
+                                            <i title="Target Achieved"
+                                                class="material-icons color-F6430F disabled">check_circle</i>
+                                        </div>
+                                        <ng-template #notAchieved>
+                                            <i *ngIf="permission.update; else notAchievedNoPerm"
+                                                title="Click to mark target as achieved"
+                                                (click)="onAchievedButtonClick(community.id)"
+                                                class="material-icons color-F6430F">
+                                                add_task</i>
+                                        </ng-template>
+                                        <ng-template #notAchievedNoPerm>
+                                            <i class="material-icons green">add_task</i>
+                                        </ng-template>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="View Target Community">
+                                        <span (click)="onViewTargetCommunityClick(community)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td *ngIf="permission.delete" data-toggle="tooltip" data-placement="top"
+                                        title="Delete Target Community">
+                                        <span (click)="onDeleteTargetCommunityClick(community.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalTargetCommunities == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Target Communities Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+
+<!-- Add/Update/View Target Community -->
+<ng-template #targetCommunityFormModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            {{isViewMode? 'Target Community Details': isOperationUpdate ? 'Update Target Community' : 'Add
+            Target Community' }}
+            <span *ngIf="isViewMode && permission.update" (click)="onUpdateTargetCommunityClick()">
+                <i class="material-icons">create</i>
+            </span>
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Close click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red">
+                <strong>*</strong></span> marked fields are mandatory
+        </div>
+        <br>
+        <form [formGroup]="targetCommunityForm">
+            <div class="form-sub-header-style">Department Details</div>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Department'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="department" [compareWith]="compareFn"
+                        (change)="onDepartmentChangeInForm(targetCommunityForm.get('department').value)">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let department of departmentList" [ngValue]="department">{{department.name}}
+                        </option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('department').touched || targetCommunityForm.get('department').dirty) 
+                        && targetCommunityForm.get('department').invalid">
+                        <div *ngIf="targetCommunityForm.get('department').errors.required">
+                            Department must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Function'}"></ng-container>
+                    </span>
+                    <ng-select [items]="targetCommunityFunctionList" bindLabel="functionName" placeholder="Select"
+                        appendTo="body" [searchable]="true" [clearable]="false" formControlName="function"
+                        [loading]="areFunctionsLoading" class="ng-select-style">
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            {{item.functionName}}
+                        </ng-template>
+                    </ng-select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('function').touched || targetCommunityForm.get('function').dirty) 
+                        && targetCommunityForm.get('function').invalid">
+                        <div *ngIf="targetCommunityForm.get('function').errors.required">
+                            Function must be specified
+                        </div>
+                    </div>
+                </div>
+                <!-- <ng-container *ngIf="showCredentialField">
+                    <div class="form-group col-sm-4 col-md-3">
+                        <label>
+                            <strong>
+                                <span class="capitalize-text">
+                                    <span *ngIf="!isViewMode" class="red">* </span>
+                                    {{targetCommunityForm.get('department').value?.role?.roleName}}
+                                </span>
+                            </strong>
+                        </label>
+                        <ng-select [items]="credentialList" bindLabel="firstName" placeholder="Select"
+                            appendTo="body" [searchable]="true" [clearable]="false" formControlName="credential"
+                            [loading]="areCredentialsLoading">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.firstName + " " + item.lastName}}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('credential').touched || targetCommunityForm.get('credential').dirty) 
+                            && targetCommunityForm.get('credential').invalid">
+                            <div *ngIf="targetCommunityForm.get('credential').errors.required">
+                                Credential must be specified
+                            </div>
+                        </div>
+                    </div>
+                </ng-container> -->
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'SalesPerson'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="salesPerson" [compareWith]="compareFn">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let salesPerson of salesPersonList" [ngValue]="salesPerson">
+                            {{salesPerson.firstName + " " + salesPerson.lastName}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('salesPerson').touched || targetCommunityForm.get('salesPerson').dirty) 
+                        && targetCommunityForm.get('salesPerson').invalid">
+                        <div *ngIf="targetCommunityForm.get('salesPerson').errors.required">
+                            SalesPerson must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Faculty'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="faculty" [compareWith]="compareFn">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let faculty of facultyList" [ngValue]="faculty">{{faculty.firstName + " " +
+                            faculty.lastName}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('faculty').touched || targetCommunityForm.get('faculty').dirty) 
+                        && targetCommunityForm.get('faculty').invalid">
+                        <div *ngIf="targetCommunityForm.get('faculty').errors.required">
+                            Faculty must be specified
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-sub-header-style">Target Details</div>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Target Type'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="targetType"
+                        (change)="onTargetTypeChange(targetCommunityForm.get('targetType').value)">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let targetType of targetTypeList" [ngValue]="targetType.value">
+                            {{targetType.value}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('targetType').touched || targetCommunityForm.get('targetType').dirty) 
+                        && targetCommunityForm.get('targetType').invalid">
+                        <div *ngIf="targetCommunityForm.get('targetType').errors.required">
+                            Target type must be specified
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="showCollegeFieldInForm">
+                    <div class="form-group col-sm-4 col-md-3">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'College(s)'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="collegeBranchList" bindLabel="branchName" placeholder="Select"
+                            appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+                            formControlName="colleges" [loading]="areCollegesLoading" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.branchName}}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('colleges').touched || targetCommunityForm.get('colleges').dirty) 
+                            && targetCommunityForm.get('colleges').invalid">
+                            <div *ngIf="targetCommunityForm.get('colleges').errors.required">
+                                College(s) must be specified
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="showCompanyFieldInForm">
+                    <div class="form-group col-sm-4 col-md-3">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Company(s)'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="companyBranchList" bindLabel="branchName" placeholder="Select"
+                            appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+                            formControlName="companies" [loading]="areCompaniesLoading" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.branchName}}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('companies').touched || targetCommunityForm.get('companies').dirty) 
+                            && targetCommunityForm.get('companies').invalid">
+                            <div *ngIf="targetCommunityForm.get('companies').errors.required">
+                                Company(s) must be specified
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="showRatingFieldInForm">
+                    <div class="form-group col-sm-4 col-md-3">
+                        <label>
+                            <strong>
+                                <span class="capitalize-text">
+                                    <span *ngIf="!isViewMode" class="red">* </span>
+                                    {{targetCommunityForm.get('targetType').value}} Rating:
+                                </span>
+                            </strong>
+                        </label>
+                        <select class="form-control input-style" formControlName="rating">
+                            <option [ngValue]="null" disabled>Select</option>
+                            <option *ngFor="let ratingNumber of ratingNumberList" [ngValue]="ratingNumber">
+                                {{ratingNumber}}</option>
+                        </select>
+                        <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('rating').touched || targetCommunityForm.get('rating').dirty) 
+                            && targetCommunityForm.get('rating').invalid">
+                            <div *ngIf="targetCommunityForm.get('rating').errors.required">
+                                Rating must be specified
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Student Type'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="studentType">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let studentType of studentTypeList" [ngValue]="studentType.value">
+                            {{studentType.value}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('studentType').touched || targetCommunityForm.get('studentType').dirty) 
+                        && targetCommunityForm.get('studentType').invalid">
+                        <div *ngIf="targetCommunityForm.get('studentType').errors.required">
+                            Student type must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Student Count'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style"
+                        formControlName="targetStudentCount" placeholder="eg: 10">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('targetStudentCount').touched || targetCommunityForm.get('targetStudentCount').dirty) 
+                        && targetCommunityForm.get('targetStudentCount').invalid">
+                        <div *ngIf="targetCommunityForm.get('targetStudentCount').errors.required">
+                            Student Count must be specified
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('targetStudentCount').errors.min">
+                            Student Count cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('targetStudentCount').errors.max">
+                            Student Count cannot be more than 2147483647
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Start Date'}">
+                        </ng-container>
+                    </span>
+                    <input type="date" class="form-control input-style" formControlName="targetStartDate"
+                        placeholder="Enter Target Start Date">
+                    <div class="alert alert-danger"
+                        *ngIf="(targetCommunityForm.get('targetStartDate').touched 
+                        || targetCommunityForm.get('targetStartDate').dirty) && targetCommunityForm.get('targetStartDate').invalid">
+                        <div *ngIf="targetCommunityForm.get('targetStartDate').errors.required">
+                            Start Date must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'End Date'}">
+                        </ng-container>
+                    </span>
+                    <input type="date" class="form-control input-style" formControlName="targetEndDate"
+                        placeholder="Enter Target End Date">
+                    <div class="alert alert-danger"
+                        *ngIf="(targetCommunityForm.get('targetEndDate').touched 
+                        || targetCommunityForm.get('targetEndDate').dirty) && targetCommunityForm.get('targetEndDate').invalid">
+                        <div *ngIf="targetCommunityForm.get('targetEndDate').errors.required">
+                            End Date must be specified
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-sub-header-style">Talent Details</div>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-3">
+                    <div>
+                        <label>&nbsp;</label>
+                    </div>
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Talent Type'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="talentType">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let talentType of talentTypeList" [ngValue]="talentType.key">
+                            {{talentType.value}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('talentType').touched || targetCommunityForm.get('talentType').dirty) 
+                        && targetCommunityForm.get('talentType').invalid">
+                        <div *ngIf="targetCommunityForm.get('talentType').errors.required">
+                            Talent type must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    <div>
+                        <label>&nbsp;</label>
+                    </div>
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Required Rating'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="requiredTalentRating">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let ratingNumber of ratingNumberList" [ngValue]="ratingNumber">
+                            {{ratingNumber}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('requiredTalentRating').touched 
+                        || targetCommunityForm.get('requiredTalentRating').dirty) 
+                        && targetCommunityForm.get('requiredTalentRating').invalid">
+                        <div *ngIf="targetCommunityForm.get('requiredTalentRating').errors.required">
+                            Required Rating must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <div>
+                        <label class="font-md-style font-weight-bolder-style">Experience (in years):</label>
+                    </div>
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Minimum'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style"
+                        formControlName="minExperienceYears" placeholder="eg: 2">
+                    <div class="alert alert-danger"
+                        *ngIf="(targetCommunityForm.get('minExperienceYears').touched 
+                        || targetCommunityForm.get('minExperienceYears').dirty) && targetCommunityForm.get('minExperienceYears').invalid">
+                        <div *ngIf="targetCommunityForm.get('minExperienceYears').errors.min">
+                            Minimum Experience in Years cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('minExperienceYears').errors.max">
+                            Minimum Experience in Years cannot be more than 99
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <div>
+                        <label>&nbsp;</label>
+                    </div>
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style"
+                        formControlName="maxExperienceYears" placeholder="eg: 2">
+                    <div class="alert alert-danger"
+                        *ngIf="(targetCommunityForm.get('maxExperienceYears').touched 
+                        || targetCommunityForm.get('maxExperienceYears').dirty) && targetCommunityForm.get('maxExperienceYears').invalid">
+                        <div *ngIf="targetCommunityForm.get('maxExperienceYears').errors.min">
+                            Maximum Experience in Years cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('maxExperienceYears').errors.max">
+                            Maximum Experience in Years cannot be more than 99
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <div>
+                        <label>&nbsp;</label>
+                    </div>
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Salary'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersWithDecimal class="form-control input-style"
+                        formControlName="salary" placeholder="eg: 200000">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('salary').touched || targetCommunityForm.get('salary').dirty) 
+                        && targetCommunityForm.get('salary').invalid">
+                        <div *ngIf="targetCommunityForm.get('salary').errors.min">
+                            Salary cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('salary').errors.max">
+                            Salary cannot be more than 9999999999
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('salary').errors.pattern">
+                            Salary can have only two decimal places
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-sub-header-style">Valuation Details</div>
+            <div class="row">
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'UpSell'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="upSell"
+                        placeholder="eg: 100">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('upSell').touched || targetCommunityForm.get('upSell').dirty) 
+                        && targetCommunityForm.get('upSell').invalid">
+                        <div *ngIf="targetCommunityForm.get('upSell').errors.min">
+                            UpSell cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('upSell').errors.max">
+                            UpSell cannot be more than 1000
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'CrossSell'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style"
+                        formControlName="crossSell" placeholder="eg: 100">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('crossSell').touched || targetCommunityForm.get('crossSell').dirty) 
+                        && targetCommunityForm.get('crossSell').invalid">
+                        <div *ngIf="targetCommunityForm.get('crossSell').errors.min">
+                            CrossSell cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('crossSell').errors.max">
+                            CrossSell cannot be more than 1000
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Referral'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="referral"
+                        placeholder="eg: 100">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('referral').touched || targetCommunityForm.get('referral').dirty) 
+                        && targetCommunityForm.get('referral').invalid">
+                        <div *ngIf="targetCommunityForm.get('referral').errors.min">
+                            Referral cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('referral').errors.max">
+                            Referral cannot be more than 1000
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-sub-header-style">Others Details</div>
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Courses'}"></ng-container>
+                    </span>
+                    <ng-select [items]="courseList" bindLabel="name" placeholder="Select" appendTo="body"
+                        class="ng-select-style" multiple="true" [searchable]="true" [clearable]="true"
+                        formControlName="courses">
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            {{item.name}} - <strong>{{item?.courseType}}</strong>
+                        </ng-template>
+                    </ng-select>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('courses').touched || targetCommunityForm.get('courses').dirty) 
+                        && targetCommunityForm.get('courses').invalid">
+                        <div *ngIf="targetCommunityForm.get('courses').errors.required">
+                            Course(s) must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Number of Batches'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style"
+                        formControlName="numberOfBatches" placeholder="eg: 10">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('numberOfBatches').touched || targetCommunityForm.get('numberOfBatches').dirty) 
+                        && targetCommunityForm.get('numberOfBatches').invalid">
+                        <div *ngIf="targetCommunityForm.get('numberOfBatches').errors.required">
+                            Number Of Batches must be specified
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('numberOfBatches').errors.min">
+                            Number Of Batches cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('numberOfBatches').errors.max">
+                            Number of Batches cannot be more than 255
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Hours'}"></ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="hours"
+                        placeholder="eg: 10">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('hours').touched || targetCommunityForm.get('hours').dirty) 
+                        && targetCommunityForm.get('hours').invalid">
+                        <div *ngIf="targetCommunityForm.get('hours').errors.min">
+                            Hours cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('hours').errors.max">
+                            Hours cannot be more than 65535
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Fees'}"></ng-container>
+                    </span>
+                    <input type="number" appAllowNumbersWithDecimal class="form-control input-style"
+                        formControlName="fees" placeholder="eg: 10000">
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('fees').touched || targetCommunityForm.get('fees').dirty) 
+                        && targetCommunityForm.get('fees').invalid">
+                        <div *ngIf="targetCommunityForm.get('fees').errors.min">
+                            Fees cannot be less than 0
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('fees').errors.max">
+                            Fees cannot be more than 1000000
+                        </div>
+                        <div *ngIf="targetCommunityForm.get('fees').errors.pattern">
+                            Fees can have only two decimal places
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="isViewMode || isOperationUpdate" class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Target Achieved?'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="isTargetAchieved">
+                        <option [ngValue]="false">No</option>
+                        <option [ngValue]="true">Yes</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-12 col-lg-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Action'}">
+                        </ng-container>
+                    </span>
+                    <textarea class="form-control input-style" formControlName="action" rows="5"
+                        placeholder="Give a detailed description of the actions to be taken to achieve the target..."
+                        appEmptyToNull></textarea>
+                    <div class="alert alert-danger" *ngIf="(targetCommunityForm.get('action').touched || targetCommunityForm.get('action').dirty) 
+                        && targetCommunityForm.get('action').invalid">
+                        <div *ngIf="targetCommunityForm.get('action').errors.maxLength">
+                            Action can have maximum 1000 characters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button type="button" [disabled]="!targetCommunityForm.dirty"
+                    class="btn btn-default swabhav-button-round" *ngIf="!isViewMode" (click)="onFormSubmit()">
+                    {{isOperationUpdate ? 'Update Target Community' : 'Add Target Community'}}
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+
+<!-- Delete target Community Confirmation -->
+<ng-template #deleteTargetCommunityModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this campus target community?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>

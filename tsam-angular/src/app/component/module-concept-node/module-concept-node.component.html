@@ -1,0 +1,67 @@
+<div class="card node-card-style" [id]="node.stepId"> 
+    <div class="card-body no-side-padding card-body-style">
+
+        <!-- New -->
+        <div class="row">
+            <div class="col-10 no-side-padding">
+                <ng-select #ngSelectConceptComponent [items]="conceptList" bindLabel="name" bindValue="id" placeholder="Select Concept" appendTo="body"
+                    [searchable]="true" class="ng-select-style concept-select-style margin-botton-style" [clearable]="true" 
+                    [(ngModel)]="node.conceptID" (change)="onConceptChange()" [disabled]="node.isConceptIDDisabled">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index" ng-disabled="item.disabled">
+                        {{item.name}}-
+                        <span class="font-weight-bold" 
+                            [ngClass]="{'easy': item.complexity==1,'medium': item.complexity==2,'hard': item.complexity==3}">
+                            {{item.complexityName}}
+                        </span>
+                    </ng-template>
+                </ng-select>
+            </div>
+            <div class="col-2 no-side-padding">
+                <img class="remove-button-style cursor-pointer-style" width="20" src="assets/icon/colour-icons/delete.png" 
+                    alt="Remove node" (click)="removeNode()">
+                <!-- {{node.stepId}} -->
+            </div>
+        </div>
+        <!-- <hr class="hr-style"> -->
+        <div class="text-with-line-style cursor-pointer-style" (click)="onShowParentConceptsClick()">
+            <span *ngIf="!node.showParentConcepts" class="text-with-line-text-style">Show Parent Concept</span>
+            <span *ngIf="node.showParentConcepts" class="text-with-line-text-style">Hide Parent Concept</span>
+        </div>
+        <ng-container *ngIf="node.showParentConcepts">
+            <div>
+                <ng-select #ngSelectParentConceptComponent [items]="parentConceptList" bindLabel="name" bindValue="id" placeholder="Select Parent Concept" appendTo="body"
+                    [searchable]="true" class="ng-select-style margin-botton-style" [clearable]="false" [(ngModel)]="node.parentConceptIDs"
+                    multiple="true" (add)="onAddingParentConceptID($event)" (remove)="onRemoveParentConceptID($event)" (change)="onParentConceptChange()">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                        {{item.name}}
+                    </ng-template>
+                </ng-select>
+            </div>
+        </ng-container>
+        <!-- <hr class="hr-style"> -->
+        <div>
+            <button class="btn btn-default swabhav-button-round add-child-concept-button-style" (click)="addChildNode()">
+                Add Child Concept
+            </button>
+        </div>
+
+        <!-- Old -->
+        <!-- <div class="row">
+            <div class="col-6">
+                <input class="form-control input-style" type="number" #parentIDTemplate>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-default swabhav-button-round add-child-concept-button-style" (click)="tempAddNewParentToNode(node.stepId,parentIDTemplate.value)">
+                    Add Parent Concept
+                </button>
+            </div>
+        </div> -->
+        <!-- <hr>
+        <div>
+            <button class="btn btn-default swabhav-button-round add-child-concept-button-style" (click)="addChildNode()">
+                Add Child Concept
+            </button>
+        </div> -->
+
+    </div>
+</div>   

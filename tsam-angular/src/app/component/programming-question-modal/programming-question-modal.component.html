@@ -1,0 +1,576 @@
+<div class="modal-body">
+
+  <div class="form-header-style">
+    {{isViewClicked? 'Programming Details': isUpdateClicked ? 'Update Programming Question' : 'Add Programming Question' }}
+    <span *ngIf="isViewClicked && permission.update && !hasAnyTalentAnswered" class="cursor-pointer-style"
+      (click)="onUpdateProgrammingQuestionClick()">
+      <i class="material-icons">create</i>
+    </span>
+    <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+      (click)="dismissModal()">
+      <span class="vertical-align-top-icon-style">
+        <i class="material-icons modal-popup-close-icon-style">close</i>
+      </span>
+      Close
+    </div>
+  </div>
+  <div *ngIf="!isViewClicked" class="marked-fields-right-style"><span class="red">
+    <strong>*</strong></span> marked fields are mandatory
+  </div>
+
+  <br>
+
+  <form [formGroup]="programmingQuestionForm">
+    <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Programming Question
+            Type(s):</label>
+          <ng-select [items]="programmingQuestionTypeList" bindLabel="programmingType" placeholder="Select"
+            appendTo="body" multiple="true" [searchable]="true" [clearable]="true" multiple="true"
+            formControlName="programmingQuestionTypes" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.programmingType}}
+            </ng-template>
+          </ng-select>
+          <!-- <select class="form-control input-style" [compareWith]="compareFn" formControlName="programmingQuestionType">
+            <option [ngValue]="null" disabled>Select Type</option>
+            <option *ngFor="let type of programmingQuestionTypeList" [ngValue]="type">{{type.programmingType}}</option>
+          </select> -->
+          <div class="alert alert-danger"
+            *ngIf="(programmingQuestionForm.get('programmingQuestionTypes').touched||
+            programmingQuestionForm.get('programmingQuestionTypes').dirty)&&programmingQuestionForm.get('programmingQuestionTypes').invalid">
+            <div *ngIf="programmingQuestionForm.get('programmingQuestionTypes').errors.required">
+              Programming Question type(s) must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label class="filter-form-label">Programming Concept(s):</label>
+          <ng-select [items]="programmingConceptList" bindLabel="name" placeholder="Select" appendTo="body" multiple="true"
+            [searchable]="true" [clearable]="true" multiple="true" formControlName="programmingConcept"
+            class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+
+          <!-- <div class="alert alert-danger"
+            *ngIf="(programmingQuestionForm.get('programmingQuestionTypes').touched||
+            programmingQuestionForm.get('programmingQuestionTypes').dirty)&&programmingQuestionForm.get('programmingQuestionTypes').invalid">
+            <div *ngIf="programmingQuestionForm.get('programmingQuestionTypes').errors.required">
+              Programming Question type(s) must be specified
+            </div>
+          </div> -->
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Label:</label>
+          <input type="text" formControlName="label" class="form-control input-style" placeholder="eg: Recursion">
+          <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('label').touched||
+              programmingQuestionForm.get('label').dirty)&&programmingQuestionForm.get('label').invalid">
+            <div *ngIf="programmingQuestionForm.get('label').errors.required">
+              Programming question label must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Status:</label>
+          <select class="form-control input-style" formControlName="isActive">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Inactive</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('isActive').touched||
+              programmingQuestionForm.get('isActive').dirty)&&programmingQuestionForm.get('isActive').invalid">
+            <div *ngIf="programmingQuestionForm.get('isActive').errors.required">
+              Programming question status must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Options Available:</label>
+          <select class="form-control input-style" formControlName="hasOptions" (change)="onHasOptionChange()">
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('hasOptions').touched||
+              programmingQuestionForm.get('hasOptions').dirty)&&programmingQuestionForm.get('hasOptions').invalid">
+            <div *ngIf="programmingQuestionForm.get('hasOptions').errors.required">
+              Options exist must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Level:</label>
+          <select class="form-control input-style" formControlName="level">
+            <option [ngValue]="null" disabled>Select Level</option>
+            <option *ngFor="let level of programmingQuestionLevel" [ngValue]="level.key">{{level.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('level').touched||
+              programmingQuestionForm.get('level').dirty)&&programmingQuestionForm.get('level').invalid">
+            <div *ngIf="programmingQuestionForm.get('level').errors.required">
+              Programming question level must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-2">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Score:</label>
+          <input type="number" formControlName="score" appAllowNumbersOnly class="form-control input-style"
+            placeholder="eg: 1">
+          <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('score').touched||
+              programmingQuestionForm.get('score').dirty)&&programmingQuestionForm.get('score').invalid">
+            <div *ngIf="programmingQuestionForm.get('score').errors.required">
+              Programming question score must be specified
+            </div>
+            <div *ngIf="programmingQuestionForm.get('score').errors?.min">
+              Programming question score must be greater than zero
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-2">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Time Required:</label>
+          <div class="row">
+            <div class="col-sm-6 col-md-6">
+              <input type="number" formControlName="timeHour" appAllowNumbersOnly class="form-control input-style"
+                placeholder="00" min="0" (change)="initializeTimeInHoursAndMinutes()" onpaste="return false">
+            </div>
+            <div class="col-sm-6 col-md-6">
+              <input type="number" formControlName="timeMin" appAllowNumbersOnly class="form-control input-style"
+                placeholder="00" min="0" (change)="initializeTimeInHoursAndMinutes()" onpaste="return false">
+            </div>
+            <div class="col-12">
+              <div class="alert alert-danger" *ngIf="((programmingQuestionForm.get('timeHour').touched ||
+                  programmingQuestionForm.get('timeHour').dirty) && programmingQuestionForm.get('timeHour')?.invalid)
+                  || ((programmingQuestionForm.get('timeMin')?.touched ||
+                  programmingQuestionForm.get('timeMin').dirty) && programmingQuestionForm.get('timeMin')?.invalid)">
+                <div *ngIf="programmingQuestionForm.get('timeHour')?.errors?.min">
+                  Hours required must be greater than equal to zero
+                </div>
+                <div
+                  *ngIf="programmingQuestionForm.get('timeMin')?.errors?.min|| programmingQuestionForm.get('timeHour')?.errors?.minMuntes">
+                  Minutes required must be greater than equal to Five
+                </div>
+                <div *ngIf="programmingQuestionForm.get('timeMin')?.errors?.max">
+                  Minutes required must be less than equal to 59
+                </div>
+                <div *ngIf="programmingQuestionForm.get('timeHour')?.errors?.required ||
+                  programmingQuestionForm.get('timeMin')?.errors?.required || (programmingQuestionForm.get('timeHour')?.errors?.toTimeValidator
+                  &&programmingQuestionForm.get('timeMin')?.errors?.toTimeValidator)">
+                  Time Required for solving programming question must be specified
+                </div>
+                <div
+                  *ngIf="programmingQuestionForm.get('timeMin')?.errors?.minMinutes ||programmingQuestionForm.get('timeRequired')?.errors?.inValid">
+                  Enter Valid Time
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-3">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Is Language
+            Specific?:</label>
+          <select class="form-control input-style" formControlName="isLanguageSpecific"
+            (click)="onIsLanguageSpecificChange()">
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
+        <ng-container
+          *ngIf="programmingQuestionForm.get('isLanguageSpecific').value && programmingQuestionForm.get('programmingLanguages')">
+          <div class="form-group col-sm-6 col-md-4">
+            <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Programming
+              Language(s):</label>
+            <ng-select [items]="programmingLanguageList" bindLabel="name" placeholder="Select" appendTo="body"
+              multiple="true" [searchable]="true" [clearable]="true" multiple="true"
+              formControlName="programmingLanguages" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.name}}
+              </ng-template>
+            </ng-select>
+            <div class="alert alert-danger"
+              *ngIf="(programmingQuestionForm.get('programmingLanguages').touched||
+              programmingQuestionForm.get('programmingLanguages').dirty)&&programmingQuestionForm.get('programmingLanguages').invalid">
+              <div *ngIf="programmingQuestionForm.get('programmingLanguages').errors.required">
+                Programming Languages must be specified
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div>
+        <div class="left-panel">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Question:</label>
+              <ckeditor #ckeditorQuestion [config]="ckeEditorQuestionConfig" formControlName="question"></ckeditor>
+              <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('question').touched||
+                  programmingQuestionForm.get('question').dirty)&&programmingQuestionForm.get('question').invalid">
+                <div *ngIf="programmingQuestionForm.get('question').errors.required">
+                  Question must be specified
+                </div>
+                <div *ngIf="programmingQuestionForm.get('question').errors.maxlength">
+                  Question cannot be more than 1000 characters
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!programmingQuestionForm.get('hasOptions')?.value">
+            <div class="row">
+              <div class="form-group col-sm-12 col-md-12">
+                <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Example:</label>
+                <ckeditor #ckeditorExample [config]="ckeEditorExampleConfig" formControlName="example"></ckeditor>
+                <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('example').touched||
+                    programmingQuestionForm.get('example').dirty)&&programmingQuestionForm.get('example').invalid">
+                  <div *ngIf="programmingQuestionForm.get('example').errors.required">
+                    Example must be specified
+                  </div>
+                  <div *ngIf="programmingQuestionForm.get('example').errors.maxlength">
+                    Example can have maximum 1000 characters
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-12 col-md-12">
+                <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Constraints:</label>
+                <ckeditor #ckeditorConstraints [config]="ckeEditorConstraintsConfig" formControlName="constraints">
+                </ckeditor>
+                <div class="alert alert-danger"
+                  *ngIf="(programmingQuestionForm.get('constraints').touched||
+                  programmingQuestionForm.get('constraints').dirty)&&programmingQuestionForm.get('constraints').invalid">
+                  <div *ngIf="programmingQuestionForm.get('constraints').errors.required">
+                    Constraints must be specified
+                  </div>
+                  <div *ngIf="programmingQuestionForm.get('constraints').errors.maxlength">
+                    Constraints can have maximum 500 characters
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="programmingQuestionForm.get('hasOptions')?.value">
+            <div formArrayName="options" class="row" *ngFor="let options of programmingOptions.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <div class="col-sm-12 col-md-12">
+                  <h3><span class="swabhav-light-orange-text">Option: {{i+1}}</span>
+                    <button *ngIf="programmingOptions.controls.length > 1 && !isViewClicked" type="button"
+                      class="float-right btn btn-sm" style="cursor: pointer;"
+                      (click)="deleteProgrammingQuestionOption(i)"><i
+                        class="material-icons material-icons-button red">close</i>
+                    </button>
+                  </h3>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Status:</label>
+                  <select class="form-control input-style" formControlName="isActive">
+                    <option [ngValue]="true">Active</option>
+                    <option [ngValue]="false">Inactive</option>
+                  </select>
+                  <div class="alert alert-danger" *ngIf="(options.get('isActive').touched||
+                      options.get('isActive').dirty)&&options.get('isActive').invalid">
+                    <div *ngIf="options.get('isActive').errors.required">
+                      Option status must be specified
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Is Correct:</label>
+                  <select class="form-control input-style" formControlName="isCorrect">
+                    <option [ngValue]="true">Yes</option>
+                    <option [ngValue]="false">No</option>
+                  </select>
+                  <div class="alert alert-danger" *ngIf="(options.get('isCorrect').touched||
+                      options.get('isCorrect').dirty)&&options.get('isCorrect').invalid">
+                    <div *ngIf="options.get('isCorrect').errors.required">
+                      Whether Option is correct or not must be specified
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Order:</label>
+                  <input type="number" class="form-control input-style" formControlName="order" placeholder="eg: 1">
+                  <div class="alert alert-danger" *ngIf="(options.get('order').touched || options.get('order').dirty)
+                      && options.get('order').invalid">
+                    <div *ngIf="options.get('order').errors.required">
+                      Option order must be specified
+                    </div>
+                    <div *ngIf="options.get('order').errors?.min">
+                      Option order must be greater than zero
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-12">
+                  <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Option:</label>
+                  <ckeditor #ckeditorOption [config]="ckeEditorOptionConfig" formControlName="option"></ckeditor>
+                  <div class="alert alert-danger" *ngIf="(options.get('option').touched||
+                      options.get('option').dirty)&&options.get('option').invalid">
+                    <div *ngIf="options.get('option').errors.required">
+                      Option must be specified
+                    </div>
+                    <div *ngIf="options.get('option').errors.maxlength">
+                      Option cannot be more than 100 characters
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <div>
+              <button class="btn filter-button btn-sm material-icons-button" *ngIf="!isViewClicked"
+                (click)="addProgrammingOptionsToForm()">Add Option
+              </button>
+              <br>
+            </div>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="card card-shadow card-style h-100">
+            <div class="card-body card-body-style">
+              <span><i class="material-icons bulb-color font-xxl-style">lightbulb</i></span>
+              <br><br>
+              <div class="color-4F4F4F font-weight-bold">
+                1. Great titles are concise, descriptive and specific.
+              </div>
+              <br>
+              <span>
+                <span class="arrow">
+                  <i class="material-icons vertical-align-top-icon-style red font-lg-style">cancel</i>
+                </span>
+                <span class="color-757575">Find Substring</span>
+              </span>
+              <br>
+              <span>
+                <span class="arrow">
+                  <i class="material-icons vertical-align-top-icon-style easy font-lg-style">check_circle</i>
+                </span>
+                <span class="color-757575">Shortest Unsorted Continuous Subarray</span>
+              </span>
+              <br>
+              <hr>
+              <div class="color-4F4F4F font-weight-bold">
+                2. Clearly describe your question and check our question set to make sure your problem isn't already
+                there.
+              </div>
+              <br>
+              <div class="color-EE3733 font-lg-style font-weight-bold">
+                Sample
+              </div>
+              <br>
+              <div *ngIf="!programmingQuestionForm.get('hasOptions')?.value">
+                <div class="color-4F4F4F">
+                  Give an array of integers, return indices of the two numbers such that they add up to a specific
+                  target.
+                  <br><br>
+                  You may assume that each input would have exactly one solution and you may not use the same solution
+                  twice
+                </div>
+                <br>
+                <div class="color-4F4F4F font-weight-bold">
+                  Example:
+                </div>
+                <div class="color-4F4F4F">
+                  Given <span class="red highlight-style font-weight-bold">nums = [2, 7, 11, 15], target = 9</span>,
+                  <br>
+                  Because <span class="red highlight-style font-weight-bold">nums[0] + nums[1]</span> = 2 + 7 = 9,
+                  returm
+                  <span class="red highlight-style font-weight-bold">[0, 1]</span>
+                </div>
+                <br><br>
+                <span><i class="material-icons bulb-color font-xxl-style">lightbulb</i></span>
+                <br><br>
+                <div class="color-4F4F4F font-lg-style font-weight-bold">
+                  Example Sample
+                </div>
+                <br>
+                <div class="color-4F4F4F">
+                  Input: <span class="red highlight-style font-weight-bold">nums = [2, 7, 11, 15], target = 9</span>,
+                  <br>
+                  Output: <span class="red highlight-style font-weight-bold">[0, 1]</span>,
+                  <br><br>
+                  Input: <span class="red highlight-style font-weight-bold">nums = [-3, 4, 3, 90], target = 0</span>,
+                  <br>
+                  Output: <span class="red highlight-style font-weight-bold">[0, 2]</span>,
+                </div>
+              </div>
+              <div *ngIf="programmingQuestionForm.get('hasOptions')?.value">
+                <div class="color-4F4F4F font-weight-bold">
+                  Given:
+                </div>
+                <br>
+                <div>
+                  <span class="red highlight-style font-weight-bold">int array[5] = {{'{'}}50, 60, 70, 80,
+                    90{{'}'}}</span> ;
+                </div>
+                <br>
+                <div class="color-4F4F4F font-weight-bold">
+                  What does the following code output?
+                </div>
+                <br>
+                <div>
+                  <span class="red highlight-style font-weight-bold">printf("%d\n", (int) *(array+3))</span> ;
+                </div>
+                <hr>
+                <span>
+                  <span class="arrow">
+                    <i
+                      class="material-icons vertical-align-top-icon-style color-757575 font-lg-style">radio_button_unchecked</i>
+                  </span>
+                  <span class="color-757575"> Syntax error at compile time</span>
+                </span>
+                <hr>
+                <span>
+                  <span class="arrow">
+                    <i
+                      class="material-icons vertical-align-top-icon-style color-757575 font-lg-style">radio_button_unchecked</i>
+                  </span>
+                  <span class="color-757575"> 70</span>
+                </span>
+                <hr>
+                <span>
+                  <span class="arrow">
+                    <i
+                      class="material-icons vertical-align-top-icon-style color-757575 font-lg-style">radio_button_unchecked</i>
+                  </span>
+                  <span class="color-757575"> 80</span>
+                </span>
+                <hr>
+                <span>
+                  <span class="arrow">
+                    <i
+                      class="material-icons vertical-align-top-icon-style color-757575 font-lg-style">radio_button_unchecked</i>
+                  </span>
+                  <span class="color-757575"> Memory address of array index 3</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="no-float-style">
+        <div *ngIf="!programmingQuestionForm.get('hasOptions')?.value">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label class="filter-form-label">Comment:</label>
+              <textarea class="form-control input-style" rows="5" formControlName="comment" nbInput appEmptyToNull
+                placeholder="Comment...."></textarea>
+              <div class="alert alert-danger" *ngIf="(programmingQuestionForm.get('comment').touched||
+                  programmingQuestionForm.get('comment').dirty)&&programmingQuestionForm.get('comment').invalid">
+                <div *ngIf="programmingQuestionForm.get('comment').errors.required">
+                  Comment must be specified
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group form-check" *ngIf="!isViewClicked && !isUpdateClicked">
+            <label class="form-check-label">
+              <label class="checkbox-container">
+                <input type="checkbox" (change)="toggleTestCaseControls($event)" formControlName="hasTestCases">
+                <span class="checkmark"></span>
+              </label>
+              <span class="checkbox-text-style">Add Test Cases</span>
+            </label>
+          </div>
+          <div *ngIf="showTestCasesInProgrammingForm">
+            <div class="form-sub-header-style">Test Cases</div>
+            <div formArrayName="testCases" *ngFor="let tempTestCase of programmingTestCases.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <div class="row">
+                  <div class="col-sm-12 col-md-12">
+                    <label>
+                      <h5>Test Case {{i+1}}</h5>
+                    </label>
+                    <label class="float-right" *ngIf="programmingTestCases.length > 1"
+                      (click)="deleteTestCaseFromProgrammingForm(i)">
+                      <i class="material-icons edit-icon-style">delete</i>
+                    </label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-sm-12 col-md-12">
+                    <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Sample
+                      Input:</label>
+                    <textarea class="form-control input-style" rows="2" formControlName="input"
+                      placeholder="Sample Input...."></textarea>
+                    <div class="alert alert-danger" *ngIf="(tempTestCase.get('input').touched||
+                      tempTestCase.get('input').dirty) && tempTestCase.get('input').invalid">
+                      <div *ngIf="tempTestCase.get('input').errors.required">
+                        Sample Input must be specified
+                      </div>
+                      <div *ngIf="tempTestCase.get('input').errors.maxlength">
+                        Sample Input can have maximum 500 characters
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-12 col-md-12">
+                    <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Sample
+                      Output:</label>
+                    <textarea class="form-control input-style" rows="2" formControlName="output"
+                      placeholder="Sample Output...."></textarea>
+                    <div class="alert alert-danger" *ngIf="(tempTestCase.get('output').touched||
+                      tempTestCase.get('output').dirty) && tempTestCase.get('output').invalid">
+                      <div *ngIf="tempTestCase.get('output').errors.required">
+                        Sample Output must be specified
+                      </div>
+                      <div *ngIf="tempTestCase.get('output').errors.maxlength">
+                        Sample Output can have maximum 500 characters
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-12 col-md-12">
+                    <label class="filter-form-label">Explanation of Sample Input:</label>
+                    <textarea class="form-control input-style" rows="2" formControlName="explanation"
+                      placeholder="Explanation of sample input...."></textarea>
+                    <div class="alert alert-danger" *ngIf="(tempTestCase.get('explanation').touched||
+                      tempTestCase.get('explanation').dirty) && tempTestCase.get('explanation').invalid">
+                      <div *ngIf="tempTestCase.get('explanation').errors.maxlength">
+                        Explanation can have maximum 500 characters
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-6 col-md-4">
+                    <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Status:</label>
+                    <select class="form-control input-style" formControlName="isActive">
+                      <option [ngValue]="true">Yes</option>
+                      <option [ngValue]="false">No</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(tempTestCase.get('isActive').touched||
+                      tempTestCase.get('isActive').dirty) && tempTestCase.get('isActive').invalid">
+                      <div *ngIf="tempTestCase.get('isActive').errors.required">
+                        Test case status must be specified
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-6 col-md-4">
+                    <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Is Hidden
+                      ?:</label>
+                    <select class="form-control input-style" formControlName="isHidden">
+                      <option [ngValue]="true">Yes</option>
+                      <option [ngValue]="false">No</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(tempTestCase.get('isHidden').touched||
+                      tempTestCase.get('isHidden').dirty) && tempTestCase.get('isHidden').invalid">
+                      <div *ngIf="tempTestCase.get('isHidden').errors.required">
+                        Test case hidden status must be specified
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <button class="btn btn-default swabhav-button-round" (click)="addTestCasesToProgrammingForm()">
+              + Add Test Case
+            </button>
+            <br>
+            <br>
+          </div>
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-submit-swabhav material-icons-button" (click)="dismissModal()">Close
+        </button>
+        &nbsp;&nbsp;&nbsp;
+        <button type="button" *ngIf="!isViewClicked" class="btn btn-submit-swabhav material-icons-button"
+          [disabled]="!programmingQuestionForm.dirty" (click)="validate()">
+          {{isUpdateClicked ? 'Update Question' : 'Add Question'}}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

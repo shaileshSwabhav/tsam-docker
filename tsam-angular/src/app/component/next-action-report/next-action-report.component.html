@@ -1,0 +1,468 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="nextActionReportSearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Action Type'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="actionType">
+                            <option [ngValue]="null" disabled>Select Next Action Type</option>
+                            <option *ngFor="let nextAction of nextActionList" [ngValue]="nextAction.id">
+                                {{nextAction.type}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}">
+                            </ng-container>
+                        </span>
+                        <input type="date" formControlName="fromDate" class="form-control input-style">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To Date'}">
+                            </ng-container>
+                        </span>
+                        <input type="date" formControlName="toDate" class="form-control input-style">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Date'}">
+                            </ng-container>
+                        </span>
+                        <input type="date" formControlName="targetDate" class="form-control input-style">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Stipend'}">
+                            </ng-container>
+                        </span>
+                        <input type="number" formControlName="stipend" class="form-control input-style"
+                            appAllowNumbersOnly placeholder="Enter stipend">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Login'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="loginID">
+                            <option [ngValue]="null">Select Login</option>
+                            <option *ngFor="let sales of userCredentialList" [ngValue]="sales.id">
+                                {{sales.firstName}} {{sales.lastName}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Course'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="courseList" bindValue="id" bindLabel="name" placeholder="Select Course"
+                            appendTo="body" [searchable]="true" [clearable]="false" formControlName="courses"
+                            multiple="true" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="companyList" bindValue="id" bindLabel="branchName"
+                            placeholder="Select Company" appendTo="body" [searchable]="true" [clearable]="false"
+                            formControlName="companies" multiple="true" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.branchName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Technology'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="technologyList" bindValue="id" bindLabel="language"
+                            placeholder="Select Technology" appendTo="body" [searchable]="true" [clearable]="false"
+                            formControlName="technologies" multiple="true" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.language}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit"
+                        [disabled]="!nextActionReportSearchForm.dirty"
+                        (click)="searchedNextActionReport();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Next Action Reports -
+                    <span class="color-F6430F"> {{totalReports}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Reports
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalReports > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalReports}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalReports == 0 && isSearched) || (totalReports > 0 && !isSearched) 
+                    || (totalReports > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalReports > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let nextActionReport of nextActionReports | paginate: { id:'nextActionReportID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalReports }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="nextActionReportID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalReports > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Sr. No</th>
+                                <th>Login Name</th>
+                                <th>Talent Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Action Type</th>
+                                <!-- <th>Stipend</th>
+                                <th>Referral Count</th>
+                                <th>From Date</th>
+                                <th>To Date</th>
+                                <th>Target Date</th> -->
+                                <th>Action Name</th>
+                                <th data-toggle="tooltip" data-placement="top" title="View Next Action Report">View</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let report of nextActionReports; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{report.loginName}}</td>
+                                    <td>{{report.talent?.firstName}} {{report.talent?.lastName}}</td>
+                                    <td>{{report.talent?.contact}}</td>
+                                    <td>{{report.talent?.email}}</td>
+                                    <td>{{report.actionType}}</td>
+                                    <!-- <td>
+                                        <div *ngIf="report.stipend; else noValue">
+                                            {{report.stipend}}
+                                        </div>
+                                        <ng-template #noValue>
+                                            <span class="badge badge-warning">Not Required</span>
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="report.referralCount; else noValue">
+                                            {{report.referralCount}}
+                                        </div>
+                                        <ng-template #noValue>
+                                            <span class="badge badge-warning">Not Required</span>
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="report.fromDate; else noDate">
+                                            {{report.fromDate | date:'dd-MMM-yyyy'}}
+                                        </div>
+                                        <ng-template #noDate>
+                                            <span class="badge badge-warning">Not Required</span>
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="report.toDate; else noDate">
+                                            {{report.toDate | date:'dd-MMM-yyyy'}}
+                                        </div>
+                                        <ng-template #noDate>
+                                            <span class="badge badge-warning">Not Required</span>
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="report.targetDate; else noDate">
+                                            {{report.targetDate | date:'dd-MMM-yyyy'}}
+                                        </div>
+                                        <ng-template #noDate>
+                                            <span class="badge badge-warning">Not Required</span>
+                                        </ng-template>
+                                    </td> -->
+                                    <td>
+                                        <div *ngIf="report.courses">
+                                            <span class="badge swabhav-badge-header-style">Course:</span>
+                                            <div *ngFor="let actionType of report.courses">
+                                                <span class="badge swabhav-badge-style">{{actionType.name}}</span>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="report.companies">
+                                            <span class="badge swabhav-badge-header-style">Company:</span>
+                                            <div *ngFor="let actionType of report.companies">
+                                                <span class="badge swabhav-badge-style">{{actionType.branchName}}</span>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="report.technologies">
+                                            <span class="badge swabhav-badge-header-style">Technology:</span>
+                                            <div *ngFor="let actionType of report.technologies">
+                                                <span class="badge swabhav-badge-style">{{actionType.language}}</span>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="report.referralCount">
+                                            <span class="badge swabhav-badge-style">No action for referral</span>
+                                        </div>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="View Next Action Report">
+                                        <span (click)="onViewReportClick(report, viewReport)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalReports == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Next Action Reports Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<ng-template #viewReport let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Next Action Report
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <form [formGroup]="nextActionReportForm">
+            <fieldset disabled="disabled">
+                <div class="form-sub-header-style">Next Action details</div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Login Name'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="loginName">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Action Type'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="actionType">
+                        </div>
+                    </div>
+                    <div *ngIf="isCoursesAvailable" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Courses'}">
+                            </ng-container>
+                            <ng-select [items]="courseList" bindLabel="name" placeholder="Select Course" appendTo="body"
+                                [searchable]="true" [clearable]="false" formControlName="courses" multiple="true"
+                                class="ng-select-style">
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div *ngIf="isCompanyAvailable" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company'}">
+                            </ng-container>
+                            <ng-select [items]="companyList" bindLabel="branchName" placeholder="Select Company"
+                                appendTo="body" multiple="true" [searchable]="true" [clearable]="false"
+                                formControlName="companies" class="ng-select-style">
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    {{item.branchName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div *ngIf="isTechnologyAvailable" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Technology'}">
+                            </ng-container>
+                            <ng-select [items]="technologyList" bindLabel="language" placeholder="Select Technology"
+                                appendTo="body" multiple="true" [searchable]="true" [clearable]="false"
+                                formControlName="technologies" class="ng-select-style">
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    {{item.language}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div *ngIf="nextActionReportForm.get('fromDate')?.value" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From Date'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="fromDate">
+                        </div>
+                    </div>
+                    <div *ngIf="nextActionReportForm.get('toDate')?.value" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To Date'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="toDate">
+                        </div>
+                    </div>
+                    <div *ngIf="nextActionReportForm.get('targetDate')?.value" class="col-sm-12 col-md-5">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Target Date'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="targetDate">
+                        </div>
+                    </div>
+                    <div *ngIf="nextActionReportForm.get('stipend')?.value" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Stipend'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="stipend">
+                        </div>
+                    </div>
+                    <div *ngIf="nextActionReportForm.get('referralCount')?.value" class="col-sm-12 col-md-4">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Referral Count'}">
+                            </ng-container>
+                            <input type="text" class="form-control input-style" formControlName="referralCount">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div *ngIf="nextActionReportForm.get('comment')?.value" class="col-sm-12 col-md-12">
+                        <div class="form-group">
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}">
+                            </ng-container>
+                            <textarea class="form-control rounded-0 input-style" name="comment" rows="2"
+                                formControlName="comment"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-sub-header-style">Talent details</div>
+                <div formGroupName="talent">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                                </ng-container>
+                                <input type="text" class="form-control input-style" formControlName="firstName">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+                                </ng-container>
+                                <input type="text" class="form-control input-style" formControlName="lastName">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}">
+                                </ng-container>
+                                <input type="text" class="form-control input-style" formControlName="email">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Contact'}">
+                                </ng-container>
+                                <input type="text" class="form-control input-style" formControlName="contact">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">
+                    Close
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>

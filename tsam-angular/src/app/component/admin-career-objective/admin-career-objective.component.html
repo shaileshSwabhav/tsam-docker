@@ -1,0 +1,345 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-30-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="careerObjectiveSearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-12">
+                        <span>
+                            <ng-container
+                                *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Career Objective Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="name"
+                            placeholder="eg: Backend Developer">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit"
+                        [disabled]="!careerObjectiveSearchForm.dirty"
+                        (click)="searchCareerObjectives();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Career Objectives -
+                    <span class="color-F6430F"> {{totalCareerObjectives}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Career Objectives
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" (click)="onAddNewCareerObjectiveClick()">
+                        Add New Career Objective
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalCareerObjectives > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalCareerObjectives}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalCareerObjectives == 0 && isSearched) || (totalCareerObjectives > 0 && !isSearched) 
+                    || (totalCareerObjectives > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalCareerObjectives > 0"
+                    class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let careerObjective of careerObjectiveList | paginate: { id:'careerObjectiveID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalCareerObjectives }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="careerObjectiveID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalCareerObjectives > 0">
+            <div class="card card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th class="color-F6430F font-weight-bold">Name</th>
+                                <th>Courses</th>
+                                <th data-toggle="tooltip" data-placement="top"
+                                    title="Check All Detail Of Career Objective">
+                                    View
+                                </th>
+                                <th data-toggle="tooltip" data-placement="top" title="Delete Career Objective">
+                                    Delete
+                                </th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let careerObjective of careerObjectiveList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{careerObjective.name}}</td>
+                                    <td>
+                                        <span class="badge swabhav-badge-style"
+                                            *ngFor="let course of careerObjective.courses">
+                                            <span>{{course.order}}</span>)&nbsp;
+                                            <span>{{showCourseByID(course.courseID)}}</span>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top"
+                                        title="View details of Career Objective">
+                                        <span (click)="onViewCareerObjevtiveClick(careerObjective)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Delete Career Objective">
+                                        <span (click)="onDeleteCareerObjectiveClick(careerObjective.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalCareerObjectives == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Career Objectives Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add/Update/View Career Objective -->
+<ng-template #careerObjectiveFormModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            {{isViewMode? 'Career Objective Details': isOperationUpdate ? 'Update Career Objective' : 'Add Career
+            Objective' }}
+            <span *ngIf="isViewMode" (click)="onUpdateCareerObjevtiveClick()">
+                <i class="material-icons">create</i>
+            </span>
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Close click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red">
+                <strong>*</strong></span> marked fields are mandatory
+        </div>
+        <br>
+        <form [formGroup]="careerObjectiveForm">
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Name'}"></ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" nbInput formControlName="name"
+                        placeholder="eg: Front end developer">
+                    <div class="alert alert-danger" *ngIf="(careerObjectiveForm.get('name').touched || careerObjectiveForm.get('name').dirty) 
+                        && careerObjectiveForm.get('name').invalid">
+                        <div *ngIf="careerObjectiveForm.get('name').errors.required">
+                            Name must be specified
+                        </div>
+                        <div *ngIf="careerObjectiveForm.get('name').errors.pattern">
+                            Name should only have alphabets
+                        </div>
+                        <div *ngIf="careerObjectiveForm.get('name').errors.maxLength">
+                            Name can have maximum 100 characters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-sub-header-style">Courses</div>
+            <div formArrayName="courses"
+                *ngFor="let course of careerObjectiveCourseControlArray.controls;let i = index">
+                <ng-container [formGroupName]="i">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <label class="font-weight-bold font-lg-style">Course {{i+1}}</label>
+                            <label class="float-right"
+                                *ngIf="!isViewMode && careerObjectiveCourseControlArray.length > 1"
+                                (click)="deleteCourse(i)">
+                                <i class="material-icons color-F6430F">delete</i>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6 col-md-4">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Course'}">
+                                </ng-container>
+                            </span>
+                            <ng-select [items]="courseList" bindLabel="name" bindValue="id" placeholder="Select"
+                                appendTo="body" [searchable]="true" [clearable]="true" formControlName="courseID"
+                                class="ng-select-style">
+                                <option [ngValue]="null" disabled>Select Course</option>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                            <div class="alert alert-danger" *ngIf="(careerObjectiveCourseControlArray.at(i).get('courseID').touched 
+                                || careerObjectiveCourseControlArray.at(i).get('courseID').dirty) 
+                                && careerObjectiveCourseControlArray.at(i).get('courseID').invalid">
+                                <div *ngIf="careerObjectiveCourseControlArray.at(i).get('courseID').errors.required">
+                                    Course must be specified
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-4">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Order'}">
+                                </ng-container>
+                            </span>
+                            <input type="number" class="form-control input-style" nbInput formControlName="order"
+                                placeholder="eg: 1" appAllowNumbersOnly>
+                            <div class="alert alert-danger" *ngIf="(careerObjectiveCourseControlArray.at(i).get('order').touched 
+                            || careerObjectiveCourseControlArray.at(i).get('order').dirty) 
+                            && careerObjectiveCourseControlArray.at(i).get('order').invalid">
+                                <div *ngIf="careerObjectiveCourseControlArray.at(i).get('order').errors.required">
+                                    Order must be specified
+                                </div>
+                                <div *ngIf="careerObjectiveCourseControlArray.at(i).get('order').errors.min">
+                                    Order cannot be less than 1
+                                </div>
+                            </div>
+                            <div *ngIf="checkOrderAlreadyExists(careerObjectiveCourseControlArray.at(i).get('order'), i)"
+                                class="alert alert-danger">
+                                Order already given
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-4">
+                            <span>
+                                <ng-container
+                                    *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Technical Aspect'}">
+                                </ng-container>
+                            </span>
+                            <input type="text" class="form-control input-style" nbInput
+                                formControlName="technicalAspect" placeholder="eg: Design Principles">
+                            <div class="alert alert-danger" *ngIf="(careerObjectiveCourseControlArray.at(i).get('technicalAspect').touched 
+                            || careerObjectiveCourseControlArray.at(i).get('technicalAspect').dirty) 
+                            && careerObjectiveCourseControlArray.at(i).get('technicalAspect').invalid">
+                                <div
+                                    *ngIf="careerObjectiveCourseControlArray.at(i).get('technicalAspect').errors.required">
+                                    Technical Aspect must be specified
+                                </div>
+                                <div
+                                    *ngIf="careerObjectiveCourseControlArray.at(i).get('technicalAspect').errors.pattern">
+                                    Technical Aspect must consist of only alphabets
+                                </div>
+                                <div
+                                    *ngIf="careerObjectiveCourseControlArray.at(i).get('technicalAspect').errors.maxLength">
+                                    Technical Aspect can have maximum 500 characters
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <button *ngIf="!isViewMode" class="btn btn-default swabhav-button-round" (click)="addCourse()">
+                + Add Course
+            </button>
+            <br><br>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button type="button" [disabled]="!careerObjectiveForm.dirty"
+                    class="btn btn-default swabhav-button-round" *ngIf="!isViewMode" (click)="onFormSubmit()">
+                    {{isOperationUpdate ? 'Update Career Objective' : 'Add Career Objective'}}
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<!-- Delete Career Objective Confirmation -->
+<ng-template #deleteCareerObjectiveModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this career objective?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>

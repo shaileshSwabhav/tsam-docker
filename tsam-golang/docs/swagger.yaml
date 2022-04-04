@@ -1,0 +1,1128 @@
+basePath: /api/v1/tsam
+definitions:
+  errors.HTTPError:
+    properties:
+      errorKey:
+        example: unable to fetch data
+        type: string
+      httpstatus:
+        example: 400
+        type: integer
+    type: object
+  errors.ValidationError:
+    properties:
+      error:
+        example: Name must be specified
+        type: string
+    type: object
+  model.Academic:
+    properties:
+      college:
+        type: string
+      degree:
+        $ref: '#/definitions/model.Degree'
+        type: object
+      id:
+        type: string
+      passout:
+        type: integer
+      percentage:
+        type: number
+    type: object
+  model.CallRecord:
+    properties:
+      comment:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      outcome:
+        type: string
+      purpose:
+        type: string
+    type: object
+  model.Channel:
+    properties:
+      channelName:
+        example: Golang Developer
+        type: string
+      id:
+        type: string
+    type: object
+  model.Country:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Degree:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Designation:
+    properties:
+      id:
+        type: string
+      position:
+        type: string
+    type: object
+  model.Discussion:
+    properties:
+      channel:
+        $ref: '#/definitions/model.Channel'
+        type: object
+      description:
+        example: Question Description
+        type: string
+      id:
+        type: string
+      isSolve:
+        example: true
+        type: boolean
+      question:
+        example: Question string
+        type: string
+      talent:
+        $ref: '#/definitions/model.Talent'
+        type: object
+    type: object
+  model.Enquiry:
+    properties:
+      academicYear:
+        type: string
+      academics:
+        items:
+          $ref: '#/definitions/model.Academic'
+        type: array
+      address:
+        type: string
+      callRecords:
+        items:
+          $ref: '#/definitions/model.CallRecord'
+        type: array
+      city:
+        type: string
+      comment:
+        type: string
+      contact:
+        type: integer
+      country:
+        $ref: '#/definitions/model.Country'
+        type: object
+      email:
+        type: string
+      enquiryDate:
+        type: string
+      enquiryID:
+        type: string
+      enquirySource:
+        type: string
+      enquiryType:
+        type: string
+      experiences:
+        items:
+          $ref: '#/definitions/model.Experience'
+        type: array
+      firstName:
+        type: string
+      id:
+        type: string
+      isExperience:
+        type: boolean
+      lastName:
+        type: string
+      pinCode:
+        type: integer
+      salePerson:
+        type: string
+      state:
+        $ref: '#/definitions/model.State'
+        type: object
+      technologies:
+        items:
+          $ref: '#/definitions/model.Technology'
+        type: array
+      testHistories:
+        items:
+          $ref: '#/definitions/model.TestHistory'
+        type: array
+    type: object
+  model.Experience:
+    properties:
+      company:
+        type: string
+      designation:
+        $ref: '#/definitions/model.Designation'
+        type: object
+      id:
+        type: string
+      package:
+        type: number
+      technologies:
+        items:
+          $ref: '#/definitions/model.Technology'
+        type: array
+      yearOfExperience:
+        type: number
+    type: object
+  model.Reply:
+    properties:
+      bestReply:
+        example: true
+        type: boolean
+      comment:
+        items:
+          $ref: '#/definitions/model.Reply'
+        type: array
+      discussionID:
+        example: cfe25758-f5fe-48f0-874d-e72cd4edd9b9
+        type: string
+      id:
+        type: string
+      replier:
+        $ref: '#/definitions/model.Talent'
+        type: object
+      reply:
+        example: Answer Against Question
+        type: string
+      replyID:
+        example: cfe25758-f5fe-48f0-874d-e72cd4edd9b9
+        type: string
+    type: object
+  model.ReplyDTO:
+    properties:
+      discussionDTO:
+        $ref: '#/definitions/model.Discussion'
+        type: object
+      replyDTO:
+        items:
+          $ref: '#/definitions/model.Reply'
+        type: array
+    type: object
+  model.Result:
+    properties:
+      cutoff:
+        type: integer
+      mark:
+        type: integer
+      total:
+        type: integer
+    type: object
+  model.State:
+    properties:
+      countryID:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Talent:
+    properties:
+      id:
+        type: string
+    type: object
+  model.TalentAuth:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.Technology:
+    properties:
+      id:
+        type: string
+      language:
+        type: string
+    type: object
+  model.TestHistory:
+    properties:
+      date:
+        type: string
+      id:
+        type: string
+      link:
+        type: string
+      result:
+        $ref: '#/definitions/model.Result'
+        type: object
+      technologies:
+        items:
+          $ref: '#/definitions/model.Technology'
+        type: array
+      testType:
+        type: string
+    type: object
+host: swabhav-tsam.herokuapp.com
+info:
+  contact:
+    email: info@swabhavtechlabs.com
+    name: Swabhav Techlabs
+  description: Short Description
+  license:
+    name: Apache 2.0
+  title: Talent Sourcing and Mentoring (TSAM)
+  version: "1.0"
+paths:
+  /channel:
+    post:
+      consumes:
+      - application/json
+      description: Add New Channel
+      parameters:
+      - description: Add Channel
+        in: body
+        name: channel
+        required: true
+        schema:
+          $ref: '#/definitions/model.Channel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /channel/{channelid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Channel By ID
+      parameters:
+      - description: channel ID
+        format: uuid.UUID
+        in: path
+        name: channelid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+    get:
+      consumes:
+      - application/json
+      description: Return Channel By ID
+      parameters:
+      - description: channel ID
+        format: uuid.UUID
+        in: path
+        name: channelid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Channel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+    put:
+      consumes:
+      - application/json
+      description: Update Channel By Channel ID
+      parameters:
+      - description: Channel ID For Update
+        format: uuid.UUID
+        in: path
+        name: channelid
+        required: true
+        type: string
+      - description: Update Channel
+        in: body
+        name: channel
+        required: true
+        schema:
+          $ref: '#/definitions/model.Channel'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /channel/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: Return All Channels
+      parameters:
+      - description: total number of result
+        format: int
+        in: path
+        name: limit
+        required: true
+        type: integer
+      - description: page number
+        format: int
+        in: path
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Channel'
+              type: array
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /discussion:
+    post:
+      consumes:
+      - application/json
+      description: Add New Discussion
+      parameters:
+      - description: Add Discussion
+        in: body
+        name: discussion
+        required: true
+        schema:
+          $ref: '#/definitions/model.Discussion'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /discussion/{discussionid}:
+    delete:
+      consumes:
+      - application/json
+      description: DeleteDiscussion Discussion By Discussion ID
+      parameters:
+      - description: Discussion ID
+        in: path
+        name: discussion
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+    get:
+      consumes:
+      - application/json
+      description: Return Discussion By Channel ID
+      parameters:
+      - description: Get Discussion By Discussion id
+        format: uuid.UUID
+        in: path
+        name: discussionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Discussion'
+              type: array
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+    put:
+      consumes:
+      - application/json
+      description: Update Discussion By Discussion ID
+      parameters:
+      - description: Update Discussion Data
+        in: body
+        name: discussion
+        required: true
+        schema:
+          $ref: '#/definitions/model.Discussion'
+      - description: Discussion ID
+        in: path
+        name: discussion
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /discussion/channel/{channelid}/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: Return Discussion By Channel ID
+      parameters:
+      - description: total number of result
+        format: int
+        in: path
+        name: limit
+        required: true
+        type: integer
+      - description: page number
+        format: int
+        in: path
+        name: offset
+        required: true
+        type: integer
+      - description: Get Discussion By Channel id
+        format: uuid.UUID
+        in: path
+        name: channelid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Discussion'
+              type: array
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /discussion/talent/{talentid}:
+    get:
+      consumes:
+      - application/json
+      description: Return Discussion By Talent ID
+      parameters:
+      - description: Get Discussion By Talent id
+        format: uuid.UUID
+        in: path
+        name: talentid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Discussion'
+              type: array
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /enquiry:
+    post:
+      consumes:
+      - application/json
+      description: Add New Enquiry
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: Add New Enquiry
+      tags:
+      - Enquiry-Master
+  /enquiry/{enquiryid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Enquiry By ID
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: DeleteEnquiry Enquiry
+      tags:
+      - Enquiry-Master
+    get:
+      consumes:
+      - application/json
+      description: GetEnquiry Return Enquiry By Enquiry ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Enquiry'
+            type: array
+      summary: Get Enquiry
+      tags:
+      - Enquiry-Master
+    put:
+      consumes:
+      - application/json
+      description: Update Enquiry
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: Update Enquiry
+      tags:
+      - Enquiry-Master
+  /enquiry/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: GetEnquiries Return all Enquiry By Limit and Offset
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Enquiry'
+              type: array
+            type: array
+      summary: Get All Enquiries
+      tags:
+      - Enquiry-Master
+  /enquiry/{salespersonid}/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: GetEnquiries Return all Enquiry By Limit and Offset
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Enquiry'
+              type: array
+            type: array
+      summary: Get All Enquiries
+      tags:
+      - Enquiry-Master
+  /enquiry/search/{limit}/{offset}:
+    post:
+      consumes:
+      - application/json
+      description: SearchEnquiry Return Enquiries Based On Search Paramater
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Enquiry'
+              type: array
+            type: array
+      summary: Get Enquiry
+      tags:
+      - Enquiry-Master
+  /reply:
+    post:
+      consumes:
+      - application/json
+      description: Add New Reply
+      parameters:
+      - description: Add Reply
+        in: body
+        name: reply
+        required: true
+        schema:
+          $ref: '#/definitions/model.Reply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /reply/{replyid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Reply By Reply ID
+      parameters:
+      - description: Reply ID For Delete Reply
+        format: uuid.UUID
+        in: path
+        name: replyid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+    get:
+      consumes:
+      - application/json
+      description: GetReply Reply By Reply ID
+      parameters:
+      - description: Reply ID For Get Reply
+        format: uuid.UUID
+        in: path
+        name: replyid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Reply'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+    put:
+      consumes:
+      - application/json
+      description: Update Reply By Reply ID
+      parameters:
+      - description: Add Reply
+        in: body
+        name: reply
+        required: true
+        schema:
+          $ref: '#/definitions/model.Reply'
+      - description: Reply ID For Update Reply
+        format: uuid.UUID
+        in: path
+        name: replyid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /reply/discussion/{discussionid}/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: Return multiple Reply By Discussion ID
+      parameters:
+      - description: total number of result
+        format: int
+        in: path
+        name: limit
+        required: true
+        type: integer
+      - description: page number
+        format: int
+        in: path
+        name: offset
+        required: true
+        type: integer
+      - description: Get ReplyDTO By Discussion id
+        format: uuid.UUID
+        in: path
+        name: discussionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.ReplyDTO'
+              type: array
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - community-forum
+  /talent:
+    post:
+      consumes:
+      - application/json
+      description: Add New Talent
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Add New Talent
+      tags:
+      - Talent-Master
+  /talent/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: GetTalents Return all Talent By Limit and Offset
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Get All Talents
+      tags:
+      - Talent-Master
+  /talent/{talentid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Talent By Talent ID
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Delete Talent
+      tags:
+      - Talent-Master
+    get:
+      consumes:
+      - application/json
+      description: GetTalent Return Talent By Talent ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Return Talent By Talent ID
+      tags:
+      - Talent-Master
+    put:
+      consumes:
+      - application/json
+      description: Update Talent By Talent ID
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Update Talent
+      tags:
+      - Talent-Master
+  /talent/login:
+    post:
+      consumes:
+      - application/json
+      description: Login Verify Talent Credential and Return Token with Full Name, Email
+      parameters:
+      - description: Talent email and password
+        in: body
+        name: talent
+        required: true
+        schema:
+          $ref: '#/definitions/model.TalentAuth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - talent-login
+  /talent/multiple:
+    post:
+      consumes:
+      - application/json
+      description: Add Multiple New Talent
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Add New Talents
+      tags:
+      - Talent-Master
+  /talent/register:
+    post:
+      consumes:
+      - application/json
+      description: Register Add New Talent
+      parameters:
+      - description: Talent firstName, email,contact and Password
+        in: body
+        name: talent
+        required: true
+        schema:
+          $ref: '#/definitions/model.Talent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      tags:
+      - talent-login
+  /talent/requirement/{requirementID}/talents/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: GetTalentsByCompanyRequirement Return All Talents By Company Requirement ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Get Talent By Company Requirement ID
+      tags:
+      - Talent-Master
+  /talent/salesperson/{salespersonid}/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: GetTalents Return Talent By Sales Person ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Get Talent By Sales Person ID
+      tags:
+      - Talent-Master
+  /talent/search/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: SearchTalents Return Talents Based On Search Paramater
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Talent'
+              type: array
+            type: array
+      summary: Return Talent Based On Search Parameter
+      tags:
+      - Talent-Master
+swagger: "2.0"

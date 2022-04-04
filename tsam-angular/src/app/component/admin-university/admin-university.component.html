@@ -1,0 +1,322 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="universitySearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Country'}">
+                            </ng-container>
+                        </span>
+                        <ng-select formControlName="countryID" placeholder="Select Country" class="ng-select-style">
+                            <ng-option [value]="country.id" *ngFor="let country of countryList">
+                                {{country.name}}
+                            </ng-option>
+                        </ng-select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'University Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="universityName"
+                            placeholder="Enter University Name">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit" [disabled]="!universitySearchForm.dirty"
+                        (click)="searchUniversities();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Universities -
+                    <span class="color-F6430F"> {{totalUniversities}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Universities
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" (click)="onAddNewUniversityClick()">
+                        Add New University
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalUniversities > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalUniversities}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalUniversities == 0 && isSearched) || (totalUniversities > 0 && !isSearched) 
+                    || (totalUniversities > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalUniversities > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let university of universityList | paginate: { id:'universityID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalUniversities }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="universityID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalUniversities> 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>University</th>
+                                <th>Country</th>
+                                <th>View</th>
+                                <th>Delete</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let university of universityList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{university.universityName}}</td>
+                                    <td>{{university.country?.name}}</td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Update University">
+                                        <span (click)="onViewUniversityClick(university)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Delete University">
+                                        <span (click)="onDeleteUniversityClick(university.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalUniversities == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Universities Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+
+<app-master-footer></app-master-footer>
+
+<!-- Add/Update/View University -->
+<ng-template #universityFormModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            {{isViewMode? 'University Details': isOperationUpdate ? 'Update University' : 'Add University' }}
+            <span *ngIf="isViewMode" (click)="onUpdateUniversityClick()">
+                <i class="material-icons">create</i>
+            </span>
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Close click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red"><strong>*</strong></span> marked
+            fields are mandatory
+        </div>
+        <br>
+
+        <!-- Template for university form -->
+        <ng-template #universityFormTemplate>
+            <form [formGroup]="universityForm">
+                <div class="row">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary context:{name:'Country'}">
+                            </ng-container>
+                        </span>
+                        <ng-select [items]="countryList" bindLabel="name" placeholder="Select Country" appendTo="body"
+                            [searchable]="true" [clearable]="true" formControlName="country" class="ng-select-style">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                            </ng-template>
+                        </ng-select>
+                        <div class="alert alert-danger" *ngIf="(universityForm.get('country').touched||
+                            universityForm.get('country').dirty)&&
+                            universityForm.get('country').invalid">
+                            Country must be specified
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'University Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="universityName"
+                            placeholder="Enter University Name">
+                        <div class="alert alert-danger" *ngIf="(universityForm.get('universityName').
+                            touched||universityForm.get('universityName').dirty)&&
+                            universityForm.get('universityName').invalid">
+                            University name must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="button" (click)="modal.dismiss('Close click')"
+                        class="btn btn-default swabhav-button-round">Close</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button type="button" [disabled]="!universityForm.dirty"
+                        class="btn btn-default swabhav-button-round" *ngIf="!isViewMode" (click)="onFormSubmit()">
+                        {{isOperationUpdate ? 'Update University' : 'Add University'}}
+                    </button>
+                </div>
+            </form>
+        </ng-template>
+
+        <!-- Tabs for add university -->
+        <ng-container *ngIf="!isViewMode && !isOperationUpdate">
+            <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs ul-space-even-style">
+                <li [ngbNavItem]="1" class="list-active-link-style">
+                    <a ngbNavLink class="modal-popup-tab-link-style">{{isOperationUpdate == true? 'Update' : 'Single
+                        Add'}}</a>
+                    <ng-template ngbNavContent>
+                        <!-- <ngb-alert [dismissible]="false" class="d-block mt-3" type="danger">
+                            This tab content DOM will de destroyed when not active
+                        </ngb-alert> -->
+                        <!-- Modal body -->
+                        <ng-template [ngTemplateOutlet]="universityFormTemplate"></ng-template>
+                    </ng-template>
+                </li>
+                <li [ngbNavItem]="2" class="list-active-link-style">
+                    <a ngbNavLink class="modal-popup-tab-link-style">Mutiple add</a>
+                    <ng-template ngbNavContent>
+                        <div class="text-center">
+                            <br>
+                            <div class="form-sub-header-style">Upload Excel File</div>
+                            <br>
+                            <span>
+                                <input type="file" #excelFile (change)="onFileChange($event, excelFile)" />
+                                <button class="btn" *ngIf="isUploadedSuccessfully"
+                                    (click)="excelFile.value='';isUploadedSuccessfully=false">
+                                    <i class="material-icons red">close</i>
+                                </button>
+                            </span>
+                            <br><br>
+                            <h4 id="demoLink" class="revert-margin-style">
+                                Here is the
+                                <i><a class="anchor-blue" [href]=UNIVERSITY_EXCEL_DEMO_LINK target="_blank">link</a></i>
+                                to download the demo excel file.
+                            </h4>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-default swabhav-button-round"
+                                (click)="modal.dismiss('Close click')">Close</button>
+                            &nbsp;&nbsp;&nbsp;
+                            <button type="submit" class="btn btn-default swabhav-button-round"
+                                [disabled]="!isUploadedSuccessfully" (click)="addMultipleUniversities()">
+                                Add Universities
+                            </button>
+                        </div>
+                    </ng-template>
+                </li>
+            </ul>
+
+            <!-- Output of the selected ngbNavItem -->
+            <div [ngbNavOutlet]="nav" class="mt-2"></div>
+        </ng-container>
+
+        <!-- For update and view university -->
+        <ng-container *ngIf="isViewMode || isOperationUpdate">
+            <ng-template [ngTemplateOutlet]="universityFormTemplate"></ng-template>
+        </ng-container>
+    </div>
+</ng-template>
+
+<!-- Delete University Confirmation -->
+<ng-template #deleteUniversityModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this university?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>

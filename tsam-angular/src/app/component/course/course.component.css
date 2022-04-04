@@ -1,0 +1,85 @@
+.top-panel-center {
+  text-align: center;
+  padding-right: 20%;
+}
+.font-20-style {
+  font-size: 20px;
+}
+.top-panel-style {
+  background-color: #f26d00;
+  color: white;
+  padding: 15px;
+}
+
+.top-panel-left {
+  float: left;
+  text-align: left;
+}
+.talent-dropdown-style {
+  display: inline;
+  text-align: center;
+  border-radius: 5px;
+  background-color: #fff;
+}
+.input-style {
+  width: 18%;
+  color: black;
+  border-color: #fc6e26;
+  border-width: 1.5px;
+  letter-spacing: normal;
+  font-weight: 500;
+  font-size: large;
+  text-align: center;
+}
+
+::ng-deep .mat-progress-bar-fill::after {
+  background-color: #fc6e26;
+}
+
+::ng-deep .mat-progress-bar-buffer {
+  background: #e4e8eb;
+}
+
+::ng-deep .mat-progress-bar {
+  border-radius: 2px;
+}
+
+.course-tab-selector {
+    display: flex;
+    padding: 5%;
+    /* text-align: center; */
+    /* width: 100%; */
+    /* flex-direction: row; */
+    align-content: center;
+    justify-content: space-evenly;
+    align-items: baseline;
+}
+.item {
+  width: 100px;
+
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.mat-progress-bar {
+  width: 100%;
+  height: 10px;
+  
+}
+
+/* swabhav-light-orange-text */
+.tab-unselected-text{
+    font-weight: 500;
+    color: black;
+}
+
+.padding-text{
+  padding-top: 1rem;
+}
+
+.back-button{
+  align-self: center;
+  margin-bottom: -30px;
+  /* flex: 1; */
+  display: flex;
+}

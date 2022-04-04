@@ -1,0 +1,73 @@
+.page-margin{
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 2%;
+}
+
+.heading-style{
+    color: #000000;
+    font-size: x-large;
+    font-weight: bold;
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+.question-box{
+    background-color: #CDE9FC;
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    border: 1.5px solid #004370;
+    font-size: medium;
+    font-weight: bold;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.problem-selected-card-style{
+    border: solid #D63C2A;
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.problem-disabled-card-style{
+    border: solid #BDBDBD;
+    color: #757575;
+    text-align: center;
+    font-size: medium;
+    cursor: pointer;
+}
+
+.problem-option-card-style{
+    border: solid #D63C2A;
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.selected-option-style{
+    background-color: #FFB2B0;
+    border: #D63C2A solid;
+    font-weight: bold;
+    box-shadow: 5px 10px 8px #00000029;
+    cursor: default;
+    font-size: medium;
+    text-align: center;
+    border-radius: 50px;
+}
+  
+.option-style{
+    border: #D63C2A solid;
+    font-size: medium;
+    font-weight: bold;
+    color: #EE3733;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 50px;
+}
+
+.option-style:hover{
+    transform: scale(1.05);
+}

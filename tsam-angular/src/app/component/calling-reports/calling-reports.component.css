@@ -1,0 +1,36 @@
+i{
+  cursor: pointer;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.pagination-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.pagination-flex-item {
+  display: flex;
+  align-items: baseline;
+  margin-left: auto;
+}
+
+.pagination-control-flex-item {
+  display: flex;
+  margin-bottom: auto;
+}

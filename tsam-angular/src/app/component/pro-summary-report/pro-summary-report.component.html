@@ -1,0 +1,306 @@
+<app-master-navbar></app-master-navbar>
+
+<ng-template #zeroTemplate>
+    <span class="btn btn-default no-link">
+        0
+    </span>
+</ng-template>
+
+<div class="container-fluid margin-2pt">
+    <div class="card margin-2pt">
+        <div *ngIf="totalEntries > 0">
+            <div class="card-header">
+                <div class="totalLabel">
+                    <label>Total Entries: {{ totalEntries || 0}}</label>
+                    <!-- <label *ngIf="totalEntries > 0" class="float-right">{{paginationString}}</label> -->
+                </div>
+                <!-- <div class="display-inline">
+                    <div class="form-group col-sm-6 col-md-6">
+                        <div class="row">
+                            <select class="form-control col-sm-2 col-md-2" [(ngModel)]="limit" (change)="changePage(1)">
+                            <option>10</option>
+                            <option>20</option>
+                            <option selected>50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <ul class="pagination" *ngFor="let waiting of proSummaryReportList | paginate: { id:'proSummaryReportListID',
+                    itemsPerPage: limit, currentPage: currentPage, totalItems: totalEntries}">
+                    </ul>
+                    <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="proSummaryReportListID">
+                    </pagination-controls>
+                </div> -->
+            </div>
+            <div class="card-body padding-0pt">
+                <div class="table-responsive">
+                    <table class="table center-style table-bordered">
+                        <thead class="main-header">
+                            <tr>
+                                <th>No.<br><br></th>
+                                <th>Company Name<br><br></th>
+                                <th>1.0 - 2.0 years
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="firstCategory"
+                                            (click)="toggleTechCount('first')">
+                                        <label class="custom-control-label" for="firstCategory"></label>
+                                    </div>
+                                </th>
+                                <ng-container *ngIf="showFirstCategoryColumns">
+                                    <th><strong>Technology Name</strong><br><br></th>
+                                    <th><strong>Talent Count</strong><br><br></th>
+                                </ng-container>
+                                <th>2.1 - 5.0 years
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="secondCategory"
+                                            (click)="toggleTechCount('second')">
+                                        <label class="custom-control-label" for="secondCategory"></label>
+                                    </div>
+                                </th>
+                                <ng-container *ngIf="showSecondCategoryColumns">
+                                    <th><strong>Technology Name</strong><br><br></th>
+                                    <th><strong>Talent Count</strong><br><br></th>
+                                </ng-container>
+                                <th>5.1 - 7.0 years
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="thirdCategory"
+                                            (click)="toggleTechCount('third')">
+                                        <label class="custom-control-label" for="thirdCategory"></label>
+                                    </div>
+                                </th>
+                                <ng-container *ngIf="showThirdCategoryColumns">
+                                    <th><strong>Technology Name</strong><br><br></th>
+                                    <th><strong>Talent Count</strong><br><br></th>
+                                </ng-container>
+                                <th>7.1 and above years
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="fourthCategory"
+                                            (click)="toggleTechCount('fourth')">
+                                        <label class="custom-control-label" for="fourthCategory"></label>
+                                    </div>
+                                </th>
+                                <ng-container *ngIf="showFourthCategoryColumns">
+                                    <th><strong>Technology Name</strong><br><br></th>
+                                    <th><strong>Talent Count</strong><br><br></th>
+                                </ng-container>
+                                <th>Total<br><br></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let pro of proSummaryReportList; let i = index">
+                                <td>{{(i+1)+(offset*limit)}}</td>
+                                <td>{{pro.company}}</td>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='pro.firstCount != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport(pro.company,'first',true)">
+                                        <span><strong>{{pro.firstCount}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showFirstCategoryColumns">
+                                    <td>
+                                        <div *ngFor="let techCount of pro.firstCatergoryTechCount">
+                                            <button class="btn btn-default no-link">
+                                                <span
+                                                    class="badge badge-info"><strong>{{techCount.techName}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div *ngFor="let techCount of pro.firstCatergoryTechCount">
+                                            <button *ngIf='techCount.talentCount != 0; else zeroTemplate'
+                                                class="btn btn-default fake-link" type="button"
+                                                (click)="redirectToTalentsForProSummaryReportByTechnologyCount(techCount.company,'first',true,techCount.techID)">
+                                                <span><strong>{{techCount.talentCount}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='pro.secondCount != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport(pro.company,'second',true)">
+                                        <span><strong>{{pro.secondCount}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showSecondCategoryColumns">
+                                    <td>
+                                        <div *ngFor="let techCount of pro.secondCatergoryTechCount">
+                                            <button class="btn btn-default no-link">
+                                                <span
+                                                    class="badge badge-info"><strong>{{techCount.techName}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div *ngFor="let techCount of pro.secondCatergoryTechCount">
+                                            <button *ngIf='techCount.talentCount != 0; else zeroTemplate'
+                                                class="btn btn-default fake-link" type="button"
+                                                (click)="redirectToTalentsForProSummaryReportByTechnologyCount(techCount.company,'second',true,techCount.techID)">
+                                                <span><strong>{{techCount.talentCount}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='pro.thirdCount != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport(pro.company,'third',true)">
+                                        <span><strong>{{pro.thirdCount}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showThirdCategoryColumns">
+                                    <td>
+                                        <div *ngFor="let techCount of pro.thirdCatergoryTechCount">
+                                            <button class="btn btn-default no-link">
+                                                <span
+                                                    class="badge badge-info"><strong>{{techCount.techName}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div *ngFor="let techCount of pro.thirdCatergoryTechCount">
+                                            <button *ngIf='techCount.talentCount != 0; else zeroTemplate'
+                                                class="btn btn-default fake-link" type="button"
+                                                (click)="redirectToTalentsForProSummaryReportByTechnologyCount(techCount.company,'third',true,techCount.techID)">
+                                                <span><strong>{{techCount.talentCount}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='pro.fourthCount != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport(pro.company,'fourth',true)">
+                                        <span><strong>{{pro.fourthCount}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showFourthCategoryColumns">
+                                    <td>
+                                        <div *ngFor="let techCount of pro.fourthCatergoryTechCount">
+                                            <button class="btn btn-default no-link">
+                                                <span
+                                                    class="badge badge-info"><strong>{{techCount.techName}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div *ngFor="let techCount of pro.fourthCatergoryTechCount">
+                                            <button *ngIf='techCount.talentCount != 0; else zeroTemplate'
+                                                class="btn btn-default fake-link" type="button"
+                                                (click)="redirectToTalentsForProSummaryReportByTechnologyCount(techCount.company,'fourth',true,techCount.techID)">
+                                                <span><strong>{{techCount.talentCount}}</strong></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button
+                                        *ngIf='pro.firstCount + pro.secondCount + pro.thirdCount + pro.fourthCount != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport(pro.company,'fifth',true)">
+                                        <span><strong>{{pro.firstCount + pro.secondCount + pro.thirdCount +
+                                                pro.fourthCount}}</strong></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><strong>Total</strong></td>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='proSummaryReportCounts.firstCountTotal != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport('none','first',false)">
+                                        <span><strong>{{proSummaryReportCounts.firstCountTotal}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showFirstCategoryColumns">
+                                    <td></td>
+                                    <td></td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='proSummaryReportCounts.secondCountTotal != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport('none','second',false)">
+                                        <span><strong>{{proSummaryReportCounts.secondCountTotal}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showSecondCategoryColumns">
+                                    <td></td>
+                                    <td></td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='proSummaryReportCounts.thirdCountTotal != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport('none','third',false)">
+                                        <span><strong>{{proSummaryReportCounts.thirdCountTotal}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showThirdCategoryColumns">
+                                    <td></td>
+                                    <td></td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button *ngIf='proSummaryReportCounts.fourthCountTotal != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport('none','fourth',false)">
+                                        <span><strong>{{proSummaryReportCounts.fourthCountTotal}}</strong></span>
+                                    </button>
+                                </td>
+                                <ng-container *ngIf="showFourthCategoryColumns">
+                                    <td></td>
+                                    <td></td>
+                                </ng-container>
+                                <td data-toggle="tooltip" data-placement="top" title="Go To Talents Page">
+                                    <button
+                                        *ngIf='proSummaryReportCounts.firstCountTotal+ proSummaryReportCounts.secondCountTotal
+                                        +proSummaryReportCounts.thirdCountTotal+ proSummaryReportCounts.fourthCountTotal != 0; else zeroTemplate'
+                                        class="btn btn-default fake-link" type="button"
+                                        (click)="redirectToTalentsForProSummaryReport('none','fifth',false)">
+                                        <span><strong>{{proSummaryReportCounts.firstCountTotal+
+                                                proSummaryReportCounts.secondCountTotal
+                                                +proSummaryReportCounts.thirdCountTotal+
+                                                proSummaryReportCounts.fourthCountTotal}}</strong></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="totalLabel">
+                    Total Entries: {{totalEntries || 0}}
+                    <!-- <label *ngIf="totalEntries > 0" class="float-right">{{paginationString}}</label> -->
+                </div>
+                <!-- <div class="display-inline">
+                    <div class="form-group col-sm-6 col-md-6">
+                        <div class="row">
+                            <select class="form-control col-sm-2 col-md-2" [(ngModel)]="limit" (change)="changePage(1)">
+                            <option>10</option>
+                            <option>20</option>
+                            <option selected>50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <ul class="pagination" *ngFor="let waiting of proSummaryReportList | paginate: { id:'proSummaryReportListID',
+                    itemsPerPage: limit, currentPage: currentPage, totalItems: totalEntries}">
+                    </ul>
+                    <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="proSummaryReportListID">
+                    </pagination-controls>
+                </div> -->
+            </div>
+        </div>
+        <div class="container full-h" *ngIf="totalEntries == 0">
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-12 mx-auto">
+                    <div class="jumbotron">
+                        <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>No professional summary report found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-master-footer></app-master-footer>

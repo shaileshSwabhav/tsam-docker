@@ -1,0 +1,213 @@
+<app-master-navbar></app-master-navbar>
+
+<!-- Batch Dropdown -->
+<div class="top-panel-style">
+    <div class="d-flex justify-content-center">
+    <select [(ngModel)]="batchID" class="form-control input-style talent-dropdown-style" (change)="onBathcesForTalentChange()">
+        <option *ngFor="let batchesForTalent of batchesForTalentList" [ngValue]="batchesForTalent.id">{{batchesForTalent.course.name}}</option>
+    </select>
+    </div>
+</div>
+
+<br>
+
+<!-- Batch Detail Section with field name and value -->
+<ng-template #batchDetailSection let-batchDetail="batchDetail">
+    <ng-container *ngIf="batchDetail.fieldName!=null">
+        <div class="field-section-space-style">
+            <div class="font-md-style font-weight-bold">
+                {{batchDetail.fieldName}}:
+            </div>
+            <div class="field-value-style">
+                {{batchDetail.fieldValue}}
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<div class="container-fluid standard-page-margin container-style">
+    <mat-drawer-container class="menu-tab-container">
+
+        <!-- Batch Detail Section with field name and value -->
+        <mat-drawer mode="side" class="drawer-container" #sidePanelDrawer [(opened)]="isSidePanelOpen"
+            (mouseleave)="lockStatus?null:sidePanelDrawer.close()">
+
+            <div class="drawer-container-menu">
+
+                <div class="ml-auto pr-3" *ngIf="lockStatus==false">
+                    <i class="teal pointer select-disabled material-icons-outlined"
+                        (click)="lockStatus=true">lock_open</i>
+                </div>
+                <div class="ml-auto pr-3" *ngIf="lockStatus==true">
+                    <i class="btn-swabhav select-disabled pointer material-icons-outlined"
+                        (click)="lockStatus=false">lock</i>
+                </div>
+
+                <ng-container *ngFor="let tab of batchDetailsTabList; let i = index">
+                    <div class="font-weight-bold font-lg-style">
+                        {{tab.tabName}}
+                    </div>
+                    <br>
+                    <ng-container *ngFor="let subTab of tab.subTabs; let j = index">
+                        <ng-container *ngIf="subTab.isVisible">
+                            <div class="font-md-style ml-2 color-757575 font-weight-bold cursor-pointer-style" [ngClass]="{'color-757575': subTab.isActive==false, 
+                                'color-F6430F': subTab.isActive==true}"
+                                (click)="onSubTabClick(tab.tabName,subTab.tabName,subTab.url)">
+                                {{subTab.tabName}}
+                            </div>
+                            <br>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </mat-drawer>
+
+        <mat-drawer-content class="content-container">
+
+            <!-- Side tab for toggling drawer -->
+            <div class="verticalLine toggle-side-nav-style" (mouseover)="sidePanelDrawer.open()"
+                *ngIf="!isSidePanelOpen">
+                <i class="toggle-side-nav-style material-icons-outlined p-1">arrow_forward</i>
+            </div>
+
+            <!-- Main Content -->
+            <div class="selected-template-style">
+                <ng-template *ngTemplateOutlet="selectedTemplateName"></ng-template>
+            </div>
+
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>
+
+<br><br>
+
+<ng-template #batchDetailsTemplate>
+    <ng-container *ngIf="batch">
+        <div class="font-weight-bold font-lg-style color-F6430F text-center">
+            Batch Details
+        </div>
+        <br><br>
+        <div class="row">
+            <ng-container *ngFor="let field of batchDetailsList; let i = index">
+                <div class="col-md-4">
+                    <ng-template *ngTemplateOutlet="batchDetailSection; context: {batchDetail: field}"></ng-template>
+                </div>
+                <ng-container *ngIf="(i==5) && (batch.faculty)">
+                    <div class="col-md-12">
+                        <div class="font-md-style font-weight-bold">
+                            Mentor's Details:
+                        </div>
+                    </div>
+                    <br><br>
+                </ng-container>
+            </ng-container>
+        </div>
+        <ng-container *ngIf="batch.faculty?.telegramID">
+            <div class="link-style telegram-link-style cursor-pointer-style" (click)="redirectToTelegramLink()">
+                <img class="width-30px-style" src="assets/icon/talent-dashboard/telegramicon.png" alt="Telegram">
+                &nbsp;&nbsp;
+                <span class="font-sm-style color-FFFFFF">
+                    Message your mentor
+                </span>
+            </div>
+            <br>
+        </ng-container>
+        <div class="font-md-style font-weight-bold">
+            Session Details:
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-2">
+                        <img width="40" src="assets/icon/talent-dashboard/coursedetails.png" alt="Welcome back">
+                    </div>
+                    <div class="col-10">
+                        <div *ngFor="let batchTiming of batch.batchTimings">
+                            <div class="row font-sm-style color-757575">
+                                <div class="col-2 padding-0-style text-right">
+                                    {{batchTiming.day?.day.substr(0,3)}}&nbsp;&nbsp;|
+                                </div>
+                                <div class="col-10 padding-0-style">
+                                    &nbsp;&nbsp;{{batchTiming.fromTime}} - {{batchTiming.toTime}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <ng-container *ngIf="batch.batchMeetLink">
+                    <div class="link-style meet-link-style cursor-pointer-style" (click)="redirectToMeetLink()">
+                        <img class="width-30px-style" src="assets/icon/talent-dashboard/google-meet.png"
+                            alt="Google meet">
+                        &nbsp;&nbsp;
+                        <span class="font-sm-style color-FFFFFF">
+                            Join the session now
+                        </span>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="col-md-4">
+                <ng-template
+                    *ngTemplateOutlet="batchDetailSection; context: {batchDetail: {fieldName:'Total Sessions',fieldValue:batch.totalSessionsCount}}">
+                </ng-template>
+            </div>
+            <div class="col-md-4">
+                <ng-container *ngIf="batch.brochure!=null">
+                    <div class="field-section-space-style">
+                        <div class="font-md-style font-weight-bold">
+                            Brochure:
+                        </div>
+                        <div class="field-value-style">
+                            <img class="cursor-pointer-style" (click)="redirectToExternalLink(batch.brochure)"
+                              src="assets/icon/colour-icons/pdf.png" width="30">
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #talentFeedbackSubmitTemplate>
+    <app-talent-batch-details-feedback [isSubmission]="true">
+    </app-talent-batch-details-feedback>
+</ng-template>
+
+<ng-template #talentFeedbackLeaderboardTemplate>
+    <app-talent-batch-details-feedback [isSubmission]="false">
+    </app-talent-batch-details-feedback>
+</ng-template>
+
+<ng-template #talentBatchSessionPlanTemplate>
+    <app-batch-session-plan>
+    </app-batch-session-plan>
+</ng-template>
+
+<ng-template #talentBatchSessionPlanViewAllTemplate>
+    <app-batch-session-details>
+    </app-batch-session-details>
+</ng-template>
+
+<ng-template #talentAssignmentTemplate>
+    <app-talent-batch-details-assignment>
+    </app-talent-batch-details-assignment>
+</ng-template>
+
+<ng-template #talentProjectTemplate>
+    <app-talent-batch-details-project>
+    </app-talent-batch-details-project>
+</ng-template>
+
+
+<ng-template #talentConceptTreeTemplate>
+    <app-module-concept-score>
+    </app-module-concept-score>
+</ng-template>
+
+<ng-template #talentPerformanceTemplate>
+    <app-batch-progress-report>
+    </app-batch-progress-report>
+</ng-template>
+
+<app-master-footer></app-master-footer>

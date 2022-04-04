@@ -1,0 +1,113 @@
+.table-unstriped > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #fff;
+}
+
+.assignment-alignment {
+  text-align: justify;
+  margin-left: 5%;
+  width: 95%;
+}
+
+.feedback-img-icon {
+  width: 100%;
+  margin-top: -20%;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container {
+  border: 1.5px solid #fc6e26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled > .ng-select-container {
+  border: 1.5px solid #fc6e26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  padding: 4px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+/* ************** Module tab styles ******************** */
+
+.module-tab-menu-style {
+  box-shadow: 0 0 10px #ccc;
+  margin: 0 auto;
+}
+
+/* active tab */
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+  color: black;
+  background-color: #ffe0da;
+  height: 100px;
+}
+
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label {
+  color: black;
+  height: 100px;
+}
+
+:host::ng-deep .mat-tab-header {
+  border: none;
+}
+
+/* ink bar */
+:host::ng-deep .mat-ink-bar {
+  background-color: var(--primary-color, #ffe0da) !important;
+}
+
+.table-striped > tbody > .unstriped-tr > td {
+  background-color: #fff;
+}
+
+.table-unstriped  > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #fff;
+}
+
+.red-box-style{
+  background-color: #ffeaea;
+  color: #f80309;
+}
+
+.blue-box-style{
+  background-color: #e5f6fd;
+  color: #61abde;
+}
+
+.green-box-style{
+  background-color: #e5fdf0;
+  color: #36b98c;
+}
+
+.yellow-box-style{
+  background-color: #faeed9;
+  color: #ed9511;
+}
+
+.tasklist-box-style {
+  border-radius: 30px;
+  font-weight: bold;
+  padding: 4px;
+  text-align: center;
+}
+
+.table-td-center-align{
+  vertical-align: middle;
+}

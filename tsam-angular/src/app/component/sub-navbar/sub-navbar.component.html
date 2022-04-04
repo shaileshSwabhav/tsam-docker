@@ -1,0 +1,15 @@
+<mat-menu #menu>
+  <ng-container *ngFor="let item of items" matMenuContent>
+    <div *ngIf="item.isVisible">
+      <ng-container *ngIf="!item.menus; else branch">
+        <a class="dropdown-style option-hover-style" *ngIf="!item.opertaion" mat-menu-item [routerLink]="[item.url]">{{item.menuName}}<span *ngIf="item.parentMenu && item.parentMenu.menuName !='Invisible'"> - {{item.parentMenu.menuName}}</span></a>
+        <a class="dropdown-style option-hover-style" *ngIf="item.opertaion" mat-menu-item [routerLink]="[item.url]" [queryParams]="{operation: 'add'}">{{item.menuName}}<span *ngIf="item.parentMenu && item.parentMenu.menuName !='Invisible'"> - {{item.parentMenu.menuName}}</span></a>
+        <!-- <a class="dropdown-style option-hover-style" *ngIf="item.opertaion" mat-menu-item (click)="addModalComponent(item)">{{item.menuName}}<span *ngIf="item.parentMenu && item.parentMenu.menuName !='Invisible'"> - {{item.parentMenu.menuName}}</span></a> -->
+      </ng-container>
+    </div>
+    <ng-template #branch>
+      <button class="dropdown-style option-hover-style" mat-menu-item [matMenuTriggerFor]="innerPanel.menu">{{item.menuName}}<span *ngIf="item.parentMenu"> - {{item.parentMenu.menuName}}</span></button>
+      <app-sub-navbar #innerPanel [items]="item.menus"></app-sub-navbar>
+    </ng-template>
+  </ng-container>
+</mat-menu>

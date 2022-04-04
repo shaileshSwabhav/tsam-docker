@@ -1,0 +1,818 @@
+<!-- No module logo template -->
+<ng-template #noModuleLogo>
+  <img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<!-- Batch Details Section Template -->
+<ng-template #batchDetailSection let-batchDetails="batchDetails">
+  <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 batch-details-section-style">
+    <img width="50" src={{batchDetails.fieldImage}}>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="font-lg-style">
+      {{batchDetails.fieldName}}:
+    </span>
+    <span class="font-lg-style font-weight-bold color-F6430F">
+      {{batchDetails.fieldValue}}
+    </span>
+  </div>
+</ng-template>
+
+<!-- Talent feedback for faculty -->
+<ng-template #talentFeedbackToFacultyModal let-modal>
+  <app-talent-feedback-modal #talentFeedback [batchSessionID]="currentBatchSession.id" [batchID]="batchID"
+    [batchSessionDate]="currentBatchSessionDate" [sessionNumber]="currentBatchSession.sessionNumber"
+    [feedbacks]="currentBatchSession.feedbacks" (isSuccessfulEmitter)="receiveIsFeedbackAddSuccessful($event)"
+    [topics]="currentBatchSession.topics" [faculty]="selectedBatchSessionFaculty">
+  </app-talent-feedback-modal>
+</ng-template>
+
+<!-- Session plan modules, topics and sub topics list -->
+<ng-template #sessionPlanModuleList let-modules="modules">
+  <ng-container *ngFor="let module of modules; let i=index">
+
+    <!-- If module consists of sub topics then show the module -->
+    <ng-container *ngIf="module.moduleSubTopicsCount > 0">
+
+      <!-- Module Info -->
+      <div class="row">
+        <div class="col-2">
+          <ng-container *ngIf="module.logo;else noModuleLogo">
+            <img src="{{module.logo}}" width="50">
+          </ng-container>
+        </div>
+        <div class="col-10 font-weight-bold font-md-style">
+          <div>
+            <div>
+              Module: {{module.moduleName}}
+            </div>
+            <div>
+              Resource:
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <!-- If module consists of topics -->
+      <ng-container *ngIf="module.moduleTopics.length > 0">
+        <ng-container *ngFor="let topic of module.moduleTopics; let j=index">
+
+          <!-- Topic Info -->
+          <div class="font-weight-bold font-md-style">
+            Topic: {{topic.topicName}}
+          </div>
+
+          <!-- Subtopics Info -->
+          <div class="table-responsive">
+            <table class="table table-borderless agenda-table-text-style">
+              <thead>
+                <tr class="text-center">
+                  <th>Order</th>
+                  <th class="text-left">Sub Topic Name</th>
+                  <th>Coverage Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let subTopic of topic.subTopics; let k = index">
+                  <tr class="text-center">
+                    <td class="table-td-center-align">{{k+1}}</td>
+                    <td class="text-left table-td-center-align">{{subTopic.topicName}}</td>
+                    <td class="table-td-center-align">
+                      {{subTopic.totalTime | minute}}
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<!-- Session plan assignment -->
+<ng-template #sessionPlanAssignmentList let-modules="modules">
+  <ng-container *ngFor="let module of modules; let i=index">
+
+    <!-- If module consists of assignments then show the module -->
+    <ng-container *ngIf="module.moduleAssignmentsCount > 0">
+
+      <!-- Module Info -->
+      <div class="row">
+        <div class="col-2">
+          <ng-container *ngIf="module.logo;else noModuleLogo">
+            <img src="{{module.logo}}" width="50">
+          </ng-container>
+        </div>
+        <div class="col-10 font-weight-bold font-md-style">
+          <div>
+            <div>
+              Module: {{module.moduleName}}
+            </div>
+            <div>
+              Resource:
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <!-- If module consists of topics -->
+      <ng-container *ngIf="module.moduleTopics.length > 0">
+        <ng-container *ngFor="let topic of module.moduleTopics; let j=index">
+
+          <!-- If topic consists of assignments -->
+          <ng-container *ngIf="topic.topicAssignments.length > 0">
+
+            <!-- Topic Info -->
+            <div class="font-weight-bold font-md-style">
+              Topic: {{topic.topicName}}
+            </div>
+
+            <!-- Assignments Info -->
+            <div class="table-responsive">
+              <table class="table table-borderless assignment-table-text-style">
+                <thead>
+                  <tr class="text-center">
+                    <th>Order</th>
+                    <th class="text-left">Assignment Name</th>
+                    <th>Difficulty</th>
+                    <th>Due Date</th>
+                    <th>View</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let assignment of topic.topicAssignments; let k = index">
+                    <tr class="text-center">
+                      <td class="table-td-center-align">{{k+1}}</td>
+                      <td class="text-left table-td-center-align">{{assignment.programmingQuestion?.label}}</td>
+                      <td class="table-td-center-align">
+                        <div class="tasklist-box-style" [ngClass]="{'green-box-style': assignment?.programmingQuestion?.difficulty=='Easy',
+                          'yellow-box-style': assignment?.programmingQuestion?.difficulty=='Medium',
+                          'red-box-style': assignment?.programmingQuestion?.difficulty=='Hard'}">
+                          {{assignment?.programmingQuestion?.difficulty}}
+                        </div>
+                      </td>
+                      <td class="table-td-center-align">
+                        <span *ngIf="assignment.dueDate;else noDueDate">
+                          {{assignment.dueDate | date}}
+                        </span>
+                        <ng-template #noDueDate>
+                          -
+                        </ng-template>
+                      </td>
+                      <td class="table-td-center-align">
+                        <img src="assets/course/view.png" alt="view module" width="30" class="cursor-pointer-style"
+                          (click)="onViewAssignment(assignment)">
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<!-- No Batch Session Plan -->
+<ng-container *ngIf="batchSessionList.length == 0">
+  <div class="card my-course-card-style h-100">
+    <div class="card-body">
+      <div class="text-center">
+        <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+        <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+        <br>
+        <div class="font-lg-style text-center">
+          No Session Plan Found
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Batch Details Section -->
+<div class="row" *ngIf="batchSessionList.length > 0">
+  <ng-container *ngFor="let batchDetails of batchDetailsList; let i = index">
+    <ng-template *ngTemplateOutlet="batchDetailSection; context: {batchDetails: batchDetails}">
+    </ng-template>
+  </ng-container>
+</div>
+
+<br>
+
+<ng-container *ngIf="dateList.length > 0">
+
+  <!-- Month year change -->
+  <div>
+    <div class="float-left" *ngIf="batchSessionList.length > 0">
+      <div class="row">
+        <div class="col-3">
+          <img width="50" src="assets/icon/colour-icons/clock.png" alt="Create Session Plan">
+        </div>
+        <div class="col-9 font-weight-bold font-lg-style">
+          <div>
+            EST BATCH END DATE:
+          </div>
+          <div>
+            {{batchSessionList[batchSessionList.length-1].date | date: 'EEEE, d MMM, y'}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="float-right">
+      <div class="month-year-box-style color-414141">
+        <span>
+          <span *ngIf="currentDateListIndex!=0" class="vertical-align-bottom-icon-style cursor-pointer-style"
+            (click)="onMonthYearClick(false)">
+            <i class="material-icons font-20-style">arrow_back_ios</i>
+          </span>
+          &nbsp;&nbsp;&nbsp;
+          <span class="font-weight-bold">
+            {{MONTHS[this.dateList[this.currentDateListIndex].month]}},
+            {{this.dateList[this.currentDateListIndex].year}}
+          </span>
+          &nbsp;&nbsp;&nbsp;
+          <span *ngIf="currentDateListIndex!=(dateList.length-1)"
+            class="vertical-align-bottom-icon-style cursor-pointer-style" (click)="onMonthYearClick(true)">
+            <i class="material-icons font-20-style">arrow_forward_ios</i>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <br><br><br>
+
+  <!-- Dates tab menu -->
+  <div class="card module-tab-menu-style">
+    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="currentDateListDateIndex"
+      (selectedTabChange)="onDateTabClick($event)">
+      <ng-container *ngFor="let date of this.dateList[this.currentDateListIndex].dates;let i = index">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <div>
+              <ng-container *ngIf="dayList.length > 0">
+                <div class="margin-bottom-date-tab-style">{{(dayList[date.day - 1].day).substr(0,3)}}</div>
+              </ng-container>
+              <div class="font-xl-style font-weight-bold margin-bottom-date-tab-style">
+                {{date.date}}
+              </div>
+              <div class="margin-bottom-date-tab-style">
+                {{date.fromTime}} - {{date.toTime}}
+              </div>
+              <div *ngIf="date.isSessionTaken">
+                <img src="assets/icon/colour-icons/check.png" width="30">
+              </div>
+              <div *ngIf="!date.isSessionTaken">
+                <img src="assets/icon/colour-icons/caution.png" width="40">
+              </div>
+            </div>
+          </ng-template>
+        </mat-tab>
+      </ng-container>
+    </mat-tab-group>
+  </div>
+</ng-container>
+
+<br><br>
+
+<!-- Buttons for faculty -->
+<div class="row" *ngIf="access.isFaculty && currentBatchSessionPlan">
+  <div class="col-sm-3 text-center"
+    *ngIf="(!currentBatchSessionPlan.isSessionTaken && currentBatchSessionPlan.showStatusButton) || true">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="openModal(sessionCompletionStatus, 'md')">
+      <img src="assets/icon/colour-icons/check.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold">Status</span>
+    </button>
+    <!-- <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="onBatchSessionButtonClick(COMPLETEDOPERATION)">
+      <img src="assets/icon/colour-icons/check.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold">Mark Completed</span>
+    </button> -->
+  </div>
+  <div class="col-sm-3 text-center"
+    *ngIf="currentBatchSessionPlan.isSessionTaken && !currentBatchSessionPlan.isAttendanceMarked">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="onBatchSessionButtonClick(ATTENDANCEOPERATION)">
+      <img src="assets/icon/colour-icons/attendance.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold">Mark Attendance</span>
+    </button>
+  </div>
+  <div class="col-sm-3 text-center" *ngIf="!currentBatchSessionPlan.isSessionTaken">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="onPreRequisiteClick()">
+      <img src="assets/icon/colour-icons/addtask.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold">Add a pre-req for this session</span>
+    </button>
+  </div>
+  <div class="col-sm-3 text-center">
+    <!-- *ngIf="!currentBatchSessionPlan.isSessionTaken"> -->
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="onAddNewAssignmentClick()">
+      <img src="assets/icon/colour-icons/addtask.png" width="30" class="p-2">
+      <span class="font-sm-style font-weight-bold">Add a new Assignment</span>
+    </button>
+  </div>
+  <div class="col-sm-3 text-center"
+    *ngIf="currentBatchSessionPlan.isSessionTaken && !currentBatchSessionPlan.isFeedbackGiven">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="onBatchSessionButtonClick(FEEDBACKOPERATION)">
+      <img src="assets/icon/colour-icons/review.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold">Give Feedback</span>
+    </button>
+  </div>
+  <div class="col-sm-3 text-center"
+    *ngIf="currentBatchSessionPlan.isSessionTaken && ((currentBatchSessionPlanCurrentAssignmentCountForFaculty + 
+    currentBatchSessionPlanPendingAssignmentCountForFaculty)-(currentBatchSessionPlanCurrentAssignmentCountForTalent + currentBatchSessionPlanPendingAssignmentCountForTalent))">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button"
+      (click)="onBatchSessionButtonClick(ASSIGNMENTOPERATION)">
+      <img src="assets/icon/colour-icons/assignment.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold">Publish Assignments</span>
+    </button>
+  </div>
+</div>
+
+<!-- Buttons for talent -->
+<div class="row" *ngIf="access.isTalent && currentBatchSession">
+  <div class="col-sm-3 text-center" *ngIf="currentBatchSession.isPresent">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button">
+      <img src="assets/icon/colour-icons/review.png" width="30">
+      &nbsp;&nbsp;
+      <span *ngIf="!currentBatchSession.isFeedbackGiven" class="font-sm-style font-weight-bold"
+        (click)="onTalentFeeddbackToFacultyClick()">Give Feedback
+      </span>
+      <span *ngIf="currentBatchSession.isFeedbackGiven" class="font-sm-style font-weight-bold"
+        (click)="onTalentFeeddbackToFacultyClick()">Show Feedback
+      </span>
+    </button>
+  </div>
+  <div class="col-sm-3 text-center" *ngIf="currentBatchSessionPlan?.prerequisiteList?.length > 0">
+    <button type="button" class="btn btn-default session-plan-button-style material-icons-button">
+      <img src="assets/icon/colour-icons/addtask.png" width="30">
+      &nbsp;&nbsp;
+      <span class="font-sm-style font-weight-bold" (click)="onPreRequisiteClick()">View Tasks
+      </span>
+    </button>
+  </div>
+</div>
+
+<br>
+
+<ng-container *ngIf="currentBatchSessionPlan">
+  <div class="row">
+
+    <!-- Agenda Container -->
+    <div class="col-sm-6">
+      <div class="agenda-container-style h-100">
+
+        <br>
+
+        <!-- Header -->
+        <div class="text-center">
+          <img src="assets/course/subtopics.png" width="50">&nbsp;&nbsp;&nbsp;
+          <span class="font-lg-style font-weight-bold">
+            <span *ngIf="isCurrentSessionToday">
+              TODAY'S AGENDA
+            </span>
+            <span *ngIf="!isCurrentSessionToday">
+              AGENDA
+              <span class="font-md-style">
+                <!-- {{currentBatchSessionDate | date: 'EEE, MMM d, y'}} -->
+              </span>
+            </span>
+          </span>
+        </div>
+
+        <!-- Pending List Header -->
+        <ng-container *ngIf="currentBatchSessionPlanPendingSubtopicCount > 0">
+          <br>
+          <div class="text-center">
+            <span class="badge agenda-badge-style font-md-style">
+              Pending List
+              <!-- : {{currentBatchSessionPlanPendingSubtopicCount}} -->
+            </span>
+          </div>
+          <br>
+
+          <!-- Pending Topics List -->
+          <ng-template
+            *ngTemplateOutlet="sessionPlanModuleList; context: {modules: currentBatchSessionPlan.pendingModule}">
+          </ng-template>
+        </ng-container>
+
+        <!-- Current List Header -->
+        <ng-container *ngIf="currentBatchSessionPlanCurrentSubtopicCount > 0">
+          <br>
+          <div class="text-center">
+            <span class="badge agenda-badge-style font-md-style">
+              For
+              <span *ngIf="isCurrentSessionToday">
+                Today
+              </span>
+              <span *ngIf="!isCurrentSessionToday">
+                <span class="font-md-style">
+                  This Day
+                  <!-- {{currentBatchSessionDate | date: 'MMM d, y'}}: -->
+                </span>
+              </span>
+              <!-- {{currentBatchSessionPlanCurrentSubtopicCount}} -->
+            </span>
+          </div>
+          <br>
+
+          <!-- Current Topics List -->
+          <ng-template *ngTemplateOutlet="sessionPlanModuleList; context: {modules: currentBatchSessionPlan.module}">
+          </ng-template>
+          <br>
+        </ng-container>
+
+      </div>
+    </div>
+
+    <!-- Assignment Container -->
+    <div class="col-sm-6">
+      <div class="assignment-container-style h-100">
+
+        <br>
+
+        <!-- Header -->
+        <div class="text-center">
+          <img src="assets/course/subtopics.png" width="50">&nbsp;&nbsp;&nbsp;
+          <span class="font-lg-style font-weight-bold">
+            LIST OF ASSIGNMENTS
+          </span>
+        </div>
+
+        <div
+          *ngIf="(!access.isTalent && currentBatchSessionPlanPendingAssignmentCountForFaculty == 0 && currentBatchSessionPlanCurrentAssignmentCountForFaculty == 0)
+          || (access.isTalent && currentBatchSessionPlanPendingAssignmentCountForTalent == 0 && currentBatchSessionPlanCurrentAssignmentCountForTalent == 0)"
+          class="font-lg-style font-weight-bold text-center">
+          <br><br>
+          No Assignments for
+          <span *ngIf="isCurrentSessionToday">
+            today
+          </span>
+          <span *ngIf="!isCurrentSessionToday">
+            this day
+            <!-- {{currentBatchSessionDate | date: 'MMM d, y'}} -->
+          </span>
+        </div>
+
+        <!-- Pending List Header -->
+        <ng-container *ngIf="(!access.isTalent && currentBatchSessionPlanPendingAssignmentCountForFaculty > 0) ||
+          (access.isTalent && currentBatchSessionPlanPendingAssignmentCountForTalent > 0)">
+          <br>
+          <div class="text-center">
+            <span class="badge assignment-badge-style font-md-style">
+              Pending List
+              <!-- : {{currentBatchSessionPlanPendingAssignmentCountForFaculty}} -->
+            </span>
+          </div>
+          <br>
+
+          <!-- Pending Topics List -->
+          <ng-template
+            *ngTemplateOutlet="sessionPlanAssignmentList; context: {modules: currentBatchSessionPlan.pendingModule}">
+          </ng-template>
+        </ng-container>
+
+        <!-- Current List Header -->
+        <ng-container *ngIf="(!access.isTalent && currentBatchSessionPlanCurrentAssignmentCountForFaculty > 0) ||
+          (access.isTalent && currentBatchSessionPlanCurrentAssignmentCountForTalent > 0)">
+          <br>
+          <div class="text-center">
+            <span class="badge assignment-badge-style font-md-style">
+              For
+              <span *ngIf="isCurrentSessionToday">
+                Today
+              </span>
+              <span *ngIf="!isCurrentSessionToday">
+                <span class="font-md-style">
+                  This Day
+                  <!-- {{currentBatchSessionDate | date: 'MMM d, y'}}:  -->
+                </span>
+              </span>
+              <!-- {{currentBatchSessionPlanCurrentAssignmentCountForFaculty}} -->
+            </span>
+          </div>
+          <br>
+
+          <!-- Current Topics List -->
+          <ng-template
+            *ngTemplateOutlet="sessionPlanAssignmentList; context: {modules: currentBatchSessionPlan.module}">
+          </ng-template>
+          <br>
+        </ng-container>
+
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- View Programming Question Modal -->
+<ng-template #programmingQuestionModal let-modal>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-2">
+        <img src="assets/icon/colour-icons/assignment.png" width="80">&nbsp;&nbsp;&nbsp;
+      </div>
+      <div class="col-10">
+        <div class="color-F26A00 font-weight-bold font-lg-style top-margin-10-style">
+          Assignment
+        </div>
+        <div class="font-md-style top-margin-10-style">
+          <span class="font-weight-bold">Module</span>:
+          {{selectedAssignment.moduleName}}
+        </div>
+        <div class="font-md-style top-margin-10-style">
+          <span class="font-weight-bold">Topic</span>:
+          {{selectedAssignment.topicName}}
+        </div>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div class="font-weight-bold">
+      Question:
+    </div>
+    <div [innerHTML]="selectedAssignment.programmingQuestion?.question">
+    </div>
+    <div class="row">
+      <div class="col-3">
+        <span class="font-weight-bold">Difficulty: </span>
+        <div class="tasklist-box-style assignment-popup-difficulty-style" [ngClass]="{'green-box-style': selectedAssignment?.programmingQuestion?.difficulty=='Easy',
+          'yellow-box-style': selectedAssignment?.programmingQuestion?.difficulty=='Medium',
+          'red-box-style': selectedAssignment?.programmingQuestion?.difficulty=='Hard'}">
+          {{selectedAssignment?.programmingQuestion?.difficulty}}
+        </div>
+      </div>
+      <div class="col-3">
+        <span class="font-weight-bold">Status: </span>
+        <span>{{selectedAssignment?.programmingQuestion?.isActive? 'Active': 'Inactive' }}</span>
+      </div>
+      <div class="col-3">
+        <span class="font-weight-bold">Score: </span>
+        <span>{{selectedAssignment?.programmingQuestion?.score}}</span>
+      </div>
+      <div class="col-3">
+        <span class="font-weight-bold">Duration: </span>
+        <span>{{selectedAssignment?.programmingQuestion?.timeRequired}}</span>
+      </div>
+    </div>
+    <br>
+    <div class="font-weight-bold">
+      Example:
+    </div>
+    <div [innerHTML]="selectedAssignment.programmingQuestion?.example">
+    </div>
+    <div class="font-weight-bold">
+      Constraints:
+    </div>
+    <div [innerHTML]="selectedAssignment.programmingQuestion?.constraints">
+    </div>
+    <div class="text-right">
+      <button type="button" class="btn btn-default swabhav-button-round button-style"
+        (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Session completion status modal -->
+<ng-template #sessionCompletionStatus let-modal>
+
+  <div class="modal-body">
+    <div class="form-header-style">
+      Mark session status
+      <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+        (click)="modal.dismiss('Cross click')">
+        <span class="vertical-align-top-icon-style">
+          <i class="material-icons">close</i>
+        </span>
+      </div>
+    </div>
+    <br><br>
+    <div class="text-center">
+      <button type="button" class="btn swabhav-button-round material-icons-button"
+        (click)="onBatchSessionButtonClick(COMPLETEDOPERATION)">Mark as completed
+      </button>
+      &nbsp;&nbsp;&nbsp;
+      <button type="button" class="btn btn-outline-swabhav material-icons-button" (click)="onSkipSessionClick()">Skip
+        Session
+      </button>
+    </div>
+  </div>
+
+</ng-template>
+
+<!-- Add a new assignment modal -->
+<ng-template #topicSelection let-modal>
+
+  <div class="modal-body">
+    <form [formGroup]="programmigQuestionTopicSelectionForm">
+
+      <div class="float-right">
+        <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+            class="material-icons close-icon">close</i>
+        </button>
+      </div>
+    
+      <br><br>
+
+      <div class="row">
+        <div class="col-sm-2">
+          <img src="assets/icon/colour-icons/assignment.png" width="80">
+        </div>
+        <div class="col-sm-10">
+  
+          <div class="font-weight-bold top-margin-10-style top-margin-10-style">
+            <span class="font-xl-style color-F6430F">Add Assignment
+            </span>
+          </div>
+  
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-6 no-padding-style">
+          <div class="form-check no-padding-style">
+            <label class="form-check-label">
+              <label class="checkbox-container">
+                <input type="checkbox" formControlName="isPublished">
+                <span class="checkmark"></span>
+              </label>
+              <span class="filter-form-label">Publish this assignment?</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="font-weight-bold">
+        If the Question already exists in bank, add question to topic by &nbsp;
+        <a routerLink="/bank/module" class="swabhav-light-orange-text" (click)="dismissModal()"><i>clicking here</i></a>
+      </div>
+      <div class="font-weight-bold">
+        If the Question is already assigned to topic, assign it to batch by
+        <button class="btn swabhav-light-orange-text" (click)="dismissModal();redirectToAssignNewAssignment()">
+          <i>clicking here</i></button>
+      </div> -->
+      <div class="row">
+        <div class="form-group col-md-4 col-sm-6 col-xs-12">
+          <label class="form-control-label-style"><span class="red">*</span> Module:</label>
+          <select class="form-control input-style input-select-style" (change)="changeModule($event)" formControlName="moduleID">
+            <option *ngFor="let module of moduleList" [ngValue]="module.id">{{module.moduleName}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(programmigQuestionTopicSelectionForm.get('moduleID').touched||
+            programmigQuestionTopicSelectionForm.get('moduleID').dirty)&&programmigQuestionTopicSelectionForm.get('moduleID').invalid">
+            <div *ngIf="programmigQuestionTopicSelectionForm.get('moduleID').errors.required">
+              Module must be selected.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-4 col-sm-6 col-xs-12">
+          <label class="form-control-label-style"><span class="red">*</span> Topic:</label>
+          <select class="form-control input-style input-select-style" formControlName="topicID">
+            <option *ngFor="let topic of programmingQuestionTopicList" [ngValue]="topic.id">{{topic.topicName}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(programmigQuestionTopicSelectionForm.get('topicID').touched||
+            programmigQuestionTopicSelectionForm.get('topicID').dirty)&&programmigQuestionTopicSelectionForm.get('topicID').invalid">
+            <div *ngIf="programmigQuestionTopicSelectionForm.get('topicID').errors.required">
+              Topic must be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-md-4 col-sm-6 col-xs-12" *ngIf="programmigQuestionTopicSelectionForm.get('isPublished').value">
+          <label class="form-control-label-style"><span class="red">* </span>Due Date:</label>
+          <input type="date" class="form-control input-style" formControlName="dueDate"
+            [min]="currentBatchSessionDate">
+          <div class="alert alert-danger" *ngIf="programmigQuestionTopicSelectionForm.get('dueDate').errors?.required">
+            Due Date must be specified
+          </div>
+        </div>
+      </div>
+
+      <div class="float-right">
+        <button type="button" class="btn swabhav-button-round material-icons-button" (click)="onAddQuestionClick()">Add a
+          new Question
+        </button>
+        &nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-outline-swabhav material-icons-button"
+          (click)="dismissModal('Close click')">Close
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Prerequisite form modal -->
+<ng-template #preRequisiteModal let-modal>
+
+  <div class="modal-body">
+    <div class="float-right">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <br><br>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <img src="assets/icon/colour-icons/addtask.png" width="80">
+      </div>
+      <div class="col-sm-10">
+
+        <!-- Header -->
+        <div class="font-weight-bold top-margin-10-style">
+          <span class="font-lg-style color-F6430F"><span *ngIf="!access.isTalent">Add/Update </span>Pre-requisite for:
+          </span>
+          <span class="font-md-style">{{currentBatchSessionDate | date: 'fullDate'}}</span>
+        </div>
+
+        <!-- Add new pre requisite button -->
+        <div *ngIf="currentBatchSessionPlan.prerequisiteList?.length == 0 && !showPrerequisiteForm && permission.add"
+          class="top-margin-10-style">
+          <button type="button" class="btn btn-submit-swabhav" (click)="onAddNewPreRequisiteButtonClick()">Add New
+            <i class="material-icons inline-icon">add</i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <br>
+
+    <!-- Show pre-requisite -->
+    <div *ngIf="currentBatchSessionPlan.prerequisiteList?.length > 0 && !showPrerequisiteForm"
+      class="top-margin-10-style">
+      <div class="row">
+        <div class="col-2 text-center">
+          <span class="red">* </span><strong>Description:</strong>
+        </div>
+        <div class="col-8" [innerHTML]="currentBatchSessionPlan.prerequisiteList[0]?.prerequisite">
+          {{currentBatchSessionPlan.prerequisiteList[0]?.prerequisite}}
+        </div>
+        <div class="form-group col-2">
+          <img *ngIf="permission.update" class="cursor-pointer-style" src="assets/icon/colour-icons/edit.png"
+            alt="Edit prerequisite" width="30" (click)="onUpdatePreRequisiteButtonClick()">
+          &nbsp;&nbsp;
+          <img *ngIf="permission.delete" class="cursor-pointer-style" src="assets/icon/colour-icons/delete.png"
+            alt="Delete prerequisite" width="30" (click)="onDeletePreRequisite()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Prerequisite form -->
+    <div *ngIf="showPrerequisiteForm">
+      <form [formGroup]="preRequisiteForm">
+        <div class="row">
+          <div class="col-2 text-center">
+            <span class="red">* </span><strong>Description:</strong>
+          </div>
+          <div class="col-8">
+            <ckeditor #ckeditorPreRequisite [config]="ckeEditorConfig" formControlName="prerequisite"></ckeditor>
+            <!-- <textarea rows=5 type="text" class="form-control input-style" formControlName="prerequisite" 
+              placeholder="List pre-requisites here..."></textarea> -->
+            <div class="alert alert-danger" *ngIf="(preRequisiteForm.get('prerequisite').touched||
+              preRequisiteForm.get('prerequisite').dirty)&&preRequisiteForm.get('prerequisite').invalid">
+              <div *ngIf="preRequisiteForm.get('prerequisite').errors.required">
+                Description must be specified
+              </div>
+              <div *ngIf="preRequisiteForm.get('prerequisite').errors.maxlength">
+                Description can have maximum 1000 characters
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <br>
+
+    <div class="float-right">
+      <button *ngIf="showPrerequisiteForm && !isUpdatePreRequisiteMode" type="button" class="btn btn-submit-swabhav"
+        (click)="validatePreRequisiteForm()">Add
+      </button>
+      <button *ngIf="showPrerequisiteForm && isUpdatePreRequisiteMode" type="button" class="btn btn-submit-swabhav"
+        (click)="validatePreRequisiteForm()">Update
+      </button>
+      &nbsp;&nbsp;&nbsp;
+      <button type="button" class="btn btn-submit-swabhav" (click)="modal.dismiss()">Close</button>
+    </div>
+  </div>
+</ng-template>

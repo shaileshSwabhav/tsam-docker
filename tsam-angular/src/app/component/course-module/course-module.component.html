@@ -1,0 +1,220 @@
+
+<ng-template #noModuleLogo>
+  <img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<br>
+<div class="container-fluid margin-2pt">
+  <h3> <strong>
+      Select the Modules in Order you want for your Course :
+    </strong> </h3>
+
+
+  <div *ngIf="totalModules > 0" class="view-label-flex">
+    Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+    &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalModules}}</strong></span>
+  </div>
+
+
+  <div class="d-flex justify-content-between align-items-center flex-row">
+    <div class="d-flex justify-content-between align-items-center flex-row">
+      <form class="form-inline" [formGroup]="moduleSearchForm">
+        <label for="moduleName" class="filter-form-label">Module Name:</label>
+        &nbsp;&nbsp;
+        <input type="text" name="moduleName" class="form-control input-style" formControlName="moduleName"
+          placeholder="Enter Module Name">
+        &nbsp;&nbsp;
+        <button class="btn btn-sm filter-button material-icons-button" type="submit" (click)="searchModule()"
+          [disabled]="!moduleSearchForm.dirty||moduleSearchForm.invalid">Search</button> &nbsp;&nbsp;&nbsp;
+      </form> &nbsp;&nbsp;&nbsp;
+      <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+        (click)="resetSearchAndGetAll()">View All Modules</button>
+    </div>
+
+
+    <form [formGroup]="moduleSearchForm">
+      <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+        <div class="d-flex flex-wrap">
+          <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select> &nbsp;&nbsp;&nbsp;
+        </div>
+        <div class="d-flex flex-wrap">
+          <ul class="pagination" *ngFor="let module of allModules | paginate: { id:'courseModulePageID',
+            itemsPerPage: moduleSearchForm.get('limit').value, 
+            currentPage: (+moduleSearchForm.get('offset').value + 1), 
+            totalItems: totalModules }">
+          </ul>
+          <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="courseModulePageID">
+          </pagination-controls>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <br>
+
+
+  <!-- ModuleTables -->
+  <div class="card-body swabhav-shadow padding-0pt" *ngIf="isCourseModule; else noCourseModulesFound">
+    <div class="table-responsive">
+      <form [formGroup]="courseModuleForm">
+        <table class="table table-striped table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">Sr.No</th>
+              <th class="text-left">Module Name</th>
+              <th class="text-center">Topics</th>
+              <th class="text-center">Approx Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="modules" *ngFor="let moduleControl of moduleControlArray.controls;let i=index">
+              <ng-container [formGroupName]="i">
+                <tr>
+                  <td class="text-center">{{(i+1)}}
+                    <label class="checkbox-container" [ngClass]="moduleControl.get('module')?.value?.moduleTopics?.length < 1?'disabled':''">
+                      <input type="checkbox" 
+                      [attr.disabled]='moduleControl.get("module")?.value?.moduleTopics?.length < 1?true:null' 
+                        [checked]="moduleControl?.get('isMarked').value" (change)="toggleModules(moduleControl)" 
+                        formControlName="isMarked">
+                      <span class="checkmark"></span>
+                    </label>
+                  </td>
+                  <td class="text-left">
+                    <ng-container *ngIf="moduleControl.get('module')?.value?.logo;else noModuleLogo">
+                      <img [src]="moduleControl.get('module')?.value?.logo" width="30">
+                    </ng-container>
+                    &nbsp;&nbsp;
+                    {{moduleControl.get("module")?.value?.moduleName}}
+                  </td>
+                  <td class="text-center">{{moduleControl.get("module")?.value?.moduleTopics?.length}}</td>
+                  <td class="text-center">{{calculateTotalTime(moduleControl.get("module")?.value?.moduleTopics) | minute}}</td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+
+  <br><br>
+
+  <div *ngIf="selectedModulesList.length>0">
+    <h3> <strong>
+      <span>
+        <img src="assets/course/project.png" alt="" width="5%"></span>
+        &nbsp;&nbsp;&nbsp;
+        Preview of all your modules in this courses in order :
+        &nbsp;
+      </strong> </h3>
+    <br>
+
+    <div class="table-responsive">
+      <table class="table table-striped table-borderless">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th class="text-center" scope="col">Order</th>
+            <th class="text-left" scope="col">Module</th>
+            <th class="text-center" scope="col">Topics</th>
+            <th class="text-center" scope="col">Approx Time</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody cdkDropList (cdkDropListDropped)="onDrop($event)">
+          <tr *ngFor="let selectedCourseModule of selectedModulesList; let i=index" cdkDrag cdkDragLockAxis="y">
+            <td>
+              <div class="drag-handle">
+                <ng-container [ngTemplateOutlet]="dragHandleTmpl"></ng-container>
+              </div>
+            </td>
+            <td class="text-center">{{selectedCourseModule?.order}}</td>
+            <td class="text-left">
+              <ng-container *ngIf="selectedCourseModule?.module?.logo;else noModuleLogo">
+                <img [src]="selectedCourseModule?.module?.logo" width="30">
+              </ng-container>
+              &nbsp;&nbsp;
+              <!-- <img [src]="selectedCourseModule?.module?.logo" width="30"> -->
+              {{selectedCourseModule.module.moduleName}}</td>
+            <td class="text-center">{{selectedCourseModule.module.moduleTopics.length}}
+            </td>
+            <td class="text-center">{{calculateTotalTime(selectedCourseModule.module.moduleTopics) | minute}}</td>
+            <td>
+              <button type="button" class="btn btn-default" (click)="onDropClose(selectedCourseModule?.module.id, i)">
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #dragHandleTmpl>
+      <svg class="bi bi-list handle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+          d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+          clip-rule="evenodd" />
+      </svg>
+    </ng-template>
+  </div>
+
+  <br>
+  <br>
+
+  <!-- Bottom Buttons -->
+  <div>
+    <button type="button" class="btn btn-submit-swabhav btn-width" (click)="redirectToCourseDetails()">Back</button>
+    <button type="button" class="btn btn-sm btn-submit-swabhav material-icons-button next-button float-right"
+      [disabled]="selectedModulesList.length<1" (click)="processSelectedModuleList()"> Next </button>
+  </div>
+  <br>
+
+  <!-- no courses found -->
+  <ng-template #noCourseModulesFound>
+    <br>
+    <br>
+    <div class="container full-h">
+      <div class="d-flex align-items-center full-h">
+        <div class="col-sm-12 col-md-12 mx-auto">
+          <div class="jumbotron">
+            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Course Modules not found</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- delete modal -->
+  <!-- Delete User Confirmation -->
+  <ng-template #deleteConfirmationModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">Confirmation</h2>
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          Are you sure you want to delete this Course Module?
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+      <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">No</button>
+    </div>
+  </ng-template>

@@ -1,0 +1,50 @@
+i{
+  cursor: pointer;
+}
+
+.search-section-group-style{
+  padding-right: 10%;
+  padding-top: 50%;
+}
+
+.selected-search-section-name-style{
+  font-weight: bold;
+  color: #F6430F;
+  padding-top: 20%;
+  border-bottom: 1.5px solid #F6430F;
+  cursor: pointer;
+}
+
+.search-section-name-style{
+  font-weight: bold;
+  color: #757575;
+  padding-top: 20%;
+  border-bottom: 1.5px solid hsl(0, 0%, 46%);
+  cursor: pointer;
+}
+
+.search-main-content-style{
+  background-color: white;
+  padding: 5%;
+  min-height: 500px;
+}
+
+.search-mat-drawer-style{
+  width: 20%;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  font-size: small;
+}

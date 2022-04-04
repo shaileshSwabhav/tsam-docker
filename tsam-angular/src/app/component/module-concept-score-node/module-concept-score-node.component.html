@@ -1,0 +1,36 @@
+<div class="card node-card-style" [ngClass]="{'white-box-style': (node.score==null), 'red-box-style': (node.score<=5),'orange-box-style': (node.score>5 && node.score<=7.5),'green-box-style': (node.score>7.5)}" 
+    [id]="node.stepId"> 
+    <div class="card-body no-side-padding card-body-style">
+        <div class="white-style">
+            <div class="row concept-name-style">
+                <div class="col-12 no-side-padding color-D63C2A font-weight-bold font-lg-style">
+                    {{node.conceptName}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 no-side-padding font-md-style">
+                    Score:
+                    <span *ngIf="node.score" class="font-weight-bold color-D63C2A">
+                        {{node.score}} <span class="color-000000 font-sm-style">/10</span>
+                    </span>
+                    <span *ngIf="!node.score" class="font-weight-bold">
+                        N/A
+                    </span>
+                </div>
+            </div>
+            <!-- <div class="text-with-line-style cursor-pointer-style" (click)="onShowParentConceptsClick()">
+                <span *ngIf="!node.showParentConcepts" class="text-with-line-text-style">Show Details</span>
+                <span *ngIf="node.showParentConcepts" class="text-with-line-text-style">Hide Details</span>
+            </div> -->
+            <!-- <ng-container *ngIf="node.showParentConcepts"> -->
+            <ng-container>
+                <div>
+                   Complexity: 
+                   <span class="font-weight-bold" [ngClass]="{'easy': node.complexityName=='Easy','medium': node.complexityName=='Medium','hard': node.complexityName=='Hard'}">
+                        {{node.complexityName}}
+                   </span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>   

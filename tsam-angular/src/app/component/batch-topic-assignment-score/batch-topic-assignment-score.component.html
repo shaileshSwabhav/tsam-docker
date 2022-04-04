@@ -1,0 +1,118 @@
+<div class="container-fluid">
+  <h1 class="swabhav-light-orange-text"><strong>Assignment Scores</strong></h1>
+  <div>Here's how your students perfomed on the content you assigned. You can tap an assignment/student name to get
+    more detailed reports.</div>
+  <div *ngIf="batchTalents?.length > 0 && batchTopicAssignments?.length > 0; else noTalentScore">
+    <div class="d-flex col-lg-12">
+      <div class="d-inline-flex justify-content-start col-md-1">
+        <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+          <option>5</option>
+          <option>10</option>
+          <option>20</option>
+          <option>50</option>
+        </select>
+      </div>
+      <!-- #niranjan is ngfor needed? -->
+      <div class="d-inline-flex justify-content-start col-md-3">
+        <select class="form-control form-control-sm input-style" [(ngModel)]="option" (change)="changeOption()">
+          <ng-container *ngFor="let opt of options">
+            <option>{{opt}}</option>
+          </ng-container>
+        </select>&nbsp;
+        <div *ngIf="option == 'Pending'" class="custom-control custom-switch">
+          <!-- <input type="checkbox" class="custom-control-input" id="fresherExperiencedSwitched"
+            (click)="toggleShowExperienceColumns()"> -->
+          <input type="checkbox" class="custom-control-input" id="dueDateSwitch" (change)="getDueDateCrossed($event)">
+          <label class="custom-control-label" for="dueDateSwitch">
+            <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Late</span>
+          </label>
+        </div>
+
+      </div>
+      <div class="d-inline-flex justify-content-end right">
+        <!-- <ul class="pagination no-padding-left" *ngFor="let sub of visibleAssignmentSubmissions | paginate: { id:'subID',
+             itemsPerPage: limit, currentPage: currentPage, totalItems: visibleAssignmentSubmissions.length }">
+        </ul> -->
+        <pagination-controls class="d-inline-flex justify-content-end" responsive="true" maxSize="5"
+          (pageChange)="changePage($event)" id="subID">
+        </pagination-controls>
+      </div>
+    </div>
+    <br />
+    <div class="table-responsive assignment-score">
+      <table class="table">
+        <thead>
+          <th colspan="1" class="sticky-row"><strong>Sr No</strong></th>
+          <th colspan="3" class="sticky-row"><strong>Assignments</strong></th>
+          <ng-container *ngFor="let talent of batchTalents; let i = index">
+            <th colspan="3" class="sticky-row swabhav-light-orange-text">
+              <span class="pointer" (click)="redirectToDetails(talent.id)">
+                <strong>
+                  {{talent?.firstName + ' ' +talent?.lastName}}
+                </strong>
+              </span>
+            </th>
+          </ng-container>
+        </thead>
+        <tbody>
+          <ng-container
+            *ngFor="let assignSubmission of visibleAssignmentSubmissions | paginate: { id:'subID',
+          itemsPerPage: limit, currentPage: currentPage, totalItems: visibleAssignmentSubmissions?.length } ; let i = index;">
+            <tr class="border-bottom">
+              <td colspan="1"><strong>{{(i+1)+(offset*limit)}}</strong>
+              <td colspan="3" class="hover-click"
+                (click)="redirectToDetails(null,assignSubmission?.assignment?.id,true)">
+                <strong>{{assignSubmission?.assignment?.programmingQuestion?.label}}</strong>
+                <br>
+                Due: {{assignSubmission?.assignment?.dueDate | date: "EEE, d MMM" }}
+              </td>
+              <!-- <td colspan="3" *ngFor="let submission of assignSubmission?.talentSubmission | keyvalue"> -->
+              <td colspan="3" *ngFor="let talent of batchTalents;">
+                <ng-container [ngTemplateOutlet]="!assignSubmission.talentSubmission.get(talent.id)? noSubmission : 
+                !assignSubmission.talentSubmission.get(talent.id)?.isChecked? checkingNeeded : 
+                assignSubmission.talentSubmission.get(talent.id)?.isAccepted? score : reSubmitNeeded "
+                  [ngTemplateOutletContext]="{score:assignSubmission.talentSubmission.get(talent.id)?.score,
+                    talentID:talent.id}">
+                </ng-container>
+              </td>
+              <!-- </td> -->
+              <ng-template #score let-score="score" let-talentID="talentID">
+                <span (click)="redirectToDetails(talentID,assignSubmission?.assignment?.id,true)" class="pointer">
+                  <strong>{{score}}/{{assignSubmission.assignment?.programmingQuestion?.score}}</strong>
+                </span>
+              </ng-template>
+              <ng-template #checkingNeeded let-talentID="talentID">
+                <img src="assets/icon/colour-icons/checklist.png" alt="assignment not checked" width="25"
+                  title="Checking Needed" (click)="redirectToDetails(talentID,assignSubmission?.assignment?.id,true)"
+                  class="pointer">
+              </ng-template>
+              <ng-template #reSubmitNeeded let-talentID="talentID">
+                <img src="assets/icon/colour-icons/caution.png" alt="re-submit needed" width="30"
+                  title="Resubmission Required"
+                  (click)="redirectToDetails(talentID,assignSubmission?.assignment?.id,true)" class="pointer">
+              </ng-template>
+              <ng-template #noSubmission let-talentID="talentID">
+                <img src="assets/icon/colour-icons/no-submission.png" alt="assignment not submitted" width="25"
+                  title="No Submission" (click)="redirectToDetails(talentID,assignSubmission?.assignment?.id,true)"
+                  class="pointer">
+              </ng-template>
+
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <ng-template #noTalentScore>
+    <div class="col-sm-12 col-md-8 mx-auto" *ngIf="ongoingOperations == 0">
+      <br />
+      <br />
+      <div class="jumbotron">
+        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+          <h2>Assignments or talents not assigned to batch.</h2>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

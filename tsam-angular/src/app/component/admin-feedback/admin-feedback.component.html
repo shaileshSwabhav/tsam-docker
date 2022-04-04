@@ -1,0 +1,482 @@
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+    <!-- DRAWER CONTENT -->
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+        <div class="filter-header">
+            Edit Filters&nbsp;&nbsp;&nbsp;
+            <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+            <div class="float-right">
+                <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+                    <i class="material-icons close-icon close-icon">close</i>
+                </button>
+            </div>
+        </div>
+
+        <br />
+        <br />
+
+        <form [formGroup]="feedbackQuestionSearchForm">
+            <div class="filter-by-field row">
+                <div class="form-group col-sm-6 col-md-6">
+                    <label class="filter-form-label">Feedback Question Type:</label>
+                    <select class="form-control input-style" formControlName="questionType"
+                        (change)="getSearchFeedbackQuestionGroupByType(feedbackQuestionSearchForm.get('questionType')?.value)">
+                        <option [ngValue]="null">Select Type</option>
+                        <option *ngFor="let type of feedbackType" [ngValue]="type.value">{{type.value}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                    <label class="filter-form-label">Keyword:</label>
+                    <input type="text" formControlName="keyword" class="form-control input-style"
+                        placeholder="eg: Mindset">
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                    <label class="filter-form-label">Status:</label>
+                    <select class="form-control input-style" formControlName="isActive">
+                        <option [ngValue]="null">Select status</option>
+                        <option [ngValue]="'1'">Active</option>
+                        <option [ngValue]="'0'">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                    <label class="filter-form-label">Group:</label>
+                    <ng-select [items]="searchFeedbackQuestionGroupList" bindLabel="groupName"
+                        placeholder="Select Group" appendTo="body" [searchable]="true" [clearable]="true"
+                        class="ng-select-style" formControlName="groupID" bindValue="id"
+                        [loading]="isSearchGroupLoading">
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            {{item.groupName}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+            </div>
+        </form>
+
+        <br>
+
+        <div class="text-center">
+            <button type="button" class="btn btn-submit-swabhav material-icons-button"
+                [disabled]="!feedbackQuestionSearchForm.dirty" (click)="searchAndCloseDrawer()">Search <i
+                    class="inline-icon material-icons no-hover">search</i>
+            </button>
+        </div>
+    </mat-drawer>
+
+    <mat-drawer-content>
+        <app-master-navbar></app-master-navbar>
+
+        <div class="container-fluid margin-2pt">
+            <br>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="totalLabel">
+                    <h1>Total Feedback Questions: <span class="swabhav-light-orange-text">{{totalFeedbackQuestions ||
+                            0}}</span></h1>
+                </div>
+
+                <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission?.add"
+                    (click)="onAddFeedbackQuestionClick()">Add New Feedback Question
+                    <i class="inline-icon material-icons no-hover">add</i>
+                </button>
+            </div>
+
+            <br>
+
+            <div *ngIf="totalFeedbackQuestions > 0" class="view-label-flex">
+                Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+                &nbsp; of &nbsp;<span class="swabhav-light-orange-text">
+                    <strong>{{totalFeedbackQuestions}}</strong></span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row">
+                    <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+                        Add Filter <i class="inline-icon material-icons no-hover">add</i>
+                    </button> &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-sm filter-button material-icons-button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">View All Feedback Questions
+                    </button>
+                </div>
+                <div class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination" *ngFor="let feedbackQuestion of feedbackQuestionsList | paginate: { id:'questionPageID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalFeedbackQuestions }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="questionPageID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="card-body swabhav-shadow padding-0pt"
+                *ngIf="feedbackQuestionsList?.length > 0; else noFeedbackQuestions">
+                <div class="table-responsive">
+                    <table class="table table-striped table-borderless">
+                        <thead>
+                            <tr>
+                                <th><strong>No.</strong></th>
+                                <th><strong>Question</strong></th>
+                                <th><strong>Type</strong></th>
+                                <th><strong>Options</strong></th>
+                                <th *ngIf="permission?.update" title="Toggle status of feedback question">
+                                    <strong>Status</strong></th>
+                                <th><strong>View</strong></th>
+                                <!-- <th></th> -->
+                                <!-- <th>Delete</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let feedbackQuestion of feedbackQuestionsList; let i = index">
+                                <td>{{(i+1)+(offset*limit)}}</td>
+                                <td>{{feedbackQuestion.question}}</td>
+                                <td>{{feedbackQuestion.type}}</td>
+                                <td>{{(feedbackQuestion.hasOptions ? 'Yes' : 'No')}}</td>
+                                <td *ngIf="permission?.update" title="Toggle status of feedback question">
+                                    <button type="button" class="btn"
+                                        (click)="updateFeedbackQuestionStatus(feedbackQuestion)">
+                                        <i
+                                            [ngClass]="feedbackQuestion.isActive? 'material-icons green':'material-icons red'">
+                                            {{feedbackQuestion.isActive?'check_circle':'hide_source'}}
+                                        </i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-default"
+                                        (click)="onViewFeedbackQuestionClick(feedbackQuestion)">
+                                        <i class="inline-icon material-icons">visibility</i>
+                                    </button>
+                                </td>
+                                <!-- <td class="text-left">
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-element material-icons-button" type="button" id="dropdownMenuButton" 
+                                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                          <i class="material-icons"><strong>more_vert</strong></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                          <button class="dropdown-item btn btn-default btn-dropdown" 
+                                            (click)="onViewFeedbackQuestionClick(feedbackQuestion)">
+                                            <i class="inline-icon material-icons-outlined">visibility</i> View
+                                          </button>
+                                          <button class="dropdown-item btn btn-default btn-dropdown" 
+                                            (click)="onDeleteFeedbackQuestionClick(feedbackQuestion)"
+                                            *ngIf="permission && permission?.delete">
+                                            <i class="inline-icon material-icons">delete</i> Delete
+                                          </button>
+                                        </div>
+                                    </div>
+                                </td> -->
+                                <!-- <td data-toggle="tooltip" data-placement="top" title="View feedback questions">
+                                <button type="button"
+                                    (click)="onViewFeedbackQuestionClick(feedbackQuestion)"
+                                    class="btn"><i class="material-icons color-teal">visibility</i></button>
+                                </td>
+                                <td data-toggle="tooltip" data-placement="top" title="Delete feedback question">
+                                    <button type="button"
+                                        (click)="(feedbackQuestion, )"
+                                        class="btn"><i class="material-icons red">delete</i>
+                                    </button>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Feedback Questions Not Found -->
+            <ng-template #noFeedbackQuestions>
+                <div class="container full-h">
+                    <br />
+                    <br />
+                    <div class="d-flex align-items-center full-h">
+                        <div class="col-sm-12 col-md-8 mx-auto">
+                            <div class="jumbotron">
+                                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                    <h2>Feedback Questions Not Found</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </mat-drawer-content>
+</mat-drawer-container>
+
+<!-- Add New Feedback Question -->
+<ng-template #feedbackQuestionFormModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div class="modal-title">
+            <h4 class="modal-title swabhav-light-orange-text">{{modalHeader}}
+                <button *ngIf="isViewClicked && permission?.update && feedbackQuestion.isActive"
+                    class="btn btn-default material-icons-button" type="button"
+                    (click)="onUpdateFeedbackQuestionClick()"><i class="material-icons grey-icon">create</i>
+                </button>
+            </h4><span *ngIf="!isViewClicked"><span class="red">*
+                </span> Marked fields are mandatory</span>
+        </div>
+        <button type="button" class="close" (click)="modal.dismiss()">
+            <i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <form [formGroup]="feedbackQuestionForm">
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                    <label><span *ngIf="!isViewClicked" class="red">* </span>Question Type:</label>
+                    <select class="form-control input-style" formControlName="type"
+                        (change)="getFeedbackQuestionGroupByType(feedbackQuestionForm.get('type').value)">
+                        <option [ngValue]="null" disabled>Select Type</option>
+                        <option *ngFor="let type of feedbackType" [ngValue]="type.value">{{type.value}}</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('type').touched||
+                        feedbackQuestionForm.get('type').dirty)&&feedbackQuestionForm.get('type').invalid">
+                        <div *ngIf="feedbackQuestionForm.get('type').errors.required">
+                            Feedback type must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <label><span *ngIf="!isViewClicked" class="red">* </span>Order:</label>
+                    <input type="number" formControlName="order" appAllowNumbersOnly class="form-control input-style"
+                        placeholder="eg: 1">
+                    <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('order').touched||
+                        feedbackQuestionForm.get('order').dirty)&&feedbackQuestionForm.get('order').invalid">
+                        <div *ngIf="feedbackQuestionForm.get('order').errors.required">
+                            Feedback question order must be specified
+                        </div>
+                        <div *ngIf="feedbackQuestionForm.get('order').errors?.min">
+                            Feedback question order must be greater than zero
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="isViewClicked && feedbackQuestionForm.get('feedbackQuestionGroup').value; else notView"
+                    class="form-group col-sm-6 col-md-4">
+                    <fieldset disabled="true">
+                        <div class="form-group">
+                            <label>Group:</label>
+                            <input type="text" class="form-control input-style"
+                                [value]="feedbackQuestionForm.get('feedbackQuestionGroup').value?.groupName">
+                        </div>
+                    </fieldset>
+                </div>
+                <ng-template #notView>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <fieldset
+                                [disabled]="!feedbackQuestionForm.get('type')?.value || feedbackQuestionGroupList?.length == 0">
+                                <label>
+                                    Group:</label>
+                                <select class="form-control input-style" [compareWith]="compareFn"
+                                    formControlName="feedbackQuestionGroup">
+                                    <option [ngValue]="null" disabled>Select Group</option>
+                                    <option *ngFor="let group of feedbackQuestionGroupList" [ngValue]="group">
+                                        {{group.groupName}}</option>
+                                </select>
+                                <!-- <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('feedbackQuestionGroup').touched||
+                                    feedbackQuestionForm.get('feedbackQuestionGroup').dirty)&&feedbackQuestionForm.get('feedbackQuestionGroup').invalid">
+                                    <div *ngIf="feedbackQuestionForm.get('feedbackQuestionGroup').errors.required">
+                                        Feedback Question Group must be specified
+                                    </div>
+                                </div> -->
+                            </fieldset>
+                        </div>
+                    </div>
+                </ng-template>
+                <div *ngIf="!isUpdateClicked" class="form-group col-sm-6 col-md-4">
+                    <label><span *ngIf="!isViewClicked" class="red">* </span>Status:</label>
+                    <select class="form-control input-style" formControlName="isActive">
+                        <option [ngValue]="true">Active</option>
+                        <option [ngValue]="false">Inactive</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('isActive').touched||
+                        feedbackQuestionForm.get('isActive').dirty)&&feedbackQuestionForm.get('isActive').invalid">
+                        <div *ngIf="feedbackQuestionForm.get('isActive').errors.required">
+                            Feedback Question status must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <label><span *ngIf="!isViewClicked" class="red">* </span>Options Available:</label>
+                    <select class="form-control input-style" formControlName="hasOptions"
+                        (change)="addFeedbackOptionsToForm(feedbackQuestionForm.get('hasOptions')?.value)">
+                        <option [ngValue]="true">Yes</option>
+                        <option [ngValue]="false">No</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('hasOptions').touched||
+                        feedbackQuestionForm.get('hasOptions').dirty)&&feedbackQuestionForm.get('hasOptions').invalid">
+                        <div *ngIf="feedbackQuestionForm.get('hasOptions').errors.required">
+                            Options exist must be specified
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="feedbackQuestionForm.get('hasOptions').value == true" class="form-group col-sm-6 col-md-4">
+                    <label><span *ngIf="!isViewClicked" class="red">* </span>Keyword:</label>
+                    <input type="text" formControlName="keyword" class="form-control input-style"
+                        placeholder="eg: Mindset">
+                    <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('keyword').touched||
+                        feedbackQuestionForm.get('keyword').dirty)&&feedbackQuestionForm.get('keyword').invalid">
+                        <div *ngIf="feedbackQuestionForm.get('keyword').errors.required">
+                            Feedback question keyword must be specified
+                        </div>
+                        <div *ngIf="feedbackQuestionForm.get('keyword').errors.maxlength">
+                            Feedback question keyword cannot have more than 30 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-12">
+                    <label><span *ngIf="!isViewClicked" class="red">* </span>Question:</label>
+                    <textarea type="text" class="form-control input-style" formControlName="question"
+                        placeholder="Enter Feedback Question"></textarea>
+                    <div class="alert alert-danger" *ngIf="(feedbackQuestionForm.get('question').touched||
+                        feedbackQuestionForm.get('question').dirty)&&feedbackQuestionForm.get('question').invalid">
+                        <div *ngIf="feedbackQuestionForm.get('question').errors.required">
+                            Question must be specified
+                        </div>
+                        <div *ngIf="feedbackQuestionForm.get('question').errors.maxlength">
+                            Question cannot be more than 250 characters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="feedbackQuestionForm.get('hasOptions').value">
+                <div *ngIf="!isViewClicked" class="form-group col-12">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <label class="checkbox-container">
+                                <input type="checkbox" [checked]="isOptionsAdded" id="eligilibility-checkbox"
+                                    (change)="onAddRatingTypeOptionClick($event)">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text-style" for="eligilibility-checkbox"> Add rating type
+                                    option.</span>
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <!-- <h4>Options:</h4> -->
+                <div formArrayName="options" class="row" *ngFor="let options of feedbackOptions.controls;let i = index">
+                    <ng-container [formGroupName]="i">
+                        <div class="col-sm-12 col-md-12">
+                            <label>
+                                <h3>Option: {{i+1}}</h3>
+                            </label>
+                            <button *ngIf="feedbackOptions.controls.length > 1 && !isViewClicked" type="button"
+                                class="float-right btn btn-sm" style="cursor: pointer;"
+                                (click)="deleteFeedbackOption(i)"><i class="material-icons red">close</i>
+                            </button>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-4">
+                            <label><span *ngIf="!isViewClicked" class="red">* </span>Answer:</label>
+                            <input type="text" class="form-control input-style" formControlName="value"
+                                placeholder="eg: Answer">
+                            <div class="alert alert-danger" *ngIf="(options.get('value').touched || options.get('value').dirty)
+                                && options.get('value').invalid">
+                                <div *ngIf="options.get('value').errors.required">
+                                    Answer must be specified
+                                </div>
+                                <div *ngIf="options.get('value').errors.maxlength">
+                                    Answer cannot have more than 250 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-4">
+                            <label><span *ngIf="!isViewClicked" class="red">* </span>Score:</label>
+                            <input type="number" class="form-control input-style" formControlName="key"
+                                placeholder="eg: 1">
+                            <div class="alert alert-danger" *ngIf="(options.get('key').touched || options.get('key').dirty)
+                                && options.get('key').invalid">
+                                <div *ngIf="options.get('key').errors.required">
+                                    Option score must be specified
+                                </div>
+                                <div *ngIf="options.get('key').errors?.min">
+                                    Option score must be greater than zero
+                                </div>
+                                <div *ngIf="options.get('key').errors?.max">
+                                    Option score cannot be greater than 10
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-4">
+                            <label><span *ngIf="!isViewClicked" class="red">* </span>Order:</label>
+                            <input type="number" class="form-control input-style" formControlName="order"
+                                placeholder="eg: 1">
+                            <div class="alert alert-danger" *ngIf="(options.get('order').touched || options.get('order').dirty)
+                                && options.get('order').invalid">
+                                <div *ngIf="options.get('order').errors.required">
+                                    Option order must be specified
+                                </div>
+                                <div *ngIf="options.get('order').errors?.min">
+                                    Option order must be greater than zero
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="float-right">
+                    <button class="btn filter-button btn-sm material-icons-button"
+                        *ngIf="!isViewClicked && (10 > feedbackOptions.controls.length)"
+                        (click)="addFeedbackOptions()">Add Options
+                    </button>
+                    <br>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+            (click)="modal.dismiss()">Close
+        </button>
+        <button type="submit" *ngIf="!isViewClicked" class="btn btn-submit-swabhav material-icons-button"
+            [disabled]="!feedbackQuestionForm.dirty" (click)="validateFeedbackQuestion()">{{modalButton}}
+        </button>
+    </div>
+</ng-template>
+
+
+<!-- Delete designation Confirmation -->
+<ng-template #deleteFeedbackQuestionModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <h2 class="modal-title">Confirmation</h2>
+        <button type="button" class="close" (click)="modal.dismiss('Close click')" class="btn btn-default"
+            type="submit">
+            <i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+                Are you sure you want to delete this feedback?
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" (click)="deleteFeedbackQuestion()">Yes</button>
+        <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Close click')">No</button>
+    </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>

@@ -1,0 +1,100 @@
+.heading-style{
+    color: #707070;
+    font-size: x-large;
+    font-weight: bold;
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+.card-style{
+    border: solid #D63C2A;
+}
+
+.card-shadow {
+    padding: 10px;
+    box-shadow: 5px 10px 8px #00000029;
+}
+
+.card-body-style{
+    padding-top: 0%;
+    padding-bottom: 0%;
+}
+
+.icon-style{
+    font-size: 15px;
+    padding-top: 30%;
+    font-weight: bold;
+    transform: none;
+}
+
+.submit-and-end{
+    color: #000000;
+    border: 1.5px solid #CDA700;
+    background-color: #FFE05C;
+    font-size: small;
+    font-weight: bold;
+    padding: 0.5%;
+    border-radius: 5px;
+}
+
+.timer{
+    border: 1px solid;
+    color: #D63C2A;
+    border-radius: 30px;
+    font-size: small;
+    font-weight: bold;
+    margin-right: 2%;
+    box-shadow: 5px 3px 5px #feababab;
+    padding: 0.5%;
+    border-color: white;
+}
+
+.medals-style{
+    width: 25%;
+}
+
+table {
+    border-collapse: separate;
+    width: 100%;
+    border: none;
+    border-spacing: 0px 10px;
+}
+  
+table td {
+    background-color: #FFFFFF;
+    border-bottom: 1pt solid #E2E2E2;
+    border-top: 1pt solid #E2E2E2;
+    font-size: medium;
+}
+
+th{
+    font-size: large;
+}
+
+td:first-child {
+    border-radius: 30px 0 0 30px;
+    border-left: 1pt solid #E2E2E2;
+}
+
+td:last-child {
+    border-radius: 0 30px 30px 0;
+    border-right: 1pt solid #E2E2E2;
+}
+
+tr:nth-child(2) td {
+    box-shadow: 8px 10px 8px #00000029;
+}
+
+.leader-image{
+    margin-top: 1%;
+    border-radius: 50% 50% 50% 50%;
+    width: 40px;
+    margin-bottom: 1%;
+    margin-left: 1%;
+    border: 2pt solid #D63C2A;
+}
+
+
+
+
+

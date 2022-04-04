@@ -1,0 +1,24 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  # googleCloudBuild:
+  #   projectId: kubernetes-demo-345511
+  artifacts:
+    # - image: shaileshb02/tsam-go
+    - image: us.gcr.io/kubernetes-demo-345511/tsam-golang
+      context: tsam-golang # path to find dockerfile
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - dest: .
+            src: "*/**/*.go" # specifing which file to be watched for changes
+    # - image: shaileshb02/tsam-angular
+    - image: us.gcr.io/kubernetes-demo-345511/tsam-angular
+      context: tsam-angular # path to find dockerfile
+      docker:
+        dockerfile: Dockerfile.dev

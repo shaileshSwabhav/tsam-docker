@@ -1,0 +1,81 @@
+.main-content{
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+.title-style{
+    font-size: xxx-large;
+    color: #D63C2A;
+    font-family: auto;
+    margin-top: 5%;
+}
+
+.profile-image-container{
+    width: 40px;
+    height: 40px;
+}
+  
+.profile-image{
+    border-radius: 50% 50% 50% 50%;
+    object-fit: cover;
+    width: 40px;
+    height: 40px;
+}
+
+.icon-blog-style{
+    font-size: 40px;
+    cursor: pointer;
+    padding-top: 30%;
+}
+
+.icon-reply-style{
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.mat-drawer-replies-style{
+    width: 35%;
+    position: fixed;
+}
+
+.close-icon{
+    font-size: 30px;
+    padding-top: 20%;
+    color: #757575;
+    cursor: pointer;
+}
+
+.sub-reply-block-style{
+    padding-left: 5%;
+    margin-left: 5%;
+    border-left: solid 2px #757575;
+    margin-top: 5%;
+}
+
+.modal-dialog,
+.modal-content {
+    /* 80% of window height */
+    height: 80%;
+}
+
+.modal-body {
+    /* 100% = dialog height, 120px = header + footer */
+    max-height: calc(100% - 120px);
+    overflow-y: scroll;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  .ng-select.ng-select-disabled>.ng-select-container {
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+  }

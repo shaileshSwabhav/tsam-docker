@@ -1,0 +1,948 @@
+<!--  -->
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-baseline flex-row flex-wrap">
+    <div class="d-flex">
+      <h1 class="display-1">Total Sessions: <span
+          class="swabhav-light-orange-text"><strong>{{totalSessions}}</strong></span></h1>
+    </div>
+    <div class="d-flex flex-wrap">
+      <button *ngIf="permission?.add && isAssign" class="btn btn-submit-swabhav" (click)="onAddBatchSessionClick()">
+        Add Sessions <i class="material-icons inline-icon">add</i>
+      </button>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- {{batchModules | json}} -->
+
+  <ng-container *ngIf="totalBatchModules > 0">
+    <br>
+    <div class="table-responsive">
+      <table class="table table-sm table-striped table-borderless">
+        <thead>
+          <tr>
+            <th class="text-center">No.</th>
+            <th>Module Name</th>
+            <th class="text-center">Order</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let module of batchModules; let i = index">
+            <tr class="striped-tr">
+              <td class="text-center">
+                <button type="button" class="btn btn-default" (click)="module.showDetails=!module.showDetails"
+                  *ngIf="module.batchSessions && module.batchSessions.length != 0; else noBatchSession">
+                  <i class="material-icons-outlined material-icons-button inline-icon">
+                    {{module.showDetails ? 'expand_more' : 'chevron_right'}}
+                  </i> {{i+1}}
+                </button>
+                <ng-template #noBatchSession>
+                  <label>{{i+1}}</label>
+                </ng-template>
+              </td>
+              <td>{{module.moduleName}}</td>
+              <td class="text-center">{{module.order}}</td>
+            </tr>
+            <tr *ngIf="module.showDetails" class="unstriped-tr">
+              <td colspan="5">
+                <div class="table-responsive">
+                  <table class="table table-sm table-unstriped table-borderless">
+                    <thead>
+                      <tr>
+                        <th class="text-center">No.</th>
+                        <th>Name</th>
+                        <th>Start Date</th>
+                        <th class="text-center">Hours</th>
+                        <th data-toggle="tooltip" data-placement="top"
+                          *ngIf="permission?.update && !isAssign && !isManage">Complete</th>
+                        <th *ngIf="!isAssign && !isManage" class="text-center">Feedback</th>
+                        <th class="text-center" title="Add Aha Moment"
+                          *ngIf="permission?.add && !isAssign && !isManage">Aha Moment</th>
+                        <th class="text-center" title="Add Attendance"
+                          *ngIf="permission?.add && !isAssign && !isManage">Attendance</th>
+                        <th class="text-center" data-toggle="tooltip" data-placement="top" title="Edit Session"
+                          *ngIf="permission?.update && isManage && !isAssign">Edit</th>
+                        <th class="text-center" data-toggle="tooltip" data-placement="top"
+                          title="Delete Session from batch" *ngIf="permission?.delete && isManage && !isAssign">Delete
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngFor="let sessions of module.batchSessions;let i = index">
+                        <tr class="striped-tr">
+                          <td class="text-nowrap">
+                            <button type="button" class="btn btn-default"
+                              (click)="sessions.session.viewSubSessionClicked=!sessions.session.viewSubSessionClicked"
+                              *ngIf="sessions.session.subSessions && sessions.session.subSessions.length != 0; else noBatchSession">
+                              <i class="material-icons-outlined material-icons-button inline-icon">
+                                {{sessions.session.viewSubSessionClicked ? 'expand_more' : 'chevron_right'}}
+                              </i> {{i+1}}
+                            </button>
+                            <ng-template #noBatchSession>
+                              <label class="no-sub-session">{{i+1}}</label>
+                            </ng-template>
+                          </td>
+                          <td class="text-wrap">
+                            <dl>
+                              <dt>
+                                <img src="assets/icon/colour-icons/sessions.png" width="30">
+                                {{sessions.session && sessions.session?.name}}
+                              </dt>
+                              <dd *ngIf="!isAssign && !isManage" class="text-muted">
+                                <small>{{sessions?.session?.subSessions.length}} Sub-sessions</small>
+                              </dd>
+                            </dl>
+                          </td>
+                          <td>{{sessions.startDate | date: 'longDate'}}</td>
+                          <td class="text-center">{{sessions.session && sessions.session?.hours}}</td>
+                          <td *ngIf="permission?.update && !isAssign && !isManage" data-toggle="tooltip"
+                            data-placement="top" title="Mark session as complete">
+                            <button type="button" class="btn" [disabled]="sessions.isCompleted"
+                              (click)="setSessionForUpdate(sessions)">
+                              <div *ngIf="sessions.isCompleted; else sessionNotCompleted">
+                                <img src="assets/icon/colour-icons/check.png" alt="session completed"
+                                  alt="session-completed" width="30">
+                              </div>
+                              <ng-template #sessionNotCompleted>
+                                <img src="assets/icon/grey-icons/complete.png" alt="session not completed"
+                                  alt="session-not-completed" width="30">
+                              </ng-template>
+                            </button>
+                          </td>
+                          <td title="Feedback can be given when session is completed" *ngIf="!isAssign && !isManage">
+                            <button class="btn" [disabled]="!sessions.isCompleted && !sessions.isAttendanceGiven"
+                              (click)="onSessionFeedbackClick(sessions)"
+                              *ngIf="!sessions.isFeedbackGiven;else feedbackGiven">
+                              <img src="assets/icon/grey-icons/review.png" alt="feedback pending" width="30">
+                            </button>
+                            <ng-template #feedbackGiven>
+                              <img src="assets/icon/colour-icons/review.png" alt="feedback given" width="30">
+                            </ng-template>
+                          </td>
+                          <td title="Add Aha Moment" *ngIf="permission?.add && !isAssign && !isManage"
+                            class="text-center">
+                            <button type="button" class="btn" (click)="onAhaMomentsClick(sessions)"
+                              [disabled]="!sessions.isCompleted">
+                              <i
+                                [ngClass]="sessions.isCompleted ? 'material-icons red' : 'material-icons grey-icon'">local_fire_department</i>
+                            </button>
+                          </td>
+                          <td title="Add Attendance" *ngIf="permission?.add && !isAssign && !isManage"
+                            class="text-center">
+                            <ng-container *ngIf="sessions.isAttendanceGiven; else attendanceNotGiven">
+                              <button type="button" class="btn" (click)="onAttendanceClick(sessions)">
+                                <img src="assets/icon/colour-icons/attendance.png" alt="Talent Attendance" width="30">
+                              </button>
+                            </ng-container>
+                            <ng-template #attendanceNotGiven>
+                              <button type="button" class="btn" (click)="onAttendanceClick(sessions)">
+                                <img src="assets/icon/grey-icons/attendance.png" alt="Talent Attendance" width="30">
+                              </button>
+                            </ng-template>
+                          </td>
+                          <td *ngIf="permission?.update && isManage && !isAssign" data-toggle="tooltip"
+                            data-placement="top" title="Edit Session" class="text-center">
+                            <button class="btn" (click)="onBatchSessionUpdateClick(sessions)">
+                              <img src="assets/icon/colour-icons/edit.png" alt="update session" width="30">
+                            </button>
+                          </td>
+                          <td *ngIf="permission?.delete && isManage && !isAssign" data-toggle="tooltip"
+                            data-placement="top" title="Delete session from batch">
+                            <button class="btn" (click)="deleteSession(sessions.session, sessions.id)">
+                              <img src="assets/icon/colour-icons/delete.png" alt="delete session" width="30">
+                            </button>
+                          </td>
+                        </tr>
+                        <tr *ngIf="sessions.session.viewSubSessionClicked" class="unstriped-tr">
+                          <td colspan="10">
+                            <div class="row">
+                              <div class="col-md-6 col-sm-12">
+                                <table class="table table-borderless table-unstriped">
+                                  <thead>
+                                    <tr>
+                                      <th class="text-center">Order</th>
+                                      <th>Name</th>
+                                      <th class="text-center">Total Hrs</th>
+                                      <th class="text-center">Output</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <ng-container
+                                      *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let even = even">
+                                      <tr *ngIf="even">
+                                        <td class="text-center">{{j+1}}</td>
+                                        <td>
+                                          <img src="assets/icon/colour-icons/sub-sessions.png" width="30">
+                                          {{subSession.name}}
+                                        </td>
+                                        <td class="text-center">{{subSession.hours != null ? subSession.hours : '-'}}
+                                        </td>
+                                        <td class="text-center">{{subSession.studentOutput}}</td>
+                                      </tr>
+                                    </ng-container>
+                                  </tbody>
+                                </table>
+                              </div>
+                              <div class="col-md-6 col-sm-12">
+                                <table class="table table-borderless table-unstriped">
+                                  <thead>
+                                    <tr>
+                                      <th class="text-center">Order</th>
+                                      <th>Name</th>
+                                      <th class="text-center">Total Hrs</th>
+                                      <th class="text-center">Output</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <ng-container
+                                      *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let odd = odd">
+                                      <tr *ngIf="odd">
+                                        <td class="text-center">{{j+1}}</td>
+                                        <td>
+                                          <img src="assets/icon/colour-icons/sub-sessions.png" width="30">
+                                          {{subSession.name}}
+                                        </td>
+                                        <td class="text-center">{{subSession.hours != null ? subSession.hours : '-'}}
+                                        </td>
+                                        <td class="text-center">{{subSession.studentOutput}}</td>
+                                      </tr>
+                                    </ng-container>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <!-- No Sessions -->
+  <ng-template #sessionsNotFound>
+    <br />
+    <br />
+    <br />
+    <div class="col-sm-12 col-md-8 mx-auto">
+      <div class="jumbotron">
+        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+          <h2>Session not assigned to batch</h2>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<!-- BATCH SESSION MODAL -->
+<ng-template #batchSessionModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="swabhav-light-orange-text">Assign Sessions</h2>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button">
+      <i class="material-icons close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="batchSessionForm">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-borderless">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th>Sessions</th>
+              <th>Order</th>
+              <th>Session Date</th>
+              <th>Is the Session Completed?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container formArrayName="sessions"
+              *ngFor="let sessionControl of batchSessionControlArray.controls;let i = index">
+              <ng-container [formGroupName]="i">
+                <tr class="striped-tr">
+                  <td class="text-nowrap text-center">
+                    <button type="button" class="btn btn-default"
+                      (click)="sessionControl.get('showDetails').setValue(!sessionControl.get('showDetails').value)"
+                      *ngIf="sessionControl.get('session').value?.subSessions && sessionControl.get('session')?.value?.subSessions?.length > 0">
+                      <i class="material-icons-outlined material-icons-button inline-icon">
+                        {{sessionControl.get('showDetails').value ? 'expand_more' : 'chevron_right'}}
+                      </i>
+                    </button>{{i+1}}
+                  </td>
+                  <td class="text-nowrap">
+                    <!-- <input class="form-check-input" id="checkboxNoLabel" [checked]="sessionControl.get('isMarked').value"
+                      type="checkbox" (change)="toggleSessionWithForm($event, i)"> -->
+                    <label class="form-check-label">
+                      <label class="checkbox-container">
+                        <input type="checkbox" [checked]="sessionControl.get('isMarked').value" id="isMarked-checkbox"
+                          (change)="toggleSessionWithForm(sessionControl, i)" formControlName="isMarked">
+                        <span class="checkmark"></span>
+                      </label>
+                    </label>
+                    <!-- <span class="material-icons-outlined inline-icon">calendar_today</span> -->
+                    <img src="assets/icon/colour-icons/sessions.png" width="30">
+                    {{sessionControl.get('session').value.name}}
+                  </td>
+                  <td class="text-center">
+                    <input type="number" appAllowNumbersOnly class="form-control input-style" placeholder="Eg: 1"
+                      formControlName="order">
+                    <div class="alert alert-danger" *ngIf=" (sessionControl.get('order').dirty || 
+                      sessionControl.get('order').touched) && sessionControl.get('order').invalid">
+                      <div *ngIf="sessionControl.get('order').errors.required">
+                        Order must be specified
+                      </div>
+                      <div *ngIf="sessionControl.get('order').errors.min">
+                        Order must be greater than 0
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input type="datetime-local" class="form-control input-style" formControlName="startDate">
+                    <div class="alert alert-danger" *ngIf="(sessionControl.get('startDate').dirty 
+                      || sessionControl.get('startDate').touched) && sessionControl.get('startDate').invalid">
+                      <div *ngIf="sessionControl.get('startDate').errors.required">
+                        Session date must be specified
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <select class="form-control input-style" formControlName="isCompleted">
+                      <option [ngValue]="true">Yes</option>
+                      <option [ngValue]="false" selected>No</option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(sessionControl.get('isCompleted').dirty 
+                      || sessionControl.get('isCompleted').touched) && sessionControl.get('isCompleted').invalid">
+                      <div *ngIf="sessionControl.get('isCompleted').errors.required">
+                        Session date must be specified
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="sessionControl.get('showDetails').value" class="unstriped-tr">
+                  <td colspan="10">
+                    <table class="table table-borderless table-unstriped">
+                      <thead>
+                        <tr>
+                          <th class="text-center">Order</th>
+                          <th>Name</th>
+                          <th class="text-center">Total Hrs</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container formArrayName="subSessions"
+                          *ngFor="let subSessionControl of subSessionControlArray(i)?.controls;let j = index">
+                          <ng-container [formGroupName]="j">
+                            <tr>
+                              <td class="text-nowrap text-center">
+                                <label class="form-check-label">
+                                  <label class="checkbox-container">
+                                    <input type="checkbox" [checked]="subSessionControl?.get('isMarked')?.value"
+                                      formControlName="isMarked"
+                                      (change)="toggleSubSessionWithForm(subSessionControl, i, j)">
+                                    <span class="checkmark"></span>
+                                  </label>
+                                </label>{{j+1}}
+                              </td>
+                              <td>
+                                <img src="assets/icon/colour-icons/sub-sessions.png" alt="" width="30">
+                                {{subSessionControl?.get('session')?.value?.name}}
+                              </td>
+                              <td class="text-center">{{subSessionControl?.get('session')?.value?.hours != null ?
+                                subSessionControl?.get('session')?.value?.hours : '-'}}</td>
+                            </tr>
+                          </ng-container>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text fixed-btn"
+      (click)="dismissModal(modal)">Close</button>
+    <button type="submit" class="btn btn-submit-swabhav fixed-btn" (click)="validateBatchSession()"
+      [disabled]='!batchSessionForm.dirty && assignedCourseSessions.length == 0'>Save
+    </button>
+  </div>
+</ng-template>
+
+<!-- Single Batch Update -->
+<ng-template #batchSessionUpdateModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h1 class="display-1">Name: {{updateSession.session.name}}</h1>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click');" class="btn btn-default" type="button"><i
+        class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="batchSessionForm">
+      <div formArrayName="sessions" *ngFor="let batchSession of batchSessionControlArray.controls;let i = index">
+        <ng-container [formGroupName]="i">
+          <div class="row">
+            <div class="col-sm-12 col-md-6">
+              <div class="form-group">
+                <label for="sel1"><span class="red">*</span> Start Date:</label>
+                <input type="datetime-local" class="form-control input-style" formControlName="startDate">
+                <div class="alert alert-danger" *ngIf="(batchSession.get('startDate').dirty || 
+                  batchSession.get('startDate').touched) && batchSession.get('startDate').invalid">
+                  <div *ngIf="batchSession.get('startDate').errors.required">
+                    Session start date must be specified
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+              <div class="form-group">
+                <label for="sel1"><span class="red">*</span> Is Session Completed?</label>
+                <select class="form-control input-style" formControlName="isCompleted">
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(batchSession.get('isCompleted').dirty || 
+                  batchSession.get('isCompleted').touched) && batchSession.get('isCompleted').invalid">
+                  <div *ngIf="batchSession.get('isCompleted').errors.required">
+                    Session status must be specified
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text"
+      (click)="modal.dismiss('Cross click')">Close</button>
+    <button type="button" [disabled]="!batchSessionForm.dirty" (click)="validateSingleSession()"
+      class="btn btn-submit-swabhav">Update</button>
+  </div>
+</ng-template>
+
+
+<!-- Aha-moment modal -->
+<ng-template #ahamomentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h3 class="modal-title display-3">Batch Name: <span class="swabhav-light-orange-text">{{batchName}}</span></h3>
+      <h3 class="modal-title display-3">Session Name: <span class="swabhav-light-orange-text">{{sessionName}}</span>
+      </h3>
+    </div>
+
+    <button type="button" class="close" (click)="modal.dismiss('Cross click');resetSelectedTalent()"
+      class="btn btn-default" type="submit"><i class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!--Modal Body-->
+  <div class="modal-body">
+
+    <ng-container *ngIf="viewAhaMoment">
+
+      <div class="float-right">
+        <button class="btn filter-button btn-sm" type="button" *ngIf="isFaculty && ahaMoments.length != totalTalent"
+          (click)="onAddAhaMomentClick()">Add Aha Moment</button>
+      </div>
+
+      <br>
+      <br>
+
+      <div class="card-body padding-0pt" *ngIf="ahaMoments.length > 0; else noAhaMoments">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Sr No.</th>
+                <th>Talent Name</th>
+                <th>Faculty Name</th>
+                <th>Feeling</th>
+                <th>Feeling Level</th>
+                <th>Response</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let ahamoment of ahaMoments; let i = index">
+                <tr>
+                  <td [attr.rowspan]="ahamoment.ahaMomentResponse.length" class="text-center">{{i+1}}</td>
+                  <td [attr.rowspan]="ahamoment.ahaMomentResponse.length" class="text-center">
+                    {{ahamoment.talent.firstName}} {{ahamoment.talent.lastName}}
+                  </td>
+                  <td [attr.rowspan]="ahamoment.ahaMomentResponse.length" class="text-center">
+                    {{ahamoment.faculty.firstName}} {{ahamoment.faculty.lastName}}
+                  </td>
+                  <td [attr.rowspan]="ahamoment.ahaMomentResponse.length" class="text-center">
+                    {{ahamoment.feeling.feelingName}}
+                  </td>
+                  <td [attr.rowspan]="ahamoment.ahaMomentResponse.length" class="text-center">
+                    {{ahamoment.feelingLevel.levelNumber}}
+                  </td>
+                  <td class="text-center">{{ahamoment.ahaMomentResponse[0].response}}</td>
+                  <td class="text-center" [attr.rowspan]="ahamoment.ahaMomentResponse.length">
+                    <button class="btn" (click)="deleteTalentAhaMoment(ahamoment.id)">
+                      <i class="material-icons red">delete</i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngFor="let response of ahamoment.ahaMomentResponse | slice:1">
+                  <td class="text-center">{{response.response}}</td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <ng-template #noAhaMoments>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h4>Aha moments not found</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+
+
+
+    <!-- STEP - 1 -->
+    <!-- Select talent for whom aha-moment is to be added -->
+    <ng-container *ngIf="selectTalent">
+
+      <!-- All Talents -->
+      <div class="card">
+        <div *ngIf="isTalentLoaded; else noTalent">
+          <div class="card-header">
+            <div class="display-inline">
+              <div class="form-group col-sm-6 col-md-6">
+                <div class="row">
+                  <!-- changePage(1) change of limit will set the offset to 0 -->
+                  <select class="form-control input-style col-sm-2 col-md-2" [(ngModel)]="talentLimit"
+                    (change)="changeTalentPage(1)">
+                    <option selected>5</option>
+                    <option>10</option>
+                    <option>20</option>
+                    <option>50</option>
+                  </select>
+                </div>
+              </div>
+              <ul class="pagination" *ngFor="let talent of talents | paginate: { id:'talentID',
+              itemsPerPage: talentLimit, 
+              currentPage: currentTalentPage, totalItems: totalTalent }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changeTalentPage($event)" id="talentID">
+              </pagination-controls>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-active">
+                <thead>
+                  <tr>
+                    <th *ngIf="permission?.add">
+                      <label class="checkbox-container">
+                        <input type="checkbox" [checked]="checkAllTalentAdded()" (change)="addAllTalentsToList($event)">
+                        <span class="checkmark"></span>
+                      </label>
+                    </th>
+                    <th>No.</th>
+                    <th>Candidate ID</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                    <th>Email</th>
+                    <th>Resume</th>
+                    <th>Contact</th>
+                    <th>City</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let talent of talents; let i = index">
+                    <td *ngIf="permission?.add">
+                      <label class="checkbox-container">
+                        <input type="checkbox" [checked]="checkTalentAdded(talent.id)"
+                          (change)="addTalentsToList($event, talent.id)" [disabled]="isCheckboxDisabled(talent.id)">
+                        <span class="checkmark"></span>
+                      </label>
+                    </td>
+                    <td>{{i+1}}</td>
+                    <td>{{talent && talent.code}}</td>
+                    <td>{{talent && talent.firstName}}</td>
+                    <td>{{talent && talent.lastName}}</td>
+                    <td>{{talent && talent.email}}</td>
+                    <td>
+                      <span data-toggle="tooltip" data-placement="top" title="No Resume Added"
+                        *ngIf='talent.resume==null;else resumePresent'>
+                        <button class="btn btn-primary disabled">Resume</button></span>
+                      <ng-template #resumePresent>
+                        <span data-toggle="tooltip" data-placement="top" title="View Resume">
+                          <button class="btn btn-primary"><a href={{talent.resume}} target="_blank">Resume</a>
+                          </button></span>
+                      </ng-template>
+                    </td>
+                    <td>{{talent && talent.contact}}</td>
+                    <td>{{talent && talent.city}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="float-right">
+              <button class="btn filter-button btn-sm" type="reset" [disabled]="addSelectedTalents.length==0"
+                (click)="addSelectedTalents=[]">Reset
+              </button>
+            </div>
+            <br>
+            <br>
+          </div>
+        </div>
+
+        <!-- Talents not found -->
+        <ng-template #noTalent>
+          <div class="container full-h">
+            <br />
+            <br />
+            <div class="d-flex align-items-center full-h">
+              <div class="col-sm-12 col-md-8 mx-auto">
+                <div class="jumbotron">
+                  <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                    <h4>Talents not found</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <br>
+    </ng-container>
+    <!-- STEP - 1 END -->
+
+    <!-- STEP - 2 -->
+    <ng-container *ngIf="selectFeeling">
+
+      <form [formGroup]="feelingForm">
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-4">
+            <label><span class="red">*</span> Select Feeling:</label>
+            <select class="form-control input-style" formControlName="feeling"
+              (change)="getFeelingLevelList(feelingForm.get('feeling').value.id)">
+              <option [ngValue]="null" disabled>Select Feeling</option>
+              <option *ngFor="let feeling of feelingList" [ngValue]="feeling">{{feeling.feelingName}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(feelingForm.get('feeling').touched || feelingForm.get('feeling').dirty)
+                  && feelingForm.get('feeling').invalid">
+              <div *ngIf="feelingForm.get('feeling').errors.required">
+                Feeling must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-4">
+            <fieldset [disabled]="!feelingForm.get('feeling')?.value || feelingLevelList?.length == 0">
+              <label><span class="red">*</span> Select Feeling Level:</label>
+              <select class="form-control input-style" formControlName="feelingLevel"
+                (change)="feelingLevelDescription=feelingForm.get('feelingLevel')?.value.description">
+                <option [ngValue]="null" disabled>Select Feeling Level</option>
+                <option *ngFor="let feeling of feelingLevelList" [ngValue]="feeling">{{feeling.levelNumber}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(feelingForm.get('feelingLevel').touched || feelingForm.get('feelingLevel').dirty)
+                    && feelingForm.get('feelingLevel').invalid">
+                <div *ngIf="feelingForm.get('feelingLevel').errors.required">
+                  Feeling Level must be specified
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div *ngIf="feelingLevelDescription" class="form-group col-12">
+            <label>Description:</label>
+            <p class="text-size">{{feelingLevelDescription}}</p>
+          </div>
+        </div>
+      </form>
+
+    </ng-container>
+
+    <!-- STEP - 3 -->
+    <ng-container *ngIf="selectResponse">
+      <!-- <h1>THIS IS TEST</h1> -->
+
+      <div *ngIf="feedbacksArray.controls.length > 0; else noFeedbackQuestions">
+        <form [formGroup]="feedbackQuestionForm">
+          <div formArrayName="feedbacks" *ngFor="let feedback of feedbacksArray.controls;let i = index">
+            <ng-container [formGroupName]="i">
+              <div class="form-group col-md-12 col-sm-6">
+                <label><span class="red">*</span> Question {{i+1}}:</label>
+                {{feedbackQuestions[i].question}}
+              </div>
+              <!-- No Options -->
+              <div class="form-group col-md-12 col-sm-6">
+                <label for="exampleFormControlTextarea2">Response:</label>
+                <textarea class="form-control input-style rounded-0" id="exampleFormControlTextarea2" rows="1"
+                  formControlName="response" placeholder="Enter your response"></textarea>
+                <div class="alert alert-danger" *ngIf="(feedback.get('response').touched || feedback.get('response').dirty)
+                          && feedback.get('response').invalid">
+                  <div *ngIf="feedback.get('response').errors.required">
+                    Response must be specified
+                  </div>
+                  <div *ngIf="feedback.get('response').errors?.maxlength">
+                    Response cannot have more than 200 characters
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </form>
+      </div>
+      <ng-template #noFeedbackQuestions>
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Feedback Questions Not Found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </ng-container>
+
+  </div>
+  <!-- Modal footer -->
+  <div class="modal-footer">
+
+    <button type="button" class="btn btn-default swabhav-light-orange-text"
+      (click)="modal.dismiss();resetSelectedTalent()">Close</button>
+    <button type="button" class="btn btn-default swabhav-light-orange-text" *ngIf="!selectTalent && !viewAhaMoment"
+      (click)="onPreviousButtonClick()">❮ Previous
+    </button>
+    <button type="button" class="btn btn-default swabhav-light-orange-text" *ngIf="!selectResponse && !viewAhaMoment"
+      (click)="onNextButtonClick()">Next ❯
+    </button>
+    <button type="button" class="btn btn-submit-swabhav"
+      *ngIf="selectResponse && !viewAhaMoment && feedbackQuestions.length > 0" (click)="validateAhaMoment()">Submit
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Talent Comfirmation -->
+<ng-template #deleteModal let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title">Comfirmation</h3>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click');" class="btn btn-default" type="button"><i
+        class="material-icons close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want you to delete this session for current batch?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click');">No</button>
+  </div>
+</ng-template>
+
+
+
+<!-- <div *ngIf="totalSessions > 0;else sessionsNotFound">
+		<br>
+		<div class="table-responsive">
+      <table class="table table-sm table-striped table-borderless">
+        <thead>
+          <tr>
+            <th class="text-center">No.</th>
+            <th>Name</th>
+            <th>Start Date</th>
+            <th class="text-center">Hours</th>
+            <th data-toggle="tooltip" data-placement="top" *ngIf="permission?.update && !isAssign && !isManage">Complete</th>
+            <th *ngIf="!isAssign && !isManage" class="text-center">Feedback</th>
+            <th class="text-center" title="Add Aha Moment" *ngIf="permission?.add && !isAssign && !isManage">Aha Moment</th>
+            <th class="text-center" title="Add Attendance" *ngIf="permission?.add && !isAssign && !isManage">Attendance</th>
+            <th class="text-center" data-toggle="tooltip" data-placement="top" title="Edit Session" 
+              *ngIf="permission?.update && isManage && !isAssign">Edit</th>
+            <th class="text-center" data-toggle="tooltip" data-placement="top" title="Delete Session from batch"
+              *ngIf="permission?.delete && isManage && !isAssign">Delete
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let sessions of batchSessions;let i = index">
+            <tr class="striped-tr">
+              <td class="text-nowrap">
+                <button type="button" class="btn btn-default" (click)="sessions.session.viewSubSessionClicked=!sessions.session.viewSubSessionClicked"
+                  *ngIf="sessions.session.subSessions && sessions.session.subSessions.length != 0; else noBatchSession">
+                  <i class="material-icons-outlined material-icons-button inline-icon">
+                    {{sessions.session.viewSubSessionClicked ? 'expand_more' : 'chevron_right'}}
+                  </i> {{i+1}}
+                </button>
+                <ng-template #noBatchSession>
+                  <label class="no-sub-session">{{i+1}}</label>
+                </ng-template>
+              </td>
+              <td class="text-wrap">
+                <dl>
+                  <dt>
+                    <img src="assets/icon/colour-icons/sessions.png" width="30">
+                    {{sessions.session && sessions.session?.name}}
+                  </dt>
+                  <dd *ngIf="!isAssign && !isManage" class="text-muted">
+                    <small>{{sessions?.session?.subSessions.length}} Sub-sessions</small>
+                  </dd>
+                </dl> 
+              </td>
+              <td>{{sessions.startDate | date: 'longDate'}}</td>
+              <td class="text-center">{{sessions.session && sessions.session?.hours}}</td>
+              <td *ngIf="permission?.update && !isAssign && !isManage" data-toggle="tooltip" data-placement="top" title="Mark session as complete">
+                <button type="button" class="btn" [disabled]="sessions.isCompleted"
+                  (click)="setSessionForUpdate(sessions)">
+                  <div *ngIf="sessions.isCompleted; else sessionNotCompleted">
+                    <img src="assets/icon/colour-icons/check.png" alt="session completed" alt="session-completed" width="30">
+                  </div>
+                  <ng-template #sessionNotCompleted>
+                    <img src="assets/icon/grey-icons/complete.png" alt="session not completed" alt="session-not-completed" width="30">
+                  </ng-template>
+                </button>
+              </td>
+              <td title="Feedback can be given when session is completed" *ngIf="!isAssign && !isManage">
+                <button class="btn" [disabled]="!sessions.isCompleted && !sessions.isAttendanceGiven" 
+                  (click)="onSessionFeedbackClick(sessions)" *ngIf="!sessions.isFeedbackGiven;else feedbackGiven">
+                  <img src="assets/icon/grey-icons/review.png" alt="feedback pending" width="30">
+                </button>
+                <ng-template #feedbackGiven>
+                  <img src="assets/icon/colour-icons/review.png" alt="feedback given" width="30">
+                </ng-template>
+              </td>
+              <td title="Add Aha Moment" *ngIf="permission?.add && !isAssign && !isManage" class="text-center">
+                <button type="button" class="btn" (click)="onAhaMomentsClick(sessions)" [disabled]="!sessions.isCompleted">
+                  <i [ngClass]="sessions.isCompleted ? 'material-icons red' : 'material-icons grey-icon'">local_fire_department</i>
+                </button>
+              </td>
+              <td title="Add Attendance" *ngIf="permission?.add && !isAssign && !isManage" class="text-center">
+                <ng-container *ngIf="sessions.isAttendanceGiven; else attendanceNotGiven">
+                  <button type="button" class="btn" (click)="onAttendanceClick(sessions)">
+                    <img src="assets/icon/colour-icons/attendance.png" alt="Talent Attendance" width="30">
+                  </button>
+                </ng-container>
+                <ng-template #attendanceNotGiven>
+                  <button type="button" class="btn" (click)="onAttendanceClick(sessions)">
+                    <img src="assets/icon/grey-icons/attendance.png" alt="Talent Attendance" width="30">
+                  </button>
+                </ng-template>
+              </td>
+              <td *ngIf="permission?.update && isManage && !isAssign" data-toggle="tooltip" data-placement="top"
+                title="Edit Session" class="text-center">
+                <button class="btn" (click)="onBatchSessionUpdateClick(sessions)">
+                  <img src="assets/icon/colour-icons/edit.png" alt="update session" width="30">
+                </button>
+              </td>
+              <td *ngIf="permission?.delete && isManage && !isAssign" data-toggle="tooltip" data-placement="top"
+                title="Delete session from batch">
+                <button class="btn" (click)="deleteSession(sessions.session, sessions.id)">
+                  <img src="assets/icon/colour-icons/delete.png" alt="delete session" width="30">
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="sessions.session.viewSubSessionClicked" class="unstriped-tr">
+              <td colspan="10">
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <table class="table table-borderless table-unstriped">
+                      <thead>
+                        <tr>
+                          <th class="text-center">Order</th>
+                          <th>Name</th>
+                          <th class="text-center">Total Hrs</th>
+                          <th class="text-center">Output</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let even = even">
+                          <tr *ngIf="even"> 
+                            <td class="text-center">{{j+1}}</td>
+                            <td>
+                              <img src="assets/icon/colour-icons/sub-sessions.png" width="30">
+                              {{subSession.name}}
+                            </td>
+                            <td class="text-center">{{subSession.hours != null ? subSession.hours : '-'}}</td>
+                            <td class="text-center">{{subSession.studentOutput}}</td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-6 col-sm-12">
+                    <table class="table table-borderless table-unstriped">
+                      <thead>
+                        <tr>
+                          <th class="text-center">Order</th>
+                          <th>Name</th>
+                          <th class="text-center">Total Hrs</th>
+                          <th class="text-center">Output</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container *ngFor="let subSession of sessions?.session?.subSessions; let j = index; let odd = odd">
+                          <tr *ngIf="odd">
+                            <td class="text-center">{{j+1}}</td>
+                            <td>
+                              <img src="assets/icon/colour-icons/sub-sessions.png" width="30">
+                              {{subSession.name}}
+                            </td>
+                            <td class="text-center">{{subSession.hours != null ? subSession.hours : '-'}}</td>
+                            <td class="text-center">{{subSession.studentOutput}}</td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+	</div> -->

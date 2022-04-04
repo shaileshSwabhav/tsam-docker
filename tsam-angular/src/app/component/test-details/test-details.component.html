@@ -1,0 +1,99 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="standard-page-margin">
+
+        <div class="heading-style">
+            {{selectedSubTestName}}
+            <div class="float-right submit-and-end">
+                Submit & End Test
+            </div>
+            <div class="float-right timer">
+                2 Hrs 20 Mins 30 Secs
+            </div>
+        </div>
+
+        <div *ngIf="subTestList.length > 0">
+            <div class="row">
+                <ng-container *ngFor="let test of subTestList; let i = index">
+                    <div class="form-group col-sm-4 col-md-3">
+                        <div class="card card-margin card-shadow card-style h-100">
+                            <div class="card-body card-body-style">
+                                <div class="color-000000 font-weight-bold font-md-style text-center">{{test.name}}</div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <span
+                                                class="col-sm-4 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Difficulty</span>
+                                            <div class="col-sm-8 px-0">
+                                                <span [ngClass]="test.difficultyClass">{{test.difficulty}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <span
+                                                class="col-sm-4 px-0 opacity-75-style color-757575 font-weight-bold font-sm-style">Max
+                                                Score</span>
+                                            <div class="col-sm-8 px-0">
+                                                <span
+                                                    class="opacity-86-style color-212121 font-weight-bold font-sm-style">{{test.maxScore}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="text-center">
+                                    <span class="color-F6430F font-weight-bold font-sm-style cursor-pointer-style"
+                                        (click)="redirectToProblemDetails(test.id)">
+                                        Show
+                                        <span class="vertical-align-top-icon-style"><i
+                                                class="material-icons icon-style">arrow_right_alt</i></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="subTestList.length == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Tests Found</h2>
+                </div>
+            </div>
+        </div>
+        <div class="heading-style">Leader <span class="color-D63C2A">({{selectedSubTestName}})</span></div>
+        <div *ngIf="leaderList.length > 0">
+            <table>
+                <tr class="color-757575">
+                    <th>Star Performers</th>
+                    <th>Rewards</th>
+                    <th>Score</th>
+                    <th>Rank</th>
+                </tr>
+                <tr *ngFor="let leader of leaderList; let i = index">
+                    <td class="color-212121 font-weight-bold">
+                        <img class="leader-image" src={{leader.image}} alt="">
+                        &nbsp;&nbsp;&nbsp;{{leader.name}}
+                    </td>
+                    <td><img class="medals-style" src={{leader.rewards}} alt=""></td>
+                    <td class="color-212121 font-weight-bold">{{leader.score}}</td>
+                    <td class="color-212121 font-weight-bold">{{leader.rank}}</td>
+                </tr>
+            </table>
+        </div>
+        <div *ngIf="leaderList.length == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Leader Board Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>

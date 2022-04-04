@@ -1,0 +1,566 @@
+<ng-template #fieldNameCompulsary let-name="name">
+	<label class="form-control-label-style"><span *ngIf="!isViewClicked" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+	<label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+	<mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+		<div class="overflow-x-hidden-style">
+			<div class="filter-header">
+				Edit Filters&nbsp;&nbsp;&nbsp;
+				<span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+				<div class="float-right" (click)="drawer.toggle()">
+					<span><i class="material-icons filter-close-icon-style">close</i></span>
+				</div>
+			</div>
+			<br>
+			<form [formGroup]="employeeSearchForm">
+				<div class="form-group col-md-4 p-0">
+					<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+					</ng-container>
+					<select class="form-control input-style" formControlName="isActive">
+						<option [ngValue]="null">Select Status</option>
+						<option [ngValue]="'1'">Active</option>
+						<option [ngValue]="'0'">Closed</option>
+					</select>
+				</div>
+				<div class="filter-by-field row">
+					<div class="form-group col-sm-12 col-md-6">
+						<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+						</ng-container>
+						<input class="form-control input-style" type="text" formControlName="firstName"
+							placeholder="eg: John">
+						<div *ngIf="employeeSearchForm.get('firstName').invalid">
+							<div class="alert alert-danger" *ngIf="employeeSearchForm.get('firstName').errors.pattern">
+								First Name should only have alphabet.
+							</div>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 col-md-6">
+						<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+						</ng-container>
+						<input class="form-control input-style" type="text" formControlName="lastName"
+							placeholder="eg: Doe">
+						<div *ngIf="employeeSearchForm.get('lastName').invalid">
+							<div class="alert alert-danger" *ngIf="employeeSearchForm.get('lastName').errors.pattern">
+								Last Name should only have alphabet.
+							</div>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 col-md-6">
+						<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+						<input class="form-control input-style" type="email" formControlName="email"
+							placeholder="eg: johndoe@example.com">
+					</div>
+					<div class="form-group col-sm-12 col-md-6">
+						<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Contact'}">
+						</ng-container>
+						<input class="form-control input-style" type="number" formControlName="contact"
+							placeholder="eg: 9090909090">
+						<!-- <div *ngIf="employeeSearchForm.get('contact').invalid">
+                <div class="alert alert-danger" *ngIf="employeeSearchForm.get('contact').errors.pattern">
+                    Contact must be of type 9090909090.
+                </div>
+            </div> -->
+					</div>
+				</div>
+				<div class="text-center">
+					<button class="btn btn-default filter-button" type="submit" [disabled]="!employeeSearchForm.dirty"
+						(click)="searchEmployee();drawer.toggle()">Search
+						<span class="vertical-align-top-icon-style"><i
+								class="material-icons search-button-icon-style">search</i></span>
+					</button>
+				</div>
+			</form>
+		</div>
+	</mat-drawer>
+	<app-master-navbar></app-master-navbar>
+	<div class="container-fluid">
+		<br>
+		<div class="standard-page-margin">
+			<div class="display-inline">
+				<div class="font-weight-bold font-xl-style">
+					Employees -
+					<span class="color-F6430F"> {{totalEmployees}}</span>
+					&nbsp;&nbsp;&nbsp;
+					<button class="btn btn-default filter-button" type="button" *ngIf="searched"
+						(click)="resetSearchAndGetAll()">
+						View All Employees
+					</button>
+				</div>
+				<div class="float-right">
+					<button class="btn btn-default swabhav-button-round" *ngIf="permission?.add"
+						(click)="onAddEmployeeClick(employeeModal)">
+						Add New Employee
+					</button>
+				</div>
+			</div>
+			<br>
+			<div *ngIf="totalEmployees > 0" class="view-label-flex">
+				<span class="pagination-string">
+					Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+					<span class="pagination-numbers">{{totalEmployees}}</span>
+				</span>
+			</div>
+			<div class="d-flex justify-content-between align-items-center flex-row">
+				<div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalEmployees == 0 && searched) 
+						|| (totalEmployees > 0 && !searched) || (totalEmployees > 0 && searched)">
+					<button class="btn btn-default filter-button" (click)="drawer.toggle()">
+						Add Filter <strong>+</strong>
+					</button>
+				</div>
+				<div *ngIf="totalEmployees > 0" class="d-flex justify-content-between align-items-start flex-row">
+					<div class="d-flex">
+						<select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+							(change)="changePage(1)">
+							<option selected>5</option>
+							<option>10</option>
+							<option>20</option>
+							<option>50</option>
+						</select> &nbsp;&nbsp;&nbsp;
+					</div>
+					<div class="d-flex">
+						<ul class="pagination no-padding-left" *ngFor="let employee of employees | paginate: { id:'employeePageID',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalEmployees }">
+						</ul>
+						<pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+							id="employeePageID">
+						</pagination-controls>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="searchFilterFieldList.length > 0">
+				<br>
+				<span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+					{{searchFilterField.propertyNameText}}
+					<span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+						class="vertical-align-top-icon-style">
+						<i class="material-icons dropdown-option-icon-style">close</i>
+					</span>
+				</span>
+			</div>
+		</div>
+		<br>
+		<div *ngIf="totalEmployees > 0">
+			<div class="card table-card-shadow table-card-style">
+				<div class="card-body padding-0pt">
+					<div class="table-responsive">
+						<table class="table text-center table-striped table-borderless">
+							<tr>
+								<th>No.</th>
+								<th>EmployeeID</th>
+								<th>Name</th>
+								<th>Email Address</th>
+								<th>Contact</th>
+								<th>Address</th>
+								<th>City</th>
+								<th>State</th>
+								<th>Status</th>
+								<th>Technologies</th>
+								<th></th>
+							</tr>
+							<tbody>
+								<tr *ngFor="let employee of employees;let i = index">
+									<td>{{(i+1)+(offset*limit)}}</td>
+									<td>{{employee.code}}</td>
+									<td>{{employee.firstName}} {{employee.lastName}}</td>
+									<td>{{employee.email}}</td>
+									<td>{{employee.contact}}</td>
+									<td>
+										<ng-container *ngIf="employee.address; else noAddress">{{employee.address}}
+										</ng-container>
+										<ng-template #noAddress>{{"-"}}</ng-template>
+									</td>
+									<td>
+										<ng-container *ngIf="employee.city; else noCity">{{employee.city}}
+										</ng-container>
+										<ng-template #noCity>{{"-"}}</ng-template>
+									</td>
+									<td>{{employee.state && employee.state.name || "-"}}</td>
+									<td>
+										<div *ngIf="employee.isActive; else inActive">
+											<span *ngIf="employee.isActive; else inActive"
+												class="badge badge-success">Active</span>
+										</div>
+										<ng-template #inActive>
+											<span class="badge badge-danger">Inactive</span>
+										</ng-template>
+									</td>
+									<td>
+										<div *ngFor="let tech of employee.technologies">
+											<span class="badge swabhav-badge-style">{{tech.language}}</span>
+										</div>
+									</td>
+									<td>
+										<div class="dropdown">
+											<span id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+												aria-expanded="false">
+												<i class="material-icons">more_vert</i>
+											</span>
+											<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+												<a class="dropdown-item dropdown-style dropdown-option-hover-style"
+													*ngIf="employee.resume!=null" href={{employee.resume}}
+													target="_blank">
+													<span class="vertical-align-top-icon-style">
+														<i
+															class="material-icons dropdown-option-icon-style">description</i>
+													</span>Resume
+												</a>
+												<span class="dropdown-item disabled-dropdown-style"
+													*ngIf="employee.resume==null">
+													<span class="vertical-align-top-icon-style">
+														<i
+															class="material-icons dropdown-option-icon-style">description</i>
+													</span>No Resume
+												</span>
+												<a class="dropdown-item dropdown-style dropdown-option-hover-style"
+													(click)="onViewEmployeeClick(employee, employeeModal)">
+													<span class="vertical-align-top-icon-style">
+														<i
+															class="material-icons dropdown-option-icon-style">visibility</i>
+													</span>View
+												</a>
+												<a class="dropdown-item dropdown-style dropdown-option-hover-style"
+													*ngIf="permission?.delete"
+													(click)="onDeleteEmployeeClick(employee.id, deleteConfirmationModal)">
+													<span class="vertical-align-top-icon-style">
+														<i class="material-icons dropdown-option-icon-style">delete</i>
+													</span>Delete
+												</a>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf="totalEmployees == 0">
+			<div class="card">
+				<div class="card-body not-found-card-style">
+					<h2>No Employees Found</h2>
+				</div>
+			</div>
+		</div>
+		<br>
+		<br>
+	</div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+<!-- Add/Update/View Employee -->
+<ng-template #employeeModal let-modal>
+	<div class="modal-body">
+		<div class="form-header-style">
+			{{modalHeader}}
+			<span *ngIf="isViewClicked && permission?.update" (click)="onUpdateEmployeeClick()">
+				<i class="material-icons">create</i>
+			</span>
+			<div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+				(click)="dismissFormModal(modal)">
+				<span class="vertical-align-top-icon-style">
+					<i class="material-icons modal-popup-close-icon-style">close</i>
+				</span>
+				Close
+			</div>
+		</div>
+		<div *ngIf="!isViewClicked" class="marked-fields-right-style">
+			<span class="red"><strong>*</strong></span>
+			marked fields are mandatory
+		</div>
+		<br>
+		<form [formGroup]="employeeForm">
+			<div class="row">
+				<div class="form-group col-sm-3 col-md-2" *ngIf="isViewClicked || isUpdateClicked">
+					<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'EmployeeID'}">
+					</ng-container>
+					<input type="text" class="form-control input-style" nbInput formControlName="code">
+				</div>
+			</div>
+			<div class="form-sub-header-style">Personal Details</div>
+			<div class="row">
+				<div class="col-sm-6 col-md-4">
+					<div class="form-group">
+						<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'First Name'}">
+						</ng-container>
+						<input type="text" class="form-control input-style" formControlName="firstName"
+							placeholder="eg: John">
+						<div class="alert alert-danger" *ngIf="(employeeForm.get('firstName').dirty || employeeForm.get('firstName').touched) 
+                && employeeForm.get('firstName').invalid">
+							<div *ngIf="employeeForm.get('firstName').errors.required">
+								First Name must be specified
+							</div>
+							<div *ngIf="employeeForm.get('firstName').errors.pattern">
+								First Name should only have alphabets.
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4">
+					<div class="form-group">
+						<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Name'}">
+						</ng-container>
+						<input type="text" class="form-control input-style" formControlName="lastName"
+							placeholder="eg: Doe">
+						<div class="alert alert-danger" *ngIf="(employeeForm.get('lastName').dirty || employeeForm.get('lastName').touched) 
+                && employeeForm.get('lastName').invalid">
+							<span *ngIf="employeeForm.get('lastName').errors.required">
+								Last Name must be specified
+							</span>
+							<span *ngIf="employeeForm.get('lastName').errors.pattern">
+								Last Name should only have alphabet.
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4">
+					<div class="form-group">
+						<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Email Address'}">
+						</ng-container>
+						<input type="email" class="form-control input-style" formControlName="email"
+							placeholder="eg: johndoe@example.com">
+						<div class="alert alert-danger" *ngIf="(employeeForm.get('email').dirty ||employeeForm.get('email').touched) 
+                && employeeForm.get('email').invalid">
+							<span *ngIf="employeeForm.get('email').errors.required">
+								Email must be specified
+							</span>
+							<span *ngIf="employeeForm.get('email').errors.pattern">
+								Email must be of the type abc@domain.com
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4">
+					<div class="form-group">
+						<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Mobile Number'}">
+						</ng-container>
+						<input type="text" appAllowNumbersOnly class="form-control input-style"
+							formControlName="contact" placeholder="eg: 9090909090">
+						<div class="alert alert-danger" *ngIf="(employeeForm.get('contact').dirty || employeeForm.get('contact').touched) 
+                && employeeForm.get('contact').invalid">
+							<span *ngIf="employeeForm.get('contact').errors.required">
+								Contact must be specified
+							</span>
+							<span *ngIf="employeeForm.get('contact').errors.pattern">
+								Contact must be of type 9090909090
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4">
+					<div class="form-group">
+						<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Date of Birth'}">
+						</ng-container>
+						<input type="date" class="form-control input-style" formControlName="dateOfBirth" nbInput
+							appEmptyToNull max="{{currentDate | date:'yyyy-MM-dd'}}">
+						<!-- <div class="alert alert-danger" *ngIf="(employeeForm.get('dateOfBirth').dirty || employeeForm.get('dateOfBirth').touched) 
+                            && employeeForm.get('dateOfBirth').invalid">
+                            <span *ngIf="employeeForm.get('dateOfBirth').errors.required">
+                                Date of birth must be specified
+                            </span>
+                        </span> -->
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4">
+					<div class="form-group">
+						<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Date of Joining'}">
+						</ng-container>
+						<input type="date" class="form-control input-style" formControlName="dateOfJoining" nbInput
+							appEmptyToNull placeholder="Enter Date of Joining">
+					</div>
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Technology Stack'}">
+					</ng-container>
+					<ng-select [items]="technologyList" bindLabel="language" placeholder="Select Technology"
+						appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+						formControlName="technologies" class="ng-select-style" (search)="getTechnologyList($event)"
+						(focus)="getTechnologyList()" [loading]="isTechLoading">
+						<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+							{{item.language}}
+						</ng-template>
+					</ng-select>
+					<!-- <div class="alert alert-danger" *ngIf="(employeeForm.get('technologies').dirty 
+						|| employeeForm.get('technologies').touched) && employeeForm.get('technologies').errors">
+						<span *ngIf="employeeForm.get('technologies').errors.required">
+							Technology must be specified
+						</span>
+					</div> -->
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Employee Role'}">
+					</ng-container>
+					<select class="form-control input-style" [compareWith]="compareFn" formControlName="role">
+						<option [ngValue]="null" disabled>Select Role</option>
+						<option *ngFor="let role of roleList" [ngValue]="role">{{role.roleName}}</option>
+					</select>
+					<div class="alert alert-danger" *ngIf="(employeeForm.get('role').dirty || employeeForm.get('role').touched) 
+              && employeeForm.get('role').invalid">
+						<span *ngIf="employeeForm.get('role').errors.required">
+							Employee role must be specified
+						</span>
+					</div>
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Status'}"></ng-container>
+					<select class="form-control input-style" formControlName="isActive">
+						<option [ngValue]="null" disabled>Select Status</option>
+						<option [ngValue]="true">Active</option>
+						<option [ngValue]="false">Inactive</option>
+					</select>
+					<div class="alert alert-danger" *ngIf="(employeeForm.get('isActive').dirty || employeeForm.get('isActive').touched) 
+              && employeeForm.get('isActive').invalid">
+						<span *ngIf="employeeForm.get('isActive').errors.required">
+							Employee status must be specified
+						</span>
+					</div>
+				</div>
+				<hr>
+			</div>
+			<div class="form-sub-header-style">Location Details</div>
+			<div class="row">
+				<div class="form-group col-sm-12 col-md-12">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Address'}"></ng-container>
+					<textarea type="text" class="form-control input-style" formControlName="address" rows="2"
+						placeholder="eg: Mumbai"></textarea>
+					<div class="alert alert-danger" *ngIf="(employeeForm.get('address').dirty ||employeeForm.get('address').touched) 
+              && employeeForm.get('address').invalid">
+						<span *ngIf="employeeForm.get('address').errors.required">
+							Address must be specified
+						</span>
+						<label *ngIf="employeeForm.get('address').errors.pattern">
+							Address should only have alphabet , / number.
+						</label>
+					</div>
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country'}"></ng-container>
+					<select class="form-control input-style" [compareWith]="compareFn"
+						(change)="getStateList(employeeForm.get('country').value.id)" formControlName="country"
+						#country>
+						<option [ngValue]="null" disabled>Select Country</option>
+						<option *ngFor="let country of countryList" [ngValue]="country">{{country.name}}</option>
+					</select>
+					<div class="alert alert-danger" *ngIf="(employeeForm.get('country').dirty || employeeForm.get('country').touched) 
+          		&& employeeForm.get('country').invalid">
+						<span *ngIf="employeeForm.get('country').errors.required">
+							Country must be specified
+						</span>
+					</div>
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'State'}"></ng-container>
+					<ng-select [items]="stateList" bindLabel="name" placeholder="Select State" appendTo="body"
+						[searchable]="true" [clearable]="true" formControlName="state" class="ng-select-style">
+						<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+							{{item.name}}
+						</ng-template>
+					</ng-select>
+					<div class="alert alert-danger" *ngIf="(employeeForm.get('state').dirty || employeeForm.get('state').touched) 
+              && employeeForm.get('state').invalid">
+						<span *ngIf="employeeForm.get('state').errors.required">
+							State must be specified
+						</span>
+					</div>
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+					<input type="text" class="form-control input-style" formControlName="city" placeholder="eg: Mumbai">
+					<div class="alert alert-danger"
+						*ngIf="(employeeForm.get('city').dirty || employeeForm.get('city').touched) && employeeForm.get('city').errors">
+						<span *ngIf="employeeForm.get('city').errors.required">
+							City must be specified
+						</span>
+					</div>
+				</div>
+				<div class="form-group col-sm-6 col-md-4">
+					<ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'PIN Code'}"></ng-container>
+					<input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="pinCode"
+						placeholder="eg: 401104">
+					<div class="alert alert-danger"
+						*ngIf="(employeeForm.get('pinCode').dirty || employeeForm.get('pinCode').touched) && employeeForm.get('pinCode').errors">
+						<span *ngIf="employeeForm.get('pinCode').errors.required">
+							Pincode must be specified
+						</span>
+						<span *ngIf="employeeForm.get('pinCode').errors.pattern">
+							Pincode must be of 6 digit
+						</span>
+					</div>
+				</div>
+			</div>
+			<!-- span is used to hide the border as well -->
+			<span *ngIf="!isViewClicked || selectedEmployee.resume">
+				<hr>
+				<div class="form-group row">
+					<h4><label class="col-sm-2 col-form-label">Resume</label></h4>
+					<div class="col-sm-4">
+						<span class="custom-file">
+							<input *ngIf="!isViewClicked" type="file" class="custom-file-input"
+								(change)="onResourceSelect($event)" id="customFile" value="displayedFileName">
+							<label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label"
+								for="customFile" [innerHTML]="displayedFileName"></label>
+							<button class="btn btn-success custom-file" id="uploadingButton" type="button"
+								*ngIf="isFileUploading">
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+								Uploading file...
+							</button>
+							<div *ngIf="(selectedEmployee && selectedEmployee.resume) && !isResumeUploadedToServer"
+								data-toggle="tooltip" data-placement="top" title="View Resume">
+								<button class="btn btn-default swabhav-button-round"><a class="link-button-style"
+										href={{selectedEmployee.resume}} target="_blank">View Resume</a>
+								</button>
+							</div>
+						</span>
+						<!-- should add view uploaded resume using a resume variable after cleaning. -->
+						<label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+					</div>
+				</div>
+			</span>
+			<div class="text-center">
+				<button type="button" (click)="dismissFormModal(modal)"
+					class="btn btn-default swabhav-button-round">Close</button>
+				&nbsp;&nbsp;&nbsp;
+				<button type="button" [disabled]="!employeeForm.dirty || isFileUploading"
+					class="btn btn-default swabhav-button-round" *ngIf="!isViewClicked" (click)="validate()">
+					{{modalButton}}
+				</button>
+			</div>
+		</form>
+	</div>
+</ng-template>
+
+
+<!-- Delete Employee Comfirmation -->
+<ng-template #deleteConfirmationModal let-modal>
+	<div class="modal-body">
+		<div class="form-header-style">
+			Confirmation
+			<div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+				(click)="modal.dismiss('Cross click')">
+				<span class="vertical-align-top-icon-style">
+					<i class="material-icons modal-popup-close-icon-style">close</i>
+				</span>
+				Close
+			</div>
+		</div>
+		<br>
+		<div class="text-center">
+			<div class="delete-text-style">
+				Are you sure you want to delete this user?
+			</div>
+		</div>
+		<br>
+		<div class="text-center">
+			<button type="button" class="btn btn-default swabhav-button-round" (click)="deleteEmployee()">Yes</button>
+			&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn btn-default swabhav-button-round"
+				(click)="modal.dismiss('Close click')">No</button>
+		</div>
+	</div>
+</ng-template>

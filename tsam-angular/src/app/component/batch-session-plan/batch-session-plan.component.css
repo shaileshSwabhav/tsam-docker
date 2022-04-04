@@ -1,0 +1,156 @@
+.button-style{
+    width: 150px;
+    font-size: small;
+}
+
+.table-td-center-align{
+    vertical-align: middle;
+}
+
+select{
+    width: 60%;
+    display: initial;
+}
+
+/* ************** Module tab styles ******************** */
+
+.module-tab-menu-style{
+    box-shadow: 0 0 10px #ccc;
+    margin: 0 auto;
+}
+
+/* active tab */
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+    color:black;
+    background-color: #ffe0da;
+    height: 140px;
+}
+
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color:black;
+    height: 140px;
+}
+
+:host::ng-deep .mat-tab-header {
+    border: none;
+}
+    
+/* ink bar */
+:host::ng-deep .mat-ink-bar {
+    background-color: var(--primary-color,#ffe0da) !important;
+}
+
+/* ****************************************************** */
+
+.red-box-style{
+    background-color: #ffeaea;
+    color: #f80309;
+}
+
+.green-box-style{
+    background-color: #e5fdf0;
+    color: #36b98c;
+}
+
+.yellow-box-style{
+    background-color: #faeed9;
+    color: #ed9511;
+}
+
+.tasklist-box-style{
+    border-radius: 30px;
+    font-weight: bold;
+    padding: 4px;
+    text-align: center;
+}
+
+.font-20-style{
+    font-size: 20px;
+}
+
+.session-plan-button-style {
+    background-color: #fffffe;
+    border-radius: 30px;
+    color: #000000;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 16%), 0 2px 3px rgb(0 0 0 / 23%);
+  }
+
+.agenda-container-style{
+    background-color: #fdf6f4;
+    color: #f6431c;
+    border-radius: 10px;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.agenda-badge-style{
+    text-align: center;
+    background-color: #f6431c;
+    color: #FFFFFF;
+    border-radius: 30px;
+    padding: 10px;
+}
+
+.assignment-container-style{
+    background-color: #f6f4ff;
+    color: #593dc1;
+    border-radius: 10px;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.assignment-badge-style{
+    text-align: center;
+    background-color: #593dc1;
+    color: #FFFFFF;
+    border-radius: 30px;
+    padding: 10px;
+}
+
+.month-year-box-style{
+    border-radius: 5px;
+    background-color: #f5f7f9;
+    padding: 8px;
+}
+
+.agenda-table-text-style{
+    color: #f6431c;
+}
+
+.assignment-table-text-style{
+    color: #593dc1;
+}
+
+.top-margin-10-style{
+    margin-top: 10px;
+}
+
+.assignment-popup-difficulty-style{
+    width: 60%;
+    display: inline-block;
+}
+
+.batch-details-section-style{
+    padding: 1%;
+}
+
+.margin-bottom-date-tab-style{
+    margin-bottom: 6px
+}
+
+.input-select-style{
+    display: block;
+    width: 100%;
+}
+
+
+/*======================================= MEDIA QUERIES ======================================*/
+@media screen and (max-width: 800px) {
+
+}
+
+@media screen and (max-width: 600px) {
+    .batch-details-section-style {
+        text-align: center;
+    }
+}

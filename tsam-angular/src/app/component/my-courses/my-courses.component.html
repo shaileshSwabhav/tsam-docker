@@ -1,0 +1,127 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="standard-page-margin">
+        <div class="my-courses-heading-style">My Courses</div>
+        <div *ngIf="totalCourses > 0">
+            <!-- <div class="totalLabel float-right">{{paginationString}}</div>
+            <div class="totalLabel">
+                Total Courses: {{totalCourses}}
+            </div> -->
+            <!-- <div class="display-inline">
+                <div class="form-group col-sm-6 col-md-6">
+                    <div class="row">
+                        <select class="form-control col-sm-2 col-md-2" [(ngModel)]="limit" (change)="changePage(1)">
+                            <option selected>8</option>
+                        </select>&nbsp;&nbsp;&nbsp;
+                    </div>
+                </div>
+                <ul class="pagination" *ngFor="let course of courseList | paginate: { id:'courseID',
+                    itemsPerPage: limit, 
+                    currentPage: currentPage, totalItems: totalCourses }">
+                </ul>
+                <pagination-controls autoHide="true" responsive="true" maxSize="10" (pageChange)="changePage($event)"
+                    id="courseID"></pagination-controls>
+            </div> -->
+            <div class="row">
+                <ng-container *ngFor="let course of courseList; let i = index">
+                    <div class="form-group col-sm-6 col-md-4">
+                        <div class="card white-card-shadow-style modal-popup-table-card-style h-100 px-0 pt-0">
+                            <div class="course-image-container">
+                                <div class="circle">
+                                    <span class="people-completed-number">{{course.totalCourseTaken}}</span>
+                                    <br>
+                                    <div class="people-have-text">people have</div>
+                                    <br>
+                                    <div class="completed-text">completed</div>
+                                </div>
+                                <div *ngIf="course.logo; else defaultLogo">
+                                    <img class="course-image" src={{course.logo}} alt="">
+                                </div>
+                                <ng-template #defaultLogo>
+                                    <img class="course-image" src="assets/images/default-course.png" alt="">
+                                </ng-template>
+                            </div>
+                            <div class="card-body course-card-body-margin">
+                                <div class="font-weight-bold font-lg-style">{{course.batchName}}</div>
+                                <br>
+                                <div class="font-sm-style">{{course.description}}</div>
+                                <br>
+                                <div>
+                                    <div class="display-inline-style">
+                                        <label class="date-header-style">Subscribed Date</label>
+                                        <br>
+                                        <span
+                                            class="color-4F4F4F font-weight-bold font-sm-style">{{course.subscribedDate
+                                            | date:'dd MMM, yyyy'}}</span>
+                                    </div>
+                                    <div class="view-now-button-style">
+                                        <button class="btn btn-default swabhav-button-square" type="button"
+                                            (click)="redirectToMySessions(course.batchID, course.batchName)">
+                                            View Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <br>
+                                <hr>
+                                <div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-custom"
+                                            role="progressbar" [style.width]="course.completedPercentage + '%'"
+                                            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="color-BDBDBD font-weight-bold font-sm-style">
+                                    You have completed <span
+                                        class="color-F26A00 font-weight-bold">{{course.completedPercentage}}%</span> of
+                                    your course till now
+                                </div>
+                                <div *ngIf="course.completedPercentage!=100 && hideCertificate">
+                                    <br>
+                                    <div class="course-certificate-disabled">
+                                        Download your Certificate
+                                    </div>
+                                    <br>
+                                    <div class="font-sm-style color-757575 text-center">
+                                        You can download your certificate once you complete your course
+                                    </div>
+                                </div>
+                                <div *ngIf="course.completedPercentage==100 && hideCertificate">
+                                    <br>
+                                    <div class="course-certificate">
+                                        Download your Certificate
+                                    </div>
+                                    <br>
+                                    <div class="font-sm-style color-757575 text-center">
+                                        You can download your certificate now
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="course-certificate"
+                                    (click)="redirectToBatchFeedback(course.batchID, course.batchName)">
+                                    Give Feedback
+                                </div>
+                                <br>
+                                <div class="font-sm-style color-757575 text-center">
+                                    You can give feedback once you complete your course
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="totalCourses == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Courses Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>

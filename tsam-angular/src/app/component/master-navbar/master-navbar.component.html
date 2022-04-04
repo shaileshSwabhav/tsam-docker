@@ -1,0 +1,157 @@
+<nav class="navbar navbar-expand-lg navbar-style" (mouseleave)="selectedMenuHoverOut()">
+  <!-- <a class="navbar-brand pointer" (click)="redirect()">
+    <img class="logo-size" src="assets/logo/swabhav-logo-black.png" alt="">
+  </a> -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse">☰</button>
+
+  <div class="collapse navbar-collapse main-menu-style" id="navbar-collapse">
+    <a class="pointer" (click)="redirectToHomePage()">
+      <img class="logo-size" src="assets/logo/swabhav-logo-black.png" alt="">
+    </a>
+    &nbsp;&nbsp;
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item" *ngFor="let menu of menuList; let i = index">
+        <div *ngIf="menu.isVisible">
+          <a class="nav-link menu-style" *ngIf="!menu.menus; else multiplelink" [routerLinkActive]="['active-menu']"
+            routerLink="/{{menu.url}}" (mouseenter)="selectedMenuHoverOut()">
+            {{menu.menuName}}
+          </a>
+        </div>
+        <ng-template #multiplelink>
+
+          <!-- <ng-container>
+            <a [matMenuTriggerFor]="panel.menu" class="nav-link pointer {{menu.class}}" id="navbardrop"
+              data-toggle="dropdown" [routerLinkActive]="['active-menu']">
+              {{menu.menuName}}&nbsp;&nbsp;<span class="arrow down"></span>
+            </a>
+            <app-sub-navbar #panel [items]="menu.menus"></app-sub-navbar>
+          </ng-container> -->
+
+          <!-- If role is anything other than admin and salesperson then give nested menus -->
+          <ng-container *ngIf="!access">
+            <a [matMenuTriggerFor]="panel.menu" class="nav-link pointer {{menu.class}}" id="navbardrop"
+              data-toggle="dropdown" [routerLinkActive]="['active-menu']">
+              <span *ngIf="menu.menuName == 'Add a New'" class="vertical-align-top-icon-style">
+                <i class="material-icons add-icon-font-style add-icon-style">add</i>
+                &nbsp;&nbsp;
+              </span>
+              {{menu.menuName}}&nbsp;&nbsp;<span *ngIf="menu.menuName != 'Add a New'" class="arrow down"></span>
+            </a>
+            <app-sub-navbar #panel [items]="menu.menus"></app-sub-navbar>
+          </ng-container>
+
+          <!-- If role is admin or salesperson then give horizontal menus -->
+          <ng-container *ngIf="access">
+            <a class="nav-link pointer {{menu.class}}" [ngClass]="{'font-weight-bold': menu.menuName==selectedMainMenuName}"
+              [routerLinkActive]="['active-menu']">
+              <span (mouseenter)="selectedMenuHoverIn(menu.menuName)">
+                <span>{{menu.menuName}}</span>
+                &nbsp;&nbsp;
+                <span class="arrow down"></span>
+              </span>
+            </a>
+          </ng-container>
+
+        </ng-template>
+      </li>
+      <li>
+        <div class="row">
+          <div class="col-12">
+            <span class="search-menu text-center">
+              <input (focusout)="onFocusOut()" #searchBar (keyup)="onSearch()" type="search"
+                placeholder="Search menus...">
+            </span>
+          </div>
+          <div class="col-12">
+            <a #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="panel.menu"></a>
+            <app-sub-navbar #panel [items]="searchedMenuList"></app-sub-navbar>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <div *ngIf="profileMenu?.isVisible">
+          <a class="nav-link" *ngIf="!profileMenu.menus; else multiplelink" [routerLinkActive]="['active-menu']"
+            routerLink="/{{profileMenu.url}}">
+            {{profileMenu.menuName}}
+          </a>
+        </div>
+        <ng-template #multiplelink>
+          <a [matMenuTriggerFor]="panel.menu" class="nav-link pointer {{profileMenu.class}}" data-toggle="dropdown">
+            <i class="material-icons black-color">person</i>
+            <span class="profile-style">{{profileMenu.menuName}}&nbsp;&nbsp;<span class="arrow down"></span></span>
+          </a>
+          <app-sub-navbar #panel [items]="profileMenu.menus"></app-sub-navbar>
+        </ng-template>
+      </li>
+    </ul>
+  </div>
+  <ng-container *ngIf="showFullSubMenu">
+    <div class="selected-sub-menu-style">
+      <div class="row">
+        <div class="col-3 no-padding-style">
+          <div class="font-weight-bold category-header-style">{{selectedMenuCategory.menuDivision[0]?.categoryName}}</div>
+          <ng-container *ngFor="let selectedSubMenu of selectedSubMenuList;let i = index">
+            <div class="sub-menu-style cursor-pointer-style padding-bottom-5-style" routerLink="/{{selectedSubMenu.url}}"
+              *ngIf="i>=selectedMenuCategory.menuDivision[0]?.subMenuIndex && i<selectedMenuCategory.menuDivision[1]?.subMenuIndex
+              && selectedSubMenu.isVisible">
+              <div *ngIf="selectedMainMenuName == 'Sourcing' && selectedSubMenu.order == 1" 
+                class="sub-mneu-header-style font-weight-bold color-000000">
+                Check:
+              </div>
+              <div *ngIf="selectedMainMenuName == 'Sourcing' && selectedSubMenu.order == 3" 
+                class="sub-mneu-header-style font-weight-bold color-000000">
+                View + Add:
+              </div>
+              <span>{{selectedSubMenu.menuName}}</span>
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-3 no-padding-style">
+          <div class="font-weight-bold category-header-style">{{selectedMenuCategory.menuDivision[1]?.categoryName}}</div>
+          <ng-container *ngFor="let selectedSubMenu of selectedSubMenuList;let i = index">
+            <div class="sub-menu-style cursor-pointer-style padding-bottom-5-style" routerLink="/{{selectedSubMenu.url}}"
+              *ngIf="i>=selectedMenuCategory.menuDivision[1]?.subMenuIndex && i<selectedMenuCategory.menuDivision[2]?.subMenuIndex
+              && selectedSubMenu.isVisible">
+              <div *ngIf="selectedMainMenuName == 'Sourcing' && selectedSubMenu.order == 6" 
+                class="sub-mneu-header-style font-weight-bold color-000000">
+                Check:
+              </div>
+              <div *ngIf="selectedMainMenuName == 'Sourcing' && selectedSubMenu.order == 8"
+                class="sub-mneu-header-style font-weight-bold color-000000">
+                View + Add:
+              </div>
+              <span>{{selectedSubMenu.menuName}}</span>
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-3 no-padding-style">
+          <div class="font-weight-bold category-header-style">{{selectedMenuCategory.menuDivision[2]?.categoryName}}</div>
+          <ng-container *ngFor="let selectedSubMenu of selectedSubMenuList;let i = index">
+            <div class="sub-menu-style cursor-pointer-style padding-bottom-5-style" routerLink="/{{selectedSubMenu.url}}"
+              *ngIf="selectedMenuCategory.menuDivision[2] && i>=selectedMenuCategory.menuDivision[2]?.subMenuIndex
+              && selectedSubMenu.isVisible">
+              <span>{{selectedSubMenu.menuName}}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</nav>
+
+<!-- <datalist id="search-list">
+  <option *ngFor="let item of searchedMenus" (click)="goToUrl(item?.menu.url)" [value]="item?.menu.menuName">
+    {{item?.menu.menuName}} - <b>{{item.parentName? item.parentName :
+      item?.menu.menuName}}</b>
+  </option>
+</datalist> -->
+
+
+<!-- <datalist id="search-list">
+  <option *ngFor="let item of searchedMenus" (click)="goToUrl(item?.menu.url)" [value]="item?.menu.menuName">
+    {{item?.menu.menuName}} - <b>{{item.parentName? item.parentName :
+      item?.menu.menuName}}</b>
+  </option>
+</datalist> -->

@@ -1,0 +1,108 @@
+.pointer {
+  cursor: pointer;
+}
+
+a, a:hover {
+  color:white;
+  text-decoration: none;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.card-margin {
+  margin-bottom: 5%;
+}
+
+.card-left-margin {
+  margin-bottom: 5%;
+}
+
+.margin-top {
+  margin-top: -2%;
+}
+
+.text-size {
+  font-size: large;
+}
+ 
+.card-header, .card-footer {
+  background-color: #fff6f4d0;
+}
+
+.btn-swabhav {
+  color: #f6430f;
+}
+
+/* *******************input styles***************** */
+.form-control:focus {
+  box-shadow: none;
+}
+
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+
+/* SLIDER */
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;  
+  background: #aaa;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; 
+  background: #D63C2A;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #D63C2A;
+  cursor: pointer;
+}
+
+.slider::-ms-thumb {
+  border: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #D63C2A;
+}
+  
+/* And now the ticks */
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 1%;
+}
+
+.tick {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 1px;
+}

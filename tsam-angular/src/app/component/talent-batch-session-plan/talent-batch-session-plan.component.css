@@ -1,0 +1,22 @@
+.width-80px-style{
+  width: 80px;
+}
+
+.no-background-tr-style{
+  background: white !important;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+  background-color: #ebd0ca;
+}
+
+.current-session-row-style{
+  background-color: #e75636;
+}
+
+.image-fit-style{
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}

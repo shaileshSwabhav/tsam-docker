@@ -1,0 +1,61 @@
+.left-panel{
+    float: left;
+    width: 65%;
+    padding: 6%;
+}
+
+.right-panel{
+    float: right;
+    width: 35%;
+    border-left: solid 1px #BDBDBD;
+    left: 60%;
+    padding: 6%;
+}
+
+.profile-image-container{
+    width: 40px;
+    height: 40px;
+}
+  
+.profile-image{
+    border-radius: 50% 50% 50% 50%;
+    object-fit: cover;
+    width: 40px;
+    height: 40px;
+}
+
+.blog-title-style{
+    font-weight: bold;
+    font-size: x-large;
+    padding-top: 2%;
+    color: #EE3733;
+    cursor: pointer;
+}
+
+.blog-description-style{
+    font-size: large;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+.blog-banner-image-style{
+    width: 200px;
+}
+
+.slap-clap-icon-style{
+    font-size: 20px;
+    cursor: pointer;
+    padding-top: 30%;
+    cursor: default;
+}
+
+.tab-icon-style{
+    font-size: 30px;
+    font-weight: bold;
+    transform: none;
+}
+
+.blog-topic-name-icon-style{
+    font-size: 20px;
+    cursor: pointer;
+}

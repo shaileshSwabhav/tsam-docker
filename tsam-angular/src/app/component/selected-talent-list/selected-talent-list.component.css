@@ -1,0 +1,16 @@
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+/* .border-less {
+  border: none;
+  display: none;
+} */
+
+.display {
+  display: block;
+}
+
+.hide {
+  display: none;
+}

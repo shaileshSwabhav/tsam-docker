@@ -1,0 +1,585 @@
+<app-master-navbar></app-master-navbar>
+
+<div class="container-fluid margin-2pt">
+  <form>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="text-center">Faculty Batch List</h3>
+      </div>
+      <div class=" card-body search-bar padding">
+        <div class="search-input">
+          <div class="form-group">
+            <div class="input-group mb-3 input-group-lg">
+              <input type="text" class="form-control" placeholder="Search">
+              <div class="input-group-append">
+                <span class="input-group-text"><i class="material-icons">search</i></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-by-field row">
+          <div class="form-group col-sm-3 col-md-3">
+            <label for="sel1">Select Course Name:</label>
+            <select class="form-control" id="sel1">
+              <option>Select Course Name</option>
+              <option>DBS</option>
+              <option>DS</option>
+              <option>Python Foundation</option>
+              <option>Golang Foundation</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-3 col-md-3">
+            <label for="sel1">Select Batch Code:</label>
+            <select class="form-control" id="sel1">
+              <option>Select Batch</option>
+              <option>BS101</option>
+              <option>BS103</option>
+              <option>BS102</option>
+              <option>BS106</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-3 col-md-3">
+            <label for="sel1">Select Batch Start Date:</label>
+            <input type="date" class="form-control" placeholder="Select Date" />
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="float-right">
+          <button class="btn btn-success" type="submit">Search</button> &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-secondary" type="reset">Reset</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
+  <div class="card margin-2pt">
+    <div class="card-header">
+      <div class="totalLabel">
+        Total Batch: 4
+      </div>
+      <div class="display-inline">
+        <div class="form-group col-sm-2 col-md-2 inline">
+          <select class="form-control ">
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+          </select>
+          &nbsp;&nbsp;
+        </div>
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">Previous</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-body padding-0pt">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Batch Number</th>
+              <th>Eligibility</th>
+              <th>Start date</th>
+              <th>End Date</th>
+              <th>Total Student</th>
+              <th>Total Seat</th>
+              <th>Timing From</th>
+              <th>Timing To</th>
+              <th>Sales Person</th>
+              <th data-toggle="tooltip" data-placement="top" title="Student List">
+                <button type="button" class="btn" disabled><i class="material-icons primary">list</i></button>
+              </th>
+              <th data-toggle="tooltip" data-placement="top" title="Add Resource Batch">
+                <button type="button" class="btn" disabled><i class="material-icons primary">note_add</i></button>
+              </th>
+              <!-- <th data-toggle="tooltip" data-placement="top" title="Send Message To Student.">
+                <button type="button" class="btn" disabled><i class="material-icons green">sms</i></button>
+              </th> -->
+              <th data-toggle="tooltip" data-placement="top" title="Session list">
+                <button type="button" class="btn" disabled><i class="material-icons">list</i></button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>SV001</td>
+              <td>Data Structure and Problem Solving</td>
+              <td>BS101</td>
+              <td><span class="badge badge-success">Java</span><span class="badge badge-success">Data Structure</span>
+              <td>11/11/2019</td>
+              <td>10/01/2020</td>
+              <td>20</td>
+              <td>25</td>
+              <td>11:30 AM</td>
+              <td>01:30 PM</td>
+              <td>John Deo</td>
+              <th data-toggle="tooltip" data-placement="top" title="Student List">
+                <button type="button" data-toggle="modal" data-target="#studentlist" class="btn"><i
+                    class="material-icons primary">list</i></button>
+              </th>
+              <td data-toggle="tooltip" data-placement="top" title="Add Resource Batch">
+                <button type="button" data-toggle="modal" data-target="#sessionList" class="btn"><i
+                    class="material-icons primary">note_add</i></button>
+              </td>
+              <!-- <td data-toggle="tooltip" data-placement="top" title="Send Message To Student.">
+                <button type="button" data-toggle="modal" data-target="#messageSend" class="btn"><i
+                    class="material-icons green">sms</i></button>
+              </td> -->
+              <td data-toggle="tooltip" data-placement="top" title="Session list">
+                <button type="button" data-toggle="modal" data-target="#sessionlist" class="btn"><i
+                    class="material-icons">list</i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>SV002</td>
+              <td>Data Structure</td>
+              <td>BS102</td>
+              <td><span class="badge badge-success">Java</span><span class="badge badge-success">3rd Year Student</span>
+              </td>
+              <td>11/11/2019</td>
+              <td>10/01/2020</td>
+              <td>20</td>
+              <td>25</td>
+              <td>02:30 PM</td>
+              <td>05:30 PM</td>
+              <td>John Deo</td>
+              <th data-toggle="tooltip" data-placement="top" title="Student List">
+                <button type="button" data-toggle="modal" data-target="#studentlist" class="btn"><i
+                    class="material-icons primary">list</i></button>
+              </th>
+              <td data-toggle="tooltip" data-placement="top" title="Add Resource Batch">
+                <button type="button" data-toggle="modal" data-target="#addNewBatch" class="btn"><i
+                    class="material-icons primary">note_add</i></button>
+              </td>
+              <!-- <td data-toggle="tooltip" data-placement="top" title="Send Message To Student.">
+                <button type="button" data-toggle="modal" data-target="#messageSend" class="btn"><i
+                    class="material-icons green">sms</i></button>
+              </td> -->
+              <td data-toggle="tooltip" data-placement="top" title="Session list">
+                <button type="button" data-toggle="modal" data-target="#sessionlist" class="btn"><i
+                    class="material-icons">list</i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>SV003</td>
+              <td>Object Oriented Programming</td>
+              <td>BS103</td>
+              <td><span class="badge badge-success">Java</span><span class="badge badge-success">Data Structure</span>
+              </td>
+              <td>11/11/2019</td>
+              <td>10/01/2020</td>
+              <td>20</td>
+              <td>25</td>
+              <td>09:30 AM</td>
+              <td>12:30 PM</td>
+              <td>John Deo</td>
+              <th data-toggle="tooltip" data-placement="top" title="Student List">
+                <button type="button" data-toggle="modal" data-target="#studentlist" class="btn"><i
+                    class="material-icons primary">list</i></button>
+              </th>
+              <td data-toggle="tooltip" data-placement="top" title="Add Resource Batch">
+                <button type="button" data-toggle="modal" data-target="#addNewBatch" class="btn"><i
+                    class="material-icons primary">note_add</i></button>
+              </td>
+              <!-- <td data-toggle="tooltip" data-placement="top" title="Send Message To Student.">
+                <button type="button" data-toggle="modal" data-target="#messageSend" class="btn"><i
+                    class="material-icons green">sms</i></button>
+              </td> -->
+              <td data-toggle="tooltip" data-placement="top" title="Session list">
+                <button type="button" data-toggle="modal" data-target="#sessionlist" class="btn"><i
+                    class="material-icons">list</i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>SV004</td>
+              <td>System Design</td>
+              <td>BS101</td>
+              <td><span class="badge badge-success">Java</span></td>
+              <td>11/11/2019</td>
+              <td>10/01/2020</td>
+              <td>20</td>
+              <td>25</td>
+              <td>11:30 AM</td>
+              <td>01:30 PM</td>
+              <td>John Deo</td>
+              <th data-toggle="tooltip" data-placement="top" title="Student List">
+                <button type="button" data-toggle="modal" data-target="#studentlist" class="btn"><i
+                    class="material-icons primary">list</i></button>
+              </th>
+              <td data-toggle="tooltip" data-placement="top" title="Add Resource Batch">
+                <button type="button" data-toggle="modal" data-target="#addNewBatch" class="btn"><i
+                    class="material-icons primary">note_add</i></button>
+              </td>
+              <td data-toggle="tooltip" data-placement="top" title="Session list">
+                <button type="button" data-toggle="modal" data-target="#sessionlist" class="btn"><i
+                    class="material-icons">list</i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add New Session -->
+<div class="modal fade" id="sessionList">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add Resource</h4>
+        <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+            class="material-icons">highlight_off</i></button>
+      </div>
+
+      <!-- Modal body -->
+      <form [formGroup]="courseform">
+        <div class="modal-body">
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-6">
+              <label for="sel1">Course Code:</label>
+              <input type="text" class="form-control" placeholder="Course Code" disabled>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-6">
+              <label for="sel1">Session:</label>
+              <select class="form-control">
+                <option>Select Session of Current Course</option>
+                <option value="video">Session 1</option>
+                <option value="document">Session 2</option>
+                <option value="document">Session 3</option>
+                <option value="document">Session 4</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="sel1">Resourse Type:</label>
+              <select class="form-control" (change)="resourceTypeChange($event.target.value)">
+                <option>Select Resourse Type</option>
+                <option value="url">Url</option>
+                <option value="video">Video</option>
+                <option value="document">Document</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <div class="custom-file" *ngIf="resourseType != 'url'">
+                <input type="file" class="custom-file-input" id="customFile">
+                <label class="custom-file-label" for="customFile">Upload Resourse</label>
+              </div>
+              <input *ngIf="resourseType == 'url'" type="text" class="form-control" placeholder="Resource Url">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label for="comment">Description:</label>
+              <textarea class="form-control" placeholder="Resourse Description..."></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-4">
+              <button type="submit" class="btn btn-primary" (click)="formAction()">Add Resourse</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              Resource History:
+            </div>
+            <div class="col-sm-12 col-md-12">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Sr No.</th>
+                      <th>Resourse Type</th>
+                      <th>Resourse</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>Url</td>
+                      <td>data</td>
+                      <td>Description</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" (click)="formAction()">Add Resource</button>
+          <button type="submit" class="btn btn-secondary" type="reset">Reset</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add New Session -->
+<div class="modal fade" id="sessionlist">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Session List</h4>
+        <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+            class="material-icons">highlight_off</i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            Session List:
+          </div>
+          <div class="col-sm-12 col-md-12">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Hours</th>
+                    <th>Status</th>
+                    <th>Resource</th>
+                    <th>Feedback Link</th>
+                    <th>Test Link</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>SECODE001</td>
+                    <td>Session Name</td>
+                    <td>3</td>
+                    <td>
+                      <div class="form-group col-sm-12 col-md-12" style="padding-left: 0px;">
+                        <select class="form-control">
+                          <option class="green-back" value="document" selected>Complete</option>
+                          <option class="primary-back" value="document">Active</option>
+                          <option class="warning-back" value="document">Pending</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td>12</td>
+                    <td><button class="btn btn-default"><i class="material-icons rotate">link</i></button></td>
+                    <td><button class="btn btn-default"><i class="material-icons rotate">link</i></button></td>
+                  </tr>
+                  <tr>
+                    <td>SECODE002</td>
+                    <td>Session Name</td>
+                    <td>3</td>
+                    <td>
+                      <div class="form-group col-sm-12 col-md-12" style="padding-left: 0px;">
+                        <select class="form-control">
+                          <option value="document">Complete</option>
+                          <option value="document" selected>Active</option>
+                          <option value="document">Pending</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td>12</td>
+                    <td><button class="btn btn-default"><i class="material-icons rotate">link</i></button></td>
+                    <td><button class="btn btn-default"><i class="material-icons rotate">link</i></button></td>
+                  </tr>
+                  <tr>
+                    <td>SECODE003</td>
+                    <td>Session Name</td>
+                    <td>3</td>
+                    <td>
+                      <div class="form-group col-sm-12 col-md-12" style="padding-left: 0px;">
+                        <select class="form-control">
+                          <option value="document">Complete</option>
+                          <option value="document">Active</option>
+                          <option value="document" selected>Pending</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td>12</td>
+                    <td><button class="btn btn-default"><i class="material-icons rotate">link</i></button></td>
+                    <td><button class="btn btn-default"><i class="material-icons rotate">link</i></button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Send Message -->
+<div class="modal fade" id="messageSend">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Send Message</h4>
+        <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+            class="material-icons">highlight_off</i></button>
+      </div>
+
+      <!-- Modal body -->
+      <form [formGroup]="courseform">
+        <div class="modal-body">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label for="comment">Message:</label>
+              <textarea class="form-control" rows="5" placeholder="Message..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" (click)="formAction()" data-dismiss="modal">Send
+            Message</button>
+          <button type="submit" class="btn btn-secondary" type="reset">Reset</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Student List -->
+<div class="modal fade" id="studentlist">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Student List</h4>
+        <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+            class="material-icons">highlight_off</i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <!-- <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" [(ngModel)]="multipleSelect">
+          <label class="custom-control-label" for="customCheck">Select</label>
+        </div> -->
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="multipleSelect" value="">Select Multiple
+          </label>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th *ngIf="multipleSelect == true">
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" class="form-check-input" [(ngModel)]="multipleSelect" value="" disabled>
+                    </label>
+                  </div>
+                </th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th *ngIf="multipleSelect == false">Message</th>
+                <th *ngIf="multipleSelect == false">Report Card</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let student of enquiry">
+                <td *ngIf="multipleSelect == true">
+                  <input type="checkbox" value="">
+                </td>
+                <td>{{student.firstName}} {{student.lastName}}</td>
+                <td>{{student.email}}</td>
+                <td>{{student.contact}}</td>
+                <td *ngIf="multipleSelect == false" data-toggle="tooltip" data-placement="top"
+                  title="Send Message To Student.">
+                  <button type="button" data-dismiss="modal" data-toggle="modal" data-target="#messageSend"
+                    class="btn"><i class="material-icons green">sms</i></button>
+                </td>
+                <td *ngIf="multipleSelect == false" data-toggle="tooltip" data-placement="top"> <button type="button"
+                    data-dismiss="modal" data-toggle="modal" data-target="#studentreport" class="btn"><i
+                      class="material-icons green">show_chart</i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="modal"
+            data-target="#messageSend" *ngIf="multipleSelect" type="reset">Send Message</button>
+          <button type="button" data-dismiss="modal" data-toggle="modal" data-target="#sessionList"
+            class="btn btn-primary" *ngIf="multipleSelect" type="reset">Send Resource</button>
+          <button type="submit" class="btn btn-secondary" type="reset">Reset</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Send Message -->
+<div class="modal fade" id="studentreport">
+  <div class="modal-dialog modal-dialog-centered  modal-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Report Card</h4>
+        <button type="button" class="close" data-dismiss="modal" class="btn btn-default" type="submit"><i
+            class="material-icons">highlight_off</i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="row">
+          <div style="padding: 0 0 0 0;overflow-x: scroll;">
+            <!-- <ngx-charts-line-chart [view]="view" [showXAxisLabel]="showXAxisLabel" [showYAxisLabel]="showYAxisLabel"
+              [xAxis]="xAxis" [yAxis]="yAxis" [xAxisLabel]="xAxisLabel" [yAxisLabel]="yAxisLabel" [timeline]="timeline"
+              [results]="multi">
+            </ngx-charts-line-chart> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal" type="button">close</button>
+      </div>
+
+    </div>
+  </div>
+</div>

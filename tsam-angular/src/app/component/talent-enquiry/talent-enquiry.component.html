@@ -1,0 +1,2294 @@
+<ng-template #fieldNameCompulsary let-name="name">
+  <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #noneTemplate>
+  <span>
+    None
+  </span>
+</ng-template>
+
+<ng-template #dashTemplate>
+  <span>-</span>
+</ng-template>
+
+<ng-template #enquiryNameDisplay>
+  <span class="color-F6430F"> {{selectedEnquiry.firstName + " " + selectedEnquiry.lastName}}</span>
+</ng-template>
+
+<ng-template #noTemplate>
+  <span>
+    No
+  </span>
+</ng-template>
+
+
+<mat-drawer-container class="drawer-container-style">
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right" (click)="drawer.toggle()">
+        <span><i class="material-icons filter-close-icon-style">close</i></span>
+      </div>
+    </div>
+    <br>
+    <br>
+    <mat-sidenav-container class="example-container">
+      <mat-sidenav mode="side" opened position="start" class="search-mat-drawer-style">
+        <div class="search-section-group-style">
+          <div *ngFor="let searchSection of searchSectionList">
+            <div (click)="onSearchSectionNameClick(searchSection.name)"
+              [ngClass]="searchSection.isSelected ? 'selected-search-section-name-style' : 'search-section-name-style'">
+              {{searchSection.name}}
+            </div>
+          </div>
+        </div>
+      </mat-sidenav>
+      <mat-sidenav-content class="search-main-content-style">
+        <form [formGroup]="enquirySearchForm">
+          <div *ngIf="selectedSectionName=='Personal'">
+            <div class="font-weight-bold font-lg-style">Personal Details Search</div>
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}"></ng-container>
+                </span>
+                <input type="text" formControlName="firstName" class="form-control input-style" placeholder="eg: Ravi"
+                  appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}"></ng-container>
+                </span>
+                <input type="text" formControlName="lastName" class="form-control input-style" placeholder="eg: Sharma"
+                  appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+                </span>
+                <input type="email" formControlName="email" nbInput class="form-control input-style"
+                  placeholder="eg: ravisharma@gmail.com" appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'City'}"></ng-container>
+                </span>
+                <input type="text" formControlName="city" class="form-control input-style" placeholder="eg: Mumbai"
+                  appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Country'}"></ng-container>
+                </span>
+                <ng-select [items]="countryList" bindValue="id" bindLabel="name" placeholder="Select" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="countryID" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedSectionName=='Enquiry'">
+            <div class="font-weight-bold font-lg-style">Enquiry Details Search</div>
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-12 col-md-6">
+                <div>
+                  <label class="font-weight-bolder-style font-md-style">Enquiry Date:</label>
+                </div>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From'}"></ng-container>
+                </span>
+                <input type="date" class="form-control input-style" formControlName="enquiryFromDate" appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <div>
+                  <label>&nbsp;</label>
+                </div>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To'}"></ng-container>
+                </span>
+                <input type="date" class="form-control input-style" formControlName="enquiryToDate" appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Source'}"></ng-container>
+                </span>
+                <ng-select [items]="sourceList" bindLabel="description" placeholder="Select" appendTo="body"
+                  bindValue="id" [searchable]="true" [clearable]="true" formControlName="enquirySource"
+                  [compareWith]="compareFn" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.description}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last 30 Days'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="isLastThirtyDays">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedSectionName=='Academics'">
+            <div class="font-weight-bold font-lg-style">Academic Details Search</div>
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'College Name'}">
+                  </ng-container>
+                </span>
+                <input type="text" formControlName="college" class="form-control input-style"
+                  placeholder="eg: Thakur College of Engineering" appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Qualification(s)'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="degreeList" bindValue="id" bindLabel="name" placeholder="Select" appendTo="body"
+                  multiple="true" [searchable]="true" [clearable]="true" formControlName="degrees"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Academic Year(s)'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="academicYearList" bindLabel="value" bindValue="key" placeholder="Select"
+                  appendTo="body" multiple="true" [searchable]="true" [clearable]="true" formControlName="academicYears"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.value}}
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedSectionName=='Experiences'">
+            <div class="font-weight-bold font-lg-style">Experience Details Search</div>
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Experienced?'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="isExperience">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="false">Fresher</option>
+                  <option [ngValue]="true">Experienced</option>
+                </select>
+              </div>
+              <div *ngIf="enquirySearchForm.get('isExperience').value" class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Minimum Experience'}">
+                  </ng-container>
+                </span>
+                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                  formControlName="minimumExperience" placeholder="eg: 2"
+                  (input)="setMaximumExperienceRequired($event.target.value)">
+                <div class="alert alert-danger" *ngIf="(enquirySearchForm.get('minimumExperience').touched||enquirySearchForm.get('minimumExperience').dirty)
+                  &&enquirySearchForm.get('minimumExperience').invalid">
+                  <div *ngIf=" enquirySearchForm.get('minimumExperience').errors.max">
+                    Can't be more than 30 years.
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="enquirySearchForm.get('isExperience').value" class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum Experience'}">
+                  </ng-container>
+                </span>
+                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                  formControlName="maximumExperience" placeholder="eg: 2">
+                <div class="alert alert-danger" *ngIf="(enquirySearchForm.get('maximumExperience').touched||enquirySearchForm.get('maximumExperience').dirty)
+                  &&enquirySearchForm.get('maximumExperience').invalid">
+                  <div *ngIf=" enquirySearchForm.get('maximumExperience').errors.max">
+                    Can't be more than 30 years.
+                  </div>
+                  <div *ngIf="enquirySearchForm.get('maximumExperience')?.errors.min">
+                    Should be greater than {{enquirySearchForm.get('minimumExperience').value}} years.
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="enquirySearchForm.get('isExperience').value;else regularTech"
+                class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Technology With Experience'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="technologyList" bindValue="id" bindLabel="language" placeholder="Select"
+                  appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+                  formControlName="experienceTechnologies" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.language}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <ng-template #regularTech>
+                <div class="form-group col-sm-12 col-md-6">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Enquiry\'s Technology(s)'}">
+                    </ng-container>
+                  </span>
+                  <ng-select [items]="technologyList" bindValue="id" bindLabel="language"
+                    placeholder="Select Technology" appendTo="body" multiple="true" [searchable]="true"
+                    [clearable]="true" class="ng-select-style" formControlName="technologies" [loading]="isTechLoading"
+                    (search)="getTechnologyList($event)" (focus)="getTechnologyList()">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index"
+                      class="ng-select-style">
+                      {{item.language}}
+                    </ng-template>
+                  </ng-select>
+                </div>
+              </ng-template>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Designation(s)'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="designationList" bindValue="id" bindLabel="position" placeholder="Select"
+                  appendTo="body" multiple="true" [searchable]="true" [clearable]="true" formControlName="designations"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.position}}
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedSectionName=='Calling'">
+            <div class="font-weight-bold font-lg-style">Calling Record Details Search</div>
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Purpose'}"></ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="callRecordPurposeID"
+                  (change)="getOutcomesByPurposeID(enquirySearchForm.get('callRecordPurposeID').value)">
+                  <option [ngValue]="null">Select</option>
+                  <option *ngFor="let purpose of purposeList" [ngValue]="purpose.id">{{purpose.purpose}}</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <fieldset [disabled]="!outcomeList || outcomeList?.length == 0">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Outcome'}"></ng-container>
+                  </span>
+                  <select class="form-control input-style" formControlName="callRecordOutcomeID">
+                    <option [ngValue]="null">Select</option>
+                    <option *ngFor="let outcome of outcomeList" [ngValue]="outcome.id">{{outcome.outcome}}</option>
+                  </select>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedSectionName=='Waiting List'">
+            <div class="font-weight-bold font-lg-style">Waiting List Details Search</div>
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Waiting For?'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="waitingFor">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="'Company'">Company</option>
+                  <option [ngValue]="'Course'">Course</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company Branch'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="companyBranchList" bindLabel="branchName" bindValue="id" placeholder="Select"
+                  appendTo="body" [searchable]="true" [clearable]="true" formControlName="waitingForCompanyBranchID"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.branchName}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company Requirement'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="allRequirementList" bindLabel="code" bindValue="id" placeholder="Select"
+                  appendTo="body" [searchable]="true" [clearable]="true" formControlName="waitingForRequirementID"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.branch.branchName}} {{item.code}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Course'}"></ng-container>
+                </span>
+                <ng-select [items]="courseList" bindLabel="code" bindValue="id" placeholder="Select" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="waitingForCourseID" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <div>
+                  <label>&nbsp;</label>
+                </div>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Batch'}"></ng-container>
+                </span>
+                <ng-select [items]="allBatchList" bindLabel="batchName" bindValue="id" placeholder="Select"
+                  appendTo="body" [searchable]="true" [clearable]="true" formControlName="waitingForBatchID"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.batchName}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <div>
+                  <label>&nbsp;</label>
+                </div>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Active?'}"></ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="waitingForIsActive">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <div>
+                  <label class="font-weight-bolder-style font-md-style">Applied Date:</label>
+                </div>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From'}"></ng-container>
+                </span>
+                <input type="date" class="form-control input-style" formControlName="waitingForFromDate" appEmptyToNull>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <div>
+                  <label>&nbsp;</label>
+                </div>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To'}"></ng-container>
+                </span>
+                <input type="date" class="form-control input-style" formControlName="waitingForToDate" appEmptyToNull>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedSectionName=='Others'">
+            <div class="font-weight-bold font-lg-style">Other Details Search</div>
+            <div class="filter-by-field row">
+              <div *ngIf="showForSalesPerson" class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Salesperson(s)'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="salesPersonList" bindLabel="firstName" bindValue="id" placeholder="Select"
+                  appendTo="body" multiple="true" [searchable]="true" [clearable]="true"
+                  formControlName="salesPersonIDs" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.firstName +' '+ item.lastName}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Masters Abroad?'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="isMastersAbroad">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+              </div>
+              <div *ngIf="enquirySearchForm.get('isMastersAbroad').value" class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Year for Masters in Abroad'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="yearOfMS">
+                  <option [ngValue]="null">Undecided</option>
+                  <option *ngFor="let yearOfMS of yearOfMSList" [ngValue]="yearOfMS">{{yearOfMS}}</option>
+                </select>
+              </div>
+              <div *ngIf="roleName == 'salesperson'" class="form-group col-sm-12 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Search All Enquiries'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="searchAllEnquiries">
+                  <option [ngValue]="null">Search all enquiries</option>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="text-center">
+            <button class="btn btn-default filter-button" type="submit" [disabled]="!enquirySearchForm.dirty"
+              (click)="OnSerachEquiriesButtonClick();drawer.toggle()">
+              Search
+              <span class="vertical-align-top-icon-style"><i
+                  class="material-icons search-button-icon-style">search</i></span>
+            </button>
+          </div>
+        </form>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-drawer>
+  <app-master-navbar></app-master-navbar>
+  <div class="container-fluid">
+    <br>
+    <div class="standard-page-margin">
+      <div class="display-inline">
+        <div class="font-weight-bold font-xl-style">
+          <span *ngIf="isNavigatedFromWaitingList">
+            <button class="btn btn-default filter-button" (click)="backToPreviousPage()">
+              <i class="material-icons-outlined back-button-style">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;
+          </span>
+          Enquiries -
+          <span class="color-F6430F"> {{totalEnquiries}}</span>
+          &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-default filter-button" type="button" *ngIf="isSearched && !isNavigatedFromWaitingList"
+            (click)="resetSearchAndGetAll()">
+            View All Enquiries
+          </button>
+        </div>
+        <div class="float-right">
+          <button *ngIf="permission.add" class="btn btn-default swabhav-button-round" (click)="onAddNewEnquiryClick()">
+            Add New Enquiry
+          </button>
+        </div>
+      </div>
+      <div
+        *ngIf="(!isNavigatedFromWaitingList && totalEnquiries == 0 && isSearched) || (!isNavigatedFromWaitingList && totalEnquiries> 0 && !isSearched) || (!isNavigatedFromWaitingList && totalEnquiries > 0 && isSearched)">
+        <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+          Add Filter <strong>+</strong>
+        </button>
+        <div>
+          <span class="search-filter-name-style" *ngFor="let searchFilterField of searchFilterFieldList">
+            {{searchFilterField.propertyNameText}}
+            <!-- <span *ngFor="let value of searchFilterField.valueList">
+              {{value}}
+            </span> -->
+            <span (click)="deleteSearchCriteria(searchFilterField.propertyName)" class="vertical-align-top-icon-style">
+              <i class="material-icons search-name-delete-icon-style">close</i>
+            </span>
+          </span>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="totalEnquiries > 0">
+        <div class="text-right">
+          <span class="pagination-string">
+            Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+            <span class="pagination-numbers">{{totalEnquiries}}</span>
+          </span>
+        </div>
+        <div class="pagination-flex">
+          <div class="pagination-flex-item">
+            <!-- <div class="row"> -->
+            <div class="form-check">
+              <div class="custom-control custom-switch" *ngIf="!isNavigatedFromWaitingList">
+                <input type="checkbox" class="custom-control-input switch-style" id="multipleSelectSwitch"
+                  (click)="toggleMultipleSelect()">
+                <label class="custom-control-label" for="multipleSelectSwitch">
+                  <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Multiple
+                    Selection</span>
+                </label>
+              </div>
+            </div>&nbsp;&nbsp;<span class="vertical-line-style" *ngIf="!isNavigatedFromWaitingList">|</span>&nbsp;&nbsp;
+            <span class="color-D63C2A font-weight-bold font-md-style">Fresher</span>&nbsp;
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="fresherExperiencedSwitched"
+                (click)="toggleShowExperienceColumns()">
+              <label class="custom-control-label" for="fresherExperiencedSwitched">
+                <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Experienced</span>
+              </label>
+            </div>
+            <!-- </div> -->
+          </div>
+          <div class="pagination-flex-item">
+            <div class="pagination-control-flex-item">
+              <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+                <option selected>5</option>
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="pagination-control-flex-item">
+              <ul class="pagination" *ngFor="let enquiry of enquiryList | paginate: { id:'enquiryID',
+                itemsPerPage: limit, currentPage: currentPage, totalItems: totalEnquiries}">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="enquiryID">
+              </pagination-controls>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="multipleSelect">
+            <br>
+            <button *ngIf="showForAdmin" class="btn btn-default swabhav-button-round"
+              (click)="onAllocateSalespersonToEnquiriesClick()">
+              Allocate Salesperson
+            </button>
+          </div>
+        </div>
+        <br>
+      </div>
+    </div>
+    <div *ngIf="totalEnquiries > 0">
+      <div class="card table-card-shadow table-card-style">
+        <div class="card-body padding-0pt">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <tr>
+                <th *ngIf="multipleSelect">
+                  <label class="checkbox-container">
+                    <input type="checkbox" [checked]="checkEnquiriesAdded()"
+                      (change)="setSelectAllEnquiries($event.target.checked)">
+                    <span class="checkmark"></span>
+                  </label>
+                </th>
+                <th>Sr. No.</th>
+                <th>Full Name</th>
+                <th>Contact</th>
+                <th>Source</th>
+                <th>Purpose</th>
+                <th>Date</th>
+                <th>SalesPerson</th>
+                <th *ngIf="!showExperienceColumns">Technologies</th>
+                <th *ngIf="showExperienceColumns">Experience Technologies</th>
+                <th *ngIf="!showExperienceColumns">Academic Year</th>
+                <th *ngIf="!showExperienceColumns">College Name</th>
+                <th *ngIf="showExperienceColumns">Total Experience</th>
+                <th *ngIf="showExperienceColumns">Current Company</th>
+                <th *ngIf="showExperienceColumns">Designation</th>
+                <th *ngIf="showExperienceColumns">CTC Current</th>
+                <th>City</th>
+                <th *ngIf="showExperienceColumns">Expected CTC</th>
+                <th></th>
+              </tr>
+              <tbody>
+                <tr *ngFor="let enquiry of enquiryList; let i = index">
+                  <td *ngIf="multipleSelect == true">
+                    <label class="checkbox-container">
+                      <input type="checkbox" [checked]="checkEnquiryAdded(enquiry.id)"
+                        (change)="addEnquiryToList($event.target.checked,enquiry)">
+                      <span class="checkmark"></span>
+                    </label>
+                  </td>
+                  <td>{{(i+1)+(offset*limit)}}</td>
+                  <td>{{enquiry.firstName + " " + enquiry.lastName }}</td>
+                  <td>{{enquiry.contact}}</td>
+                  <td>
+                    <span *ngIf="enquiry.enquirySource!=null">
+                      {{enquiry.enquirySource.description}}
+                    </span>
+                  </td>
+                  <td>{{enquiry.enquiryType}}</td>
+                  <td>{{enquiry.enquiryDate | date:'dd MMM, yyyy'}}</td>
+                  <td>
+                    <span *ngIf="enquiry.salesPerson != null; else noSalesperson">
+                      {{enquiry.salesPerson.firstName}} {{enquiry.salesPerson.lastName}}</span>
+                    <ng-template #noSalesperson>
+                      <span data-toggle="tooltip" data-placement="top" title="Allocate salesperson">
+                        <span *ngIf="permission.add" (click)="onAllocateSalespersonToOneEnquiryClick(enquiry.id)">
+                          <i class="material-icons color-F6430F">add</i>
+                        </span>
+                      </span>
+                    </ng-template>
+                  </td>
+                  <td *ngIf="!showExperienceColumns">
+                    <span *ngFor="let tech of enquiry.technologies">
+                      <span class="badge swabhav-badge-style">
+                        {{tech.language}}
+                      </span>&nbsp;
+                    </span>
+                  </td>
+                  <td *ngIf="showExperienceColumns">
+                    <span *ngFor="let tech of enquiry.allExperiencesTechnologies">
+                      <span class="badge swabhav-badge-style">
+                        {{tech}}
+                      </span>&nbsp;
+                    </span>
+                  </td>
+                  <td *ngIf="!showExperienceColumns">{{utilityService.getValueByKey(enquiry.academicYear,
+                    academicYearList)}}</td>
+                  <td *ngIf="!showExperienceColumns">{{enquiry.firstCollegeName}}</td>
+                  <td *ngIf="showExperienceColumns">{{enquiry.totalYearsOfExperienceInString}}</td>
+                  <td *ngIf="showExperienceColumns">{{enquiry.currentCompanyName}}</td>
+                  <td *ngIf="showExperienceColumns" class="color-F6430F">{{enquiry.lastDesignation}}</td>
+                  <td *ngIf="showExperienceColumns">{{enquiry.currentCompanyPackage}}</td>
+                  <td>{{enquiry.city}}</td>
+                  <td *ngIf="showExperienceColumns">
+                    <span *ngIf="enquiry.expectedCTC != null && enquiry.expectedCTC > 0; else noExpectedCTC">
+                      {{enquiry.expectedCTCInString}}
+                    </span>
+                    <ng-template #noExpectedCTC>
+                      <span>
+                        No Expected CTC
+                      </span>
+                    </ng-template>
+                  </td>
+                  <td>
+                    <div class="dropdown">
+                      <span id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="material-icons">more_vert</i>
+                      </span>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item dropdown-style dropdown-option-hover-style" *ngIf="enquiry.resume!=null"
+                          href={{enquiry.resume}} target="_blank">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">description</i></span>
+                          Resume
+                        </a>
+                        <span class="dropdown-item disabled-dropdown-style" *ngIf="enquiry.resume==null">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">description</i></span>
+                          No Resume
+                        </span>
+                        <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                          (click)="onViewEnquiryClick(enquiry.id)">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">visibility</i></span>
+                          View
+                        </a>
+                        <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                          (click)="getWaitingListForSelectedEnquiry(enquiry.id)">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">hourglass_top</i></span>
+                          Waiting List
+                        </a>
+                        <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                          (click)="getCallRecordsForSelectedEnquiry(enquiry.id)">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">add_ic_call</i></span>
+                          Calling Details
+                        </a>
+                        <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                          *ngIf="!enquiry.talentID && permission.add" (click)="convertEnquiryToTalent(enquiry)">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">transfer_within_a_station</i></span>
+                          Convert to Talent
+                        </a>
+                        <span class="dropdown-item disabled-dropdown-style" *ngIf="enquiry.talentID && permission.add">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">transfer_within_a_station</i></span>
+                          Already a Talent
+                        </span>
+                        <a class="dropdown-item dropdown-style dropdown-option-hover-style"
+                          *ngIf="permission.delete && !isNavigatedFromWaitingList"
+                          (click)="onDeleteEnquiryClick(enquiry.id)">
+                          <span class="vertical-align-top-icon-style"><i
+                              class="material-icons search-name-delete-icon-style">delete</i></span>
+                          Delete
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="totalEnquiries == 0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Enquiries Found</h2>
+        </div>
+      </div>
+    </div>
+    
+    <br>
+    <div class="mr-5" *ngIf="totalEnquiries > 0">
+      <div class="text-right">
+        <span class="pagination-string">
+          Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+          <span class="pagination-numbers">{{totalEnquiries}}</span>
+        </span>
+      </div>
+      <div class="pagination-flex">
+        <div class="pagination-flex-item">
+         
+        </div>
+        <div class="pagination-flex-item">
+          <div class="pagination-control-flex-item">
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="pagination-control-flex-item">
+            <ul class="pagination" *ngFor="let enquiry of enquiryList | paginate: { id:'enquiryID',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalEnquiries}">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="enquiryID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+</mat-drawer-container>
+
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add New Enquiry -->
+<ng-template #enquiryFormModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      {{isViewMode? 'Enquiry Details' : isOperationEnquiryUpdate ? 'Update Enquiry' : 'Add Enquiry' }}
+      <span *ngIf="isViewMode && permission.update" (click)="onUpdateEnquiryClick()">
+        <i class="material-icons">create</i>
+      </span>
+      <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+        (click)="dismissFormModal(modal)">
+        <span class="vertical-align-top-icon-style">
+          <i class="material-icons modal-popup-close-icon-style">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red"><strong>*</strong></span> marked fields
+      are mandatory</div>
+    <br>
+
+
+    <!-- Template for enquiry form -->
+    <ng-template #enquiryFormTemplate>
+      <form [formGroup]="enquiryForm">
+        <div class="row">
+          <div class="form-group col-sm-3 col-md-2" *ngIf="isViewMode || isOperationEnquiryUpdate">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Enquiry Code'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput formControlName="code">
+          </div>
+        </div>
+        <div class="form-sub-header-style">Personal Details</div>
+        <div class="row">
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'First Name'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="firstName" placeholder="eg: Ravi">
+            <div *ngIf="(enquiryForm.get('firstName').dirty || enquiryForm.get('firstName').touched) 
+              && enquiryForm.get('firstName').invalid" class="alert alert-danger">
+              <div *ngIf="enquiryForm.get('firstName').errors.required">
+                First Name must be specified
+              </div>
+              <div *ngIf="enquiryForm.get('firstName').errors.pattern">
+                First Name should only have alphabets
+              </div>
+              <div *ngIf="enquiryForm.get('firstName').errors.maxLength">
+                First Name can have maximum 50 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Name'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="lastName" placeholder="eg: Sharma">
+            <div *ngIf="(enquiryForm.get('lastName').dirty || enquiryForm.get('lastName').touched) 
+            && enquiryForm.get('lastName').invalid" class="alert alert-danger">
+              <div *ngIf="enquiryForm.get('lastName').errors.required">
+                Last Name must be specified
+              </div>
+              <div *ngIf="enquiryForm.get('lastName').errors.pattern">
+                Last Name should only have alphabets
+              </div>
+              <div *ngIf="enquiryForm.get('lastName').errors.maxLength">
+                Last Name can have maximum 50 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-4">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Email Address'}"></ng-container>
+            </span>
+            <input type="email" class="form-control input-style" formControlName="email"
+              placeholder="eg: ravisharma@gmail.com">
+            <div *ngIf="(enquiryForm.get('email').dirty || enquiryForm.get('email').touched) 
+              && enquiryForm.get('email').invalid" class="alert alert-danger">
+              <div *ngIf="enquiryForm.get('email').errors.required">
+                Eamil must be specified
+              </div>
+              <div *ngIf="enquiryForm.get('email').errors.pattern">
+                Email should be in example@domain.com format
+              </div>
+              <div *ngIf="enquiryForm.get('email').errors.maxLength">
+                Email can have maximum 100 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-3 col-md-2">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Mobile Number'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="contact" placeholder="eg: 9796786545">
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('contact').touched || enquiryForm.get('contact').dirty) 
+              && enquiryForm.get('contact').invalid">
+              <div *ngIf="enquiryForm.get('contact').errors.required">
+                Contact should be specified.
+              </div>
+              <div *ngIf="enquiryForm.get('contact').errors.pattern">
+                Contact should consist of a 10 digit valid number
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-4">
+            <div>
+              <label class="font-weight-bolder-style font-md-style">Alternate:</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email Address'}"></ng-container>
+            </span>
+            <input type="email" class="form-control input-style" nbInput appEmptyToNull formControlName="alternateEmail"
+              placeholder="eg: ravisharma@gmail.com">
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('alternateEmail').touched || enquiryForm.get('alternateEmail').dirty) 
+            && enquiryForm.get('alternateEmail').invalid">
+              <div *ngIf="enquiryForm.get('alternateEmail').errors.pattern">
+                Email should be in example@domain.com format
+              </div>
+              <div *ngIf="enquiryForm.get('alternateEmail').errors.maxLength">
+                Email can have maximum 100 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-3 col-md-2">
+            <div>
+              <label>&nbsp;</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Mobile Number'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="alternateContact"
+              placeholder="eg: 9796786545" appEmptyToNull>
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('alternateContact').touched || enquiryForm.get('alternateContact').dirty) 
+              && enquiryForm.get('alternateContact').invalid">
+              <div *ngIf="enquiryForm.get('alternateContact').errors.pattern">
+                Contact should consist of a 10 digit valid number
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-3 col-md-2">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Academic Year'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="academicYear">
+              <option [ngValue]="null" disabled>Select</option>
+              <option *ngFor="let academicyear of academicYearList" [ngValue]="academicyear.key">
+                {{academicyear.value}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('academicYear').touched || enquiryForm.get('academicYear').dirty) 
+                && enquiryForm.get('academicYear').invalid">
+              <div *ngIf="enquiryForm.get('academicYear').errors.required">
+                Academic Year should be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Technology Stack'}">
+              </ng-container>
+            </span>
+            <ng-select [items]="technologyList" bindLabel="language" placeholder="Select" appendTo="body"
+              multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+              class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+              [loading]="isTechLoading">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.language}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Courses interested in'}">
+              </ng-container>
+            </span>
+            <ng-select [items]="courseList" bindLabel="name" placeholder="Select" appendTo="body" multiple="true"
+              [searchable]="true" [clearable]="true" formControlName="courses" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.name}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-sub-header-style">Enquiry Related Details</div>
+        <div class="row">
+          <div class="form-group col-sm-3 col-md-2">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Enquiry Date'}"></ng-container>
+            </span>
+            <input type="date" class="form-control input-style" formControlName="enquiryDate">
+            <div *ngIf="(enquiryForm.get('enquiryDate').dirty || enquiryForm.get('enquiryDate').touched) 
+              && enquiryForm.get('enquiryDate').invalid" class="alert alert-danger">
+              <div *ngIf="enquiryForm.get('enquiryDate').errors.required">
+                Enquiry Date must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Enquiry For'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="enquiryType">
+              <option [ngValue]="null" disabled>Select</option>
+              <option *ngFor="let enquirytype of enquiryTypeList" [ngValue]="enquirytype.value">{{enquirytype.value}}
+              </option>
+            </select>
+            <div *ngIf="(enquiryForm.get('enquiryType').dirty || enquiryForm.get('enquiryType').touched) 
+              && enquiryForm.get('enquiryType').invalid" class="alert alert-danger">
+              <div *ngIf="enquiryForm.get('enquiryType').errors.required">
+                Enquiry Type must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Enquiry Source'}"></ng-container>
+            </span>
+            <ng-select [items]="sourceList" bindLabel="description" placeholder="Select" appendTo="body"
+              class="ng-select-style" [searchable]="true" [clearable]="true" formControlName="enquirySource"
+              [compareWith]="compareFn">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.description}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div *ngIf="showForAdmin" class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'SalesPerson'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="salesPerson" [compareWith]="compareFn">
+              <option [ngValue]="null">Select</option>
+              <option *ngFor="let salesPerson of salesPersonList" [ngValue]="salesPerson">
+                {{salesPerson.firstName + " " + salesPerson.lastName}}</option>
+            </select> <br>
+          </div>
+        </div>
+        <div class="form-sub-header-style">Address Details</div>
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Address'}"></ng-container>
+            </span>
+            <textarea type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="address"
+              rows="2" placeholder="eg: Mumbai, Maharashtra"></textarea>
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('address').touched || enquiryForm.get('address').dirty) 
+              && enquiryForm.get('address').invalid">
+              <div *ngIf="enquiryForm.get('address').errors.pattern">
+                Address should only have alphabets and special characters in (.,-/)
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Country'}"></ng-container>
+            </span>
+            <ng-select [items]="countryList" bindLabel="name" placeholder="Select" appendTo="body" [searchable]="true"
+              [clearable]="true" formControlName="country" class="ng-select-style"
+              (change)="getStateListByCountryID(enquiryForm.get('country').value)">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.name}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'State'}"></ng-container>
+            </span>
+            <ng-select [items]="stateList" bindLabel="name" placeholder="Select" appendTo="body" [searchable]="true"
+              [clearable]="true" formControlName="state" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.name}}
+              </ng-template>
+            </ng-select>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'City'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="city"
+              placeholder="eg: Mumbai">
+            <div *ngIf="(enquiryForm.get('city').dirty || enquiryForm.get('city').touched) 
+              && enquiryForm.get('city').invalid" class="alert alert-danger">
+              <div *ngIf="enquiryForm.get('city').errors.pattern">
+                City name should only have alphabets
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'PIN Code'}"></ng-container>
+            </span>
+            <input type="number" class="form-control input-style" formControlName="pinCode" placeholder="eg: 456789">
+            <br>
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('pinCode').touched || enquiryForm.get('pinCode').dirty) 
+              && enquiryForm.get('pinCode').invalid">
+              <div *ngIf="enquiryForm.get('pinCode').errors.pattern">
+                Pin Code must be of 6 digits
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-sub-header-style">Social Media Details</div>
+        <div class="row">
+          <div class="form-group col-sm-4 col-md-3">
+            <div>
+              <label class="font-weight-bolder-style font-md-style">URL:</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Facebook'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="facebookUrl"
+              placeholder="Paste URL here">
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('facebookUrl').touched || enquiryForm.get('facebookUrl').dirty) 
+              && enquiryForm.get('facebookUrl').invalid">
+              <div *ngIf="enquiryForm.get('facebookUrl').errors.pattern">
+                Facebook URL must start with www.facebook.com
+              </div>
+              <div *ngIf="enquiryForm.get('facebookUrl').errors.maxLength">
+                Facebook URL can have maximum 200 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <div>
+              <label>&nbsp;</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Instagram'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="instagramUrl"
+              placeholder="Paste URL here">
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('instagramUrl').touched || enquiryForm.get('instagramUrl').dirty) 
+              && enquiryForm.get('instagramUrl').invalid">
+              <div *ngIf="enquiryForm.get('instagramUrl').errors.pattern">
+                Instagram URL must start with www.instagram.com
+              </div>
+              <div *ngIf="enquiryForm.get('instagramUrl').errors.maxLength">
+                Instagram URL can have maximum 200 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <div>
+              <label>&nbsp;</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Github'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="githubUrl"
+              placeholder="Paste URL here">
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('githubUrl').touched || enquiryForm.get('githubUrl').dirty) 
+              && enquiryForm.get('githubUrl').invalid">
+              <div *ngIf="enquiryForm.get('githubUrl').errors.pattern">
+                Github URL must start with www.github.com
+              </div>
+              <div *ngIf="enquiryForm.get('githubUrl').errors.maxLength">
+                Github URL can have maximum 200 characters
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <div>
+              <label>&nbsp;</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'LinkedIn'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="linkedInUrl"
+              placeholder="Paste URL here">
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('linkedInUrl').touched || enquiryForm.get('linkedInUrl').dirty) 
+              && enquiryForm.get('linkedInUrl').invalid">
+              <div *ngIf="enquiryForm.get('linkedInUrl').errors.pattern">
+                LinkedIn URL must start with www.linkedin.com
+              </div>
+              <div *ngIf="enquiryForm.get('linkedInUrl').errors.maxLength">
+                LinkedIn URL can have maximum 200 characters
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group form-check" *ngIf="!isViewMode">
+          <label class="form-check-label">
+            <label class="checkbox-container">
+              <input type="checkbox" (change)="toggleAcademicControls($event)" formControlName="isAcademic">
+              <span class="checkmark"></span>
+            </label>
+            <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Add Academic Details</span>
+          </label>
+        </div>
+        <div *ngIf="showAcademicsInForm">
+          <div class="form-sub-header-style">Academic Details</div>
+          <div formArrayName="academics" *ngFor="let academic of enquiryAcademicControlArray.controls;let i = index">
+            <ng-container [formGroupName]="i">
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div class="font-weight-bold font-lg-style">College {{i+1}}</div>
+                  <label class="float-right" *ngIf="!isViewMode && enquiryAcademicControlArray.length > 1"
+                    (click)="deleteAcademic(i)">
+                    <i class="material-icons color-F6430F">delete</i>
+                  </label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-sm-3 col-md-2">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Qualification'}">
+                    </ng-container>
+                  </span>
+                  <ng-select [items]="degreeList" bindLabel="name" placeholder="Qualification" appendTo="body"
+                    [searchable]="true" [clearable]="true" formControlName="degree" class="ng-select-style"
+                    (change)="getSpecializationListByDegreeID($event?.id,i,true)">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                      {{item.name}}
+                    </ng-template>
+                  </ng-select>
+                  <div class="alert alert-danger" *ngIf="(enquiryAcademicControlArray.at(i).get('degree').touched 
+                    || enquiryAcademicControlArray.at(i).get('degree').dirty) 
+                    && enquiryAcademicControlArray.at(i).get('degree').invalid">
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('degree').errors.required">
+                      Qualification must be specified
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Specialization'}">
+                    </ng-container>
+                  </span>
+                  <select class="form-control input-style" formControlName="specialization" [compareWith]="compareFn">
+                    <option [ngValue]="null" disabled>Select</option>
+                    <ng-container *ngFor="let specialization of specializationList">
+                      <option *ngIf="showSpecificSpecializations(academic,specialization)" [ngValue]="specialization">
+                        {{specialization.branchName}}
+                      </option>
+                    </ng-container>
+                  </select>
+                  <div class="alert alert-danger" *ngIf="(enquiryAcademicControlArray.at(i).get('specialization').touched 
+                    || enquiryAcademicControlArray.at(i).get('specialization').dirty) 
+                    && enquiryAcademicControlArray.at(i).get('specialization').invalid">
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('specialization').errors.required">
+                      Specialization must be specified
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-8 col-md-6">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'College Name'}"></ng-container>
+                  </span>
+                  <ng-select [addTag]="addCollegeToList" formControlName="college" [clearOnBackspace]=false
+                    placeholder="Select" clearable=false class="ng-select-style" [loading]="isCollegeLoading"
+                    (search)="getCollegeBranchList($event)" (focus)="getCollegeBranchList()">
+                    <ng-option [value]="college.branchName" [disabled]="college.disabled"
+                      *ngFor="let college of collegeBranchList">
+                      {{college.branchName}}
+                    </ng-option>
+                  </ng-select>
+                  <div *ngIf="(enquiryAcademicControlArray.at(i).get('college').dirty || enquiryAcademicControlArray.at(i).get('college').touched) 
+                    && enquiryAcademicControlArray.at(i).get('college').invalid" class="alert alert-danger">
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('college').errors.required">
+                      College Name must be specified
+                    </div>
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('college').errors.maxLength">
+                      College Name can contain maximum 200 characters
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-sm-3 col-md-2">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Percentage'}"></ng-container>
+                  </span>
+                  <input type="number" class="form-control input-style" formControlName="percentage"
+                    placeholder="eg: 89" appAllowNumbersWithDecimal>
+                  <div *ngIf="(enquiryAcademicControlArray.at(i).get('percentage').dirty || enquiryAcademicControlArray.at(i).get('percentage').touched) 
+                    && enquiryAcademicControlArray.at(i).get('percentage').invalid" class="alert alert-danger">
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('percentage').errors.required">
+                      Percentage must be specified
+                    </div>
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('percentage').errors.min">
+                      Percentage should not be less than 1
+                    </div>
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('percentage').errors.pattern">
+                      Percentage should not be more than 100 and have only 2 numbers after decimal
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Year of Passout'}">
+                    </ng-container>
+                  </span>
+                  <input type="number" class="form-control input-style" formControlName="passout" placeholder="eg: 2020"
+                    appAllowNumbersOnly>
+                  <div *ngIf="(enquiryAcademicControlArray.at(i).get('passout').dirty || enquiryAcademicControlArray.at(i).get('passout').touched) 
+                    && enquiryAcademicControlArray.at(i).get('passout').invalid" class="alert alert-danger">
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('passout').errors.required">
+                      Passout Year must be specified
+                    </div>
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('passout').errors.max">
+                      Passout year should be maximum {{currentYear + 3}}
+                    </div>
+                    <div *ngIf="enquiryAcademicControlArray.at(i).get('passout').errors.min">
+                      Passout year should be a minimum 1980
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <button class="btn btn-default swabhav-button-round" *ngIf="!isViewMode" (click)="addAcademic()">
+            + Add College
+          </button>
+          <br>
+          <br>
+        </div>
+        <div class="form-group form-check" *ngIf="!isViewMode">
+          <label class="form-check-label">
+            <label class="checkbox-container">
+              <input type="checkbox" (change)="toggleExperienceControls($event)" formControlName="isExperience">
+              <span class="checkmark"></span>
+            </label>
+            <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Add Experience Details</span>
+          </label>
+        </div>
+        <div *ngIf="showExperiencesInForm">
+          <div class="form-sub-header-style">Experience Details</div>
+          <div formArrayName="experiences"
+            *ngFor="let experience of enquiryExperienceControlArray.controls;let i = index">
+            <ng-container [formGroupName]="i">
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div class="font-weight-bold font-lg-style">Experience {{i+1}}</div>
+                  <label class="float-right" *ngIf="!isViewMode && enquiryExperienceControlArray.length > 1"
+                    (click)="deleteExperience(i)">
+                    <i class="material-icons color-F6430F">delete</i>
+                  </label>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Company Name'}"></ng-container>
+                  </span>
+                  <input type="text" class="form-control input-style" formControlName="company"
+                    placeholder="eg: Swabhav Techlabs">
+                  <div *ngIf="(enquiryExperienceControlArray.at(i).get('company').dirty || enquiryExperienceControlArray.at(i).get('company').touched) 
+                      && enquiryExperienceControlArray.at(i).get('company').invalid" class="alert alert-danger">
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('company').errors.required">
+                      Company Name must be specified
+                    </div>
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('company').errors.pattern">
+                      Company Name should only have alphabets
+                    </div>
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('company').errors.maxLength">
+                      Company Name can have maximum 255 characters
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Designation'}"></ng-container>
+                  </span>
+                  <ng-select [items]="designationList" bindLabel="position" placeholder="Select" appendTo="body"
+                    [searchable]="true" [clearable]="true" formControlName="designation" class="ng-select-style">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                      {{item.position}}
+                    </ng-template>
+                  </ng-select>
+                  <div class="alert alert-danger" *ngIf="(enquiryExperienceControlArray.at(i).get('designation').touched 
+                    || enquiryExperienceControlArray.at(i).get('designation').dirty) 
+                    && enquiryExperienceControlArray.at(i).get('designation').invalid">
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('designation').errors.required">
+                      Designation Name must be specified
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Technology Stack'}">
+                    </ng-container>
+                  </span>
+                  <ng-select [items]="technologyList" bindLabel="language" placeholder="Select" appendTo="body"
+                    multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+                    class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+                    [loading]="isTechLoading">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                      {{item.language}}
+                    </ng-template>
+                  </ng-select>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Package'}"></ng-container>
+                  </span>
+                  <input type="number" class="form-control input-style" formControlName="package"
+                    placeholder="eg: 350000" appAllowNumbersOnly>
+                  <div class="alert alert-danger" *ngIf="(enquiryExperienceControlArray.at(i).get('package').touched || enquiryExperienceControlArray.at(i).get('package').dirty) 
+                      && enquiryExperienceControlArray.at(i).get('package').invalid">
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('package').errors.min">
+                      Package should not be less than 100000.
+                    </div>
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('package').errors.max">
+                      Package should not be more than 100000000.
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-3"
+                  *ngIf="i==indexOfCurrentWorkingExp || indexOfCurrentWorkingExp == -1">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Currently working here?'}">
+                    </ng-container>
+                  </span>
+                  <select class="form-control input-style"
+                    (change)="isWorkingClicked($event.target.value,i,enquiryExperienceControlArray.at(i))"
+                    formControlName="isCurrentWorking">
+                    <option [value]=false>No</option>
+                    <option [value]=true>Yes</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Worked from'}"></ng-container>
+                  </span>
+                  <input type="month" class="form-control input-style" nbInput formControlName="fromDate"
+                    placeholder="yyyy-mm">
+                  <div class="alert alert-danger" *ngIf="(enquiryExperienceControlArray.at(i).get('fromDate').touched || enquiryExperienceControlArray.at(i).get('fromDate').dirty) 
+                        && enquiryExperienceControlArray.at(i).get('fromDate').invalid">
+                    <div *ngIf="enquiryExperienceControlArray.at(i).get('fromDate').errors.required">
+                      From Date must be specified
+                    </div>
+                  </div>
+                </div>
+                <ng-container *ngIf="!(i==indexOfCurrentWorkingExp)">
+                  <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                      <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Worked till'}">
+                      </ng-container>
+                    </span>
+                    <input type="month" class="form-control input-style" formControlName="toDate" placeholder="yyyy-mm">
+                    <div class="alert alert-danger" *ngIf="(enquiryExperienceControlArray.at(i).get('toDate').touched || enquiryExperienceControlArray.at(i).get('toDate').dirty) 
+                        && enquiryExperienceControlArray.at(i).get('toDate').invalid">
+                      <div *ngIf="enquiryExperienceControlArray.at(i).get('toDate').errors.required">
+                        To Date must be specified
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <div class="form-group col-sm-6 col-md-4" *ngIf="isViewMode">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Total years Worked'}">
+                    </ng-container>
+                  </span>
+                  <input type="text" class="form-control input-style" formControlName="yearsOfExperience"
+                    placeholder="Enter years of experience">
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <button type="button" class="btn btn-default swabhav-button-round" *ngIf="!isViewMode"
+            (click)="addExperience()">
+            + Add Company
+          </button>
+          <br>
+          <br>
+        </div>
+        <div class="form-group form-check" *ngIf="!isViewMode">
+          <label class="form-check-label">
+            <label class="checkbox-container">
+              <input type="checkbox" (change)="toggleShowMSInUsFormControls($event)" formControlName="isMastersAbroad">
+              <span class="checkmark"></span>
+            </label>
+            <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Add Masters Abroad
+              Details</span>
+          </label>
+        </div>
+        <ng-container *ngIf="showMastersAbroadInForm">
+          <div class="form-sub-header-style">Masters Abroad Details</div>
+          <div class="row" formGroupName="mastersAbroad">
+            <div class="form-group col-sm-4 col-md-3">
+              <div class="alert alert-warning mb-2" *ngIf="enquiryForm.get('mastersAbroad').get('countries')?.value?.length === 3 && 
+                  countrySelect.focused">
+                <small><strong>Max countries selected</strong></small>
+              </div>
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country(s)'}"></ng-container>
+              </span>
+              <ng-select #countrySelect [items]="countryList" bindLabel="name" placeholder="Select upto 3 countries"
+                (add)="onAddCountry($event.id)" [maxSelectedItems]="3" (remove)="onRemoveCountry($event.value?.id)"
+                (clear)="onClearCountries()" appendTo="body" [searchable]="true" [multiple]="true" [clearable]="true"
+                formControlName="countries" class="ng-select-style">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.name}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('countries').touched || enquiryForm.get('mastersAbroad').get('countries').dirty) 
+                  && enquiryForm.get('mastersAbroad').get('countries').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('countries').errors.required">
+                  Country(s) must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-7 col-md-5">
+              <div class="alert alert-warning mb-2" *ngIf="enquiryForm.get('mastersAbroad').get('universities')?.value?.length === 10 && 
+                  uniSelect.focused">
+                <small><strong>Max universities selected</strong></small>
+              </div>
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'University(s)'}"></ng-container>
+              </span>
+              <ng-select #uniSelect [items]="universityList" bindLabel="universityName"
+                placeholder="Select upto 10 universities" appendTo="body" multiple="true" [virtualScroll]="true"
+                [searchable]="true" [clearable]="true" [hideSelected]="true" [loading]="areUniversitiesLoading"
+                [maxSelectedItems]="10" groupBy="countryName" formControlName="universities" class="ng-select-style">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.universityName}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('universities').touched || enquiryForm.get('mastersAbroad').get('universities').dirty) 
+                  && enquiryForm.get('mastersAbroad').get('universities').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('universities').errors.required">
+                  University(s) must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-2">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Degree'}"></ng-container>
+              </span>
+              <ng-select [items]="degreeList" bindLabel="name" placeholder="Select" appendTo="body" [searchable]="true"
+                formControlName="degree" class="ng-select-style"
+                (change)="onDegreeChange(enquiryForm.get('mastersAbroad').get('degree').value)">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.name}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('degree').touched 
+                || enquiryForm.get('mastersAbroad').get('degree').dirty) 
+                && enquiryForm.get('mastersAbroad').get('degree').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('degree').errors.required">
+                  Degree must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-2">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Year of MS'}"></ng-container>
+              </span>
+              <select class="form-control input-style" formControlName="yearOfMS">
+                <option [ngValue]="null" disabled>Undecided</option>
+                <ng-container *ngFor="let yearOfMS of yearOfMSList">
+                  <option [ngValue]="yearOfMS">{{yearOfMS}}</option>
+                </ng-container>
+              </select>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('yearOfMS').touched 
+                || enquiryForm.get('mastersAbroad').get('yearOfMS').dirty) 
+                && enquiryForm.get('mastersAbroad').get('yearOfMS').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('yearOfMS').errors.required">
+                  Year of MS must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-2">
+              <div>
+                <label class="font-weight-bolder-style font-md-style">Score:</label>
+              </div>
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'GRE'}"></ng-container>
+              </span>
+              <input type="number" class="form-control input-style" formControlName="gre" placeholder="eg: 340"
+                appAllowNumbersOnly>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('gre').touched || enquiryForm.get('mastersAbroad').get('gre').dirty) 
+                  && enquiryForm.get('mastersAbroad').get('gre').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('gre').errors.required">
+                  GRE score must be specified
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('gre').errors.min">
+                  GRE score cannot be below 0
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('gre').errors.max">
+                  GRE score cannot be above {{greExam.totalMarks}}
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-2">
+              <div>
+                <label>&nbsp;</label>
+              </div>
+              <span *ngIf="showMBADegreeRequiredError; else gmatNotCompulsary">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'GMAT'}"></ng-container>
+                </span>
+              </span>
+              <ng-template #gmatNotCompulsary>
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'GMAT'}"></ng-container>
+                </span>
+              </ng-template>
+              <input type="number" class="form-control input-style" formControlName="gmat" placeholder="eg: 700"
+                appAllowNumbersOnly>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('gmat').touched || enquiryForm.get('mastersAbroad').get('gmat').dirty) 
+                  && enquiryForm.get('mastersAbroad').get('gmat').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('gmat').errors.required">
+                  GMAT score must be specified
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('gmat').errors.min">
+                  GMAT score cannot be below 0
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('gmat').errors.max">
+                  GMAT score cannot be above {{gmatExam.totalMarks}}
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-2">
+              <div>
+                <label>&nbsp;</label>
+              </div>
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'TOEFL'}"></ng-container>
+              </span>
+              <input type="number" class="form-control input-style" formControlName="toefl" placeholder="eg: 120"
+                appAllowNumbersOnly>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('toefl').touched || enquiryForm.get('mastersAbroad').get('toefl').dirty) 
+                  && enquiryForm.get('mastersAbroad').get('toefl').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('toefl').errors.min">
+                  TOEFL score cannot be below 0
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('toefl').errors.max">
+                  TOEFL score cannot be above {{toeflExam.totalMarks}}
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-2">
+              <div>
+                <label>&nbsp;</label>
+              </div>
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'IELTS'}"></ng-container>
+              </span>
+              <input type="number" class="form-control input-style" formControlName="ielts" placeholder="eg: 9"
+                appAllowNumbersWithDecimal>
+              <div class="alert alert-danger" *ngIf="(enquiryForm.get('mastersAbroad').get('ielts').touched || enquiryForm.get('mastersAbroad').get('ielts').dirty) 
+                  && enquiryForm.get('mastersAbroad').get('ielts').invalid">
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('ielts').errors.min">
+                  IELTS score cannot be below 0
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('ielts').errors.max">
+                  IELTS score cannot be above {{ieltsExam.totalMarks}}
+                </div>
+                <div *ngIf="enquiryForm.get('mastersAbroad').get('ielts').errors.pattern">
+                  IELTS score can have only .5 after decimal
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-12 col-lg-12">
+            <div class="form-sub-header-style">Comment</div>
+            <textarea class="form-control input-style" rows="5" formControlName="additionalDetails"
+              placeholder="Write down your comments here..." appEmptyToNull>
+            </textarea>
+            <div class="alert alert-danger" *ngIf="(enquiryForm.get('additionalDetails').touched || enquiryForm.get('additionalDetails').dirty) 
+              && enquiryForm.get('additionalDetails').invalid">
+              <div *ngIf="enquiryForm.get('additionalDetails').errors.required">
+                Comment can have maximum 1000 characters
+              </div>
+            </div>
+          </div>
+        </div>
+        <span *ngIf="!isViewMode || selectedEnquiry.resume">
+          <hr class="hr-swabhav-stylele">
+          <div class="form-group row">
+            <h4><span class="col-sm-2 col-form-label">
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Resume'}"></ng-container>
+              </span></h4>
+            <div class="col-sm-4">
+              <div class="display-flex-style">
+                <span class="custom-file">
+                  <input *ngIf="!isViewMode" type="file" class="custom-file-input" (change)="onResourceSelect($event)"
+                    id="customFile" value="displayedFileName">
+                  <label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label" for="customFile"
+                    [innerHTML]="displayedFileName"></label>
+                  <button class="btn btn-success custom-file" id="uploadingButton" type="button"
+                    *ngIf="isFileUploading">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Uploading file...
+                  </button>
+                  <div
+                    *ngIf="(isViewMode || isOperationEnquiryUpdate) && selectedEnquiry.resume && !isResumeUploadedToServer"
+                    data-toggle="tooltip" data-placement="top" title="View Resume">
+                    <button class="btn btn-primary"><a class="link-button-style" href={{selectedEnquiry.resume}}
+                        target="_blank">View
+                        Resume</a>
+                    </button>
+                  </div>
+                </span>
+                <ng-template #resumePopover>
+                  <span class="popover-title-style">Allowed file types( .pdf .doc .docx)</span>
+                </ng-template>
+                <button *ngIf="!isViewMode" type="button" class="btn" [ngbPopover]="resumePopover" placement="bottom"
+                  triggers="mouseenter:mouseleave">
+                  <span class="material-icons cursor popover-style">error_outline</span>
+                </button>
+              </div>
+              <!-- should add view uploaded resume using a resume variable after cleaning. -->
+              <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+            </div>
+          </div>
+        </span>
+        <div class="text-center">
+          <button type="button" (click)="dismissFormModal(modal)"
+            class="btn btn-default swabhav-button-round">Close</button>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" [disabled]="!enquiryForm.dirty || isFileUploading"
+            class="btn btn-default swabhav-button-round" *ngIf="!isViewMode" (click)="validateEnquiryForm()">
+            {{isOperationEnquiryUpdate == true? 'Update Enquiry' : 'Add Enquiry'}}
+          </button>
+        </div>
+      </form>
+    </ng-template>
+
+    <!-- Tabs for add enquiry -->
+    <ng-container *ngIf="!isViewMode && !isOperationEnquiryUpdate">
+      <ul ngbNav #nav="ngbNav" [destroyOnHide]="false" class="nav-tabs ul-space-even-style">
+        <li [ngbNavItem]="1" class="list-active-link-style">
+          <a ngbNavLink class="modal-popup-tab-link-style">Single Add</a>
+          <ng-template ngbNavContent>
+            <ng-template [ngTemplateOutlet]="enquiryFormTemplate"></ng-template>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="2" class="list-active-link-style">
+          <a ngbNavLink class="modal-popup-tab-link-style">Mutiple add</a>
+          <ng-template ngbNavContent>
+            <div class="modal-body">
+              <div class="text-center">
+                <div class="form-sub-header-style">Upload Excel File</div>
+                <span>
+                  <input type="file" #excelFile (change)="onExcelUpload($event, excelFile)" />
+                  <button class="btn" *ngIf="isExcelUploaded" (click)="onCalcelUploadedExcelFile();excelFile.value='';">
+                    <i class="material-icons red">close</i></button>
+                </span>
+                <br>
+                <label id="isExcelUploaded" [innerHTML]="docStatus"></label>
+                <br><br>
+                <h4 id="demoLink"> Here is the <i><a class="anchor-blue" [href]=ENQUIRY_EXCEL_DEMO_LINK
+                      target="_blank">link
+                    </a></i> to download the demo excel file.
+                </h4>
+              </div>
+            </div>
+            <div *ngIf="showExcelProgress">
+              <div>
+                <span class="processing-text-style">Processing Enquiries
+                  {{enquiriesExcelProcessedCount}}/{{enquiriesExcelTotalCount}}</span>
+              </div>
+              <div>
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped progress-custom" role="progressbar"
+                    [style.width]="(enquiriesExcelProcessedCount/enquiriesExcelTotalCount*100) + '%'" aria-valuenow="75"
+                    aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <br>
+              <div>
+                <strong>
+                  Enquiries Added <span class="color-F6430F">{{enquiriesExcelAddedCount}}</span>
+                </strong>
+              </div>
+              <div>
+                <ng-container *ngIf="excelErrorList?.length > 0">
+                  <br>
+                  <div>
+                    <strong>
+                      Error list:
+                    </strong>
+                  </div>
+                  <div *ngFor="let error of excelErrorList;let i = index">
+                    {{i+1}}) {{error}}
+                  </div>
+                  <br>
+                </ng-container>
+              </div>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-default swabhav-button-round" type="reset"
+                (click)="modal.dismiss('Close click')">Close</button>
+              &nbsp;&nbsp;&nbsp;
+              <button type="submit" class="btn btn-default swabhav-button-round"
+                [disabled]="!isExcelUploaded || disableAddEnquiriesButton" (click)="addMultipleEnquiries()">
+                Add Enquiries
+              </button>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="nav" class="mt-2"></div>
+    </ng-container>
+
+    <!-- For update and view enquiry -->
+    <ng-container *ngIf="isViewMode || isOperationEnquiryUpdate">
+      <ng-template [ngTemplateOutlet]="enquiryFormTemplate"></ng-template>
+    </ng-container>
+
+  </div>
+</ng-template>
+
+
+<!--Add Sales Person-->
+<ng-template #allocateSalespersonModal let-modal>
+
+  <!--Modal Header-->
+  <div class="modal-header">
+    <div class="font-weight-bold font-lg-style">Allocate Sales Person</div>
+    <button type="button" class="close" style="outline: none;" (click)="modal.dismiss('Cross click')">
+      <i class="material-icons">highlight_off</i>
+    </button>
+  </div>
+
+  <!--Modal Body-->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        <span>
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'SalesPerson'}"></ng-container>
+        </span>
+        <select class="form-control" #salesPersonTemp>
+          <option value="null">Select Sales Person</option>
+          <option *ngFor="let salesPerson of salesPersonList" [value]="salesPerson.id">
+            {{salesPerson.firstName}} {{salesPerson.lastName}}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!--Modal Footer-->
+  <div class="modal-footer">
+    <button type="button" *ngIf="showAllocateSalespersonToOneEnquiry" class="btn btn btn-primary"
+      (click)="allocateSalesPersonToEnquiries(salesPersonTemp.value,selectedEnquiry.id)">Allocate Salesperson</button>
+    <button type="button" *ngIf="showAllocateSalespersonToEnquiries" class="btn btn btn-primary"
+      (click)="allocateSalesPersonToEnquiries(salesPersonTemp.value)">Allocate Salesperson</button>
+    <button type="button" (click)="modal.dismiss('Close click')" class="btn btn-danger">Close</button>
+  </div>
+</ng-template>
+
+
+<!-- Add Call Record -->
+<ng-template #callRecordFormModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Calling Details of <span>
+        <ng-container *ngTemplateOutlet="enquiryNameDisplay"></ng-container>
+      </span>
+      <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+        (click)="modal.dismiss('Cross click')">
+        <span class="vertical-align-top-icon-style">
+          <i class="material-icons modal-popup-close-icon-style">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <div *ngIf="showCallRecordForm" class="marked-fields-right-style"><span class="red"><strong>*</strong></span> marked
+      fields are mandatory</div>
+    <br>
+    <div *ngIf="showCallRecordForm">
+      <form [formGroup]="callRecordForm">
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-4">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Date'}"></ng-container>
+            </span>
+            <input type="datetime-local" class="form-control input-style" formControlName="dateTime">
+            <div class="alert alert-danger" *ngIf="(callRecordForm.get('dateTime').touched || callRecordForm.get('dateTime').dirty) 
+              && callRecordForm.get('dateTime').invalid">
+              <div *ngIf="callRecordForm.get('dateTime').errors.required">
+                Date must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-4">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Purpose'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="purpose" [compareWith]="compareFn"
+              (change)="getOutcomesByPurpose(callRecordForm.get('purpose').value)">
+              <option [ngValue]="null">Select Purpose</option>
+              <option *ngFor="let purpose of purposeList" [ngValue]="purpose">{{purpose.purpose}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(callRecordForm.get('purpose').touched || callRecordForm.get('purpose').dirty) 
+              && callRecordForm.get('purpose').invalid">
+              <div *ngIf="callRecordForm.get('purpose').errors.required">
+                Purpose must be specified
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-4">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Calling Result'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="outcome" [compareWith]="compareFn"
+              (change)="toggleOutcomeTargetDateField(callRecordForm.get('outcome').value)">
+              <option [ngValue]="null">Select Calling Result</option>
+              <option *ngFor="let outcome of outcomeList" [ngValue]="outcome">{{outcome.outcome}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(callRecordForm.get('outcome').touched || callRecordForm.get('outcome').dirty) 
+              && callRecordForm.get('outcome').invalid">
+              <div *ngIf="callRecordForm.get('outcome').errors.required">
+                Outcome must be specified
+              </div>
+            </div>
+          </div>
+          <ng-container *ngIf="showPurposeJobFields">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Expected CTC'}"></ng-container>
+              </span>
+              <input type="number" class="form-control input-style" formControlName="expectedCTC"
+                placeholder="Enter Full CTC" appAllowNumbersOnly>
+              <div class="alert alert-danger" *ngIf="(callRecordForm.get('expectedCTC').touched || callRecordForm.get('expectedCTC').dirty) 
+                && callRecordForm.get('expectedCTC').invalid">
+                <div *ngIf="callRecordForm.get('expectedCTC').errors.min">
+                  Expected CTC should not be less than 100000.
+                </div>
+                <div *ngIf="callRecordForm.get('expectedCTC').errors.max">
+                  Expected CTC should not be less than 100000000.
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Notice Period(months)'}">
+                </ng-container>
+              </span>
+              <input type="number" class="form-control input-style" formControlName="noticePeriod"
+                placeholder="Enter Months" appAllowNumbersOnly>
+              <div class="alert alert-danger" *ngIf="(callRecordForm.get('noticePeriod').touched || callRecordForm.get('noticePeriod').dirty) 
+                && callRecordForm.get('noticePeriod').invalid">
+                <div *ngIf="callRecordForm.get('noticePeriod').errors.min">
+                  Notice Period should not be less than 0.
+                </div>
+                <div *ngIf="callRecordForm.get('noticePeriod').errors.max">
+                  Notice Period should not be more than 9.
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="showOutcomeTargetDateField">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Target Date'}"></ng-container>
+              </span>
+              <input type="date" class="form-control input-style" formControlName="targetDate">
+              <div class="alert alert-danger" *ngIf="(callRecordForm.get('targetDate').touched || callRecordForm.get('targetDate').dirty) 
+                && callRecordForm.get('targetDate').invalid">
+                <div *ngIf="callRecordForm.get('targetDate').errors.required">
+                  Target Date must be specified
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-12 col-lg-12">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}"></ng-container>
+            </span>
+            <textarea class="form-control input-style" formControlName="comment" rows="5" id="comment"
+              placeholder="Comment...." appEmptyToNull></textarea>
+            <div class="alert alert-danger" *ngIf="(callRecordForm.get('comment').touched || callRecordForm.get('comment').dirty) 
+              && callRecordForm.get('comment').invalid">
+              <div *ngIf="callRecordForm.get('comment').errors.maxLength">
+                Comment can have maximum 500 characters
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center">
+          <button type="button" *ngIf="!isOperationCallRecordUpdate && permission.add"
+            [disabled]="!callRecordForm.dirty" class="btn btn-default swabhav-button-round"
+            (click)="validateCallRecordForm()">Add Calling Details</button>
+          <button type="button" *ngIf="isOperationCallRecordUpdate && permission.update"
+            [disabled]="!callRecordForm.dirty" class="btn btn-default swabhav-button-round"
+            (click)="validateCallRecordForm()">Update Calling Details</button>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-default swabhav-button-round" (click)="showCallRecordForm=false">Close
+            Form</button>
+        </div>
+        <br>
+      </form>
+    </div>
+    <div *ngIf="!showCallRecordForm" class="row">
+      <div class="form-group col-sm-6 col-md-4">
+        <button *ngIf="permission.add" type="button" class="btn btn-default swabhav-button-round"
+          (click)="onAddNewCallRecordButtonClick()">
+          Add Calling Detail
+        </button>
+      </div>
+    </div>
+    <div *ngIf="enquiryCallRecordList.length > 0">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <div class="card table-card-shadow modal-popup-table-card-style">
+            <div class="card-body padding-0pt">
+              <div class="table-responsive">
+                <table class="table table-striped modal-popup-table-style">
+                  <tr>
+                    <th>Sr</th>
+                    <th>Calling Date</th>
+                    <th>Purpose</th>
+                    <th>Expected CTC</th>
+                    <th>Notice Period</th>
+                    <th>Calling Result</th>
+                    <th>Target Date</th>
+                    <th>Comment</th>
+                    <th *ngIf="permission.update">Update</th>
+                    <th *ngIf="permission.delete">Delete</th>
+                  </tr>
+                  <tbody>
+                    <tr *ngFor="let record of enquiryCallRecordList; let i = index">
+                      <td>{{i+1}}</td>
+                      <td>{{record.dateTime.substring(0,10) + " " + record.dateTime.substring(11)}}</td>
+                      <td>{{record.purpose.purpose}}</td>
+                      <td>
+                        <span *ngIf="record.expectedCTC != null; else noneTemplate">{{record.expectedCTC}}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="record.noticePeriod != null; else noneTemplate">{{record.noticePeriod}}
+                          months</span>
+                      </td>
+                      <td>{{record.outcome.outcome}}</td>
+                      <td>
+                        <span *ngIf="record.targetDate != null; else noneTemplate">{{record.targetDate}}</span>
+                      </td>
+                      <td>{{record.comment}}</td>
+                      <td *ngIf="permission.update">
+                        <span (click)="OnUpdateCallRecordButtonClick(i)">
+                          <i class="material-icons color-F6430F">edit</i>
+                        </span>
+                      </td>
+                      <td *ngIf="permission.delete">
+                        <span (click)="deleteCallRecord(record.id)">
+                          <i class="material-icons color-F6430F">delete</i>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="enquiryCallRecordList.length==0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Call Records Found</h2>
+        </div>
+      </div>
+      <br>
+    </div>
+    <div class="text-center">
+      <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+        (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Delete Enquiry Confirmation -->
+<ng-template #deleteEnquiryModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Confirmation
+      <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+        (click)="modal.dismiss('Cross click')">
+        <span class="vertical-align-top-icon-style">
+          <i class="material-icons modal-popup-close-icon-style">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <br>
+    <div class="text-center">
+      <div class="delete-text-style">
+        Are you sure you want to delete this enquiry?
+      </div>
+    </div>
+    <br>
+    <div class="text-center">
+      <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+      &nbsp;&nbsp;&nbsp;
+      <button type="button" class="btn btn-default swabhav-button-round"
+        (click)="modal.dismiss('Close click')">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Add Waiting List -->
+<ng-template #waitingListFormModal let-modal>
+  <div class="modal-body">
+    <div class="form-header-style">
+      Waiting List of <span>
+        <ng-container *ngTemplateOutlet="enquiryNameDisplay"></ng-container>
+      </span>
+      <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+        (click)="modal.dismiss('Cross click')">
+        <span class="vertical-align-top-icon-style">
+          <i class="material-icons modal-popup-close-icon-style">close</i>
+        </span>
+        Close
+      </div>
+    </div>
+    <div *ngIf="showWaitingListForm" class="marked-fields-right-style"><span class="red"><strong>*</strong></span>
+      marked fields are mandatory</div>
+    <br>
+    <div *ngIf="showWaitingListForm">
+      <form [formGroup]="waitingListForm">
+        <div class="row">
+          <div class="form-group col-sm-6 col-md-4">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Waiting For'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="waitingFor"
+              (change)="onWaitingForChange(waitingListForm.get('waitingFor').value)">
+              <option [ngValue]="null" disabled>Select Waiting For</option>
+              <option [ngValue]="'Company'">Company</option>
+              <option [ngValue]="'Course'">Course</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(waitingListForm.get('waitingFor').touched || waitingListForm.get('waitingFor').dirty) 
+              && waitingListForm.get('waitingFor').invalid">
+              <div *ngIf="waitingListForm.get('waitingFor').errors.required">
+                Waiting For must be specified
+              </div>
+            </div>
+          </div>
+          <ng-container *ngIf="showCompanyBranchList">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Company'}"></ng-container>
+              </span>
+              <ng-select [items]="companyBranchList" bindLabel="branchName" placeholder="Select Company" appendTo="body"
+                [searchable]="true" [clearable]="false" formControlName="companyBranch" class="ng-select-style"
+                (change)="onCompanyBranchChangeForWaitingList(waitingListForm.get('companyBranch').value)">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.branchName}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(waitingListForm.get('companyBranch').touched 
+                || waitingListForm.get('companyBranch').dirty) && waitingListForm.get('companyBranch').invalid">
+                <div *ngIf="waitingListForm.get('companyBranch').errors.required">
+                  company Branch must be specified
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="showRequirementList">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Requirement'}"></ng-container>
+              </span>
+              <ng-select [items]="activeRequirementByCompanyList" bindLabel="code" class="ng-select-style"
+                placeholder="Select Requirement" appendTo="body" [searchable]="true" [clearable]="true"
+                formControlName="companyRequirement">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.branch.branchName + " " + item.code}}
+                </ng-template>
+              </ng-select>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="showCourseList">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Course'}"></ng-container>
+              </span>
+              <ng-select [items]="courseList" bindLabel="name" placeholder="Select Course" class="ng-select-style"
+                appendTo="body" [searchable]="true" [clearable]="false" formControlName="course"
+                (change)="onCourseChangeForWaitingList(waitingListForm.get('course').value)">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.name}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(waitingListForm.get('course').touched 
+                || waitingListForm.get('course').dirty) && waitingListForm.get('course').invalid">
+                <div *ngIf="waitingListForm.get('course').errors.required">
+                  Course must be specified
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="showBatchList">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Batch'}"></ng-container>
+              </span>
+              <ng-select [items]="activeBatchByCourseList" bindLabel="batchName" placeholder="Select Course"
+                appendTo="body" [searchable]="true" [clearable]="true" formControlName="batch" class="ng-select-style">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.batchName}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(waitingListForm.get('batch').touched 
+                || waitingListForm.get('batch').dirty) && waitingListForm.get('batch').invalid">
+                <div *ngIf="waitingListForm.get('batch').errors.required">
+                  Batch must be specified
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="isOperationWaitingListUpdate">
+            <div class="form-group col-sm-6 col-md-4">
+              <span>
+                <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Active?'}"></ng-container>
+              </span>
+              <select class="form-control input-style" formControlName="isActive">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
+            </div>
+          </ng-container>
+        </div>
+        <div class="text-center">
+          <button type="button" *ngIf="!isOperationWaitingListUpdate && permission.add"
+            [disabled]="!waitingListForm.dirty" class="btn btn-default swabhav-button-round"
+            (click)="validateWaitingListForm()">Add to Waiting List</button>
+          <button type="button" *ngIf="isOperationWaitingListUpdate && permission.update"
+            [disabled]="!waitingListForm.dirty" class="btn btn-default swabhav-button-round"
+            (click)="validateWaitingListForm()">Update Waiting List</button>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-default swabhav-button-round" (click)="showWaitingListForm=false">Close
+            Form</button>
+        </div>
+        <br>
+      </form>
+    </div>
+    <div *ngIf="!showWaitingListForm" class="row">
+      <div class="form-group col-sm-6 col-md-4">
+        <button *ngIf="permission.add" type="button" class="btn btn-default swabhav-button-round"
+          (click)="onAddNewWaitingListButtonClick()">
+          Add to Waiting List
+        </button>
+      </div>
+    </div>
+    <div *ngIf="waitingList.length > 0">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <div class="card table-card-shadow modal-popup-table-card-style">
+            <div class="card-body padding-0pt">
+              <div class="table-responsive">
+                <table class="table table-striped modal-popup-table-style">
+                  <tr>
+                    <th>Sr</th>
+                    <th>Waiting For</th>
+                    <th>Company Branch</th>
+                    <th>Company Requirement</th>
+                    <th>Course</th>
+                    <th>Batch</th>
+                    <th>Is Active</th>
+                    <th *ngIf="permission.update">Update</th>
+                    <th *ngIf="permission.delete">Delete</th>
+                  </tr>
+                  <tbody>
+                    <tr *ngFor="let waiting of waitingList; let i = index">
+                      <td>{{i+1}}</td>
+                      <td>
+                        <span *ngIf="waiting.companyBranch != null; else courseTemplate">Company</span>
+                        <ng-template #courseTemplate>
+                          <span>
+                            Course
+                          </span>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <span
+                          *ngIf="waiting.companyBranch != null; else dashTemplate">{{waiting.companyBranch.branchName}}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="waiting.companyRequirement != null; else dashTemplate">
+                          {{waiting.companyRequirement.branch.branchName + "-" + waiting.companyRequirement.code}}
+                        </span>
+                      </td>
+                      <td>
+                        <span *ngIf="waiting.course != null; else dashTemplate">{{waiting.course.name}}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="waiting.batch != null; else dashTemplate">{{waiting.batch.batchName}}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="waiting.isActive; else noTemplate">Yes</span>
+                      </td>
+                      <td *ngIf="permission.update">
+                        <span (click)="OnUpdateWaitingListButtonClick(i)">
+                          <i class="material-icons color-F6430F">edit</i>
+                        </span>
+                      </td>
+                      <td *ngIf="permission.delete">
+                        <span (click)="deleteWaitingList(waiting.id)">
+                          <i class="material-icons color-F6430F">delete</i>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="waitingList.length == 0">
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Waiting List Found</h2>
+        </div>
+      </div>
+      <br>
+    </div>
+    <div class="text-center">
+      <button type="button" data-dismiss="modal" class="btn btn-default swabhav-button-round"
+        (click)="modal.dismiss('Close click')">Close</button>
+    </div>
+  </div>
+</ng-template>

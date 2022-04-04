@@ -1,0 +1,517 @@
+.green {
+  color : green
+}
+
+.red{
+  color : red
+}
+
+
+
+
+
+.top-panel-style{
+  background-color: #F26A00;
+  color: white;
+  padding: 15px;
+}
+
+.top-panel-left {
+  float: left;
+  text-align: left;
+}
+
+.top-panel-center {
+  text-align: center;
+  padding-right: 20%;
+}
+
+.font-20-style{
+  font-size: 20px;
+}
+
+.dropdown-style{
+  width: 30%;
+  display: inline
+}
+
+.arrow {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.arrow-unchecked {
+  border: solid rgb(253, 147, 9);
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.arrow-pending {
+  border: solid #f80309;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.arrow-completed {
+  border: solid #36b98c;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.arrow-down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+} 
+
+.arrow-left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+
+#upDownArrow{
+  transform: scale(1.5);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.table-hover>tbody>tr:hover td {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+.selected-row{
+    background-color: #f0f0f0;
+}
+
+.table-hover td,th{
+  text-align: center;
+}
+
+#ratingMessage{
+  font-size: 87%;
+}
+
+.pending-box-style{
+  background-color: #ffeaea;
+  color: #f80309;
+}
+
+.unchecked-box-style{
+  background-color: rgb(247, 230, 207);
+  color: rgb(253, 147, 9);
+}
+
+.completed-box-style{
+  background-color: #e5fdf0;
+  color: #36b98c;
+}
+
+.tasklist-box-style{
+  border-radius: 30px;
+  font-weight: bold;
+  padding: 7px;
+  text-align: center;
+  font-size: medium;
+}
+
+.no-padding-style{
+  padding: 0;
+}
+
+.example-box-style{
+  padding: 6px;
+  background-color: #efefef;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+}
+
+td{
+  max-width: 150px;
+  word-wrap: break-word;
+  vertical-align: inherit;
+}
+
+.width-50px-style{
+  width: 50px;
+}
+
+.width-150px-style{
+  width: 150px;
+}
+
+.width-100px-style{
+  width: 100px;
+}
+
+.width-30px-style{
+  width: 30px;
+}
+
+.submit-box-style{
+  border-radius: 30px;
+  padding: 5px;
+  background-color: #BDBDBD;
+  color: white;
+  font-weight: bold;
+  font-size: small; 
+}
+
+.delete-button-style{
+  border-radius: 30px;
+  border: 1px solid #F6430F;
+}
+
+.button-width-style{
+  width: 20%;
+}
+
+.score-box-style{
+  margin: 0 auto;
+  width: 50%;
+}
+
+.modal-btn{
+  height: 33px;
+  width: 30%;
+}
+
+
+.left-align{
+  text-align: left;
+}
+
+.right-align{
+  text-align: right;
+}
+
+.alert-max-width{
+  max-width: 110px;
+}
+
+.audio-player {
+  max-width: 80%;
+}
+
+
+
+
+/* Microphone */
+.mic-btn {
+  border: none;
+  padding: 0;
+  border-radius: 100%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.7em;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  background: red;
+  position: relative;
+  z-index: 999;
+  display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+}
+
+.mic-pulse-ring {
+  content: '';
+  width: 50px;
+  height: 50px;
+  top: 0;
+  background: red;
+  border: 5px solid red;
+  border-radius: 50%;
+  position: absolute;
+  animation: pulsate infinite 1.5s;
+}
+
+.mic-pulse-ring.delay{
+ animation-delay: 1s;
+}
+
+@-webkit-keyframes pulsate {
+  0% {
+    -webkit-transform: scale(1, 1);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(1.3, 1.3);
+    opacity: 0;
+  }
+}
+
+
+.mic-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #d8d8d8;
+}
+
+.m-left{
+  margin-left: 100px * 3;
+}
+
+.mic-blue{
+  background: #189BFF;
+}
+
+.mic-disabled{
+  cursor: default;
+  background: lightgray;
+}
+
+.mic-recording{
+  background: red;
+}
+
+.mic-type2 .pulse-ring{
+  background: transparent;
+}
+
+/* Other controls */
+
+.control-btn {
+  border: none;
+  padding: 0;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  font-size: 1.1em;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 999;
+  display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+}
+
+.control-play{
+  background-color: green;
+}
+
+.control-pause{
+  background-color: #f6430f;
+}
+
+
+#cancelRecording{
+font-size: xx-large;
+}
+
+.conceptTable{
+max-width: -webkit-fill-available;
+}
+
+
+
+/* Plus minus button start */
+.score-input {
+border: 1px solid #eeeeee;
+box-sizing: border-box;
+margin: 0;
+outline: none;
+}
+
+.score-input[type="button"] :enabled {
+-webkit-appearance: button;
+cursor: pointer;
+}
+
+/* For hiding internal updown arrow in number */
+.quantity-field::-webkit-outer-spin-button,
+.quantity-field::-webkit-inner-spin-button {
+-webkit-appearance: none;
+}
+
+.input-group {
+clear: both;
+margin: 15px 0;
+position: relative;
+}
+
+.input-group input[type='button'] {
+background-color: #eeeeee;
+min-width: 38px;
+width: auto;
+transition: all 300ms ease;
+}
+
+.input-group .button-minus,
+.input-group .button-plus {
+font-weight: bold;
+height: 38px;
+padding: 0;
+width: 38px;
+position: relative;
+}
+
+.input-group .quantity-field {
+position: relative;
+height: 38px;
+left: -6px;
+text-align: center;
+width: 62px;
+display: inline-block;
+font-size: 13px;
+margin: 0 0 5px;
+resize: vertical;
+}
+
+.button-plus {
+border-left-style:none ;
+height: 30px;
+background-color: transparent;
+}
+
+.button-minus {
+border-right-style:none ;
+height: 30px;
+background-color: transparent;
+}
+
+.quantity-field{
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+
+.score-input[type="number"] {
+-moz-appearance: textfield;
+-webkit-appearance: none;
+}
+/* Plus minus button end */
+
+
+/* audio recording animation */
+
+
+@keyframes quiet {
+  25%{
+    transform: scaleY(.6);
+  }
+  50%{
+    transform: scaleY(.4);
+  }
+  75%{
+    transform: scaleY(.8);
+  }
+}
+
+@keyframes normal {
+  25%{
+    transform: scaleY(1);
+  }
+  50%{
+    transform: scaleY(.4);
+  }
+  75%{
+    transform: scaleY(.6);
+  }
+}
+@keyframes loud {
+  25%{
+    transform: scaleY(1);
+  }
+  50%{
+    transform: scaleY(.4);
+  }
+  75%{
+    transform: scaleY(1.2);
+  }
+}
+
+.boxContainer{
+  display: flex;
+  justify-content: space-between;
+  height: 64px;
+  --boxSize: 8px;
+  --gutter: 4px;
+  width: calc((var(--boxSize) + var(--gutter)) * 5);
+}
+
+.box{
+  transform: scaleY(.4);
+  height: 100%;
+  width: var(--boxSize);
+  background: #f6430f;
+  animation-duration: 1.2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  border-radius: 8px;
+}
+
+.box1{
+  animation-name: quiet;
+}
+
+.box2{
+  animation-name: normal;
+}
+
+.box3{
+  animation-name: quiet;
+}
+
+.box4{
+  animation-name: loud;
+}
+
+.box5{
+  animation-name: quiet;
+}
+/* audio end  */
+
+/* image */
+
+::ng-deep .carousel .carousel-control-prev-icon, ::ng-deep .carousel .carousel-control-next-icon {
+background-color: #F6430F;
+width: 50px;
+height: 50px;
+background-size: 41%;
+border-radius: 50%;
+}
+
+::ng-deep .carousel .carousel-item img{
+width: 100%;
+height: auto;
+margin: auto; 
+display: block;
+}
+
+::ng-deep .carousel .carousel-indicators li {background-color: #f35524;}
+::ng-deep .carousel .carousel-indicators li.active {background-color: #ff3e04;}
+::ng-deep .carousel .carousel-caption {color: #f73504;}
+
+/* image end */

@@ -1,0 +1,87 @@
+.inline-search-icon {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-by-field {
+  margin-top: 2%;
+}
+
+.inline {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: start; */
+}
+
+.teal {
+  color: teal;
+}
+
+.subSession {
+  margin-left: 15%;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+a, a:hover {
+  color:white;
+  text-decoration: none;
+}
+
+label {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.card-color {
+  margin-bottom: 5%;
+}
+
+.wrap {
+  word-wrap: break-word;
+}
+  
+.cursor {
+  cursor: pointer;
+  margin-left: -110%;
+  padding-top: 110%;
+}
+
+.card-header, .card-footer {
+  background-color: #fff6f4d0;
+}
+
+.tab {
+  margin-left: 15%;
+}
+
+.card-header, .card-footer {
+  background-color: #fff6f4d0;
+}
+
+.btn-swabhav {
+  color: #f6430f;
+}
+
+.file-type-input {
+  margin-left: -4%;
+}
+
+/* *******************input styles***************** */
+.form-control:focus {
+  box-shadow: none;
+}
+
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}

@@ -1,0 +1,98 @@
+<app-master-navbar></app-master-navbar>
+
+<div>
+    <br>
+
+    <ng-container *ngIf="!moduleID || !moduleName">
+        <br>
+        <button class="btn btn-default swabhav-button-round" (click)="redirectToModules()">Back</button>
+        <br><br>
+        <div class="card my-course-card-style h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+                    <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+                    <br>
+                    <div class="font-lg-style text-center">
+                        No Module Found
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </ng-container>
+
+    <ng-container *ngIf="moduleID && moduleName">
+
+        <!-- Header -->
+        <div class="font-weight-bold font-xl-style text-center">
+            <span class="color-F6430F">Concept Tree For: </span>{{moduleName}}
+        </div>
+        <br>
+        <ng-container *ngIf="workflow$ | async as workflow">
+
+            <!-- Buttons -->
+            <div class="button-group-style">
+                <button class="btn btn-default swabhav-button-round" (click)="redirectToModules()">Back</button>
+                &nbsp;&nbsp;&ensp;
+                <button *ngIf="workflowItems.length > 0" class="btn btn-default swabhav-button-round"
+                    (click)="addSiblingRootNode()">
+                    Add Sibling Root Concept
+                </button>
+                <div class="float-right">
+                    <button [disabled]="workflowItems.length == 0 || !isConceptTreeDirty" (click)="onSaveClick()"
+                        class="btn btn-default swabhav-button-round">
+                        Save
+                    </button>
+                    &nbsp;&nbsp;&ensp;
+                    <button *ngIf="workflowItems.length > 0" (click)="deleteConceptTree()"
+                        class="btn btn-default swabhav-button-round">
+                        Delete Concept Tree
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add starting root concept button-->
+            <ng-container *ngIf="workflowItems.length == 0">
+                <br>
+                <div class="card">
+                    <div class="card-body not-found-card-style">
+                        <button *ngIf="(nodeListCount$ | async) === 0" class="btn btn-default swabhav-button-round"
+                            (click)="addStartingNode()">
+                            Add Starting Concept
+                        </button>
+                    </div>
+                </div>
+            </ng-container>
+
+            <br>
+
+            <!-- Concept tree -->
+            <div class="temp" (scroll)="onConceptTreeScroll($event)">
+                <div class="flex row row-style box" *ngFor="let row of workflow; let first = first; let i = index">
+                    <!-- <div class="box"> -->
+                    <div class="level-style">
+                        Level: {{i+1}}
+                    </div>
+                    <div class="mt-4 flex justify-between items-center push" *ngFor="let col of row">
+                        <app-module-concept-node #nodeList #nodeComponentList [node]="col" [conceptList]="conceptList"
+                            [parentConceptList]="parentConceptList" (addNodeEmitter)="addChildNode($event)"
+                            (removeNodeEmitter)="removeNode($event)" (changeConceptEmitter)="conceptChangeFromChild()"
+                            (removeParentConceptEmitter)="removeParentFromNode($event)"
+                            (redrawParentLines)="removeAndDrawLines()"
+                            (addNewParentToNodeEmitter)="addParentToNode($event)">
+                        </app-module-concept-node>
+                    </div>
+
+                    <!-- </div> -->
+                </div>
+            </div>
+
+        </ng-container>
+
+        <br><br>
+    </ng-container>
+
+</div>
+
+<app-master-footer></app-master-footer>

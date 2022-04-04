@@ -1,0 +1,321 @@
+<app-master-navbar></app-master-navbar>
+
+<!-- Reply Form Template -->
+<ng-template #replyFormTemplate let-replyForm="replyForm">
+    <form [formGroup]="replyForm">
+        <div class="row">
+            <div class="form-group col-sm-11 col-md-11">
+                <textarea class="form-control input-style" rows="2" formControlName="reply"
+                    placeholder="Write your reply here...."></textarea>
+                <div class="alert alert-danger" *ngIf="(replyForm.get('reply').touched||
+                    replyForm.get('reply').dirty)&&replyForm.get('reply').invalid">
+                    <div *ngIf="replyForm.get('reply').errors.maxlength">
+                        Reply can have maximum 2000 characters
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-default filter-button" type="submit" [disabled]="!replyForm.dirty"
+            (click)="onReplySubmit(replyForm)">
+            Submit
+            <span class="vertical-align-top-icon-style"></span>
+        </button>
+        &nbsp;&nbsp;&nbsp;
+        <button class="btn btn-default filter-button" type="submit" *ngIf="(isOperationReplyToBlogUpdate && replyForm.get('isBlogReply').value) 
+            || (isOperationReplyToReplyUpdate && !replyForm.get('isBlogReply').value)"
+            (click)="onCancelReplyButtonClick(replyForm.get('isBlogReply').value)">
+            Cancel
+            <span class="vertical-align-top-icon-style"></span>
+        </button>
+    </form>
+</ng-template>
+
+
+<!-- Reply Template -->
+<ng-template #replyTemplate let-reply>
+
+    <div>
+        <!-- Reply Profile Image -->
+        <span class="profile-image-container">
+            <img class="profile-image" src={{reply.replier.image}} alt="">
+        </span>
+        &nbsp;&nbsp;&nbsp;
+
+        <!-- Reply Profile Name -->
+        <span class="font-weight-bold font-md-style color-EE3733 ">
+            {{reply.replier.firstName + " " + reply.replier.lastName}}
+        </span>
+        <div class="float-right">
+            <i *ngIf="reply.replier.id == credentialID" class="material-icons color-757575 cursor-pointer-style"
+                (click)="onUpdateReplyButtonClick(reply)">create</i>
+            &nbsp;&nbsp;&nbsp;
+            <i *ngIf="reply.replier.id == credentialID" class="material-icons color-D63C2A cursor-pointer-style"
+                (click)="onDeleteReplyButtonClick(reply.id)">delete</i>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Reply -->
+    <div>
+        {{reply.reply}}
+    </div>
+    <br>
+
+    <!-- Reply Features -->
+    <span class="vertical-align-bottom-icon-style">
+        <i class="material-icons">
+            <span class="icon-reply-style"
+                [ngClass]="{'color-E73A00': reply.isLoggedInClap==true, 'color-000000' : reply.isLoggedInClap==false || reply.isLoggedInClap==null }"
+                (click)="onBlogReactionClick(reply,true,false)">sentiment_satisfied_alt</span>
+        </i>
+    </span>
+    <span
+        [ngClass]="((reply.replier.id == credentialID) && reply.clapReactions?.length > 0) ? 'color-D63C2A font-lg-style cursor-pointer-style' : 'color-D63C2A font-lg-style'"
+        (click)="onClapsCountClick(reply.clapReactions)">
+        {{reply.clapReactions?.length}}
+    </span>
+    &nbsp;&nbsp;&nbsp;
+    <span class="vertical-align-bottom-icon-style">
+        <i class="material-icons">
+            <span class="icon-reply-style"
+                [ngClass]="{'color-E73A00': reply.isLoggedInClap==false, 'color-000000' : reply.isLoggedInClap==true || reply.isLoggedInClap==null }"
+                (click)="onBlogReactionClick(reply,false,false)">sentiment_satisfied_alt</span>
+        </i>
+    </span>
+    <span class="color-D63C2A font-lg-style">
+        {{reply.slapReactions?.length}}
+    </span>
+    &nbsp;&nbsp;&nbsp;
+    <span class="font-weight-bold color-707070 cursor-pointer-style" *ngIf="reply.replies?.length > 0"
+        (click)="reply.isRepliesVisible=!reply.isRepliesVisible">
+        <span *ngIf="!reply.isRepliesVisible">
+            Show {{reply.replies?.length}}
+            <span *ngIf="reply.replies?.length == 1">
+                reply
+            </span>
+            <span *ngIf="reply.replies?.length > 1">
+                replies
+            </span>
+        </span>
+        <span *ngIf="reply.isRepliesVisible">
+            Hide replies
+        </span>
+    </span>
+    &nbsp;&nbsp;&nbsp;
+    <span *ngIf="!reply.replyID" class="font-weight-bold color-707070 cursor-pointer-style"
+        (click)="onReplyButtonClick(reply.id)">
+        Reply
+    </span>
+
+    <br><br>
+
+    <!-- Reply To Blog Form Update -->
+    <div *ngIf="isOperationReplyToBlogUpdate && reply.isReplyUpdateFormVisible">
+        <span class="font-weight-bold color-707070" *ngIf="isOperationReplyToBlogUpdate">
+            Update Reply
+        </span>
+        <br><br>
+        <ng-template *ngTemplateOutlet="replyFormTemplate; context: {replyForm: replyToBlogForm}"></ng-template>
+    </div>
+
+    <div class="sub-reply-block-style">
+
+        <!-- Reply To Reply Form -->
+        <div *ngIf="reply.isReplyToReplyFormVisible">
+            <br>
+            <span class="font-weight-bold color-707070" *ngIf="isOperationReplyToReplyUpdate">
+                Update Reply
+            </span>
+            <br><br>
+            <ng-template *ngTemplateOutlet="replyFormTemplate; context: {replyForm: replyToReplyForm}"></ng-template>
+        </div>
+
+        <!-- Reply To Reply Form Update -->
+        <!-- <div *ngIf="isOperationReplyToReplyUpdate">
+            <br>
+            <ng-template *ngTemplateOutlet="replyFormTemplate; context: {replyForm: replyToReplyForm}"></ng-template>
+        </div> -->
+
+        <!-- Show Replies To Reply -->
+        <div *ngIf="reply.isRepliesVisible">
+            <br>
+            <div *ngFor="let reply of reply.replies">
+                <ng-template *ngTemplateOutlet="replyTemplate; context: {$implicit: reply}"></ng-template>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<mat-drawer-container class="drawer-container-style">
+
+    <!-- Reply Side Nav bar -->
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-replies-style">
+        <div class="overflow-x-hidden-style">
+            <div class="font-weight-bold font-lg-style">
+                Replies&nbsp;&nbsp;&nbsp;
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons close-icon">close</i></span>
+                </div>
+            </div>
+            <br><br>
+
+            <!-- Reply To Blog Form Add -->
+            <div *ngIf="!isOperationReplyToBlogUpdate">
+                <ng-template *ngTemplateOutlet="replyFormTemplate; context: {replyForm: replyToBlogForm}"></ng-template>
+            </div>
+            <br>
+            <hr>
+            <div *ngFor="let reply of replyList">
+                <ng-template *ngTemplateOutlet="replyTemplate; context: {$implicit: reply}"></ng-template>
+                <hr>
+            </div>
+        </div>
+    </mat-drawer>
+
+
+    <!-- Blog Details -->
+    <div class="main-content" *ngIf="blog">
+
+        <br><br>
+
+        <!-- Back Button -->
+        <button class="btn btn-default filter-button" (click)="redirectToBrowseBlogs()">
+            <i class="material-icons-outlined back-button-position-style">arrow_back</i>
+        </button>
+
+        <div class="title-style">
+            {{blog.title}}
+        </div>
+        <br><br>
+        <div class="color-757575 font-xl-style font-family-auto-style">
+            {{blog.description}}
+        </div>
+        <br><br>
+        <div>
+            <span class="profile-image-container">
+                <img class="profile-image" src={{blog.author.image}} alt="">
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="font-weight-bold font-md-style color-EE3733 ">
+                {{blog.author.firstName + " " + blog.author.lastName}}
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="color-757575">
+                {{blog.publishedDate | date:'dd MMM, yyyy'}}
+            </span>
+            &nbsp;&nbsp;
+            &#183;
+            &nbsp;&nbsp;
+            <span class="color-757575 font-sm-style">
+                {{blog.timeToRead}} min read
+            </span>
+        </div>
+        <br>
+        <span *ngFor="let blogTopic of blog.blogTopics">
+            <span class="badge swabhav-badge-style">
+                {{blogTopic.name}}
+            </span>
+        </span>
+        <br><br>
+        <div>
+            <img class="full-width-style" src={{blog.bannerImage}} alt="">
+        </div>
+        <br><br>
+        <div class="font-family-auto-style font-lg-style" [innerHTML]="blog.content">
+        </div>
+        <br><br>
+        <div>
+            <span data-toggle="tooltip" data-placement="top" title="Happy" class="vertical-align-bottom-icon-style">
+                <i class="material-icons">
+                    <span class="icon-blog-style"
+                        [ngClass]="{'color-E73A00': blog.isLoggedInClap==true, 'color-000000' : blog.isLoggedInClap==false || blog.isLoggedInClap==null }"
+                        (click)="onBlogReactionClick(blog,true,true)">sentiment_satisfied_alt</span>
+                </i>
+            </span>
+            <span
+                [ngClass]="((blog.author.id == credentialID) && blog.clapReactions?.length > 0) ? 'color-D63C2A font-xl-style cursor-pointer-style' : 'color-D63C2A font-xl-style'"
+                (click)="onClapsCountClick()">
+                {{blog.clapReactions?.length}}
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span data-toggle="tooltip" data-placement="top" title="Sad" class="vertical-align-bottom-icon-style">
+                <i class="material-icons">
+                    <span class="icon-blog-style"
+                        [ngClass]="{'color-E73A00': blog.isLoggedInClap==false, 'color-000000' : blog.isLoggedInClap==true || blog.isLoggedInClap==null }"
+                        (click)="onBlogReactionClick(blog,false,true)">mood_bad</span>
+                </i>
+            </span>
+            <span class="color-D63C2A font-xl-style">
+                {{blog.slapReactions?.length}}
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span data-toggle="tooltip" data-placement="top" title="Replies" (click)="drawer.toggle()"
+                class="vertical-align-bottom-icon-style">
+                <i class="material-icons icon-blog-style">chat_bubble_outline</i>
+            </span>
+            <span class="color-D63C2A font-xl-style">
+                {{replyList.length}}
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span data-toggle="tooltip" data-placement="top" title="Views" class="vertical-align-bottom-icon-style">
+                <i class="material-icons icon-blog-style">visibility</i>
+            </span>
+            <span class="color-D63C2A font-xl-style">
+                {{blog.blogViewCount}}
+            </span>
+        </div>
+        <br><br><br><br>
+    </div>
+</mat-drawer-container>
+
+
+<!-- Show claps' credentials -->
+<ng-template #showClapsModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style font-lg-style">
+            People who were happy reading your blog
+            <div class="color-757575 font-sm-style font-weight-bold cursor-pointer-style float-right"
+                (click)="modal.dismiss('Close click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div *ngFor="let reaction of selectedReactionList; let i = index">
+            <div>
+
+                <!-- Index Number -->
+                <span class="font-weight-bold">
+                    {{i+1}})
+                </span>
+
+                &nbsp;&nbsp;
+
+                <!-- Reactor Profile Image -->
+                <span class="profile-image-container">
+                    <img class="profile-image" src={{reaction.reactor.image}} alt="">
+                </span>
+
+                &nbsp;&nbsp;&nbsp;
+
+                <!-- Reactor Profile Name -->
+                <span class="font-weight-bold font-md-style color-EE3733 ">
+                    {{reaction.reactor.firstName + " " + reaction.reactor.lastName}}
+                </span>
+
+                &nbsp;&nbsp;
+                &#183;
+                &nbsp;&nbsp;
+
+                <!-- Reactor Role Name -->
+                <span class="font-weight-bold font-md-style">
+                    {{reaction.reactor.role.roleName}}
+                </span>
+            </div>
+        </div>
+    </div>
+</ng-template>

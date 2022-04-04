@@ -1,0 +1,149 @@
+.card-style{
+    margin-left: 15px;
+    margin-bottom: 50px;
+    text-align: center;
+    font-weight: bold;
+    color: #D63C2A;
+    border: solid;
+    border-radius: 5px;
+    width: 200px;
+}
+
+.row-style{
+    justify-content: center;
+    min-width: max-content;
+}
+
+.concept-tree-box-style{
+    overflow-x: scroll;
+}
+
+.button-group-style{
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.level-style{
+    margin-top: 50px;
+    margin-left: 50px;
+    font-weight: bold;
+    font-size: x-large;
+}
+
+.box {
+    display: flex;
+}
+
+.push {
+    margin: auto;
+}
+
+.indicator-style{
+    height: 30px;
+    width: 30px;
+    border: 3px solid #757575;
+    border-radius: 8px;
+    position: relative;
+}
+
+.red-indicator-style{
+    background-color: #D63C2A;
+}
+
+.orange-indicator-style{
+    background-color: #F26A00;
+}
+
+.green-indicator-style{
+    background-color: #009E0B;
+}
+
+.indicator-box-style{
+    margin-top: 20px;
+    display: flex;
+}
+
+.indicator-style:hover .tool-tip-text-style {
+    visibility: visible;
+}
+
+.tool-tip-text-style{
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 20px;
+}
+
+.talent-panel-style{
+    z-index: 10;
+    position: relative;
+    margin-top: 20px;
+    background-color: white;
+}
+
+.node-card-style{
+    text-align: center;
+    box-shadow: 0 0 15px #f6430f26;
+    border: none;
+    background-color: #FFFFFF;
+}
+
+.no-side-padding{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.talent-hr-style{
+    margin-top: 6px;
+    margin-bottom: 6px;
+    background-color: #F6430F;
+}
+
+.talent-name-style:hover{
+    background-color: #ffefec;
+}
+
+.selected-talent-name-style{
+    background-color: #f6d8d2;
+}
+
+.page-style{
+    overflow-x: hidden;
+}
+
+/* ************** Module tab styles ******************** */
+
+.module-tab-menu-style{
+    box-shadow: 0 0 10px #ccc;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+/* active tab */
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+    color:black;
+    background-color: #ffe0da;
+    height: 120px;
+}
+
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color:black;
+    height: 120px;
+}
+
+:host::ng-deep .mat-tab-header {
+    border: none;
+}
+    
+/* ink bar */
+:host::ng-deep .mat-ink-bar {
+    background-color: var(--primary-color,#ffe0da) !important;
+}
+
+/* ****************************************************** */

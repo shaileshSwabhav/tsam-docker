@@ -1,0 +1,22 @@
+.background-white {
+  background-color: white;
+}
+
+.w-30 {
+  width: 30%;
+}
+
+
+.invalid-input {
+  color: red;
+  font-size: small;
+}
+
+.full-h {
+  height: 100vh;
+}
+
+
+.f-m {
+  font-size: medium;
+}

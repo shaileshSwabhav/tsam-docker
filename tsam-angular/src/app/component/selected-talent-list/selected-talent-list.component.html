@@ -1,0 +1,90 @@
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Experience</th>
+        <th>Address</th>
+        <th>Resume</th>
+        <th *ngIf="control">Accept</th>
+        <th *ngIf="control">Reject</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>John</td>
+        <td>6 Year</td>
+        <td>G/8 San Francisco</td>
+        <td><button type="button" class="btn btn-light">Open</button></td>
+        <td *ngIf="control">
+          <button type="button" class="btn btn-success" (click)="changeClass(0, true)">Accept</button>
+        </td>
+        <td *ngIf="control">
+          <button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo1"
+            [disabled]="getCssClass(0)" (click)="changeClass(0)">Reject</button>
+        </td>
+      </tr>
+      <tr *ngIf="getCssClass(0) == true">
+        <td colspan="6" style="border: none;padding-left: 0%;padding-right: 0%;">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label for="comment">Reason For Reject:</label>
+              <textarea class="form-control" rows="3" id="comment" placeholder="Write Reason in Brief..."></textarea>
+            </div>
+            <div class="form-group col-sm-12 col-md-12">
+              <button class="btn btn-success">Add Reason</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>John</td>
+        <td>6 Year</td>
+        <td>G/8 San Francisco</td>
+        <td><button type="button" class="btn btn-light">Open</button></td>
+        <td *ngIf="control"><button type="button" class="btn btn-success" (click)="changeClass(1, true)">Accept</button>
+        </td>
+        <td *ngIf="control"><button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo2"
+            [disabled]="getCssClass(1)" (click)="changeClass(1)">Reject</button>
+        </td>
+      </tr>
+      <tr *ngIf="getCssClass(1) == true">
+        <td colspan="6" style="border: none;padding-left: 0%;padding-right: 0%;">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label for="comment">Reason For Reject:</label>
+              <textarea class="form-control" rows="3" id="comment" placeholder="Write Reason in Brief..."></textarea>
+            </div>
+            <div class="form-group col-sm-12 col-md-12">
+              <button class="btn btn-success">Add Reason</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>John</td>
+        <td>6 Year</td>
+        <td>G/8 San Francisco</td>
+        <td><button type="button" class="btn btn-light">Open</button></td>
+        <td *ngIf="control"><button type="button" class="btn btn-success" (click)="changeClass(2, true)">Accept</button>
+        </td>
+        <td *ngIf="control"><button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo3"
+            [disabled]="getCssClass(2)" (click)="changeClass(2)">Reject</button>
+        </td>
+      </tr>
+      <tr *ngIf="getCssClass(2) == true">
+        <td colspan="6" style="border: none;padding-left: 0%;padding-right: 0%;">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+              <label for="comment">Reason For Reject:</label>
+              <textarea class="form-control" rows="3" id="comment" placeholder="Write Reason in Brief..."></textarea>
+            </div>
+            <div class="form-group col-sm-12 col-md-12">
+              <button class="btn btn-success">Add Reason</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

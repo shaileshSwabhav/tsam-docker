@@ -1,0 +1,84 @@
+.card-margin{
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+.example-full-width {
+    width: 100%;
+}
+
+.faceBookColor{
+    color: #3b5998;
+}
+
+.instagramColor{
+    color: orangered;
+}
+
+.githubColor{
+    color: #333;
+}
+
+.linkedInColor{
+    color: #0e76a8;
+}
+
+.center{
+    text-align: center;
+}
+
+mat-form-field {
+    width: 100%;
+    height: 100%;
+  }
+
+.stepper-button-style{
+    background-color: rebeccapurple;
+    color: white;
+    text-align: center;
+}
+
+.center-style{
+    text-align: center;
+}
+
+.addToFormArrayButton{
+    background-color: rgb(214, 117, 214);
+}
+.deleteFromFormArrayButton{
+    background-color: rgb(230, 114, 114);
+    color: white;
+}
+.cardColor{
+    background-color: rebeccapurple;
+}
+mat-horizontal-stepper{
+    background-color: white;
+}
+
+mat-label{
+    color: rebeccapurple;
+}
+
+.matStepLabelColor{
+    color: rebeccapurple;
+}
+
+.pageStyle{
+    background: url('../../../assets/images/coding.png') no-repeat center center fixed; 
+  background-size: cover;
+  height: 50vw;
+
+}
+
+.resumeStyle{
+    text-align: left;
+}
+
+.label-style{
+    color: rebeccapurple;
+}
+
+h3{
+    background-color: rgb(231, 190, 231);
+}

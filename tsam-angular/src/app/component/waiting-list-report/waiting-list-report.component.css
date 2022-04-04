@@ -1,0 +1,29 @@
+
+
+i{
+  cursor: pointer;
+}
+
+.sub-table-header-style{
+  background-color: #f5683f !important;
+}
+
+.sub-table-header-style th{
+  color: #FFFFFF;
+}
+
+.sub-table-details-style{
+  background-color: #ffc4b3 !important;
+}
+
+.sub-table-details-style td{
+  color: #E73A00;
+}
+
+.no-sub-entries-style{
+  background-color: #EE3733 !important;
+}
+
+.no-sub-entries-style th{
+  color: #FFFFFF;
+}

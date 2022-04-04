@@ -1,0 +1,69 @@
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.checkbox-cursor {
+  cursor: pointer;
+}
+
+table {
+  font-size: small;
+}
+
+th {
+  font-weight: 400;
+}
+
+.btn-swabhav {
+  color: #f6430f;
+}
+
+.no-hover:hover:enabled {
+  transform: none;
+}
+
+/* DROPDOWN STYLES */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+/* INPUT STYLE */
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.card-header, .card-footer {
+  background-color: #fff6f4d0;
+}
+
+.filter-form-label {
+  font-size: medium;
+  font-weight: bold;
+  color: #757575;
+}
+
+.form-control:focus {
+  box-shadow: none;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}
+
+/* SIDE NAV */
+.mat-drawer-style {
+  width: 40%;
+}

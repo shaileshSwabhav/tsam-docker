@@ -1,0 +1,619 @@
+<ng-template #fieldNameCompulsary let-name="name">
+  <label><span *ngIf="!isViewClicked" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label>{{name}}:</label>
+</ng-template>
+
+<ng-template #dashTemplate>
+  <span>-</span>
+</ng-template>
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="searchBranchForm">
+      <div class="search-bar padding">
+        <div class="filter-by-field row">
+          <div class="form-group col-sm-6 col-md-6">
+            <label for="sel1"> Branch Name:</label>
+            <input type="text" class="form-control input-style" formControlName="branchName"
+              placeholder="Enter Branch Name">
+            <div class="alert alert-danger" *ngIf="(searchBranchForm.get('branchName').touched||searchBranchForm.get('branchName').dirty)
+              &&searchBranchForm.get('branchName').invalid">
+              <div *ngIf=" searchBranchForm.get('branchName').errors.maxlength">
+                College name should not have more than 150 characters.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label for="sel1"> University:</label>
+            <!-- Check if below code can be improvised further & can be used everywhere. -->
+            <ng-select class="form-group ng-select-style" formControlName="universityID"
+              placeholder="Select University">
+              <ng-option [value]="university.id" [disabled]="university.disabled"
+                *ngFor="let university of allUniversities">
+                {{university.universityName}}
+              </ng-option>
+            </ng-select>
+          </div>
+          <div class="col-sm-6 col-md-6">
+            <div class="form-group">
+              <label> TPO Name</label>
+              <input type="text" class="form-control input-style" formControlName="tpoName"
+                placeholder="Enter TPO Name">
+              <div class="alert alert-danger" *ngIf="(searchBranchForm.get('tpoName').touched||searchBranchForm.get('tpoName').dirty)
+              &&searchBranchForm.get('tpoName').invalid">
+                <div *ngIf=" searchBranchForm.get('tpoName').errors.maxlength">
+                  Name should not be more than 70 characters.
+                </div>
+                <div *ngIf=" searchBranchForm.get('tpoName').errors.pattern">
+                  Name should only have alphabets.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label>Rating:</label>
+            <select class="form-control input-style" formControlName="collegeRating">
+              <option [ngValue]="null">Select Rating</option>
+              <option *ngFor="let collegeRating of ratingList" [ngValue]="collegeRating">{{collegeRating}}
+              </option>
+            </select>
+          </div>
+          <!-- <div class="form-group col-sm-6 col-md-6">
+            <label for="sel1">Select State:</label>
+            <select class="form-control input-style" formControlName="stateID">
+              <option [ngValue]="null">Select State</option>
+              <option *ngFor="let state of states" [ngValue]="state.id">{{state.name}}
+              </option>
+            </select>
+          </div> -->
+        </div>
+        <div class="filter-by-field row">
+          <div class="form-group col-sm-6 col-md-6">
+            <label for="sel1">All India Ranking:</label>
+            <input type="number" appAllowNumbersOnly class="form-control input-style"
+              placeholder="eg:100 displays top 100 colleges" formControlName="allIndiaRanking">
+            <div class="alert alert-danger" *ngIf="(searchBranchForm.get('allIndiaRanking').touched||
+              searchBranchForm.get('allIndiaRanking').dirty)&&searchBranchForm.get('allIndiaRanking').invalid">
+              <div *ngIf=" searchBranchForm.get('allIndiaRanking').errors.max">
+                Rank cannot be more than 100000.
+              </div>
+              <div *ngIf=" searchBranchForm.get('allIndiaRanking').errors.pattern">
+                Rank must only contain numbers.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label>City</label>
+            <input type="text" class="form-control input-style" formControlName="city" placeholder="Enter City">
+            <div class="alert alert-danger" *ngIf="(searchBranchForm.get('city').touched||
+              searchBranchForm.get('city').dirty)&&searchBranchForm.get('city').invalid">
+              <div *ngIf=" searchBranchForm.get('city').errors.maxlength">
+                City name should not be more than 30 characters.
+              </div>
+              <div *ngIf=" searchBranchForm.get('city').errors.pattern">
+                City should only have alphabets.
+              </div>
+            </div>
+          </div>
+          <div *ngIf="isAdmin" class="form-group col-sm-6 col-md-6">
+            <label for="sel1">Select Sales Person:</label>
+            <select class="form-control input-style" formControlName="salesPersonID">
+              <option [ngValue]="null">Select Sales Person</option>
+              <option [ngValue]="nilUUID">Not Assigned</option>
+              <option *ngFor="let person of salesPeople" [ngValue]="person.id">
+                {{person.firstName}} {{person.lastName}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <br>
+
+    <div class="text-center">
+      <button class="btn btn-submit-swabhav material-icons-button" type="submit" (click)="closeSearchDrawer()"
+        [disabled]="!searchBranchForm.dirty||searchBranchForm.invalid">Search
+      </button>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-start align-items-center">
+        <button type="button" class="btn filter-button material-icons-button d-flex align-items-center"
+          (click)="backToPreviousPage()" *ngIf="isNavigatedFromColleges">
+          <!-- <i class="inline-icon material-icons-outlined">chevron_left</i>Back -->
+          <i class="material-icons-outlined">arrow_back</i>
+        </button>
+        <div class="totalLabel left-margin">
+          <h1>Total College Branches: <span class="swabhav-light-orange-text">{{totalCollegeBranches || 0}}</span></h1>
+        </div>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalCollegeBranches > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalCollegeBranches}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row">
+        <div class="d-flex justify-content-between align-items-center flex-row">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+            (click)="resetSearchAndGetAll()">View All Branches
+          </button>
+        </div>
+        <div class="d-flex justify-content-between align-items-start flex-row">
+          <div class="d-flex">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex">
+            <ul class="pagination" *ngFor="let branch of collegeBranchList | paginate: { id:'branchPageID',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalCollegeBranches }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="branchPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card-body swabhav-shadow padding-0pt" *ngIf="totalCollegeBranches > 0; else noCollegeBranches">
+        <div class="table-responsive">
+          <table class="table table-borderless table-striped">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>College Branch Name</th>
+                <th>Code</th>
+                <th>TPO Name</th>
+                <th>TPO Contact</th>
+                <th>TPO Email</th>
+                <th>Rating</th>
+                <th>City</th>
+                <th>Sales Person</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let branch of collegeBranchList; let i = index">
+                <td>{{(i+1)+(offset*limit)}}</td>
+                <td>{{branch.branchName}}</td>
+                <td><span class="badge swabhav-badge">{{branch.code}}</span></td>
+                <td>
+                  <div *ngIf="branch.tpoName; else dashTemplate">{{branch.tpoName}}</div>
+                </td>
+                <td>
+                  <div *ngIf="branch.tpoContact; else dashTemplate">{{branch.tpoContact}}</div>
+                </td>
+                <td>
+                  <div *ngIf="branch.tpoEmail; else dashTemplate">{{branch.tpoEmail}}</div>
+                </td>
+                <td>
+                  <div *ngIf="branch.collegeRating; else dashTemplate">
+                    <span *ngIf="branch.collegeRating>=3;else poor_rating"
+                      class="badge badge-success">{{branch.collegeRating}}</span>
+                    <ng-template #poor_rating><span class="badge badge-danger">{{branch.collegeRating}}</span>
+                    </ng-template>
+                  </div>
+                </td>
+                <td>{{branch.address?.city}}</td>
+                <td><span *ngIf="branch.salesPerson==null;else salesPerson_assigned" class="badge badge-warning">Not
+                    Assigned</span>
+                  <ng-template #salesPerson_assigned><span class="badge badge-pill swabhav-badge">
+                      {{branch.salesPerson?.firstName}} {{branch.salesPerson?.lastName}}
+                    </span></ng-template>
+                </td>
+                <td class="text-left">
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-element material-icons-button" type="button"
+                      id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="material-icons"><strong>more_vert</strong></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="onViewCollegeClick(branch)">
+                        <i class="inline-icon material-icons-outlined">visibility</i> View
+                      </button>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="onDeleteBranchClick(branch)" *ngIf="permission && permission?.delete">
+                        <i class="inline-icon material-icons">delete</i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- College Branches Not Found -->
+      <ng-template #noCollegeBranches>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>No branches found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add/Edit College -->
+<ng-template #branchDetailModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">{{modalHeader}}
+        <button type="button" *ngIf="isViewClicked && permission?.update" class="btn material-icons-button"
+          (click)="onUpdateBranchClick()">
+          <i class="material-icons grey-icon">create</i></button>
+      </h4>
+      <span *ngIf="!isViewClicked"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="collegeBranchForm">
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>College Branch Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-7">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Branch Name'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="branchName"
+              placeholder="Enter Branch Name" nbInput appEmptyToNull>
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('branchName').touched||collegeBranchForm.get('branchName').dirty)
+              &&collegeBranchForm.get('branchName').invalid">
+              <div *ngIf=" collegeBranchForm.get('branchName').errors.required">
+                Branch name must be specified.
+              </div>
+              <div *ngIf=" collegeBranchForm.get('branchName').errors.maxlength">
+                Branch name should not be more than 150 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-12 col-md-5">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'University'}"></ng-container>
+          </span>
+          <select class="form-control input-style" [compareWith]="compareFn" formControlName="university">
+            <option [ngValue]="null">Select University</option>
+            <option *ngFor="let university of allUniversities" [ngValue]="university">
+              {{university.universityName}}
+            </option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('university').touched||collegeBranchForm.get('university').dirty)
+            &&collegeBranchForm.get('university').invalid">
+            <div *ngIf=" collegeBranchForm.get('university').errors.required">
+              University must be selected.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>TPO Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-md-5">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Name'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="tpoName" placeholder="Enter TPO Name"
+              nbInput appEmptyToNull>
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('tpoName').touched||collegeBranchForm.get('tpoName').dirty)
+              &&collegeBranchForm.get('tpoName').invalid">
+              <div *ngIf=" collegeBranchForm.get('tpoName').errors.maxlength">
+                Name should not be more than 70 characters.
+              </div>
+              <div *ngIf=" collegeBranchForm.get('tpoName').errors.pattern">
+                Name should only have alphabets.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-5">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+            </span>
+            <input type="email" class="form-control input-style" formControlName="tpoEmail" nbInput appEmptyToNull
+              placeholder="Enter TPO's email">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('tpoEmail').touched||collegeBranchForm.get('tpoEmail').dirty)
+              &&collegeBranchForm.get('tpoEmail').invalid">
+              <div *ngIf=" collegeBranchForm.get('tpoEmail').errors.pattern">
+                Enter a valid e-mail address.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Contact'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="tpoContact" nbInput appEmptyToNull
+              placeholder="Enter TPO Contact">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('tpoContact').touched||collegeBranchForm.get('tpoContact').dirty)
+              &&collegeBranchForm.get('tpoContact').invalid">
+              <div *ngIf=" collegeBranchForm.get('tpoContact').errors.pattern">
+                Enter a valid 10 digit mobile number.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Alternate Contact'}">
+              </ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="tpoAlternateContact" nbInput
+              appEmptyToNull placeholder="Enter TPO Alternate Contact">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('tpoAlternateContact').touched||collegeBranchForm.get('tpoAlternateContact').dirty)
+              &&collegeBranchForm.get('tpoAlternateContact').invalid">
+              <div *ngIf=" collegeBranchForm.get('tpoContpoAlternateContacttact').errors.pattern">
+                Enter a valid 10 digit mobile number.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Location Details</strong></h1>
+      </div>
+      <div formGroupName="address" class="row">
+        <div class="col-sm-4 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country'}"></ng-container>
+            </span>
+            <select class="form-control input-style" [compareWith]="compareFn"
+              (change)="getStateList(collegeBranchForm.get('address')?.get('country')?.value?.id)"
+              formControlName="country">
+              <option [ngValue]="null">Select Country</option>
+              <option *ngFor="let country of countries" [ngValue]="country">{{country.name}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('address').get('country').touched||collegeBranchForm.get('address').get('country').dirty)
+                      &&collegeBranchForm.get('address').get('country').invalid">
+              <div *ngIf=" collegeBranchForm.get('address').get('country').errors.required">
+                Country must be selected.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'State'}"></ng-container>
+            </span>
+            <select class="form-control input-style" [compareWith]="compareFn" formControlName="state">
+              <option [ngValue]="null">Select State</option>
+              <option *ngFor="let state of states" [ngValue]="state">{{state.name}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('address').get('state').touched||collegeBranchForm.get('address').get('state').dirty)
+                  &&collegeBranchForm.get('address').get('state').invalid">
+              <div *ngIf=" collegeBranchForm.get('address').get('country').invalid; else state_required">
+                You must select a country first.
+              </div>
+              <ng-template #state_required>
+                <div *ngIf=" collegeBranchForm.get('address').get('state').errors.required">
+                  State must be selected.
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="city" placeholder="Enter City">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('address').get('city').touched||collegeBranchForm.get('address').get('city').dirty)
+                  &&collegeBranchForm.get('address').get('city').invalid">
+              <div *ngIf=" collegeBranchForm.get('address').get('city').errors.required">
+                City must be specified.
+              </div>
+              <div *ngIf=" collegeBranchForm.get('address').get('city').errors.maxlength">
+                City name should not be more than 30 characters.
+              </div>
+              <div *ngIf=" collegeBranchForm.get('address').get('city').errors.pattern">
+                City should only have alphabets.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'PIN Code'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="pinCode"
+              placeholder="Enter PIN code">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('address').get('pinCode').touched||collegeBranchForm.get('address').get('pinCode').dirty)
+                  &&collegeBranchForm.get('address').get('pinCode').invalid">
+              <div *ngIf=" collegeBranchForm.get('address').get('pinCode').errors.required">
+                PIN Code must be specified.
+              </div>
+              <div *ngIf=" collegeBranchForm.get('address').get('pinCode').errors.pattern">
+                Enter a valid 6 digit PIN Code.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-12">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Address'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="address" placeholder="Enter Address">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('address').get('address').touched||collegeBranchForm.get('address').get('address').dirty)
+                  &&collegeBranchForm.get('address').get('address').invalid">
+              <div *ngIf=" collegeBranchForm.get('address').get('address').errors.required">
+                Address must be specified.
+              </div>
+              <div *ngIf=" collegeBranchForm.get('address').get('address').errors.maxlength">
+                Address should not be more than 100 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Other Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-3 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Rating'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="collegeRating">
+              <option [ngValue]="null">Select Rating</option>
+              <option *ngFor="let collegeRating of ratingList" [ngValue]="collegeRating">{{collegeRating}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'All India Ranking'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="allIndiaRanking"
+            placeholder="Enter All India Rank">
+          <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('allIndiaRanking').touched||
+            collegeBranchForm.get('allIndiaRanking').dirty)&&collegeBranchForm.get('allIndiaRanking').invalid">
+            <div *ngIf=" collegeBranchForm.get('allIndiaRanking').errors.max">
+              Rank cannot be more than 100000.
+            </div>
+            <div *ngIf=" collegeBranchForm.get('allIndiaRanking').errors.pattern">
+              Rank must only contain positive integers.
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5 col-md-5">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+            </span>
+            <input type="email" class="form-control input-style" formControlName="email" nbInput appEmptyToNull
+              placeholder="Enter college email">
+            <div class="alert alert-danger" *ngIf="(collegeBranchForm.get('email').touched||collegeBranchForm.get('email').dirty)
+              &&collegeBranchForm.get('email').invalid">
+              <div *ngIf=" collegeBranchForm.get('email').errors.pattern">
+                Enter a valid e-mail address.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isAdmin" class="form-group col-sm-6 col-md-4">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Sales Person'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="salesPerson" [compareWith]="compareFn">
+            <option [ngValue]="null">Select Sales Person</option>
+            <option *ngFor="let person of salesPeople" [ngValue]="person">
+              {{person.firstName}} {{person.lastName}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!--Modal Footer-->
+  <div class="modal-footer">
+    <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="button"
+      (click)="modal.dismiss()">Close
+    </button>
+    <button *ngIf="!isViewClicked" type="submit" class="btn btn-submit-swabhav material-icons-button"
+      [disabled]="!collegeBranchForm.dirty" (click)="validate()">{{modalButton}}
+    </button>
+  </div>
+
+
+</ng-template>
+
+<!-- Delete College Confirmation -->
+<ng-template #deleteConfirmationModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" class="btn btn-default" type="submit" (click)="modal.dismiss()"><i
+        class="material-icons close-icon material-icons-button">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you Sure want to Delete this College ?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="deleteCollegeBranch()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">No</button>
+  </div>
+
+</ng-template>

@@ -1,0 +1,137 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="page-margin">
+        <div class="heading-style">Active Test</div>
+        <div *ngIf="activeTestList.length > 0">
+            <div class="row">
+                <ng-container *ngFor="let test of activeTestList; let i = index">
+                    <div class="form-group col-sm-6 col-md-4">
+                        <div class="card card-margin card-shadow card-style h-100">
+                            <div class="card-body card-body-style">
+                                <div class="problem-name">{{test.name}}</div>
+                                <div class="problem-date">{{test.time}} MIN</div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <span class="col-sm-3 px-0 card-sub-header">Difficulty</span>
+                                            <div class="col-sm-9 px-0">
+                                                <span [ngClass]="test.difficultyClass">{{test.difficulty}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <span class="col-sm-3 px-0 card-sub-header">Deadline</span>
+                                            <div class="col-sm-9 px-0">
+                                                <span class="card-sub-detail">{{test.deadline | date:'dd MMM,
+                                                    yyyy'}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="center-style">
+                                    <span class="solve-now" (click)="startNow(test.id)">
+                                        Start
+                                        <span class="arrow"><i
+                                                class="material-icons icon-style">arrow_right_alt</i></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="activeTestList.length == 0">
+            <div class="card">
+                <div class="card-body not-found">
+                    <h2>No Active Tests Found</h2>
+                </div>
+            </div>
+        </div>
+        <div class="heading-style">Previous Test</div>
+        <div *ngIf="previousTestList.length > 0">
+            <div class="row">
+                <ng-container *ngFor="let test of previousTestList; let i = index">
+                    <div class="form-group col-sm-6 col-md-4">
+                        <div class="card card-margin card-shadow card-style h-100">
+                            <div class="card-body card-body-style">
+                                <div class="problem-name">{{test.name}}</div>
+                                <div class="problem-date">{{test.time}} MIN</div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <span class="col-sm-3 px-0 card-sub-header">Difficulty</span>
+                                            <div class="col-sm-9 px-0">
+                                                <span [ngClass]="test.difficultyClass">{{test.difficulty}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <span class="col-sm-3 px-0 card-sub-header">Deadline</span>
+                                            <div class="col-sm-9 px-0">
+                                                <span class="card-sub-detail">{{test.deadline | date:'dd MMM,
+                                                    yyyy'}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="center-style">
+                                    <span class="solve-now" (click)="startNow(test.id)">
+                                        Practice
+                                        <span class="arrow"><i
+                                                class="material-icons icon-style">arrow_right_alt</i></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="previousTestList.length == 0">
+            <div class="card">
+                <div class="card-body not-found">
+                    <h2>No Previous Tests Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>
+
+<!-- Start Test -->
+<ng-template #startNowModal let-modal>
+    <div class="modal-body">
+        <div class="close-style float-right" (click)="modal.dismiss('Close click')">
+            <span class="arrow"><i class="material-icons close-icon">close</i></span>Close
+        </div>
+        <div class="success-body">
+            <div class="success-header">
+                {{selectedTest.name}}
+            </div>
+            <br><br>
+            <div class="success-details">
+                This test contains <span class="red">{{selectedTest.numberOfProblems}} Problems</span>
+            </div>
+            <br>
+            <div class="success-details">
+                Duration of this test is <span class="red">{{selectedTest.time}} min</span>
+            </div>
+            <br>
+            <div class="center-style">
+                <button class="btn btn-default register-button" (click)="redirectToTestDetails(selectedTest.name)">
+                    Start
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

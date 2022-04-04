@@ -1,0 +1,2040 @@
+<ng-template #noneTemplate>
+  <span>None</span>
+</ng-template>
+
+<ng-template #dashTemplate>
+  <strong><span>-</span></strong>
+</ng-template>
+
+<ng-template #notAssignedTemplate>
+  <span>Not Assigned</span>
+</ng-template>
+
+<ng-template #fieldNameCompulsary let-name="name">
+  <label><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+  <label>{{name}}:</label>
+</ng-template>
+
+
+
+<mat-drawer-container class="drawer-container-style" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="search-body filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <mat-sidenav-container class="example-container">
+      <mat-sidenav mode="side" opened position="start" class="search-mat-drawer-style">
+        <div class="search-section-group-style">
+          <div *ngFor="let searchSection of searchSectionList">
+            <div (click)="onSearchSectionNameClick(searchSection.name)"
+              [ngClass]="searchSection.isSelected ? 'selected-search-section-name-style' : 'search-section-name-style'">
+              {{searchSection.name}}
+            </div>
+          </div>
+        </div>
+      </mat-sidenav>
+      <mat-sidenav-content class="search-main-content-style">
+        <form [formGroup]="companyRequirementSearchForm">
+          <!-- REQUIREMENT DETAILS SEARCH -->
+          <div *ngIf="selectedSectionName=='Requirement'">
+            <div class="row col-sm-12 col-md-12">
+              <h3><strong>Requirement Details Search</strong></h3>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Minimum Package'}">
+                  </ng-container>
+                </span>
+                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                  formControlName="minimumPackage" placeholder="eg: 100000">
+                <div class="alert alert-danger" *ngIf="(companyRequirementSearchForm.get('minimumPackage').touched||companyRequirementSearchForm.get('minimumPackage').dirty)
+                  &&companyRequirementSearchForm.get('minimumPackage').invalid">
+                  <div *ngIf="companyRequirementSearchForm.get('minimumPackage').errors.max">
+                    Number should be less than 1000000000.
+                  </div>
+                  <div *ngIf="companyRequirementSearchForm.get('minimumPackage').errors.min">
+                    Package must be more than 100000.
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum Package'}">
+                  </ng-container>
+                </span>
+                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                  formControlName="maximumPackage" placeholder="eg: 100000">
+                <div class="alert alert-danger" *ngIf="(companyRequirementSearchForm.get('maximumPackage').touched||companyRequirementSearchForm.get('maximumPackage').dirty)
+                  &&companyRequirementSearchForm.get('maximumPackage').invalid">
+                  <div *ngIf="companyRequirementSearchForm.get('maximumPackage').errors.max">
+                    Number should be less than 1000000000.
+                  </div>
+                  <div *ngIf="companyRequirementSearchForm.get('maximumPackage').errors.min">
+                    Package must be more than 100000.
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Job Designation'}">
+                  </ng-container>
+                </span>
+                <ng-select [items]="designationList" bindLabel="position" [clearable]="true"
+                  formControlName="designation" placeholder="Select" appendTo="body" [searchable]="true" bindValue="id"
+                  class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.position}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Required From'}">
+                  </ng-container>
+                </span>
+                <input type="date" class="form-control input-style" formControlName="requirementFromDate">
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Required Till'}">
+                  </ng-container>
+                </span>
+                <input type="date" class="form-control input-style" formControlName="requirementTillDate">
+              </div>
+            </div>
+          </div>
+
+          <!-- TALENT SEARCH DETAILS -->
+          <div *ngIf="selectedSectionName=='Talent'">
+            <div class="row col-sm-12 col-md-12">
+              <h3><strong>Talent Details Search</strong></h3>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Personality Type'}">
+                  </ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="personalityType">
+                  <option [ngValue]="null">Select</option>
+                  <option *ngFor="let personalityType of personalityTypeList" [ngValue]="personalityType.value">
+                    {{personalityType.value}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Minimum Experience'}">
+                  </ng-container>
+                </span>
+                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                  formControlName="minimumExperience" placeholder="eg: 2">
+                <div class="alert alert-danger" *ngIf="(companyRequirementSearchForm.get('minimumExperience').touched||companyRequirementSearchForm.get('minimumExperience').dirty)
+                  &&companyRequirementSearchForm.get('minimumExperience').invalid">
+                  <div *ngIf=" companyRequirementSearchForm.get('minimumExperience').errors.min">
+                    Can't be less than 0.
+                  </div>
+                  <div *ngIf=" companyRequirementSearchForm.get('minimumExperience').errors.max">
+                    Can't be more than 30 years.
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum Experience'}">
+                  </ng-container>
+                </span>
+                <input type="number" appAllowNumbersOnly class="form-control input-style"
+                  formControlName="maximumExperience" placeholder="eg: 2">
+                <div class="alert alert-danger" *ngIf="(companyRequirementSearchForm.get('maximumExperience').touched||companyRequirementSearchForm.get('maximumExperience').dirty)
+                  &&companyRequirementSearchForm.get('maximumExperience').invalid">
+                  <div *ngIf=" companyRequirementSearchForm.get('maximumExperience').errors.min">
+                    Can't be less than 0.
+                  </div>
+                  <div *ngIf=" companyRequirementSearchForm.get('maximumExperience').errors.max">
+                    Can't be more than 30 years.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOCATION DETAILS SEARCH -->
+          <div *ngIf="selectedSectionName=='Location'">
+            <div class="row col-sm-12 col-md-12">
+              <h3><strong>Location Details Search</strong></h3>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-6">
+                <div class="form group">
+                  <span>
+                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Country'}"></ng-container>
+                  </span>
+                  <select class="form-control input-style" formControlName="countryID"
+                    (change)="getStateListByCountryID(companyRequirementSearchForm.get('countryID').value)">
+                    <option [ngValue]="null">Select</option>
+                    <option *ngFor="let country of countryList" [ngValue]="country.id">{{country.name}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'State'}"></ng-container>
+                </span>
+                <ng-select [items]="stateList" bindLabel="name" placeholder="Select" appendTo="body" [searchable]="true"
+                  [clearable]="true" formControlName="stateID">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'City'}"></ng-container>
+                </span>
+                <input type="text" class="form-control input-style" formControlName="city" placeholder="eg: Mumbai">
+                <div class="alert alert-danger" *ngIf="(companyRequirementSearchForm.get('city').touched||companyRequirementSearchForm.get('city').dirty)
+                  &&companyRequirementSearchForm.get('city').invalid">
+                  <div *ngIf=" companyRequirementSearchForm.get('city').errors.maxlength">
+                    City name should not be more than 50 characters.
+                  </div>
+                  <div *ngIf=" companyRequirementSearchForm.get('city').errors.pattern">
+                    City should only have alphabets.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OTHER DETAILS SEARCH -->
+          <div *ngIf="selectedSectionName=='Other'">
+            <div class="row col-sm-12 col-md-12">
+              <h3><strong>Other Details Search</strong></h3>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Status'}"></ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="isActive">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="true">Active</option>
+                  <option [ngValue]="false">In Active</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6 col-md-6">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'SalesPerson'}"></ng-container>
+                </span>
+                <select class="form-control input-style" formControlName="salesPersonID">
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="nilUUID">Not Assigned</option>
+                  <option *ngFor="let person of salesPersonList" [ngValue]="person.id">
+                    {{person.firstName}} {{person.lastName}}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <br>
+
+        <div class="text-center">
+          <button class="btn btn-submit-swabhav material-icons-button" type="submit" (click)="searchAndCloseDrawer()"
+            [disabled]="!companyRequirementSearchForm.dirty||companyRequirementSearchForm.invalid">
+            Search <i class="inline-icon material-icons">search</i>
+          </button>
+        </div>
+
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex flex-wrap justify-content-start align-items-start">
+        <button type="button" class="btn filter-button d-flex align-items-center" (click)="backToPreviousPage()"
+          *ngIf="isNavigated">
+          <!-- <i class="inline-icon material-icons-outlined">chevron_left</i>Back -->
+          <i class="material-icons-outlined">arrow_back</i>
+        </button>
+        <div class="totalLabel left-margin">
+          <h1>Total Requirement: <span class="swabhav-light-orange-text">{{totalCompanyRequirements || 0}}</span></h1>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-n5 mb-3">
+        <button *ngIf="!isNavigated" class="btn filter-button material-icons-button" (click)="onRequirementAddClick()">
+          Add Requirement <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <div *ngIf="totalCompanyRequirements > 0" class="view-label-flex left-margin">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalCompanyRequirements}}</strong></span>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center flex-row" *ngIf="totalCompanyRequirements > 0">
+        <div class="d-flex flex-wrap justify-content-between align-items-center flex-row">
+          <button *ngIf="!isNavigated" class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+            (click)="resetSearchAndGetAll()">View All Company Requirements
+          </button>
+        </div>
+        <!-- <div class="d-flex flex-wrap justify-content-between align-items-start flex-row">
+          <div class="d-flex flex-wrap">
+             --- changePage(1) change of limit will set the offset to 0 
+            <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let requirement of companyRequirement | paginate: { id:'requirementPageID',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalCompanyRequirements }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="requirementPageID">
+            </pagination-controls>
+          </div>
+        </div> -->
+        <form [formGroup]="companyRequirementSearchForm">
+          <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+            <div class="d-flex flex-wrap">
+              <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+              <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="d-flex flex-wrap">
+              <ul class="pagination" *ngFor="let requirement of companyRequirement | paginate: { id:'requirementPageID',
+                itemsPerPage: companyRequirementSearchForm.get('limit').value, currentPage: (+companyRequirementSearchForm.get('offset').value + 1), 
+                totalItems: totalCompanyRequirements }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                id="requirementPageID">
+              </pagination-controls>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <br>
+
+      <div class="card-body padding-0pt swabhav-shadow" *ngIf="isRequrimentLoaded; else noRequirements">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th><strong>Sr No.</strong></th>
+                <th><strong>ID</strong></th>
+                <th><strong>Company Name</strong></th>
+                <th><strong>Status</strong></th>
+                <th><strong>Required Before</strong></th>
+                <th><strong>Qualifications</strong></th>
+                <th><strong>Talent Rating</strong></th>
+                <th><strong>Experience</strong></th>
+                <th><strong>Technologies</strong></th>
+                <th><strong>Position</strong></th>
+                <th><strong>Job Location</strong> </th>
+                <th><strong>Salary</strong></th>
+                <th><strong>Vacancy</strong></th>
+                <th><strong>Sales Person</strong></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let requirement of companyRequirement; let i = index">
+                <td>{{(i+1)+(offset*limit)}}</td>
+                <td><span class="badge swabhav-badge">{{requirement.code}}</span></td>
+                <td>{{requirement.company?.companyName}}</td>
+                <td>
+                  <div *ngIf="requirement.isActive != null">
+                    <span *ngIf="requirement.isActive; else inactive" class="badge badge-success">Active</span>
+                    <ng-template #inactive>
+                      <span class="badge badge-danger">In Active</span>
+                    </ng-template>
+                  </div>
+                </td>
+                <td><span class="badge badge-danger"
+                    *ngIf="requirement.isUrgent;else not_urgent">{{requirement.requiredBefore | date:'longDate'}}</span>
+                </td>
+                <ng-template #not_urgent><span class="badge badge-warning">{{requirement.requiredBefore |
+                    date:'longDate'}}</span>
+                </ng-template>
+                <td>
+                  <div *ngIf="requirement.qualifications; else dashTemplate">
+                    <div *ngFor="let qualification of requirement.qualifications">
+                      {{qualification.name}}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="requirement.talentRating; else dashTemplate">
+                    <span *ngIf="requirement.talentRating >= 3;else poor_rating"
+                      class="badge badge-warning">{{requirement.talentRatingValue}}</span>
+                    <ng-template #poor_rating><span class="badge badge-info">{{requirement.talentRatingValue}}</span>
+                    </ng-template>
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="requirement.minimumExperience;else noExperience">
+                    {{requirement.minimumExperience}} {{(requirement.maximumExperience) ?
+                    '- ' + requirement.maximumExperience.toString(): ''}} year(s)
+                  </div>
+                  <ng-template #noExperience>Fresher</ng-template>
+                </td>
+                <td>
+                  <div *ngIf="requirement.technologies; else dashTemplate">
+                    <div *ngFor="let technology of requirement.technologies">
+                      <span class="badge badge-pill swabhav-badge">{{technology.language}}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="requirement.designation; else dashTemplate">
+                    {{requirement.designation?.position}}
+                  </div>
+                </td>
+                <td>{{requirement.jobLocation.city}}</td>
+                <td>
+                  <div *ngIf="requirement.minimumPackage && requirement.maximumPackage; else dashTemplate">
+                    {{requirement.minimumPackage | currency:'INR': 'symbol': '3.0'}} -
+                    {{requirement.maximumPackage | currency:'INR': 'symbol': '3.0'}}
+                  </div>
+                </td>
+                <td>{{requirement.vacancy}}</td>
+                <td data-toggle="tooltip" data-placement="top" title="Sales Person">
+                  <div *ngIf="requirement.salesPerson == null;else assigned_sp">
+                    <div *ngIf="showForCompany;else noneTemplate">
+                      <button class="btn btn-default" type="button" title="Add Sales Person"
+                        (click)="onAllocateSalesPersonToRequirementClick(requirement)">
+                        <i class="material-icons material-icons-button">person_add</i>
+                      </button>
+                    </div>
+                  </div>
+                  <ng-template #assigned_sp> <span
+                      class="badge badge-pill swabhav-badge">{{requirement.salesPerson.firstName}}
+                      {{requirement.salesPerson.lastName}}
+                    </span></ng-template>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-element material-icons-button" type="button"
+                      id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="material-icons"><strong>more_vert</strong></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <button class="dropdown-item btn btn-default btn-dropdown"
+                        (click)="onRatingViewClick(requirement)">
+                        <i class="inline-icon material-icons-outlined">star_outline</i>
+                        {{requirement.rating > 0 ? "Rating - " + requirement.rating : "Add Rating"}}
+                      </button>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="onViewCompanyRequirementClick(requirement)">
+                        <i class="inline-icon material-icons-outlined">visibility</i> View
+                      </button>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="viewSearchRequirement(requirement)">
+                        <i class="inline-icon material-icons">search</i> Search Talents
+                      </button>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="viewSelectedTalents(requirement.id)">
+                        <i class="inline-icon material-icons">list</i> Selected Talents
+                      </button>
+                      <button class="dropdown-item btn btn-default disabled"
+                        *ngIf="!requirement.termsAndConditions;else termsPresent">
+                        <i class="inline-icon material-icons">article</i> No T&C
+                      </button>
+                      <ng-template #termsPresent>
+                        <a class="dropdown-item btn-dropdown btn-default anchor-tag"
+                          href={{requirement.termsAndConditions}} target="_blank">
+                          <i class="inline-icon material-icons inline-icon">article</i> T&C
+                        </a>
+                      </ng-template>
+                      <button class="dropdown-item btn btn-default btn-dropdown"
+                        (click)="onShowApplicantsButtonClick(requirement)">
+                        <i class="inline-icon material-icons">receipt_long</i> Applicants
+                        {{requirement.totalApplicants > 0 ? "- " + requirement.totalApplicants : ""}}
+                      </button>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        *ngIf="!isNavigated && permission?.delete"
+                        (click)="onDeleteCompanyRequirementClick(requirement.id)">
+                        <i class="inline-icon material-icons">delete</i> Delete
+                      </button>
+                      <button class="dropdown-item btn btn-dropdown btn-default" type="button"
+                        *ngIf="requirement.isActive;else not_active"
+                        (click)="onCloseCompanyRequirementClick(requirement.id)">
+                        <i class="material-icons inline-icon">check_circle</i> Close Requirement
+                      </button>
+                      <ng-template #not_active>
+                        <button class="dropdown-item btn btn-dropdown btn-default" type="button" disabled>
+                          <i class="material-icons inline-icon">unpublished</i> Requirement Closed
+                        </button>
+                      </ng-template>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Requirements not found -->
+      <ng-template #noRequirements>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Requirements not found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+
+  </mat-drawer-content>
+
+</mat-drawer-container>
+
+
+<app-master-footer></app-master-footer>
+
+
+
+<!-- Add/Update/View Company Requirement-->
+<ng-template #companyRequirementFormModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+        {{isViewMode? 'Comapny Requirement Details': isOperationUpdate ? 'Update Comapny Requirement' : 'Add Comapny Requirement' }}
+        <button *ngIf="isViewMode && permission?.update" class="btn btn-default material-icons-button" type="button"
+          (click)="onUpdateCompanyRequirementClick()"><i class="material-icons grey-icon">create</i></button>
+      </h4><span *ngIf="!isViewMode"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <form [formGroup]="companyRequirementForm">
+    <div class="modal-body">
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Requirement Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 col-md-3" *ngIf="isViewMode || isOperationUpdate">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Code'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" nbInput formControlName="code">
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Required From'}"></ng-container>
+          </span>
+          <input type="date" class="form-control input-style" formControlName="requiredFrom">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('requiredFrom').touched || companyRequirementForm.get('requiredFrom').dirty) 
+              && companyRequirementForm.get('requiredFrom').invalid">
+            <div *ngIf="companyRequirementForm.get('requiredFrom').errors.required">
+              Specify the date from which talents are required.
+            </div>
+            <div *ngIf="companyRequirementForm.get('requiredFrom').errors.dateInvalid">
+              Requirement date must be atleast 10 days from today.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Required Before'}"></ng-container>
+          </span>
+          <input type="date" class="form-control input-style" formControlName="requiredBefore"
+            [min]="companyRequirementForm.get('requiredFrom')?.value">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('requiredBefore').touched || companyRequirementForm.get('requiredBefore').dirty) 
+              && companyRequirementForm.get('requiredBefore').invalid">
+            <div *ngIf="companyRequirementForm.get('requiredBefore').errors.required">
+              Specify the date till which talents are required.
+            </div>
+            <div *ngIf="companyRequirementForm.get('requiredBefore').errors.dateInvalid">
+              Requirement date must be atleast 10 days from today.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Total Vacancy'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="vacancy"
+            placeholder="eg: 10">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('vacancy').touched||
+            companyRequirementForm.get('vacancy').dirty)&&
+            companyRequirementForm.get('vacancy').invalid">
+            <div *ngIf=" companyRequirementForm.get('vacancy').errors.required">
+              Vacancy is required.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('vacancy').errors.max">
+              Vacancy cannot be more than 10000.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('vacancy').errors.min">
+              Vacancy cannot be less than 1.
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Academic Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Qualification(s)'}"></ng-container>
+          </span>
+          <ng-select formControlName="qualifications" [items]="degreeList" bindLabel="name" placeholder="Select"
+            appendTo="body" multiple="true" [clearable]="true" class="ng-select-style" [clearOnBackspace]="true"
+            [hideSelected]="true">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index=" index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Technology(s)'}"></ng-container>
+          </span>
+          <ng-select formControlName="technologies" [items]="technologyList" bindLabel="language" placeholder="Select"
+            appendTo="body" multiple="true" [clearable]="true" class="ng-select-style" [clearOnBackspace]="true"
+            [hideSelected]="true" [loading]="isTechLoading" (search)="getTechnologyList($event)"
+            (focus)="getTechnologyList()">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index=" index">
+              {{item.language}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('technologies').touched||companyRequirementForm.get('technologies').dirty)
+            &&companyRequirementForm.get('technologies').invalid">
+            <div *ngIf=" companyRequirementForm.get('technologies').errors.required">
+              Minimum 1 Technology has to be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Experienced?'}"></ng-container>
+          </span>
+          <select class="form-control input-style"
+            (change)="onIsExperiencedValueChange(companyRequirementForm.get('isExperience').value)"
+            formControlName="isExperience">
+            <option [ngValue]="false">Fresher</option>
+            <option [ngValue]="true">Experienced</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('isExperience').touched||companyRequirementForm.get('isExperience').dirty)
+            &&companyRequirementForm.get('isExperience').invalid">
+            <div *ngIf=" companyRequirementForm.get('isExperience').errors.required">
+              Experience has to be selected.
+            </div>
+          </div>
+        </div>
+        <ng-container *ngIf="showExperienceFields">
+          <div class="form-group col-sm-3 col-md-2">
+            <div>
+              <label class="experience-label-style">Experience (in years):</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Minimum'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style"
+              formControlName="minimumExperience" placeholder="eg: 2"
+              (input)="setMaximumExperienceMinimumValue($event.target.value)">
+            <div class="alert alert-danger"
+              *ngIf="(companyRequirementForm.get('minimumExperience').touched
+              ||companyRequirementForm.get('minimumExperience').dirty) && companyRequirementForm.get('minimumExperience').invalid">
+              <div *ngIf="companyRequirementForm.get('minimumExperience').errors.required">
+                Mininum Experience has to be specified.
+              </div>
+              <div *ngIf="companyRequirementForm.get('minimumExperience').errors.min">
+                Mininum Experience cannot be below 1.
+              </div>
+              <div *ngIf="companyRequirementForm.get('minimumExperience').errors.max">
+                Mininum Experience cannot be above 30.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-3 col-md-2">
+            <div>
+              <label>&nbsp;</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style"
+              formControlName="maximumExperience" placeholder="eg: 2">
+            <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('maximumExperience').touched
+              ||companyRequirementForm.get('maximumExperience').dirty)
+              &&companyRequirementForm.get('maximumExperience').invalid">
+              <div *ngIf="companyRequirementForm.get('maximumExperience').errors.min">
+                Maxinum Experience cannot be below {{minValueForMaxExp}}.
+              </div>
+              <div *ngIf="companyRequirementForm.get('maximumExperience').errors.max">
+                Maxinum Experience cannot be above 30.
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Job Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Job Type'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="jobType">
+            <option value="null" disabled>Select job type</option>
+            <option value="Full Time">Full Time</option>
+            <option value="Part Time">Part Time</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('jobType').touched||companyRequirementForm.get('jobType').dirty)
+            &&companyRequirementForm.get('jobType').invalid">
+            <div *ngIf=" companyRequirementForm.get('jobType').errors.required">
+              Job type must be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Job Designation'}"></ng-container>
+          </span>
+          <ng-select [items]="designationList" bindLabel="position" [clearable]="true" formControlName="designation"
+            placeholder="Select" appendTo="body" [searchable]="true" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.position}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('designation').touched||companyRequirementForm.get('designation').dirty)
+            &&companyRequirementForm.get('designation').invalid">
+            <div *ngIf=" companyRequirementForm.get('designation').errors.required">
+              Designation must be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Minimum Package'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="minimumPackage"
+            placeholder="eg: 100000">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('minimumPackage').touched||companyRequirementForm.get('minimumPackage').dirty)
+            &&companyRequirementForm.get('minimumPackage').invalid">
+            <div *ngIf=" companyRequirementForm.get('minimumPackage').errors.required">
+              Package must be specified.
+            </div>
+            <div *ngIf="companyRequirementForm.get('minimumPackage').errors.min">
+              Package must be more than 100000.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Maximum Package'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="maximumPackage"
+            placeholder="eg: 100000">
+          <div class="alert alert-danger"
+            *ngIf="(companyRequirementForm.get('maximumPackage').touched
+            ||companyRequirementForm.get('maximumPackage').dirty)&&companyRequirementForm.get('maximumPackage').invalid">
+            <div *ngIf=" companyRequirementForm.get('maximumPackage').errors.required">
+              Package must be specified.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('maximumPackage').errors.min">
+              Package must be more than {{companyRequirementForm.get('minimumPackage')?.value}}.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('maximumPackage').errors.max">
+              Package must be less than 100000000000.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Job Description'}"></ng-container>
+          </span>
+          <!-- <quill-editor [styles]="quillEditorStyle" [modules]="quillModuleConfig" 
+            formControlName="jobDescription" placeholder="Enter your answer here">
+          </quill-editor> -->
+          <ckeditor [config]="ckConfig" formControlName="jobDescription" placeholder="Enter your answer here">
+          </ckeditor>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('jobDescription').touched||companyRequirementForm.get('jobDescription').dirty)
+            &&companyRequirementForm.get('jobDescription').invalid">
+            <div *ngIf=" companyRequirementForm.get('jobDescription').errors.required">
+              Description must be specified.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Requirement'}"></ng-container>
+          </span>
+          <!-- <quill-editor [styles]="quillEditorStyle" [modules]="quillModuleConfig" 
+            formControlName="jobRequirement" placeholder="Enter your answer here">
+          </quill-editor> -->
+          <ckeditor [config]="ckConfig" formControlName="jobRequirement" placeholder="Enter your answer here">
+          </ckeditor>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('jobRequirement').touched||companyRequirementForm.get('jobRequirement').dirty)
+            &&companyRequirementForm.get('jobRequirement').invalid">
+            <div *ngIf=" companyRequirementForm.get('jobRequirement').errors.required">
+              Requirement must be specified.
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Job Location Details</strong></h1>
+      </div>
+      <form [formGroup]="jobLocation">
+        <div class="row">
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country'}"></ng-container>
+            </span>
+            <select class="form-control input-style" [compareWith]="compareFn" formControlName="country"
+              (change)="getStateListByCountry(jobLocation.get('country').value)">
+              <option *ngFor="let country of countryList" [ngValue]="country">{{country.name}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('country').touched||jobLocation.get('country').dirty)
+            &&jobLocation.get('country').invalid">
+              <div *ngIf=" jobLocation.get('country').errors.required">
+                Country must be selected.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <div class="form group">
+              <fieldset [disabled]="!jobLocation.get('country')?.value || stateList?.length == 0">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'State'}"></ng-container>
+                </span>
+                <ng-select [items]="stateList" bindLabel="name" placeholder="Select" appendTo="body" [searchable]="true"
+                  [clearable]="true" formControlName="state" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+              </fieldset>
+              <div class="alert alert-danger" *ngIf="(jobLocation.get('state').touched||jobLocation.get('state').dirty)
+                &&jobLocation.get('state').invalid">
+                <div *ngIf=" jobLocation.get('country').invalid; else state_required">
+                  You must select a country first.
+                </div>
+                <ng-template #state_required>
+                  <div *ngIf=" jobLocation.get('state').errors.required">
+                    State must be selected.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="city" placeholder="eg: Mumbai">
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('city').touched||jobLocation.get('city').dirty)
+              &&jobLocation.get('city').invalid">
+              <div *ngIf=" jobLocation.get('city').errors.required">
+                City must be specified.
+              </div>
+              <div *ngIf=" jobLocation.get('city').errors.maxlength">
+                City name should not be more than 50 characters.
+              </div>
+              <div *ngIf=" jobLocation.get('city').errors.pattern">
+                City should only have alphabets.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'PIN Code'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="pinCode"
+              placeholder="eg: 417898">
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('pinCode').touched||jobLocation.get('pinCode').dirty)
+            &&jobLocation.get('pinCode').invalid">
+              <div *ngIf=" jobLocation.get('pinCode').errors.required">
+                PIN Code must be specified.
+              </div>
+              <div *ngIf=" jobLocation.get('pinCode').errors.pattern">
+                Enter a valid 6 digit PIN Code.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Address'}"></ng-container>
+            </span>
+            <textarea class="form-control input-style" formControlName="address" rows="2"
+              placeholder="eg: Mumbai, Maharahstra" appEmptyToNull></textarea>
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('address').touched||jobLocation.get('address').dirty)
+            &&jobLocation.get('address').invalid">
+              <div *ngIf=" jobLocation.get('address').errors.required">
+                Address must be specified.
+              </div>
+              <div *ngIf=" jobLocation.get('address').errors.maxlength">
+                Address should not be more than 100 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Other Requirement Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Talent Personality Type'}">
+            </ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="personalityType">
+            <option [ngValue]="null">Select</option>
+            <option *ngFor="let personalityType of personalityTypeList" [ngValue]="personalityType.value">
+              {{personalityType.value}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Talent Rating'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="talentRating">
+            <option [ngValue]="null">Select</option>
+            <option *ngFor="let talentRating of talentRatingList" [ngValue]="talentRating.key">
+              {{talentRating.value}}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="showForAdmin" class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'SalesPerson'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="salesPerson" [compareWith]="compareFn">
+            <option [ngValue]="null">Select SalesPerson</option>
+            <option *ngFor="let salesPerson of salesPersonList" [ngValue]="salesPerson">
+              {{salesPerson.firstName}} {{salesPerson.lastName}}</option>
+          </select>
+        </div>
+      </div>
+      <span>
+        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}"></ng-container>
+      </span>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <textarea class="form-control input-style" rows="5" formControlName="comment" nbInput appEmptyToNull
+            placeholder="Write more specific details of the requirement here...."></textarea>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('comment').touched||companyRequirementForm.get('comment').dirty)
+              &&companyRequirementForm.get('comment').invalid">
+            <div *ngIf="companyRequirementForm.get('comment').errors.maxlength">
+              Comment should not be more than 4000 characters.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- span is used to hide the border as well -->
+      <hr>
+      <span *ngIf="!isViewMode || companyRequirementForm.get('termsAndConditions')?.value">
+        <div class="form-group row">
+          <label class="col-sm-4 col-form-label">Terms and conditions:</label>
+          <div class="col-sm-4">
+            <span class="custom-file">
+              <input *ngIf="!isViewMode" type="file" class="custom-file-input"
+                (change)="onTermsAndConditionSelect($event)" id="customTermsFile" value="termsDisplayedFileName">
+              <label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label" for="customTermsFile"
+                [innerHTML]="termsDisplayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isTermsFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="companyRequirementForm.get('termsAndConditions')?.value && !isTermsUploadedToServer"
+                data-toggle="tooltip" data-placement="top" title="View Terms and Conditions">
+                <button *ngIf="isViewMode" class="btn btn-primary btn-sm">
+                  <a [href]="companyRequirementForm.get('termsAndConditions')?.value" target="_blank">View Terms and
+                    Conditions</a>
+                </button>
+              </div>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customTermsFile" [innerHTML]="termsDocStatus"></label>
+          </div>
+        </div>
+      </span>
+
+      <span *ngIf="!isViewMode || companyRequirementForm.get('sampleOfferLetter')?.value">
+        <div class="form-group row">
+          <label class="col-sm-4 col-form-label">Sample Offer Letter:</label>
+          <div class="col-sm-4">
+            <span class="custom-file">
+              <input *ngIf="!isViewMode" type="file" class="custom-file-input" (change)="onOfferLetterClick($event)"
+                id="customOfferLetterFile" value="offerDisplayedFileName">
+              <label *ngIf="!isViewMode" class="custom-file-label" id="custom-file-label" for="customOfferLetterFile"
+                [innerHTML]="offerDisplayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isOfferLetterFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="companyRequirementForm.get('sampleOfferLetter')?.value && !isOfferLetterUploadedToServer"
+                data-toggle="tooltip" data-placement="top" title="View Logo">
+                <button *ngIf="isViewMode" class="btn btn-primary btn-sm">
+                  <a [href]="companyRequirementForm.get('sampleOfferLetter')?.value" target="_blank">View sample offer
+                    letter</a>
+                </button>
+              </div>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customOfferLetterFile" [innerHTML]="offerLetterDocStatus"></label>
+          </div>
+        </div>
+      </span>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+        (click)="dismissFormModal(modal)">Close
+      </button>
+      <button type="button" *ngIf="!isViewMode" class="btn btn-submit-swabhav material-icons-button"
+        [disabled]="!companyRequirementForm.dirty" (click)="validateRequirementForm()">
+        {{isOperationUpdate ? 'Update Requirement' : 'Add Requirement'}}
+      </button>
+    </div>
+  </form>
+
+</ng-template>
+
+
+<!-- Talent Search Requirement Details -->
+<ng-template #searchTalentsModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Company Requirement Search</h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-12">
+        <ol class="list-group list-group-numbered">
+          <li *ngIf="searchParams.isExperience != null"
+            class="list-group-item d-flex justify-content-between align-items-start">
+            <!-- <label type="button" class="btn btn-sm float-right" (click)="deleteIsExperience()">
+              <i class="material-icons red">&times;</i>
+            </label> -->
+            <p><strong>Is Experienced:</strong> {{(searchParams.isExperience == true) ? 'Yes' : 'No'}}</p>
+            <span>
+              <label type="button" class="btn btn-sm float-right" (click)="deleteIsExperience()">
+                <i class="material-icons red">&times;</i>
+              </label>
+            </span>
+          </li>
+          <li *ngIf="searchParams.minimumExperience"
+            class="list-group-item d-flex justify-content-between align-items-start">
+            <p><strong>Minimum Experience:</strong> {{selectedRequirement.minimumExperience}}</p>
+            <span>
+              <label type="button" class="btn btn-sm float-right" (click)="deleteMinimumExperience()">
+                <i class="material-icons red">&times;</i>
+              </label>
+            </span>
+          </li>
+          <li *ngIf="searchParams.maximumExperience"
+            class="list-group-item d-flex justify-content-between align-items-start">
+            <p><strong>Maximum Experience:</strong> {{selectedRequirement.maximumExperience}}</p>
+            <span>
+              <label type="button" class="btn btn-sm float-right" (click)="deleteMaximumExperience()">
+                <i class="material-icons red">&times;</i>
+              </label>
+            </span>
+          </li>
+          <li *ngIf="searchParams.talentType" class="list-group-item d-flex justify-content-between align-items-start">
+            <p><strong>Talent Rating:</strong> {{selectedRequirement.talentRatingValue}}</p>
+            <span>
+              <label type="button" class="btn btn-sm float-right" (click)="deleteTalentType()">
+                <i class="material-icons red">&times;</i>
+              </label>
+            </span>
+          </li>
+          <li *ngIf="searchParams.personalityType"
+            class="list-group-item d-flex justify-content-between align-items-start">
+            <p><strong>Personality Type:</strong> {{selectedRequirement.personalityType}}</p>
+            <span>
+              <label type="button" class="btn btn-sm float-right" (click)="deletePersonalityType()">
+                <i class="material-icons red">&times;</i>
+              </label>
+            </span>
+          </li>
+          <li *ngIf="searchParams.technologies" class="list-group-item">
+            <h3 class="display-3"><strong>Technologies</strong></h3>
+            <ol class="list-group list-group-numbered">
+              <div *ngFor="let tech of selectedRequirement.technologies; let i = index">
+                <li *ngIf="tech && searchParams.technologies.includes(tech.id)"
+                  class="list-group-item d-flex justify-content-between align-items-start">
+                  <p><strong>Technology-{{i+1}}:</strong> {{tech.language}}</p>
+                  <span>
+                    <label type="button" class="btn btn-sm float-right" (click)="deleteTechnologies(tech.id)">
+                      <i class="material-icons red">&times;</i>
+                    </label>
+                  </span>
+                </li>
+              </div>
+            </ol>
+          </li>
+          <li *ngIf="searchParams.qualifications" class="list-group-item">
+            <h3 class="display-3"><strong>Qualification</strong></h3>
+            <ol class="list-group list-group-numbered">
+              <div *ngFor="let qualification of selectedRequirement.qualifications; let i = index">
+                <li *ngIf="qualification && searchParams.qualifications.includes(qualification.id)"
+                  class="list-group-item d-flex justify-content-between align-items-start">
+                  <p><strong>Qualification-{{i+1}}:</strong> {{qualification.name}}</p>
+                  <span>
+                    <label type="button" class="btn btn-sm float-right" (click)="deleteQualification(qualification.id)">
+                      <i class="material-icons red">&times;</i>
+                    </label>
+                  </span>
+                </li>
+              </div>
+            </ol>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss()">Close
+    </button>
+    <button type="button" class="btn btn-submit-swabhav material-icons-button" (click)="searchTalents()">
+      Search
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Delete Requirement Confirmation -->
+<ng-template #deleteCompanyRequirementModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Confirmation</h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        This will also mean that all the related waiting list entries in talent and enquiry will be inactive.
+        Are you sure you want to delete this company requirement?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Close click')">No</button>
+  </div>
+</ng-template>
+
+<!-- Close Requirement Confirmation -->
+<ng-template #closeCompanyRequirementModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Confirmation</h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        This will also mean that all the related waiting list entries in talent and enquiry will be inactive.
+        Are you sure want to close this requirement ?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Close click')">No</button>
+  </div>
+</ng-template>
+
+
+<!--View Waiting List-->
+<ng-template #showApplicantsModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Applicants</h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div *ngIf="showTransferForm">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <label>Waiting For:</label>
+          <select class="form-control input-style" (change)="onWaitingForChange($event.target.value)">
+            <option [ngValue]="null" disabled>Select</option>
+            <option [ngValue]="'Requirement'">Requirement</option>
+            <option [ngValue]="'Batch'">Batch</option>
+          </select>
+        </div>
+        <ng-container *ngIf="showCompanyReqField">
+          <div class="form-group col-sm-8 col-md-8">
+            <label>Company Requirement:</label>
+            <ng-select [items]="activeRequirementList" bindLabel="code" placeholder="Select" appendTo="body"
+              [searchable]="true" [clearable]="true" [(ngModel)]="selecetdrRequirementForTransfer"
+              class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.branch.branchName + " " + item.code}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="showBatchField">
+          <div class="form-group col-sm-8 col-md-8">
+            <label>Batch:</label>
+            <ng-select [items]="activeBatchList" bindLabel="batchName" placeholder="Select" class="ng-select-style"
+              appendTo="body" [searchable]="true" [clearable]="true" [(ngModel)]="selectedBatchForTransfer">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.batchName}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </ng-container>
+      </div>
+      <button type="button" class="btn btn-primary float-right" (click)="onSubmitTransferButtonClick()">Submit</button>
+      <button type="button" class="btn btn-danger float-right margin-for-button"
+        (click)="onCloseTrasferFormButtonClick()">Close Form</button>
+      <br>
+    </div>
+    <button *ngIf="showTransferButton" type="button" class="btn btn-primary"
+      (click)="onTrasnferButtonClick()">Transfer</button>
+    <br><br>
+    <div class="table-responsive">
+      <table class="table center-style">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Number of applicants</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Talent</td>
+            <td>
+              <span class="fake-link" (click)="redirectToTalentsForWaitingList(selectedRequirement.id)"
+                *ngIf="(twoWaitingLists.talentWaitingList != null && twoWaitingLists.talentWaitingList?.length != 0); else noneTemplate">
+                {{twoWaitingLists.talentWaitingList?.length}}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>Enquiry</td>
+            <td>
+              <span class="fake-link" (click)="redirectToEnquiriesForWaitingList(selectedRequirement.id)"
+                *ngIf="(twoWaitingLists.enquiryWaitingList != null && twoWaitingLists.enquiryWaitingList?.length != 0); else noneTemplate">
+                {{twoWaitingLists.enquiryWaitingList?.length}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="reset" class="btn btn-danger" (click)="modal.dismiss('Cross click')">Cancel</button>&nbsp;&nbsp;
+  </div>
+
+</ng-template>
+
+<!--Add Sales Person-->
+<ng-template #allocateSalespersonModal let-modal>
+
+  <!--Modal Header-->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Allocate Sales Person</h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!--Modal Body-->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        <span>
+          <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'SalesPerson'}"></ng-container>
+        </span>
+        <select class="form-control input-style" #salesPersonTemp>
+          <option value="null">Select Sales Person</option>
+          <option *ngFor="let salesPerson of salesPersonList" [value]="salesPerson.id">
+            {{salesPerson.firstName}} {{salesPerson.lastName}}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!--Modal Footer-->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss()">Close
+    </button>
+    <button type="button" class="btn btn-submit-swabhav material-icons-button"
+      (click)="allocateSalesPersonToRequirement(salesPersonTemp.value,selectedRequirement.id)">
+      Allocate Salesperson
+    </button>
+  </div>
+</ng-template>
+
+<!-- Add Requirement Rating modal -->
+<ng-template #addRequirementRatingModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Requirement Rating
+        <button *ngIf="!isRatingAddClick" class="btn btn-default" type="button" (click)="onRatingAddClick()">
+          <i class="material-icons material-icons-button">create</i>
+        </button>
+      </h4>
+      <span *ngIf="!isViewMode"><span class="red">*
+        </span>Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <ng-container *ngIf="(isRatingAddClick || companyRequirementForm.get('rating').value)">
+      <h2>Salary Trend:</h2>
+      <div class="card-deck">
+        <div class="card border-info mb-3">
+          <div class="card-body">
+            <h3 class="card-title">Salary offered:</h3>
+            <ul>
+              <li>Minimum Salary:
+                <strong>{{selectedRequirement.minimumPackage | currency:'INR': 'symbol':'3.0'}}</strong>
+              </li>
+              <li>Maximum Salary:
+                <strong>{{selectedRequirement.maximumPackage | currency:'INR': 'symbol':'3.0'}}</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="card border-info mb-3">
+          <div class="card-body">
+            <ng-container>
+              <h3 class="card-title">Industry standards:</h3>
+              <ul *ngIf="selectedRequirement.salaryTrend; else standardNotFound">
+                <li>Minimum Experience:
+                  <strong>{{selectedRequirement.salaryTrend.minimumExperience}}</strong>
+                </li>
+                <li>Maximum Experience:
+                  <strong>{{selectedRequirement.salaryTrend.maximumExperience}}</strong>
+                </li>
+                <li>Minimum Salary:
+                  <strong>{{selectedRequirement.salaryTrend.minimumSalary | currency:'INR': 'symbol':'3.0'}}</strong>
+                </li>
+                <li>Maximum Salary:
+                  <strong>{{selectedRequirement.salaryTrend.maximumSalary | currency:'INR': 'symbol':'3.0'}}</strong>
+                </li>
+                <li>Median Salary:
+                  <strong>{{selectedRequirement.salaryTrend.medianSalary | currency:'INR': 'symbol':'3.0'}}</strong>
+                </li>
+              </ul>
+              <ng-template #standardNotFound>
+                <p class="card-text text-muted">Industry standards not found.</p>
+              </ng-template>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="selectedRequirement.technologies">
+        <h2>Technologies:</h2>
+        <div class="card border-info mb-3">
+          <div class="card-body">
+            <ul>
+              <ng-container *ngFor="let tech of selectedRequirement.technologies">
+                <li *ngIf="tech.rating; else noTechRating"> Industry standard rating for
+                  <strong>{{tech.language}}</strong> is
+                  <strong>{{tech.rating}}</strong>.
+                </li>
+                <ng-template #noTechRating>
+                  <li class="card-text text-muted">Rating not found for {{tech.language}}</li>
+                </ng-template>
+              </ng-container>
+            </ul>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+    <br>
+    <hr>
+
+    <form [formGroup]="companyRequirementForm">
+      <div *ngIf="isRatingAddClick || companyRequirementForm.get('rating').value; else noFeedbackQuestions">
+        <div class="row">
+          <ng-container *ngFor="let ratingQuestion of feedbackQuestions; let i = index">
+            <div class="form-group col-12">
+              <label><strong>
+                  <span *ngIf="isRatingAddClick" class="red">* </span>Question
+                  {{i+1}}: {{ratingQuestion.question}}
+                </strong>
+              </label>
+            </div>
+            <div class="form-group col-md-8">
+              <select class="form-control input-style" [formControlName]="ratingQuestion.columnName">
+                <option [ngValue]="null" disabled>Select Answer</option>
+                <option *ngFor="let option of ratingQuestion.options" [ngValue]="option.value">
+                  {{option.value}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(companyRequirementForm.get(ratingQuestion.columnName).touched 
+                || companyRequirementForm.get(ratingQuestion.columnName).dirty) 
+                && companyRequirementForm.get(ratingQuestion.columnName).invalid">
+                <span *ngIf="companyRequirementForm.get(ratingQuestion.columnName).errors.required">
+                  Answer must be selected
+                </span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <ng-template #noFeedbackQuestions>
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Rating Not Found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </form>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="button"
+      (click)="modal.dismiss()">Close</button>
+    <button type="submit" *ngIf="isRatingAddClick" class="btn btn-submit-swabhav material-icons-button"
+      (click)="validateRating()">
+      {{selectedRequirement.rating ? 'Update Rating' : 'Add Rating'}}
+    </button>
+  </div>
+
+</ng-template>
+
+<!-- Add New Company Requirement-->
+<ng-template #companyRequirementModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">Add Company Requirement</h4>
+      <span *ngIf="!isViewMode"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissRequirementFormModal(modal)" class="btn btn-default"
+      type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <form [formGroup]="companyRequirementForm">
+    <div class="modal-body">
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Requirement Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-3 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Required From'}"></ng-container>
+          </span>
+          <input type="date" class="form-control input-style" formControlName="requiredFrom">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('requiredFrom').touched || companyRequirementForm.get('requiredFrom').dirty) 
+              && companyRequirementForm.get('requiredFrom').invalid">
+            <div *ngIf="companyRequirementForm.get('requiredFrom').errors.required">
+              Specify the date from which talents are required.
+            </div>
+            <div *ngIf="companyRequirementForm.get('requiredFrom').errors.dateInvalid">
+              Requirement date must be atleast 10 days from today.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Required Before'}"></ng-container>
+          </span>
+          <input type="date" class="form-control input-style" formControlName="requiredBefore"
+            [min]="companyRequirementForm.get('requiredFrom')?.value">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('requiredBefore').touched || companyRequirementForm.get('requiredBefore').dirty) 
+              && companyRequirementForm.get('requiredBefore').invalid">
+            <div *ngIf="companyRequirementForm.get('requiredBefore').errors.required">
+              Specify the date till which talents are required.
+            </div>
+            <div *ngIf="companyRequirementForm.get('requiredBefore').errors.dateInvalid">
+              Requirement date must be atleast 10 days from today.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Total Vacancy'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="vacancy"
+            placeholder="eg: 10">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('vacancy').touched||
+            companyRequirementForm.get('vacancy').dirty)&&
+            companyRequirementForm.get('vacancy').invalid">
+            <div *ngIf=" companyRequirementForm.get('vacancy').errors.required">
+              Vacancy is required.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('vacancy').errors.max">
+              Vacancy cannot be more than 10000.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('vacancy').errors.min">
+              Vacancy cannot be less than 1.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Company'}"></ng-container>
+          </span>
+          <ng-select formControlName="company" [items]="companyList" bindLabel="companyName" placeholder="Select"
+            appendTo="body" [multiple]="false" [clearable]="true" class="ng-select-style" [clearOnBackspace]="true"
+            [hideSelected]="true" [loading]="isTechLoading" 
+            (focus)="getCompanyList()">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index=" index">
+              {{item.companyName}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('company').touched||companyRequirementForm.get('company').dirty)
+            &&companyRequirementForm.get('company').invalid">
+            <div *ngIf=" companyRequirementForm.get('company').errors.required">
+              Minimum 1 company Branch has to be selected.
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Academic Requirments</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Qualification(s)'}"></ng-container>
+          </span>
+          <ng-select formControlName="qualifications" [items]="degreeList" bindLabel="name" placeholder="Select"
+            appendTo="body" multiple="true" [clearable]="true" class="ng-select-style" [clearOnBackspace]="true"
+            [hideSelected]="true">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index=" index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Technology(s)'}"></ng-container>
+          </span>
+          <ng-select formControlName="technologies" [items]="technologyList" bindLabel="language" placeholder="Select"
+            appendTo="body" multiple="true" [clearable]="true" class="ng-select-style" [clearOnBackspace]="true"
+            [hideSelected]="true" [loading]="isTechLoading" (search)="getTechnologyList($event)"
+            (focus)="getTechnologyList()">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index=" index">
+              {{item.language}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('technologies').touched||companyRequirementForm.get('technologies').dirty)
+            &&companyRequirementForm.get('technologies').invalid">
+            <div *ngIf=" companyRequirementForm.get('technologies').errors.required">
+              Minimum 1 Technology has to be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <div>
+            <label>&nbsp;</label>
+          </div>
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Experienced?'}"></ng-container>
+          </span>
+          <select class="form-control input-style"
+            (change)="onIsExperiencedValueChange(companyRequirementForm.get('isExperience').value)"
+            formControlName="isExperience">
+            <option [ngValue]="false">Fresher</option>
+            <option [ngValue]="true">Experienced</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('isExperience').touched||companyRequirementForm.get('isExperience').dirty)
+            &&companyRequirementForm.get('isExperience').invalid">
+            <div *ngIf=" companyRequirementForm.get('isExperience').errors.required">
+              Experience has to be selected.
+            </div>
+          </div>
+        </div>
+        <ng-container *ngIf="showExperienceFields">
+          <div class="form-group col-sm-3 col-md-2">
+            <div>
+              <label class="experience-label-style">Experience (in years):</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Minimum'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style"
+              formControlName="minimumExperience" placeholder="eg: 2"
+              (input)="setMaximumExperienceMinimumValue($event.target.value)">
+            <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('minimumExperience').touched
+              ||companyRequirementForm.get('minimumExperience').dirty)
+              &&companyRequirementForm.get('minimumExperience').invalid">
+              <div *ngIf="companyRequirementForm.get('minimumExperience').errors.required">
+                Mininum Experience has to be specified.
+              </div>
+              <div *ngIf="companyRequirementForm.get('minimumExperience').errors.min">
+                Mininum Experience cannot be below 1.
+              </div>
+              <div *ngIf="companyRequirementForm.get('minimumExperience').errors.max">
+                Mininum Experience cannot be above 30.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-3 col-md-2">
+            <div>
+              <label>&nbsp;</label>
+            </div>
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style"
+              formControlName="maximumExperience" placeholder="eg: 2">
+            <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('maximumExperience').touched
+              ||companyRequirementForm.get('maximumExperience').dirty)
+              &&companyRequirementForm.get('maximumExperience').invalid">
+              <div *ngIf="companyRequirementForm.get('maximumExperience').errors.min">
+                Maxinum Experience cannot be below {{minValueForMaxExp}}.
+              </div>
+              <div *ngIf="companyRequirementForm.get('maximumExperience').errors.max">
+                Maxinum Experience cannot be above 30.
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Job Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Job Type'}"></ng-container>
+          </span>
+          <select class="form-control input-style" formControlName="jobType">
+            <option value="null" disabled>Select job type</option>
+            <option value="Full Time">Full Time</option>
+            <option value="Part Time">Part Time</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('jobType').touched||companyRequirementForm.get('jobType').dirty)
+            &&companyRequirementForm.get('jobType').invalid">
+            <div *ngIf=" companyRequirementForm.get('jobType').errors.required">
+              Job type must be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Job Designation'}"></ng-container>
+          </span>
+          <ng-select [items]="designationList" bindLabel="position" [clearable]="true" formControlName="designation"
+            placeholder="Select" appendTo="body" [searchable]="true" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.position}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('designation').touched||companyRequirementForm.get('designation').dirty)
+            &&companyRequirementForm.get('designation').invalid">
+            <div *ngIf=" companyRequirementForm.get('designation').errors.required">
+              Designation must be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Minimum Package'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="minimumPackage"
+            placeholder="eg: 100000">
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('minimumPackage').touched||companyRequirementForm.get('minimumPackage').dirty)
+            &&companyRequirementForm.get('minimumPackage').invalid">
+            <div *ngIf=" companyRequirementForm.get('minimumPackage').errors.required">
+              Package must be specified.
+            </div>
+            <div *ngIf="companyRequirementForm.get('minimumPackage').errors.min">
+              Package must be more than 100000.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-3">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Maximum Package'}"></ng-container>
+          </span>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="maximumPackage"
+            placeholder="eg: 100000">
+          <div class="alert alert-danger"
+            *ngIf="(companyRequirementForm.get('maximumPackage').touched
+            ||companyRequirementForm.get('maximumPackage').dirty)&&companyRequirementForm.get('maximumPackage').invalid">
+            <div *ngIf=" companyRequirementForm.get('maximumPackage').errors.required">
+              Package must be specified.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('maximumPackage').errors.min">
+              Package must be more than {{companyRequirementForm.get('minimumPackage')?.value}}.
+            </div>
+            <div *ngIf=" companyRequirementForm.get('maximumPackage').errors.max">
+              Package must be less than 100000000000.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Job Description'}"></ng-container>
+          </span>
+          <!-- <quill-editor [styles]="quillEditorStyle" [modules]="quillModuleConfig" 
+            formControlName="jobDescription" placeholder="Enter your answer here">
+          </quill-editor> -->
+          <ckeditor [config]="ckConfig" formControlName="jobDescription" placeholder="Enter your answer here">
+          </ckeditor>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('jobDescription').touched||companyRequirementForm.get('jobDescription').dirty)
+            &&companyRequirementForm.get('jobDescription').invalid">
+            <div *ngIf=" companyRequirementForm.get('jobDescription').errors.required">
+              Description must be specified.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-12">
+          <span>
+            <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Requirement'}"></ng-container>
+          </span>
+          <!-- <quill-editor [styles]="quillEditorStyle" [modules]="quillModuleConfig" 
+            formControlName="jobRequirement" placeholder="Enter your answer here">
+          </quill-editor> -->
+          <ckeditor [config]="ckConfig" formControlName="jobRequirement" placeholder="Enter your answer here">
+          </ckeditor>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('jobRequirement').touched||companyRequirementForm.get('jobRequirement').dirty)
+            &&companyRequirementForm.get('jobRequirement').invalid">
+            <div *ngIf=" companyRequirementForm.get('jobRequirement').errors.required">
+              Requirement must be specified.
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Job Location Details</strong></h1>
+      </div>
+      <form [formGroup]="jobLocation">
+        <div class="row">
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Country'}"></ng-container>
+            </span>
+            <select class="form-control input-style" [compareWith]="compareFn" formControlName="country"
+              (change)="getStateListByCountry(jobLocation.get('country').value)">
+              <option [ngValue]="null" disabled>Select</option>
+              <option *ngFor="let c of countryList" [ngValue]="c">{{c.name}}</option>
+            </select>
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('country').touched||jobLocation.get('country').dirty)
+              &&jobLocation.get('country').invalid">
+              <div *ngIf=" jobLocation.get('country').errors.required">
+                Country must be selected.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <div class="form group">
+              <fieldset [disabled]="!jobLocation.get('country')?.value || stateList?.length == 0">
+                <span>
+                  <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'State'}"></ng-container>
+                </span>
+                <select class="form-control input-style" [compareWith]="compareFn" formControlName="state">
+                  <option [ngValue]="null" disabled>Select</option>
+                  <option *ngFor="let state of stateList" [ngValue]="state">{{state.name}}</option>
+                </select>
+              </fieldset>
+              <div class="alert alert-danger" *ngIf="(jobLocation.get('state').touched||jobLocation.get('state').dirty)
+                &&jobLocation.get('state').invalid">
+                <div *ngIf=" jobLocation.get('country').invalid; else state_required">
+                  You must select a country first.
+                </div>
+                <ng-template #state_required>
+                  <div *ngIf=" jobLocation.get('state').errors.required">
+                    State must be selected.
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+            </span>
+            <input type="text" class="form-control input-style" formControlName="city" placeholder="eg: Mumbai">
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('city').touched||jobLocation.get('city').dirty)
+              &&jobLocation.get('city').invalid">
+              <div *ngIf=" jobLocation.get('city').errors.required">
+                City must be specified.
+              </div>
+              <div *ngIf=" jobLocation.get('city').errors.maxlength">
+                City name should not be more than 50 characters.
+              </div>
+              <div *ngIf=" jobLocation.get('city').errors.pattern">
+                City should only have alphabets.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'PIN Code'}"></ng-container>
+            </span>
+            <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="pinCode"
+              placeholder="eg: 417898">
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('pinCode').touched||jobLocation.get('pinCode').dirty)
+              &&jobLocation.get('pinCode').invalid">
+              <div *ngIf=" jobLocation.get('pinCode').errors.required">
+                PIN Code must be specified.
+              </div>
+              <div *ngIf=" jobLocation.get('pinCode').errors.pattern">
+                Enter a valid 6 digit PIN Code.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-sm-12 col-md-12">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Address'}"></ng-container>
+            </span>
+            <textarea class="form-control input-style" formControlName="address" rows="2"
+              placeholder="eg: Mumbai, Maharahstra" appEmptyToNull></textarea>
+            <div class="alert alert-danger" *ngIf="(jobLocation.get('address').touched||jobLocation.get('address').dirty)
+              &&jobLocation.get('address').invalid">
+              <div *ngIf=" jobLocation.get('address').errors.required">
+                Address must be specified.
+              </div>
+              <div *ngIf=" jobLocation.get('address').errors.maxlength">
+                Address should not be more than 100 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <hr>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Other Requirement Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Talent Personality Type'}">
+              </ng-container>
+            </span>
+            <select class="form-control input-style" [compareWith]="compareFn" formControlName="personalityType">
+              <option [ngValue]="null">Select</option>
+              <option *ngFor="let personalityType of personalityTypeList" [ngValue]="personalityType.value">
+                {{personalityType.value}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <div class="form-group">
+            <span>
+              <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Talent Rating'}"></ng-container>
+            </span>
+            <select class="form-control input-style" formControlName="talentRating">
+              <option [ngValue]="null">Select</option>
+              <option *ngFor="let talentRating of talentRatingList" [ngValue]="talentRating.key">
+                {{talentRating.value}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <span>
+        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Comment'}"></ng-container>
+      </span>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <textarea class="form-control input-style" rows="5" formControlName="comment" nbInput appEmptyToNull
+            placeholder="Write more specific details of the requirement here...."></textarea>
+          <div class="alert alert-danger" *ngIf="(companyRequirementForm.get('comment').touched||companyRequirementForm.get('comment').dirty)
+              &&companyRequirementForm.get('comment').invalid">
+            <div *ngIf="companyRequirementForm.get('comment').errors.maxlength">
+              Comment should not be more than 4000 characters.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- span is used to hide the border as well -->
+      <span>
+        <hr>
+        <div class="form-group row">
+          <label class="col-sm-3 col-form-label">Terms and conditions: </label>
+          <div class="col-sm-4">
+            <span class="custom-file">
+              <input type="file" class="custom-file-input" (change)="onRequirementTermsAndConditionSelect($event)"
+                id="customTermsFile" value="requirementTermsDisplayedFileName">
+              <label class="custom-file-label" id="custom-file-label" for="customTermsFile"
+                [innerHTML]="requirementTermsDisplayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isRequirementTermsFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+            </span>
+            <!-- should add view uploaded termsAndConditions using a termsAndConditions variable after cleaning. -->
+            <label id="uploadStatus" for="customTermsFile" [innerHTML]="requirementTermsDocStatus"></label>
+          </div>
+        </div>
+      </span>
+      <span>
+        <div class="form-group row">
+          <label class="col-sm-3 col-form-label">Sample Offer Letter: </label>
+          <div class="col-sm-4">
+            <span class="custom-file">
+              <input type="file" class="custom-file-input" (change)="onOfferLetterClick($event)"
+                id="customOfferLetterFile" value="offerDisplayedFileName">
+              <label class="custom-file-label" id="custom-file-label" for="customOfferLetterFile"
+                [innerHTML]="offerDisplayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isOfferLetterFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customOfferLetterFile" [innerHTML]="offerLetterDocStatus"></label>
+          </div>
+        </div>
+      </span>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="reset"
+        (click)="dismissRequirementFormModal(modal)">Close</button>
+      <button type="submit" class="btn btn-submit-swabhav material-icons-button"
+        [disabled]="!companyRequirementForm.dirty" (click)="validateCompanyRequirementForm()">Add Requirement</button>
+    </div>
+  </form>
+
+</ng-template>

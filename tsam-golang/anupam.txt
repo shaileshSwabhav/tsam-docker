@@ -1,0 +1,4 @@
+// Project concept rating parameter data insert
+INSERT INTO tsmdb.programming_project_rating_parameter
+VALUES ('4200f827-34c9-4fed-b9c9-78f09cd95b6g', 'f56bde44-7633-4b4f-8583-2d4271373790', '2022-02-23 06:27:18', '00000000-0000-0000-0000-000000000000', '2022-02-23 06:27:18', '00000000-0000-0000-0000-000000000000', NULL, '7ca2664b-f379-43db-bdf9-7fdd40707219','Implementation','Coverage of Scope in actual Implementation',10,1
+);

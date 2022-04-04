@@ -1,0 +1,267 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label><strong><span class="red">* </span>{{name}}</strong></label>
+</ng-template>
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label><strong>{{name}}</strong></label>
+</ng-template>
+<div class="container-fluid page-style">
+    <div *ngIf="showForm" class="form-style">
+        <form [formGroup]="enquiryForm">
+            <h1 class="heading-style">ENQUIRY FORM</h1>
+            <span><strong><span class="red">* </span>
+                    marked fields are mandatory</strong>
+            </span>
+            <br><br>
+            <h5>Personal Details</h5>
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'First Name'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control" nbInput formControlName="firstName" placeholder="eg: Ravi">
+                    <div class="alert alert-danger" *ngIf="(enquiryForm.get('firstName').touched || enquiryForm.get('firstName').dirty) 
+                        && enquiryForm.get('firstName').invalid">
+                        <div *ngIf="enquiryForm.get('firstName').errors.required">
+                            First Name must be specified
+                        </div>
+                        <div *ngIf="enquiryForm.get('firstName').errors.pattern">
+                            First Name should only have alphabets and no space
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Name'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control" nbInput formControlName="lastName" placeholder="eg: Sharma">
+                    <div class="alert alert-danger" *ngIf="(enquiryForm.get('lastName').touched || enquiryForm.get('lastName').dirty) 
+                        && enquiryForm.get('lastName').invalid">
+                        <div *ngIf="enquiryForm.get('lastName').errors.required">
+                            Last Name must be specified
+                        </div>
+                        <div *ngIf="enquiryForm.get('lastName').errors.pattern">
+                            Last Name should only have alphabets and no space
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Email Address'}">
+                        </ng-container>
+                    </span>
+                    <input type="email" class="form-control" nbInput formControlName="email"
+                        placeholder="eg: ravisharma@gmail.com">
+                    <div class="alert alert-danger" *ngIf="(enquiryForm.get('email').touched || enquiryForm.get('email').dirty) 
+                        && enquiryForm.get('email').invalid">
+                        <div *ngIf="enquiryForm.get('email').errors.required">
+                            Email should be specified.
+                        </div>
+                        <div *ngIf="enquiryForm.get('email').errors.pattern">
+                            Email should be in example@domain.com format
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Mobile Number'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control" formControlName="contact" placeholder="eg: 9897489493">
+                    <div class="alert alert-danger" *ngIf="(enquiryForm.get('contact').touched || enquiryForm.get('contact').dirty) 
+                        && enquiryForm.get('contact').invalid">
+                        <div *ngIf="enquiryForm.get('contact').errors.required">
+                            Contact should be specified.
+                        </div>
+                        <div *ngIf="enquiryForm.get('contact').errors.pattern">
+                            Contact should consist of a 10 digit valid number
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'City'}"></ng-container>
+                    </span>
+                    <input type="text" class="form-control" nbInput formControlName="city" placeholder="eg: Mumbai">
+                    <div class="alert alert-danger" *ngIf="(enquiryForm.get('city').touched || enquiryForm.get('city').dirty) 
+                        && enquiryForm.get('city').invalid">
+                        <div *ngIf="enquiryForm.get('city').errors.pattern">
+                            City name should only have alphabets
+                        </div>
+                        <div *ngIf="enquiryForm.get('city').errors.required">
+                            City should be specified
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span>
+                <h5>Academic Details</h5>
+                <ng-template #academicPopover>
+                    <span class="popover-title-style">Enter your current academic details.</span>
+                    <br>
+                    If you are not studying currently,
+                    enter your highest qualification.
+                </ng-template>
+                <a [ngbPopover]="academicPopover" animation="true" placement="bottom" class="academicPopoverClass"
+                    triggers="mouseenter:mouseleave">
+                    <i class="material-icons popover-style">error_outline</i>
+                </a>
+            </span>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Degree'}">
+                        </ng-container>
+                    </span>
+                    <ng-select [items]="degreeList" bindLabel="name" placeholder="Select Qualification" appendTo="body"
+                        [searchable]="true" [clearable]="true" formControlName="degree"
+                        (change)="getSpecializationListByDegreeID(enquiryForm.get('degree').value)">
+                        <option [ngValue]="null">Select Degree</option>
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            {{item.name}}
+                        </ng-template>
+                    </ng-select>
+                    <div class="alert alert-danger" *ngIf="(enquiryForm.get('degree').touched || enquiryForm.get('degree').dirty) 
+                        && enquiryForm.get('degree').invalid">
+                        <div *ngIf="enquiryForm.get('degree').errors.required">
+                            Degree must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Specialization'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control" [compareWith]="compareFn" formControlName="specialization">
+                        <option [ngValue]="null">Select Specialization</option>
+                        <ng-container *ngFor="let specialization of specializationList">
+                            <option *ngIf="showSpecificSpecializations(enquiryForm.get('degree'),specialization)"
+                                [ngValue]="specialization">
+                                {{specialization.branchName}}
+                            </option>
+                        </ng-container>
+                    </select>
+                </div>
+                <div class="form-group col-sm-2 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Year of Passout'}">
+                        </ng-container>
+                    </span>
+                    <div class="flex-container">
+                        <input type="number" class="form-control" formControlName="passout" placeholder="eg: 2012"
+                            appAllowNumbersOnly>
+                        <ng-template #passoutPopover>Enter the estimated year of completion if you are currently
+                            studying.</ng-template>
+                        <span [ngbPopover]="passoutPopover" placement="left" triggers="mouseenter:mouseleave">
+                            <i class="material-icons popover-style">error_outline</i>
+                        </span>
+                    </div>
+                    <div class="flex-container">
+                        <div class="alert alert-danger" *ngIf="(enquiryForm.get('passout').touched || enquiryForm.get('passout').dirty) 
+                            && enquiryForm.get('passout').invalid">
+                            <div *ngIf="enquiryForm.get('passout').errors.required">
+                                Passout year must be specified
+                            </div>
+                            <div *ngIf="enquiryForm.get('passout').errors.max">
+                                Year cannot be higher than {{currentYear + 3}}
+                            </div>
+                            <div *ngIf="enquiryForm.get('passout').errors.min">
+                                Year cannot be lower than 1980
+                            </div>
+                        </div>
+                        <span class="hidden-style">
+                            <i class="material-icons">error_outline</i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Course(s)'}">
+                        </ng-container>
+                    </span>
+                    <div class="flex-container">
+                        <ng-select [items]="courseList" bindLabel="name" placeholder="Select Course" appendTo="body"
+                            multiple="true" [searchable]="true" [clearable]="true" formControlName="courses"
+                            class="custom-width">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                            </ng-template>
+                        </ng-select>
+                        <!-- <ng-template #coursePopTitle>
+                            
+                        </ng-template> -->
+                        <ng-template #coursePopover>
+                            <span class="popover-title-style">Select the course that you are interested in.</span>
+                            <br>
+                            You may select more than one course.
+                        </ng-template>
+                        <a [ngbPopover]="coursePopover" placement="left" triggers="mouseenter:mouseleave">
+                            <i class="material-icons popover-style">error_outline</i>
+                        </a>
+                    </div>
+                    <div class="flex-container">
+                        <div class="alert alert-danger custom-width" *ngIf="(enquiryForm.get('courses').touched || enquiryForm.get('courses').dirty) 
+                            && enquiryForm.get('courses').invalid">
+                            <div *ngIf="enquiryForm.get('courses').errors.required">
+                                Course must be specified
+                            </div>
+                        </div>
+                        <span class="hidden-style">
+                            <i class="material-icons">error_outline</i>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Resume'}">
+                        </ng-container>
+                    </span>
+                    <div class="flex-container">
+                        <span class="custom-file">
+                            <input type="file" class="custom-file-input" (change)="onResourceSelect($event)"
+                                id="customFile" value="displayedFileName">
+                            <label class="custom-file-label" id="custom-file-label" for="customFile"
+                                [innerHTML]="displayedFileName"></label>
+                            <button class="btn btn-success custom-file" id="uploadingButton" type="button"
+                                *ngIf="isFileUploading">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Uploading file...
+                            </button>
+                        </span>
+                        <ng-template #resumePopover>
+                            <span class="popover-title-style">Allowed file types( .pdf .doc .docx)</span>
+                        </ng-template>
+                        <a [ngbPopover]="resumePopover" placement="left" triggers="mouseenter:mouseleave">
+                            <i class="material-icons popover-style">error_outline</i>
+                        </a>
+                        <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="center-style">
+            <div *ngIf="isFileUploading">
+                <br><br>
+            </div>
+            <button class="stepper-button-style" mat-button (click)="validateEnquiryForm()"
+                [disabled]="isFileUploading">Submit</button>
+        </div>
+        <br><br><br>
+    </div>
+    <div *ngIf="showRedirectMessage" class="card redirect-style">
+        <div class="card-body">
+            <div class="center-style">
+                <strong>Thank you for contacting us – we will get back to you soon!</strong>
+                <br><br>
+                <i class="material-icons darkslateblue large">insert_emoticon</i>
+                <br><br>
+                <button class="stepper-button-style" mat-button (click)="redirectToHomePage()">
+                    Homepage</button>
+            </div>
+        </div>
+    </div>
+</div>

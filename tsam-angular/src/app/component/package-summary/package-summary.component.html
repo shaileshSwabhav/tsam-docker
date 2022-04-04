@@ -1,0 +1,307 @@
+<app-master-navbar></app-master-navbar>
+
+
+<!-- ZERO COUNT TEMPLATE -->
+<ng-template #zeroTemplate>
+    <span class="btn btn-default no-link">
+        0
+    </span>
+</ng-template>
+
+<!-- TEMPLATE FOR CONTENT OF TECHNOLOGIES (USED TO DISPLAY TABLE-HEADER FOR TECHNOLOGIES) -->
+<ng-template #technologiesContentTemplate>
+    <ng-container *ngIf="isTechVisible">
+        <th class="text-center">Advance Java</th>
+        <th class="text-center">Cloud</th>
+        <th class="text-center">Dotnet</th>
+        <th class="text-center">Golang</th>
+        <th class="text-center">Java</th>
+        <th class="text-center">Machine Learning</th>
+        <!-- <th class="text-center">Other</th> -->
+    </ng-container>
+</ng-template>
+
+
+<!-- TEMPLATE FOR COUT OF ALL TECHNOLOGIES -->
+<ng-template let-summary="summary" let-packageType="packageType" #technologyCountTemplate>
+    <ng-container *ngFor="let experienceTech of experienceTechnologyPackageSummary">
+        <ng-container *ngIf="summary.experience === experienceTech.experience">
+            <ng-container *ngFor="let tech of experienceTech.technologySummary">
+                <td class="text-center">
+                    <button *ngIf='tech.totalCount != 0; else zeroTemplate' type="button"
+                        class="btn btn-default fake-link" (click)="redirectToTalents(summary, packageType, tech)">
+                        <u>{{tech.totalCount}}</u>
+                    </button>
+                </td>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<!-- TEMPLATE FOR TOTAL COUNT FOR PACKAGE TALENTS TECHNOLOGIES COUNT -->
+<ng-template let-packageType="packageType" #totalTechnologyCountTemplate>
+    <ng-container *ngFor="let tech of technologyList">
+        <td class="text-center">
+            <button *ngIf='calculatePackageTechTotal(tech) != 0; else zeroTemplate' type="button"
+                class="btn btn-default fake-link" (click)="redirectTotalToTalents(packageType, tech.id)">
+                <u>{{calculatePackageTechTotal(tech)}}</u>
+            </button>
+        </td>
+    </ng-container>
+    <!-- <td class="text-center">
+        <button *ngIf='calculateOtherTechTotal() != 0; else zeroTemplate' type="button"
+            class="btn btn-default fake-link" (click)="redirectTotalToTalents(packageType)">
+            <u>{{calculateOtherTechTotal()}}</u>
+        </button>
+    </td> -->
+</ng-template>
+
+<div class="container-fluid margin-2pt">
+    <div class="card">
+        <div class="card-body padding-0pt">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center heading">Experience</th>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Less than equal to 3 LPA &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="lessThanThreeDetails"
+                                            (click)="onLessThanThreeClick();" [(ngModel)]="isLessThanThreeVisibile">
+                                        <label class="custom-control-label" for="lessThanThreeDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isLessThanThreeVisibile">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    3 - 5 LPA &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="threeToFiveDetails"
+                                            (click)="onThreeToFiveClick();" [(ngModel)]="isThreeToFiveVisible">
+                                        <label class="custom-control-label" for="threeToFiveDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isThreeToFiveVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    5 - 10 LPA &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="fiveToTenDetails"
+                                            (click)="onFiveToTenClick();" [(ngModel)]="isFiveToTenVisible">
+                                        <label class="custom-control-label" for="fiveToTenDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isFiveToTenVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    10 - 15 LPA &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="tenToFifteenDetails"
+                                            (click)="onTenToFifteenClick();" [(ngModel)]="isTenToFifteenVisible">
+                                        <label class="custom-control-label" for="tenToFifteenDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isTenToFifteenVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    15+ LPA &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="greaterThanFifteenDetails" (click)="onGreaterThanFifteenClick();"
+                                            [(ngModel)]="isGreaterThanFifteenVisible">
+                                        <label class="custom-control-label" for="greaterThanFifteenDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isGreaterThanFifteenVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                            <th class="text-center heading">
+                                <div class="form-inline">
+                                    Total &nbsp;
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="totalPackageDetails"
+                                            (click)="onTotalPackageClick();" [(ngModel)]="isTotalPackageVisible">
+                                        <label class="custom-control-label" for="totalPackageDetails"></label>
+                                    </div>
+                                </div>
+                            </th>
+                            <ng-container *ngIf="isTotalPackageVisible">
+                                <ng-container [ngTemplateOutlet]="technologiesContentTemplate"></ng-container>
+                            </ng-container>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let summary of packageSummary; let i = index">
+                            <td class="text-center heading">
+                                <div *ngIf="summary.experience">
+                                    {{summary.experience}}
+                                </div>
+                            </td>
+                            <td class="text-center heading">
+                                <button *ngIf='summary.lessThanThree != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, LESSTHANTHREE)">
+                                    <u>{{summary.lessThanThree}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isLessThanThreeVisibile">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,packageType:LESSTHANTHREE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='summary.threeToFive != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirectToTalents(summary, THREETOFIVE)">
+                                    <u>{{summary.threeToFive}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isThreeToFiveVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,packageType:THREETOFIVE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='summary.fiveToTen != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirectToTalents(summary, FIVETOTEN)">
+                                    <u>{{summary.fiveToTen}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isFiveToTenVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,packageType:FIVETOTEN}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='summary.tenToFifteen != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, TENTOFIFTEEN)">
+                                    <u>{{summary.tenToFifteen}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTenToFifteenVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,packageType:TENTOFIFTEEN}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='summary.greaterThanFifteen != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link"
+                                    (click)="redirectToTalents(summary, GREATERTHANFIFTEEN)">
+                                    <u>{{summary.greaterThanFifteen}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isGreaterThanFifteenVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,packageType:GREATERTHANFIFTEEN}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='calculateTotalExperience(summary) != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirectToTalents(summary)">
+                                    <u>{{calculateTotalExperience(summary)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTotalPackageVisible">
+                                <ng-container [ngTemplateOutlet]="technologyCountTemplate"
+                                    [ngTemplateOutletContext]="{summary:summary,packageType:null}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+
+                        <!-- TOTAL -->
+                        <tr>
+                            <td class="text-center heading">Total</td>
+                            <td class="text-center heading">
+                                <button *ngIf='calculatePackageTotal(LESSTHANTHREE) != 0; else zeroTemplate'
+                                    type="button" class="btn btn-default fake-link"
+                                    (click)="redirectTotalToTalents(LESSTHANTHREE)">
+                                    <u>{{calculatePackageTotal(LESSTHANTHREE)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isLessThanThreeVisibile">
+                                <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+                                    [ngTemplateOutletContext]="{packageType:LESSTHANTHREE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='calculatePackageTotal(THREETOFIVE) != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirectTotalToTalents(THREETOFIVE)">
+                                    <u>{{calculatePackageTotal(THREETOFIVE)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isThreeToFiveVisible">
+                                <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+                                    [ngTemplateOutletContext]="{packageType:THREETOFIVE}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='calculatePackageTotal(FIVETOTEN) != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirectTotalToTalents(FIVETOTEN)">
+                                    <u>{{calculatePackageTotal(FIVETOTEN)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isFiveToTenVisible">
+                                <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+                                    [ngTemplateOutletContext]="{packageType:FIVETOTEN}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='calculatePackageTotal(TENTOFIFTEEN) != 0; else zeroTemplate'
+                                    type="button" class="btn btn-default fake-link"
+                                    (click)="redirectTotalToTalents(TENTOFIFTEEN)">
+                                    <u>{{calculatePackageTotal(TENTOFIFTEEN)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTenToFifteenVisible">
+                                <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+                                    [ngTemplateOutletContext]="{packageType:TENTOFIFTEEN}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='calculatePackageTotal(GREATERTHANFIFTEEN) != 0; else zeroTemplate'
+                                    type="button" class="btn btn-default fake-link"
+                                    (click)="redirectTotalToTalents(GREATERTHANFIFTEEN)">
+                                    <u>{{calculatePackageTotal(GREATERTHANFIFTEEN)}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isGreaterThanFifteenVisible">
+                                <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+                                    [ngTemplateOutletContext]="{packageType:GREATERTHANFIFTEEN}">
+                                </ng-container>
+                            </ng-container>
+                            <td class="text-center heading">
+                                <button *ngIf='calculateTotal() != 0; else zeroTemplate' type="button"
+                                    class="btn btn-default fake-link" (click)="redirectTotalToTalents()">
+                                    <u>{{calculateTotal()}}</u>
+                                </button>
+                            </td>
+                            <ng-container *ngIf="isTotalPackageVisible">
+                                <ng-container [ngTemplateOutlet]="totalTechnologyCountTemplate"
+                                    [ngTemplateOutletContext]="{packageType:null}">
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<app-master-footer></app-master-footer>

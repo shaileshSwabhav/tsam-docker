@@ -1,0 +1,683 @@
+<ng-template #noCourseLogo>
+  <img src="assets/icon/grey-icons/Score.png" width="30">
+</ng-template>
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchCourseForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="courseSearchForm">
+      <div class="row filter-by-field">
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Course Name:</label>
+          <input type="text" class="form-control input-style" formControlName="courseName" placeholder="eg: Java">
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Date of Creation:</label>
+          <input class="form-control input-style" type="date" formControlName="createdAt">
+          <div class="alert alert-danger" *ngIf="courseSearchForm.get('createdAt').invalid">
+            <div *ngIf="courseSearchForm.get('createdAt').errors.required">Please Enter Valid Date</div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Course Type:</label>
+          <select class="form-control input-style" formControlName="courseType">
+            <option [ngValue]="null">Select Course Type</option>
+            <option *ngFor="let type of courseType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Course Level:</label>
+          <select class="form-control input-style" formControlName="courseLevel">
+            <option [ngValue]="null">Select Course Level</option>
+            <option *ngFor="let level of courseLevel" [ngValue]="level.value">{{level.value}}</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <label class="filter-form-label">Technology:</label>
+          <!-- <ng-select [items]="technologies" bindValue="id" bindLabel="language" placeholder="Select Technology" class="ng-select-style"
+            appendTo="body" [searchable]="true" [clearable]="false" formControlName="technologies" multiple="true">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.language}}
+            </ng-template>
+          </ng-select> -->
+          <ng-select [items]="technologies" bindValue="id" bindLabel="language" placeholder="Select Technology"
+            appendTo="body" multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+            class="ng-select-style" (search)="getTechnology($event)" (focus)="getTechnology()"
+            [loading]="isTechLoading">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.language}}
+            </ng-template>
+          </ng-select>
+        </div>
+      </div>
+    </form>
+
+    <br>
+
+    <div class="text-center">
+      <button type="button" class="btn btn-submit-swabhav material-icons-button" [disabled]="!courseSearchForm.dirty"
+        (click)="searchAndCloseDrawer()">
+        Search <i class="inline-icon material-icons">search</i>
+      </button>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="header-style">
+        <div class="total-module-style">
+          <h1>Total Courses: <span class="swabhav-light-orange-text">{{totalCourse || 0}}</span></h1>
+        </div>
+        <!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+        <div>
+          <button class="btn btn-default material-icons-button swabhav-button-round ml-3"
+            (click)="onCourseAddButtonClick()" *ngIf="permission?.add">
+            Add New Course<i class="material-icons inline-icon">add</i>
+          </button>
+        </div>
+        <!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+        <div>
+          <button class="btn filter-button material-icons-button ml-3" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button>
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button ml-3"
+            (click)="resetSearchAndGetAll()">View All Courses
+          </button>
+        </div>
+        <div class="header-left-style">
+          <div class="total-module-style" *ngIf="totalCourse > 0">
+            <span>
+              Viewing <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong></span>
+              &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalCourse}}</strong></span>
+            </span>
+          </div>
+        </div>
+        <!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+        <div class="ml-3">
+          <form [formGroup]="courseSearchForm">
+            <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+              <div class="d-flex flex-wrap">
+                <select class="form-control form-control-sm input-style" formControlName="limit"
+                  (change)="changePage(1)">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select> &nbsp;&nbsp;&nbsp;
+              </div>
+              <div class="d-flex flex-wrap">
+                <ul class="pagination" *ngFor="let course of courses | paginate: { id:'coursePageID',
+                  itemsPerPage: courseSearchForm.get('limit').value, currentPage: (+courseSearchForm.get('offset').value + 1), 
+                  totalItems: totalCourse }">
+                </ul>
+                <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="coursePageID">
+                </pagination-controls>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+      <!-- <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Courses: <span class="swabhav-light-orange-text">{{totalCourse || 0}}</span></h1>
+        </div>
+
+        <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission?.add"
+          (click)="onCourseAddButtonClick()">Add New Course <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalCourse > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalCourse}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+        <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button" 
+            (click)="resetSearchAndGetAll()">View All Courses
+          </button>
+        </div>
+        <form [formGroup]="courseSearchForm">
+          <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+            <div class="d-flex flex-wrap">
+              <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="d-flex flex-wrap">
+              <ul class="pagination" *ngFor="let course of courses | paginate: { id:'coursePageID',
+                itemsPerPage: courseSearchForm.get('limit').value, currentPage: (+courseSearchForm.get('offset').value + 1), 
+                totalItems: totalCourse }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="coursePageID">
+              </pagination-controls>
+            </div>
+          </div>
+        </form>
+      </div> -->
+
+      <br>
+
+      <div class="card-body padding-0pt swabhav-shadow" *ngIf="isCoursesLoaded; else noCourse">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th><strong>No.</strong></th>
+                <th><strong>Course Name</strong></th>
+                <th class="text-center"><strong>Modules</strong></th>
+                <th class="text-center"><strong>Topics</strong></th>
+                <th class="text-center"><strong>Concepts</strong></th>
+                <th class="text-center"><strong>Assignments</strong></th>
+                <th class="text-center"><strong>Duration</strong></th>
+                <th class="text-center"><strong>Hours</strong></th>
+                <th class="text-center"><strong>Type</strong></th>
+                <th class="text-center"><strong>Level</strong></th>
+                <th *ngIf="!isFaculty"><strong>Price</strong></th>
+                <th><strong>View</strong></th>
+                <th *ngIf="permission?.delete"><strong>Delete</strong></th>
+                <!-- <th><strong>Technologies</strong></th> -->
+                <!-- <th class="text-right"><strong>Total Session</strong></th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let course of courses; let i = index">
+                <tr (click)="redirectToCourseDetails(course.id)">
+                  <td class="table-td-center-align">{{(i+1)+(offset*limit)}}</td>
+                  <td class="table-td-center-align">
+                    <ng-container *ngIf="course.logo;else noCourseLogo">
+                      <img [src]="course.logo" width="30">
+                    </ng-container>
+                    &nbsp;&nbsp;
+                    {{course.name}}
+                  </td>
+                  <!-- <td class="swabhav-light-orange-text"><strong>{{course.name}}</strong></td> -->
+                  <td class="text-center table-td-center-align">{{course.totalModules}}</td>
+                  <td class="text-center table-td-center-align">{{course.totalTopics}}</td>
+                  <td class="text-center table-td-center-align">{{course.totalConcepts}}</td>
+                  <td class="text-center table-td-center-align">{{course.totalQuestions}}</td>
+                  <!-- <td>
+                    <div *ngIf="course.technologies.length!=0; else noTechnologies">
+                      <span class="swabhav-light-orange-text" *ngFor="let tech of course.technologies">
+                        <span><strong>{{tech.language}}</strong></span>
+                      </span>
+                    </div>
+                    <ng-template #noTechnologies>
+                      <span class="swabhav-light-orange-text">No Technology</span>
+                    </ng-template>
+                  </td> -->
+                  <td class="text-center table-td-center-align">{{course.durationInMonths}} Month</td>
+                  <td class="text-center table-td-center-align">{{course.totalHours}} <span
+                      *ngIf="course.totalHours > 0">hrs</span></td>
+                  <td class="text-center table-td-center-align">{{course.courseType}}</td>
+                  <td class="text-center table-td-center-align">{{course.courseLevel}}</td>
+                  <td class="text-center table-td-center-align" *ngIf="!isFaculty">&#8377; {{course.price}}</td>
+                  <!-- <td class="text-right">{{courses && course.totalSessions}}</td> -->
+                  <td>
+                    <button type="button" class="btn btn-default" (click)="onCourseViewButtonClick($event, course)">
+                      <img src="assets/course/view.png" alt="View course" width="30">
+                    </button>
+                  </td>
+                  <td *ngIf="permission?.delete">
+                    <button type="button" class="btn btn-default" (click)="onCourseDeleteClick($event, course.id)">
+                      <img src="assets/icon/colour-icons/delete.png" alt="Delete course" width="30">
+                    </button>
+                  </td>
+                  <!-- <td> -->
+                  <!-- <div class="dropdown"> -->
+                  <!-- <button class="btn btn-default material-icons-button" type="button" id="dropdownMenuButton" 
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="material-icons"><strong>more_vert</strong></i>
+                      </button> -->
+                  <!-- <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"> -->
+                  <!-- <button class="dropdown-item btn btn-default disabled"
+                          *ngIf="course.brochure==null;else brochurePresent" disabled>
+                          <i class="inline-icon material-icons">description</i> No Brochure
+                        </button>
+                        <ng-template #brochurePresent>
+                          <a class="dropdown-item btn-dropdown btn-default anchor-tag"
+                            href={{course.brochure}} target="_blank">
+                            <i class="inline-icon material-icons inline-icon">description</i> Brochure
+                          </a>
+                        </ng-template> -->
+                  <!-- <button class="dropdown-item btn btn-dropdown btn-default" 
+                          (click)="redirectToCourseModule(course)">
+                          <i class="inline-icon material-icons">assignment</i> Module
+                        </button> -->
+                  <!-- <button class="dropdown-item btn btn-dropdown btn-default" 
+                          (click)="redirectToCourseSession(course)">
+                          <i class="inline-icon material-icons">list</i> Session
+                        </button> -->
+                  <!-- <button class="dropdown-item btn btn-dropdown btn-default" 
+                          (click)="redirectToProgrammingAssignment(course)">
+                          <i class="inline-icon material-icons">assignment</i> Assignments
+                        </button> -->
+                  <!-- <button class="dropdown-item btn btn-dropdown btn-default" 
+                          (click)="onCourseViewButtonClick(course)">
+                          <i class="inline-icon material-icons-outlined">visibility</i> View
+                        </button> -->
+                  <!-- <button class="dropdown-item btn btn-dropdown btn-default" 
+                          (click)="redirectToCourseDetails(course.id)">
+                          <i class="inline-icon material-icons-outlined">info</i> Course Details
+                        </button> -->
+                  <!-- <button class="dropdown-item btn btn-dropdown btn-default" 
+                          (click)="onCourseDeleteClick(course.id, deleteConfirmationModal)"
+                          *ngIf="permission && permission?.delete">
+                          <i class="inline-icon material-icons">delete</i> Delete
+                        </button> -->
+                  <!-- </div>
+                    </div> -->
+                  <!-- </td> -->
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <br>
+      <div class="view-label-flex" *ngIf="totalCourse > 0">
+        <span>
+          Viewing <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong></span>
+          &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalCourse}}</strong></span>
+        </span>
+      </div>
+
+      <br>
+
+      <!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+      <div class="d-flex flex-wrap justify-content-end align-items-center flex-row">
+        <form [formGroup]="courseSearchForm">
+          <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+            <div class="d-flex flex-wrap">
+              <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="d-flex flex-wrap">
+              <ul class="pagination" *ngFor="let course of courses | paginate: { id:'coursePageID',
+                itemsPerPage: courseSearchForm.get('limit').value, currentPage: (+courseSearchForm.get('offset').value + 1), 
+                totalItems: totalCourse }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="coursePageID">
+              </pagination-controls>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Courses not found -->
+    <ng-template #noCourse>
+      <div class="container full-h">
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Courses Not Found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add New Course -->
+<ng-template #courseModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">{{modalHeader}}
+        <button type="button" *ngIf="isViewClicked && permission?.update" class="btn material-icons-button"
+          (click)="onCourseUpdateButtonClick()">
+          <i class="material-icons grey-icon">create</i></button>
+      </h4>
+      <span *ngIf="!isViewClicked"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <form [formGroup]="courseForm">
+    <div class="modal-body">
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Course Details</strong></h1>
+      </div>
+      <div class="row">
+        <div *ngIf="isViewClicked" class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label>Course Code:</label>
+            <input type="text" class="form-control input-style" formControlName="code" readonly>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label><span *ngIf="!isViewClicked" class="red">* </span>Course Name:</label>
+            <input type="text" class="form-control input-style" formControlName="name" placeholder="eg: Java">
+            <div class="alert alert-danger" *ngIf=" (courseForm.get('name').dirty || courseForm.get('name').touched)
+                  &&courseForm.get('name').invalid">
+              <div *ngIf="courseForm.get('name').errors.required">
+                Name must be specified
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Technology:</label>
+          <ng-select [items]="technologies" bindLabel="language" placeholder="Select Technology" appendTo="body"
+            multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+            class="ng-select-style" (search)="getTechnology($event)" (focus)="getTechnology()"
+            [loading]="isTechLoading">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.language}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf=" (courseForm.get('technologies').dirty || courseForm.get('technologies').touched)
+                &&courseForm.get('technologies').invalid">
+            <div *ngIf="courseForm.get('technologies').errors.required">
+              Technology must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Course Type:</label>
+          <select class="form-control input-style" formControlName="courseType">
+            <option [ngValue]="null">Select Course Type</option>
+            <option *ngFor="let type of courseType" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf=" (courseForm.get('courseType').dirty || courseForm.get('courseType').touched)
+                &&courseForm.get('courseType').invalid">
+            <div *ngIf="courseForm.get('courseType').errors.required">
+              Course Type must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Course Level:</label>
+          <select class="form-control input-style" formControlName="courseLevel">
+            <option [ngValue]="null">Select Course Level</option>
+            <option *ngFor="let type of courseLevel" [ngValue]="type.value">{{type.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf=" (courseForm.get('courseLevel').dirty || courseForm.get('courseLevel').touched)
+                &&courseForm.get('courseLevel').invalid">
+            <div *ngIf="courseForm.get('courseLevel').errors.required">
+              Course Level must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="!isFaculty">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Course Price:</label>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="price"
+            placeholder="eg: 1000">
+          <div class="alert alert-danger" *ngIf=" (courseForm.get('price').dirty || courseForm.get('price').touched)
+                &&courseForm.get('price').invalid">
+            <div *ngIf="courseForm.get('price').errors.required">
+              Course Price must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Course Duration (In months):</label>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="durationInMonths"
+            placeholder="Enter Duration in Month">
+          <div class="alert alert-danger" *ngIf=" (courseForm.get('durationInMonths').dirty || courseForm.get('durationInMonths').touched)
+                &&courseForm.get('durationInMonths').invalid">
+            <div *ngIf="courseForm.get('durationInMonths').errors.required">
+              Course Duration must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Course Total Hours:</label>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="totalHours"
+            placeholder="eg: 101">
+          <div class="alert alert-danger" *ngIf=" (courseForm.get('totalHours').dirty || courseForm.get('totalHours').touched)
+                &&courseForm.get('totalHours').invalid">
+            <div *ngIf="courseForm.get('totalHours').errors.required">
+              Course total hours must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-12">
+          <label for="sel1">Description:</label>
+          <textarea class="form-control input-style" rows="2" formControlName="description"
+            placeholder="Enter description" nbInput appEmptyToNull></textarea>
+          <div class="alert alert-danger" *ngIf="(courseForm.get('description').dirty || courseForm.get('description').touched)
+            &&courseForm.get('description').invalid">
+            <div *ngIf="courseForm.get('description').errors.maxlength">
+              Description cannot have more than 2000 characters
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-12">
+          <label for="sel1">PreRequisites:</label>
+          <ckeditor #ckeEditorPreRequisites [config]="ckeEditorConfig" formControlName="preRequisites"></ckeditor>
+          <div class="alert alert-danger" *ngIf="(courseForm.get('preRequisites').dirty || courseForm.get('preRequisites').touched)
+            &&courseForm.get('preRequisites').invalid">
+            <div *ngIf="courseForm.get('preRequisites').errors.maxlength">
+              PreRequisites cannot have more than 2000 characters
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group form-check" *ngIf="!isViewClicked">
+        <label class="form-check-label">
+          <label class="checkbox-container">
+            <input type="checkbox" [checked]="doesEligibilityExists" id="eligilibility-checkbox"
+              (change)="eligilibilityChecked($event)">
+            <span class="checkmark"></span>
+            <span class="checkbox-text-style" for="eligilibility-checkbox"> Add Eligibility</span>
+          </label>
+        </label>
+      </div>
+      <div *ngIf="doesEligibilityExists">
+        <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+          <h1 class="swabhav-light-orange-text"><strong>Eligibility Details</strong></h1>
+        </div>
+        <div class="row" formGroupName="eligibility">
+          <ng-container>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Technology:</label>
+              <ng-select [items]="technologies" bindLabel="language" placeholder="Select Technology" appendTo="body"
+                multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+                class="ng-select-style" (search)="getTechnology($event)" (focus)="getTechnology()"
+                [loading]="isTechLoading">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.language}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(courseForm.get('eligibility').get('technologies').dirty || courseForm.get('eligibility').get('technologies').touched)
+                    &&courseForm.get('eligibility').get('technologies').invalid">
+                <div *ngIf="courseForm.get('eligibility').get('technologies').errors.required">
+                  Technology is required
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Student Rating:</label>
+              <select class="form-control input-style" formControlName="studentRating">
+                <option [ngValue]="null" disabled>Select Student Rating</option>
+                <option *ngFor=" let rating of ratinglist" [ngValue]="rating.value">{{rating.value}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf=" (courseForm.get('eligibility').get('studentRating').dirty || courseForm.get('eligibility').get('studentRating').touched)
+                    &&courseForm.get('eligibility').get('studentRating').invalid">
+                <div *ngIf="courseForm.get('eligibility').get('studentRating').errors.required">
+                  Student Rating must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Experience:</label>
+              <select class="form-control input-style" formControlName="experience">
+                <option [ngValue]="null" disabled>Select Experience</option>
+                <option [ngValue]=false>Fresher</option>
+                <option [ngValue]=true>Experience</option>
+              </select>
+              <div class="alert alert-danger" *ngIf=" (courseForm.get('eligibility').get('experience').dirty || courseForm.get('eligibility').get('experience').touched)
+                    &&courseForm.get('eligibility').get('experience').invalid">
+                <div *ngIf="courseForm.get('eligibility').get('experience').errors.required">
+                  Experience must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Academic Year:</label>
+              <select class="form-control input-style" formControlName="academicYear">
+                <option [ngValue]="null" disabled>Select Academic Year</option>
+                <option *ngFor=" let year of academicYears" [ngValue]="year.value">{{year.value}}</option>
+              </select>
+              <div class="alert alert-danger" *ngIf=" (courseForm.get('eligibility').get('academicYear').dirty || courseForm.get('eligibility').get('academicYear').touched)
+                    &&courseForm.get('eligibility').get('academicYear').invalid">
+                <div *ngIf="courseForm.get('eligibility').get('academicYear').errors.required">
+                  Academic Year must be specified
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- span is used to hide the border as well -->
+      <span *ngIf="(!isViewClicked || courseForm.get('brochure')?.value)">
+        <hr>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Brochure:</label>
+          <div class="col-sm-4">
+            <span class="custom-file custom-file-border">
+              <input *ngIf="!isViewClicked" type="file" class="custom-file-input" (change)="onResourceSelect($event)"
+                id="customFile" value="displayedFileName">
+              <label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label" for="customFile"
+                [innerHTML]="displayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="courseForm.get('brochure')?.value && !isBrochureUploadedToServer" data-toggle="tooltip"
+                data-placement="top" title="View Brochure">
+                <a *ngIf="isViewClicked" [href]="courseForm.get('brochure').value" target="_blank"
+                  class="anchor btn mb-5">
+                  <img src="assets/icon/colour-icons/pdf.png" alt="pdf" width="70">
+                </a>
+              </div>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+          </div>
+        </div>
+      </span>
+
+      <!-- span is used to hide the border as well -->
+      <span *ngIf="(!isViewClicked || courseForm.get('logo')?.value)">
+        <hr>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Logo:</label>
+          <div class="col-sm-4">
+            <span class="custom-file custom-file-border">
+              <input *ngIf="!isViewClicked" type="file" class="custom-file-input" (change)="onImageSelect($event)"
+                id="customFile" value="logoDisplayedFileName">
+              <label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label" for="customFile"
+                [innerHTML]="logoDisplayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isLogoFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="isViewClicked && courseForm.get('logo')?.value && !isLogoUploadedToServer"
+                data-toggle="tooltip" data-placement="top" title="View Logo">
+                <img [src]="courseForm.get('logo').value" alt="logo" width="100">
+              </div>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customFile" [innerHTML]="logoDocStatus"></label>
+          </div>
+        </div>
+      </span>
+
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="reset"
+        (click)="dismissFormModal(modal)">Close</button>
+      <button type="submit" *ngIf="!isViewClicked" class="btn btn-submit-swabhav material-icons-button"
+        [disabled]="!courseForm.dirty" (click)="validate()">{{modalButton}}</button>
+    </div>
+
+  </form>
+
+</ng-template>
+
+<ng-template #deleteConfirmationModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close material-icons-button" (click)="modal.dismiss('Cross click')"
+      class="btn btn-default" type="submit"><i
+        class="material-icons material-icons-button close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want to delete this course?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="deleteCourse()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button"
+      (click)="modal.dismiss('Close click')">No
+    </button>
+  </div>
+
+</ng-template>

@@ -1,0 +1,114 @@
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+  }
+    
+  .ng-select.ng-select-disabled>.ng-select-container {
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+  }
+  
+  .table-td-center-align{
+    vertical-align: middle;
+  }
+    
+  .modal-title {
+    font-weight: 500;
+    font-size: larger;
+  }
+  
+  .margin-left {
+    margin-left: 10%;
+  }
+  
+  .btn-width {
+    width: 15%;
+  }
+  
+  .table-striped > tbody > .unstriped-tr > td {
+    background-color: #fff;
+  }
+  
+  .table-unstriped  > tbody > tr:nth-child(odd) > td,
+  .table-unstriped > tbody > tr:nth-child(even) > td,
+  .table-unstriped > thead > tr > th {
+    background-color: #fff;
+  }
+  
+  .text-logo {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .icon-align {
+    display: inline-grid;
+  }
+  
+  .delete-icon-align {
+    display: inline-table;
+  }
+  
+  .left-margin {
+    margin-left: 3%;
+  }
+  .assignments-grey{
+    -webkit-filter: grayscale(100%) !important;
+      filter: grayscale(100%) !important;
+  }
+  .assignments-color{
+    -webkit-filter: grayscale(0) !important;
+      filter: grayscale(0) !important;
+  }
+  
+  .header-style {
+    display: flex;
+  }
+  
+  .header-left-style {
+    margin-left: auto;
+  }
+  
+  .total-module-style{
+    margin-top: 4px;
+  }
+
+  .concept-badge-style{
+    text-align: center;
+    background-color: #d9d4f1;
+    color: #593dc1;
+    border-radius: 10px;
+}
+
+.red-box-style{
+  background-color: #ffeaea;
+  color: #f80309;
+}
+
+.blue-box-style{
+  background-color: #e5f6fd;
+  color: #61abde;
+}
+
+.green-box-style{
+  background-color: #e5fdf0;
+  color: #36b98c;
+}
+
+.yellow-box-style{
+  background-color: #faeed9;
+  color: #ed9511;
+}
+
+.tasklist-box-style{
+  border-radius: 30px;
+  font-weight: bold;
+  padding: 4px;
+  text-align: center;
+}
+    

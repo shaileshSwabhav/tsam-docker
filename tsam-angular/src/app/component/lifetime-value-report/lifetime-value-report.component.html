@@ -1,0 +1,278 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="lifetimeValueSearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" formControlName="firstName" class="form-control input-style"
+                            placeholder="Enter First Name">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" formControlName="lastName" class="form-control input-style"
+                            placeholder="Enter Last Name">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" formControlName="email" class="form-control input-style"
+                            placeholder="Enter Email">
+                    </div>
+                </div>
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Upsell'}">
+                            </ng-container>
+                        </span>
+                        <br>
+                        <label class="font-md-style font-weight-bolder-style">Minimum:</label>
+                        <input type="number" formControlName="upsellMinimum" class="form-control input-style"
+                            placeholder="Enter minimum upsell" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label>&nbsp;</label>
+                        </div>
+                        <label class="font-md-style font-weight-bolder-style">Maximum:</label>
+                        <input type="number" formControlName="upsellMaximum" class="form-control input-style"
+                            placeholder="Enter maximum upsell" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Placement'}">
+                            </ng-container>
+                        </span>
+                        <br>
+                        <label class="font-md-style font-weight-bolder-style">Minimum:</label>
+                        <input type="number" formControlName="placementMinimum" class="form-control input-style"
+                            placeholder="Enter minimum placement" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label>&nbsp;</label>
+                        </div>
+                        <label class="font-md-style font-weight-bolder-style">Maximum:</label>
+                        <input type="number" formControlName="placementMaximum" class="form-control input-style"
+                            placeholder="Enter maximum placement" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Knowledge'}">
+                            </ng-container>
+                        </span>
+                        <br>
+                        <label class="font-md-style font-weight-bolder-style">Minimum:</label>
+                        <input type="number" formControlName="knowledgeMinimum" class="form-control input-style"
+                            placeholder="Enter minimum knowledge" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label>&nbsp;</label>
+                        </div>
+                        <label class="font-md-style font-weight-bolder-style">Maximum:</label>
+                        <input type="number" formControlName="knowledgeMaximum" class="form-control input-style"
+                            placeholder="Enter maximum knowledge" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Teaching'}">
+                            </ng-container>
+                        </span>
+                        <br>
+                        <label class="font-md-style font-weight-bolder-style">Minimum:</label>
+                        <input type="number" formControlName="teachingMinimum" class="form-control input-style"
+                            placeholder="Enter minimum teaching" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label>&nbsp;</label>
+                        </div>
+                        <label class="font-md-style font-weight-bolder-style">Maximum:</label>
+                        <input type="number" formControlName="teachingMaximum" class="form-control input-style"
+                            placeholder="Enter maximum teaching" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Total'}">
+                            </ng-container>
+                        </span>
+                        <br>
+                        <label class="font-md-style font-weight-bolder-style">Minimum:</label>
+                        <input type="number" formControlName="totalMinimum" class="form-control input-style"
+                            placeholder="Enter minimum total" appAllowNumbersOnly>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label>&nbsp;</label>
+                        </div>
+                        <label class="font-md-style font-weight-bolder-style">Maximum:</label>
+                        <input type="number" formControlName="totalMaximum" class="form-control input-style"
+                            placeholder="Enter maximum total" appAllowNumbersOnly>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit"
+                        [disabled]="!lifetimeValueSearchForm.dirty" (click)="searchLifetimeValues();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Lifetime Value Reports -
+                    <span class="color-F6430F"> {{totalLifetimeValueEntries}}</span>
+                    |
+                    <span class="font-lg-style font-weight-bold">
+                        <span> Total Lifetime Value -</span>
+                        <span class="color-F6430F"> {{totalLifetimeValueInString}}</span>
+                    </span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Reports
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalLifetimeValueEntries > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalLifetimeValueEntries}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalLifetimeValueEntries == 0 && isSearched) || (totalLifetimeValueEntries > 0 && !isSearched) 
+                    || (totalLifetimeValueEntries > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalLifetimeValueEntries > 0"
+                    class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let lifetimeValueReport of lifetimeValueReportList | paginate: { id:'lifetimeValueReportID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalLifetimeValueEntries }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="lifetimeValueReportID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalLifetimeValueEntries > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Upsell</th>
+                                <th>Placement</th>
+                                <th>Knowledge</th>
+                                <th>Teaching</th>
+                                <th>Total</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let lifetimeValue of lifetimeValueReportList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{lifetimeValue.firstName + " " + lifetimeValue.lastName}}</td>
+                                    <td>{{lifetimeValue.email}}</td>
+                                    <td>
+                                        <span
+                                            *ngIf="lifetimeValue.upsell != null; else noValue">{{lifetimeValue.upsell}}</span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            *ngIf="lifetimeValue.placement != null; else noValue">{{lifetimeValue.placement}}</span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            *ngIf="lifetimeValue.knowledge != null; else noValue">{{lifetimeValue.knowledge}}</span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            *ngIf="lifetimeValue.teaching != null; else noValue">{{lifetimeValue.teaching}}</span>
+                                    </td>
+                                    <ng-template #noValue>
+                                        <span>None</span>
+                                    </ng-template>
+                                    <td class="color-F6430F font-weight-bold">
+                                        {{totalLifetimeValueOfEachEntry(lifetimeValue)}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalLifetimeValueEntries == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Lifetime Value Reports Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>

@@ -1,0 +1,140 @@
+<!-- Feedback Submit Section -->
+<ng-container *ngIf="isSubmission">
+    <div class="font-weight-bold font-lg-style color-F6430F text-center">
+        Feedback
+    </div>
+
+    <!-- No Feedbacks Found -->
+    <ng-container *ngIf="batchSessionList.length == 0">
+        <br>
+        <div class="card my-course-card-style h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+                    <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+                    <br>
+                    <div class="font-lg-style text-center">
+                        No Feedbacks Found
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="batchSessionList.length > 0">
+        <table class="table table-borderless">
+            <thead>
+                <tr class="text-center">
+                    <th>Sr No.</th>
+                    <th>Session Date</th>
+                    <th class="text-left">Topics Covered</th>
+                    <th>Feedback</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let session of batchSessionList;let i = index">
+                    <tr class="text-center">
+                        <td class="font-sm-style font-weight-bold color-757575">
+                            {{i+1}}
+                        </td>
+                        <td>
+                            <div class="session-date-style">
+                                <span class="font-sm-style font-weight-bold">
+                                    {{session.date | date:'fullDate'}}
+                                </span>
+                                <span class="vertical-align-bottom-icon-style">
+                                    <i class="material-icons font-20-style color-757575">calendar_today</i>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="text-left">
+                            <ng-container *ngFor="let topic of session.topics;let i = index">
+                                <span class="badge swabhav-badge-style">
+                                    {{topic.topicName}}
+                                </span>&nbsp;
+                            </ng-container>
+                        </td>
+                        <td>
+                            <img *ngIf="!session.isFeedbackGiven" class="width-30px-style cursor-pointer-style"
+                                (click)="onTalentFeeddbackToFacultyClick(session)"
+                                src="assets/icon/grey-icons/review.png" alt="Feedback Not Given">
+                            <img *ngIf="session.isFeedbackGiven" class="width-30px-style cursor-pointer-style"
+                                (click)="onTalentFeeddbackToFacultyClick(session)"
+                                src="assets/icon/colour-icons/review.png" alt="Feedback Given">
+                        </td>
+                        <td>
+                            <div *ngIf="!session.isFeedbackGiven" class="tasklist-box-style pending-box-style">
+                                Pending
+                            </div>
+                            <div *ngIf="session.isFeedbackGiven" class="tasklist-box-style submitted-box-style">
+                                Submitted
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </ng-container>
+</ng-container>
+
+<!-- Talent feedback for faculty -->
+<ng-template #talentFeedbackToFacultyModal let-modal>
+    <app-talent-feedback-modal #talentFeedback [batchSessionID]="currentBatchSession.id" [batchID]="batchID"
+        [batchSessionDate]="currentBatchSession.date" [sessionNumber]="currentBatchSession.sessionNumber"
+        [faculty]="selectedBatchSessionFaculty" [topics]="currentBatchSession.topics"
+        [feedbacks]="currentBatchSession.feedbacks" (isSuccessfulEmitter)="receiveIsFeedbackAddSuccessful($event)">
+    </app-talent-feedback-modal>
+</ng-template>
+
+<!-- LeaderBorad -->
+<ng-container *ngIf="!isSubmission">
+    <div class="font-weight-bold font-lg-style color-F6430F text-center">
+        Leaderboard
+    </div>
+
+    <br><br>
+
+    <!-- No LeaderBoard Found -->
+    <ng-container *ngIf="facultyFeedbackForTalentLeaderBoard.length == 0">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+                    <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+                    <br>
+                    <div class="font-lg-style text-center">
+                        No LeaderBoard Found
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="facultyFeedbackForTalentLeaderBoard.length > 0">
+        <div class="row">
+            <ng-container *ngFor="let leader of facultyFeedbackForTalentLeaderBoard; let i = index">
+                <div class="col-6 right-border-style" [ngClass]="{'right-border-style': i%2==0}">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <img class="width-60px-style float-right" src={{leader.imageURL}} alt="Telegram">
+                        </div>
+                        <div class="col-md-7 color-4F4F4F">
+                            <div>
+                                Name: {{leader.firstName + " " + leader.lastName}}
+                            </div>
+                            <div>
+                                Place: {{leader.rank}}
+                            </div>
+                            <div class="font-weight-bold">
+                                Rating: {{leader.rating}}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+
+</ng-container>

@@ -1,0 +1,22 @@
+.task-list-card-style{
+    box-shadow: 2px 2px 5px #aaaaaa;
+    background-color: #FFFFFF;
+    padding-left: 5%;
+    padding-right: 5%;
+    border-radius: 10px;
+}
+
+.task-list-card-body-style{
+    padding: 5px;
+}
+
+/* STAR RATING */
+.star {
+    font-size: 300%;
+    color: #b0c4de;
+    letter-spacing: 10px;
+  }
+  
+  .star-fill {
+    color: #fee440;
+  }

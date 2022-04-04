@@ -1,0 +1,145 @@
+.pointer {
+  cursor: pointer;
+}
+
+.anchor, .anchor:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.anchor-tag {
+  color: #000;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.fake-link {
+  text-decoration: underline;
+  cursor: pointer;
+  color: rgb(33, 33, 196);
+  font-weight: 900;
+  font-family: cursive;
+}
+
+.margin-for-button {
+  margin-right: 1%;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+table {
+  font-size: small;
+}
+
+th {
+  font-weight: 400;
+}
+
+.row-hover:hover td {
+  cursor: pointer;
+  background-color: #ffded7;
+}
+
+/* .table-striped>tbody>tr:hover td {
+  cursor: pointer;
+  background-color: #ffded7;
+} */
+
+.btn-swabhav {
+  color: #f6430f;
+}
+
+.anchor-tag {
+  color: #000;
+  text-decoration: none;
+}
+
+.card-header, .card-footer {
+  background-color: #fff6f4d0;
+}
+
+.filter-form-label {
+  font-size: medium;
+  font-weight: bold;
+  color: #757575;
+}
+
+/* DROPDOWN STYLES */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+/* INPUT STYLE */
+.input-style,
+input[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.form-control:focus {
+  box-shadow: none;
+}
+
+.checkbox-text {
+  color: #D63C2A;
+  font-weight: bold;
+  font-size: medium;
+  cursor: pointer;
+}
+
+/* SIDE NAV */
+.mat-drawer {
+  width: 40%;
+  position: fixed;
+}
+
+.selected-day {
+  color: #ffffff;
+  background-color: #f34523;
+}
+
+.day {
+  border-radius: 2px;
+  width: 35px;
+  height: 30px;
+  display: inline-block;
+  border: 1px solid #bdbdbd;
+  text-align: center;
+  padding-top: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.day-text {
+  font-weight: bold;
+  margin-top: 7px;
+}
+
+.btn-border {
+  border: 1px solid #bdbdbd;
+}
+
+.unstriped-tr {
+  background-color: #ffffff;
+}
+
+.table-striped > tbody > .unstriped-tr > td {
+  background-color: #fff;
+}
+
+.table-unstriped  > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #ffffff;
+}

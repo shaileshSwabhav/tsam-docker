@@ -1,0 +1,158 @@
+.padding {
+  padding: 1% 0.5% 1% 0.5%;
+}
+
+.inline-search-icon {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-by-field {
+  margin-top: 2%;
+}
+
+.page-link:hover{
+  cursor: pointer;
+}
+
+.inline {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: start; */
+}
+
+.color-teal {
+  color: teal;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+  
+#custom-file{
+  cursor: pointer;
+}
+
+#uploadingButton{
+  cursor: progress;
+}
+  
+a, a:hover{
+  color:white;
+  text-decoration: none;
+}
+
+.fake-link{
+  text-decoration: underline;
+  cursor: pointer;
+  color: rgb(33, 33, 196);
+  font-weight: 900;
+  font-family: cursive;
+}
+
+.text-font {
+  font-weight: 900;
+  /* font-family: cursive; */
+  cursor: default;
+}
+
+.center-style{
+  text-align: center;
+}
+
+.experience-label-style{
+  font-size: medium;
+  font-weight: bolder;
+}
+
+.margin-for-button{
+  margin-right: 1%;
+}
+
+.badge-custom-orange {
+  background-color: #FF7600;
+  color: white;
+}
+
+table {
+  font-size: small;
+}
+
+.anchor-tag {
+  color: #000;
+  text-decoration: none;
+}
+
+/* DROPDOWN STYLE */
+.dropdown-element,
+.dropdown-element:hover {
+  color: #000;
+}
+
+.swabhav-badge {
+  background-color: #EE3733;
+  color: #FFFFFF;
+}
+
+/* SEARCH SIDE NAV */
+.search-body{
+  overflow-x: hidden;
+}
+
+.mat-drawer-style {
+  width: 50%;
+  position: fixed;
+}
+
+.search-mat-drawer-style {
+  width: 20%;
+}
+
+.search-section-name-style {
+  font-weight: bold;
+  color: #757575;
+  padding-top: 20%;
+  border-bottom: 1.5px solid #757575;
+  cursor: pointer;
+}
+
+.selected-search-section-name-style {
+  font-weight: bold;
+  color: #F6430F;
+  padding-top: 20%;
+  border-bottom: 1.5px solid #F6430F;
+  cursor: pointer;
+}
+
+.search-main-content-style {
+  background-color: white;
+  padding: 5%;
+  min-height: 500px;
+}
+
+.search-section-group-style {
+  padding-right: 10%;
+  padding-top: 50%;
+}
+
+
+/* *******************input styles***************** */
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #FC6E26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container {
+  color: #FFFFFF;
+  background-color: #FC6E26;
+  border: 1.5px solid #FC6E26;
+  border-radius: 5px;
+}

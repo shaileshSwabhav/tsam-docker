@@ -1,0 +1,115 @@
+.card-margin{
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+.red {
+    color: red;
+}
+
+.example-full-width {
+    width: 100%;
+}
+
+.center{
+    text-align: center;
+}
+
+.stepper-button-style{
+    background-color: green;
+    color: white;
+    text-align: center;
+}
+
+.center-style{
+    text-align: center;
+}
+
+.addToFormArrayButton{
+    background-color: rgb(214, 117, 214);
+}
+.deleteFromFormArrayButton{
+    background-color: rgb(230, 114, 114);
+    color: white;
+}
+.cardColor{
+    background-color: white;
+}
+
+.label-style{
+    color: black;
+}
+
+h5{
+    font-size: large;
+    font-weight: bolder;
+    display: inline-block;
+}
+
+.stepper-button-style:hover {
+    transform: scale(1.2);
+}
+
+.darkslateblue{
+    color: darkslateblue;
+}
+
+.redirect-style{
+    color: black;
+    font-size: large;
+    margin-top: 20%;
+}
+
+.large{
+    font-size: 50px;
+}
+
+*:disabled:hover {
+    cursor:not-allowed
+}
+
+.heading-style{
+    font-weight: bolder;
+    text-align: center;
+}
+
+.popover-style:hover{
+    transform: scale(1.2);
+    cursor: default !important;
+}
+
+.popover-style {
+    margin-left: 2px;
+}
+
+.academicPopoverClass{
+    vertical-align: sub;
+}
+
+.flex-container {
+    display: flex;
+}
+
+.custom-width{
+    width: 100%;
+}
+
+.hidden-style{
+    visibility: hidden;
+}
+
+.form-style{
+    background-color: white;
+    height: max-content;
+    width: inherit
+}
+
+.page-style{
+    background-color: white;
+    height: 100vh;
+}
+
+.popover-title-style{
+    font-size: 4mm;
+    font-weight: bold;
+}

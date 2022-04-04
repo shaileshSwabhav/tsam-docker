@@ -1,0 +1,388 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #dashTemplate>
+    <span>
+        -
+    </span>
+</ng-template>
+
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="speakerSearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="firstName"
+                            placeholder="eg: Ravi">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="lastName"
+                            placeholder="eg: Sharma">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="company"
+                            placeholder="eg: Swabhav Techlabs">
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Designation'}">
+                            </ng-container>
+                        </span>
+                        <select class="form-control input-style" formControlName="designationID">
+                            <option [ngValue]="null" selected>Select</option>
+                            <option *ngFor="let designation of designationList" [ngValue]="designation.id">
+                                {{designation.position}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label class="font-weight-bolder-style font-md-style">Experience In Years:</label>
+                        </div>
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Minimum'}">
+                            </ng-container>
+                        </span>
+                        <input type="number" appAllowNumbersOnly class="form-control input-style"
+                            formControlName="minimumExperience" placeholder="eg: 2">
+                        <div class="alert alert-danger"
+                            *ngIf="(speakerSearchForm.get('minimumExperience').touched 
+                            || speakerSearchForm.get('minimumExperience').dirty) && speakerSearchForm.get('minimumExperience').invalid">
+                            <div *ngIf="speakerSearchForm.get('minimumExperience').errors.min">
+                                Minimum Experience in Years cannot be less than 0
+                            </div>
+                            <div *ngIf="speakerSearchForm.get('minimumExperience').errors.max">
+                                Minimum Experience in Years cannot be more than 60
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12 col-md-6">
+                        <div>
+                            <label>&nbsp;</label>
+                        </div>
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Maximum'}">
+                            </ng-container>
+                        </span>
+                        <input type="number" appAllowNumbersOnly class="form-control input-style"
+                            formControlName="maximumExperience" placeholder="eg: 2">
+                        <div class="alert alert-danger"
+                            *ngIf="(speakerSearchForm.get('maximumExperience').touched 
+                            || speakerSearchForm.get('maximumExperience').dirty) && speakerSearchForm.get('maximumExperience').invalid">
+                            <div *ngIf="speakerSearchForm.get('maximumExperience').errors.min">
+                                Maximum Experience in Years cannot be less than 0
+                            </div>
+                            <div *ngIf="speakerSearchForm.get('maximumExperience').errors.max">
+                                Maximum Experience in Years cannot be more than 60
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit" [disabled]="!speakerSearchForm.dirty"
+                        (click)="searchSpeakers();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Speakers -
+                    <span class="color-F6430F"> {{totalSpeakers}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Speakers
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" (click)="onAddNewSpeakerClick()">
+                        Add New Speaker
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalSpeakers > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalSpeakers}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalSpeakers == 0 && isSearched) || (totalSpeakers > 0 && !isSearched) 
+                    || (totalSpeakers > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalSpeakers > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let speaker of speakerList| paginate: { id:'speakerID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalSpeakers }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="speakerID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalSpeakers > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>Name</th>
+                                <th>Designation</th>
+                                <th>Company</th>
+                                <th>Experience In Years</th>
+                                <th>View</th>
+                                <th>Delete</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let speaker of speakerList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{speaker.firstName}} {{speaker.lastName}}</td>
+                                    <td>
+                                        <span *ngIf="speaker.designation != null; else dashTemplate">
+                                            {{speaker.designation.position}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="speaker.company != null; else dashTemplate">
+                                            {{speaker.company}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="speaker.experienceInYears != null; else dashTemplate">
+                                            {{speaker.experienceInYears}}
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Update speaker">
+                                        <span (click)="onViewSpeakerClick(speaker)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Delete speaker">
+                                        <span (click)="onDeleteSpeakerClick(speaker.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalSpeakers == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Speakers Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+
+
+<!-- Add/Update/View Speaker -->
+<ng-template #speakerFormModal let-modal>
+    <form [formGroup]="speakerForm">
+        <div class="modal-body">
+            <div class="form-header-style">
+                {{isViewMode? 'Speaker Details': isOperationUpdate ? 'Update Speaker' : 'Add Speaker' }}
+                <span *ngIf="isViewMode" (click)="onUpdateSpeakerClick()">
+                    <i class="material-icons">create</i>
+                </span>
+            </div>
+            <div *ngIf="!isViewMode" class="marked-fields-style"><span class="red"><strong>*</strong></span> marked
+                fields are mandatory</div>
+            <br>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'First Name'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" nbInput formControlName="firstName"
+                        placeholder="eg: Ravi">
+                    <div class="alert alert-danger" *ngIf="(speakerForm.get('firstName').touched || speakerForm.get('firstName').dirty) 
+                        && speakerForm.get('firstName').invalid">
+                        <div *ngIf="speakerForm.get('firstName').errors.required">
+                            First Name must be specified
+                        </div>
+                        <div *ngIf="speakerForm.get('firstName').errors.pattern">
+                            First Name should only have alphabets and no space
+                        </div>
+                        <div *ngIf="speakerForm.get('firstName').errors.maxLength">
+                            First Name can have maximum 50 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Last Name'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" nbInput formControlName="lastName"
+                        placeholder="eg: Sharma">
+                    <div class="alert alert-danger" *ngIf="(speakerForm.get('lastName').touched || speakerForm.get('lastName').dirty) 
+                        && speakerForm.get('lastName').invalid">
+                        <div *ngIf="speakerForm.get('lastName').errors.required">
+                            Last Name must be specified
+                        </div>
+                        <div *ngIf="speakerForm.get('lastName').errors.pattern">
+                            Last Name should only have alphabets and no space
+                        </div>
+                        <div *ngIf="speakerForm.get('lastName').errors.maxLength">
+                            Last Name can have maximum 50 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-6">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Company'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" nbInput appEmptyToNull formControlName="company"
+                        placeholder="eg: Swabhav Techlabs">
+                    <div class="alert alert-danger" *ngIf="(speakerForm.get('company').touched || speakerForm.get('company').dirty) 
+                        && speakerForm.get('company').invalid">
+                        <div *ngIf="speakerForm.get('company').errors.maxLength">
+                            Company can have maximum 200 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Designation'}">
+                        </ng-container>
+                    </span>
+                    <ng-select [items]="designationList" bindLabel="position" placeholder="Select" appendTo="body"
+                        [searchable]="true" [clearable]="true" formControlName="designation" class="ng-select-style">
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            {{item.position}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+                <div class="form-group col-sm-3 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Experience(in years)'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" class="form-control input-style" formControlName="experienceInYears"
+                        placeholder="eg: 5" appAllowNumbersOnly>
+                    <div class="alert alert-danger" *ngIf="(speakerForm.get('experienceInYears').touched || speakerForm.get('experienceInYears').dirty) 
+                        && speakerForm.get('experienceInYears').invalid">
+                        <div *ngIf="speakerForm.get('experienceInYears').errors.max">
+                            Experience in years cannot be more than 60
+                        </div>
+                        <div *ngIf="speakerForm.get('experienceInYears').errors.min">
+                            Experience in years cannot be less than 0
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button type="button" [disabled]="!speakerForm.dirty" class="btn btn-default swabhav-button-round"
+                    *ngIf="!isViewMode" (click)="onFormSubmit()">
+                    {{isOperationUpdate ? 'Update Speaker' : 'Add Speaker'}}
+                </button>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<!-- Delete Speaker Confirmation -->
+<ng-template #deleteSpeakerModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this speaker?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>

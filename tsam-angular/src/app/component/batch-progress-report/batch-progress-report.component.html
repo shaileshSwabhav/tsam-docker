@@ -1,0 +1,880 @@
+<!-- Not found template -->
+<ng-template #notFoundTemplate let-message="message">
+    <div class="text-center">
+        <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+        <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+        <br>
+        <div class="font-lg-style text-center">
+            {{message}}
+        </div>
+    </div>
+</ng-template>
+
+<!-- Selection for batch or single talent -->
+<div class="header-style">
+    <div *ngIf="batchTalentList && !access.isTalent">
+        <span class="font-weight-bold font-lg-style">View Progress Report of:</span>
+        &nbsp;&nbsp;
+        <select [(ngModel)]="talentID" class="form-control input-style batch-talent-select-style" (change)="onBatchTalentChange()">
+            <option [ngValue]="null">Entire Batch</option>
+            <option *ngFor="let talent of batchTalentList" [ngValue]="talent.id">{{talent.firstName}} {{talent.lastName}}</option>
+        </select>
+    </div>
+    <div *ngIf="access.isFaculty" class="header-left-style">
+        <span class="color-D63C2A font-weight-bold font-md-style">My Modules</span>&nbsp;
+        <div class="custom-control custom-switch display-inline-style">
+            <input type="checkbox" class="custom-control-input" id="viewAllModulesSwitch" [(ngModel)]="isViewAllModules"
+                (click)="toggleIsViewAllModules()">
+            <label class="custom-control-label" for="viewAllModulesSwitch">
+                <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">All Modules</span>
+            </label>
+        </div>
+        <!-- &nbsp;&nbsp;<span class="color-000000 font-weight-bold">|</span>&nbsp;&nbsp;
+        <span class="color-D63C2A font-weight-bold font-md-style">Faculty</span>&nbsp;
+        <div class="custom-control custom-switch display-inline-style">
+            <input type="checkbox" class="custom-control-input" id="talentFaultySwitch" [(ngModel)]="this.access.isTalent"
+                (click)="toggleTalentFaculty()">
+            <label class="custom-control-label" for="talentFaultySwitch">
+                <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">Talent</span>
+            </label>
+        </div> -->
+    </div>
+    
+</div>
+
+<br>
+
+<!-- Batch details boxes -->
+<div class="row" *ngIf="batchDetails">
+    
+    <ng-container *ngIf="!access.isTalent && !isViewAllModules">
+        <div class="form-group col-md-6 col-sm-12 col-xs-12"></div>
+        <div class="form-group col-md-6 col-sm-12 col-xs-12">
+            Select Module
+            &nbsp;&nbsp;
+            <select [(ngModel)]="selectedModuleForDates" class="form-control input-style batch-module-for-date-select-style"
+                (change)="onSelectedModuleForDatesChange()">
+                <option *ngFor="let batchModule of batchModuleList" [ngValue]="batchModule">
+                    {{batchModule.module?.moduleName}}
+                </option>
+            </select>
+        </div>
+        <br>
+    </ng-container>
+
+    <!-- Total Sessions Completed -->
+    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body card-body-style">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img width="60"
+                            src="assets/icon/colour-icons/sessions.png" alt="Total Sessions Completed">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <div class="count-box-style margin-top-10-style">
+
+                            <!-- For faculty -->
+                            <span *ngIf="!access.isTalent && !this.isTalentSelected"
+                                class="count-text-style">{{batchDetails.totalSessionsCompleted}}</span>
+                            <span *ngIf="!access.isTalent && !this.isTalentSelected"
+                                class="count-total-text-style">/{{batchDetails.totalSessionsCount}}</span>
+
+                            <!-- For talent -->
+                            <span *ngIf="access.isTalent || this.isTalentSelected"
+                                class="count-text-style">{{batchDetails.sessionsAttendedCount}}</span>
+                            <span *ngIf="access.isTalent || this.isTalentSelected"
+                                class="count-total-text-style">/{{batchDetails.totalSessionsCompleted}}</span>
+
+                        </div>
+                        <div class="color-414141 font-smaller-style margin-top-10-style">
+                            Total Sessions Completed
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Hours Completed -->
+    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body card-body-style">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img width="60"
+                            src="assets/icon/talent-dashboard/attendance.png" alt="Total Hours Completed">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <div class="count-box-style margin-top-10-style">
+
+                            <!-- For faculty -->
+                            <span *ngIf="!access.isTalent && !this.isTalentSelected"
+                                class="count-text-style">{{batchDetails.totalCompletedHours}}</span>
+                            <span *ngIf="!access.isTalent && !this.isTalentSelected"
+                                class="count-total-text-style">/{{batchDetails.totalHours}}</span>
+
+                            <!-- For talent -->
+                            <span *ngIf="access.isTalent || this.isTalentSelected"
+                                class="count-text-style">{{batchDetails.attendedHours}}</span>
+                            <span *ngIf="access.isTalent || this.isTalentSelected"
+                                class="count-total-text-style">/{{batchDetails.totalCompletedHours}}</span>
+                                
+                        </div>
+                        <div class="color-414141 font-smaller-style margin-top-10-style">
+                            Total Hours Completed
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Start Date and End Date for faculty for its own modules -->
+    <ng-container *ngIf="!access.isTalent && !isViewAllModules">
+        <div class="form-group col-md-3 col-sm-6 col-xs-12">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body card-body-style">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img width="60"
+                                src="assets/icon/colour-icons/start.png" alt="Batch Start Date">
+                        </div>
+                        <div class="col-md-8 text-center">
+                            <div class="count-box-style margin-top-10-style">
+                                <span
+                                    class="count-total-text-style">{{batchDetails.startDate | date: 'EEE, d MMM'}}
+                                </span>
+                            </div>
+                            <div class="color-414141 font-smaller-style margin-top-10-style">
+                                Batch Start Date
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-md-3 col-sm-6 col-xs-12">
+            <div class="card my-course-card-style h-100">
+                <div class="card-body card-body-style">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img width="60"
+                                src="assets/icon/colour-icons/finish-line.png" alt="Batch End Date">
+                        </div>
+                        <div class="col-md-8 text-center">
+                            <div class="count-box-style margin-top-10-style">
+                                <span
+                                    class="count-total-text-style">{{batchDetails.estimatedEndDate | date: 'EEE, d MMM'}}
+                                </span>
+                            </div>
+                            <div class="color-414141 font-smaller-style margin-top-10-style">
+                                Batch End Date
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Batch Start Date for all modules -->
+    <div *ngIf="!(!access.isTalent && !isViewAllModules)" class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="card my-course-card-style" [ngClass]="{'h-100': !(!access.isTalent && !isViewAllModules)}">
+            <div class="card-body card-body-style">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img width="60"
+                            src="assets/icon/colour-icons/start.png" alt="Batch Start Date">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <div class="count-box-style margin-top-10-style">
+                            <span
+                                class="count-total-text-style">{{batchDetails.startDate | date: 'EEE, d MMM'}}
+                            </span>
+                        </div>
+                        <div class="color-414141 font-smaller-style margin-top-10-style">
+                            Batch Start Date
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch End Date for all modules -->
+    <div *ngIf="!(!access.isTalent && !isViewAllModules)" class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="card my-course-card-style" [ngClass]="{'h-100': !(!access.isTalent && !isViewAllModules)}">
+            <div class="card-body card-body-style">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img width="60"
+                            src="assets/icon/colour-icons/finish-line.png" alt="Batch End Date">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <div class="count-box-style margin-top-10-style">
+                            <span
+                                class="count-total-text-style">{{batchDetails.estimatedEndDate | date: 'EEE, d MMM'}}
+                            </span>
+                        </div>
+                        <div class="color-414141 font-smaller-style margin-top-10-style">
+                            Batch End Date
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Talent interview rating -->
+    <div *ngIf="(access.isTalent || this.isTalentSelected) && talentInterview" class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body card-body-style">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img width="60"
+                            src="assets/icon/colour-icons/running.png" alt="Talent interview Rating">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <div class="count-box-style margin-top-10-style">
+                            <span
+                                class="count-text-style">{{talentInterview.rating}}</span>
+                            <span
+                                class="count-total-text-style">/10</span>
+                        </div>
+                        <div class="color-414141 font-smaller-style margin-top-10-style">
+                            Talent interview Rating
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Talent batch rating -->
+    <div *ngIf="(access.isTalent || this.isTalentSelected) && talentAverageRatingWeekly" class="form-group col-md-3 col-sm-6 col-xs-12">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body card-body-style">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img width="60"
+                            src="assets/icon/colour-icons/calendar.png" alt="Talent interview Rating">
+                    </div>
+                    <div class="col-md-8 text-center">
+                        <div class="count-box-style margin-top-10-style">
+                            <span
+                                class="count-text-style">{{talentAverageRatingWeeklyInString}}</span>
+                            <span
+                                class="count-total-text-style">/10</span>
+                        </div>
+                        <div class="color-414141 font-smaller-style margin-top-10-style">
+                            Talent Batch Rating
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<!-- Assignment Dashboard -->
+<div class="font-xl-style">
+    Assignment Dashboard
+</div>
+<br>
+<div class="card my-course-card-style h-100 padding-0-style">
+    <div class="card-body">
+        <div class="row">
+
+            <!-- Assignment Status -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <div [ngClass]="assignmentDonutChartClass">
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        Assignment Status
+                    </div>
+                    <div>
+                        <canvas width="50%" height="auto" id="assignmentDonutChart">
+                        </canvas>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 color-757575 font-sm-style">
+                            <span class="vertical-align-middle-icon-style">
+                                <i class="material-icons assignment-donut-label-style completed-assignment-style">circle</i>
+                            </span>
+                            Completed
+                        </div>
+                        <div class="col-4 color-757575 font-sm-style">
+                            <span class="vertical-align-middle-icon-style">
+                                <i class="material-icons assignment-donut-label-style submitted-assignment-style">circle</i>
+                            </span>
+                            Submitted
+                        </div>
+                        <div class="col-4 color-757575 font-sm-style ">
+                            <span class="vertical-align-middle-icon-style">
+                                <i class="material-icons assignment-donut-label-style pending-assignment-style">circle</i>
+                            </span>
+                            Pending
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="batchTopicAssignmentList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Assignments Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+
+            <!-- Overdue Assigsnment -->
+            <div class="form-group col-md-5 col-sm-6 col-xs-12">
+                <ng-container *ngIf="overdueAssignmentList.length > 0" >
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        Overdue Assigsnments
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-borderless assignment-table-text-style">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="padding-5-style">Sr No</th>
+                                    <th *ngIf="!access.isTalent && !this.isTalentSelected" class="padding-5-style text-left">Student</th>
+                                    <th class="padding-5-style text-left">Assignment</th>
+                                    <th class="padding-5-style">Sub. Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let overdueAssignment of overdueAssignmentList | slice:0:5; let i = index">
+                                    <tr class="text-center font-sm-style">
+                                        <td class="padding-5-style table-td-center-align">{{i+1}}</td>
+                                        <td *ngIf="!access.isTalent && !this.isTalentSelected" class="padding-5-style text-left color-F6430F font-weight-bold">
+                                            {{overdueAssignment.talent?.firstName}} {{overdueAssignment.talent?.lastName}}
+                                        </td>
+                                        <td class="padding-5-style text-left">{{overdueAssignment.programmingQuestion?.label}}</td>
+                                        <td class="padding-5-style">{{overdueAssignment.submittedOn | date: 'EEE, MMM d y'}}</td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="overdueAssignmentList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Overdue Assignments Found'}">
+                    </ng-template>
+                </ng-container>
+                <div *ngIf="overdueAssignmentList?.length > 5" class="view-more-style">
+                    <span class="cursor-pointer-style"
+                        (click)="onClickViewAllOverdureAssignmentList()">View All</span>
+                </div>
+            </div>
+
+            <!-- Highest/Lowest Scored Assigsnments -->
+            <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                <div *ngIf="highestScoredAssignment">
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        Highest Scored Assignment
+                    </div>
+                    <div class="card my-course-card-style card-highest-lowest-score-style">
+                        <div class="card-body card-body-highest-lowest-score-style">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12 padding-0-style text-center">
+                                    <img width="60" src="assets/icon/colour-icons/quality.png" alt="Highest Scored Assignment">
+                                </div>
+                                <div class="col-md-6 col-sm-12 text-center color-4F4F4F padding-0-style">
+                                    <div class="font-xl-style font-weight-bold">
+                                        {{highestScoredAssignment.score}}/{{highestScoredAssignment.programmingQuestion?.score}}
+                                    </div>
+                                    <div class="margin-top-5-style">
+                                        {{highestScoredAssignment.talent?.firstName}} {{highestScoredAssignment.talent?.lastName}}
+                                    </div>
+                                    <div class="margin-top-5-style">
+                                        {{highestScoredAssignment.programmingQuestion?.label}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="lowestScoredAssignment">
+                    <div class="font-lg-style text-center margin-bottom-10-style margin-top-5-style">
+                        Lowest Scored Assignment
+                    </div>
+                    <div class="card my-course-card-style card-highest-lowest-score-style">
+                        <div class="card-body card-body-highest-lowest-score-style">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12 padding-0-style text-center">
+                                    <img width="60" src="assets/icon/colour-icons/bad-review.png" alt="Lowest Scored Assignment">
+                                </div>
+                                <div class="col-md-6 col-sm-12 text-center color-4F4F4F padding-0-style">
+                                    <div class="font-xl-style font-weight-bold">
+                                        {{lowestScoredAssignment.score}}/{{lowestScoredAssignment.programmingQuestion?.score}}
+                                    </div>
+                                    <div class="margin-top-5-style">
+                                        {{lowestScoredAssignment.talent?.firstName}} {{lowestScoredAssignment.talent?.lastName}}
+                                    </div>
+                                    <div class="margin-top-5-style">
+                                        {{lowestScoredAssignment.programmingQuestion?.label}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="!highestScoredAssignment && !lowestScoredAssignment">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Highest And Lowest Scored Assignments Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<!-- Concepts Dashboard -->
+<div class="font-xl-style">
+    Concepts Dashboard
+    &nbsp;&nbsp;
+    <select [(ngModel)]="selectedModuleID" class="form-control input-style module-for-concept-select-style"
+        (change)="onBatchModuleChange()">
+        <option *ngFor="let batchModule of batchModuleList" [ngValue]="batchModule.module?.id">
+            {{batchModule.module?.moduleName}}
+        </option>
+    </select>
+</div>
+<br>
+<div class="card my-course-card-style h-100 padding-0-style">
+    <div class="card-body">
+        <div class="row">
+
+            <!-- Total Concepts -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <div [ngClass]="moduleConceptDonutChartClass">
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        Total Concepts
+                    </div>
+                    <div class="module-concept-donut-chart-container">
+                        <div>
+                            <canvas width="50%" height="auto" id="moduleConceptDonutChart">
+                            </canvas>
+                        </div>
+                        <div class="module-concept-donut-chart-text-style font-xl-style">
+                            {{moduleConceptList.length}}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 color-757575 font-sm-style">
+                            <span class="vertical-align-middle-icon-style">
+                                <i class="material-icons assignment-donut-label-style easy-assignment-style">circle</i>
+                            </span>
+                            Easy
+                        </div>
+                        <div class="col-4 color-757575 font-sm-style">
+                            <span class="vertical-align-middle-icon-style">
+                                <i class="material-icons assignment-donut-label-style medium-assignment-style">circle</i>
+                            </span>
+                            Medium
+                        </div>
+                        <div class="col-4 color-757575 font-sm-style ">
+                            <span class="vertical-align-middle-icon-style">
+                                <i class="material-icons assignment-donut-label-style hard-assignment-style">circle</i>
+                            </span>
+                            Hard
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="moduleConceptList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Concepts Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+
+            <!-- Concept Graph -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <div class="font-lg-style margin-bottom-10-style">
+                    Concept Graph
+                    &nbsp;&nbsp;
+                    <select [(ngModel)]="selectedModuleConceptID" (change)="onModuleConceptChange()"
+                        class="form-control input-style feedback-question-select-style">
+                        <option *ngFor="let moduleConcept of moduleConceptList" 
+                            [ngValue]="moduleConcept.id">
+                            {{moduleConcept.programmingConcept.name}}
+                        </option>
+                    </select>
+                </div>
+                <div [ngClass]="talentConceptRatingGraphClass">
+                    <div>
+                        <canvas height="200px" width="auto" id="talentConceptRatingGraph">
+                        </canvas>
+                    </div>
+                    <div class="font-sm-style color-757575 text-center">
+                        Assignment
+                    </div>
+                </div>
+                <ng-container *ngIf="talentConceptRatingLabelList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Concept Graph Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+
+            <!-- Complex Concepts Found -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <ng-container *ngIf="complexConceptMaxTalentList.length > 0">
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        Complex Concepts Found
+                    </div>
+                    <div class="row">
+                        <div *ngFor="let complexConceptMaxTalent of complexConceptMaxTalentList | slice:0:16" 
+                            class="col-md-6 col-sm-12">
+                            <div class="complex-concept-box-style text-center font-weight-bold">
+                                {{complexConceptMaxTalent[0]?.conceptName}}
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="complexConceptMaxTalentList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Complex Concepts Found'}">
+                    </ng-template>
+                </ng-container>
+                <div *ngIf="complexConceptMaxTalentList.length > 0" class="view-more-style margin-top-10-style">
+                    <span class="cursor-pointer-style"
+                       (click)="onClickViewAllComplexConceptList()">View All</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<!-- Student Performance Dashboard -->
+<div class="font-xl-style">
+    Student Performance Dashboard
+</div>
+<br>
+<div class="card my-course-card-style h-100 padding-0-style">
+    <div class="card-body">
+        <div class="row">
+
+            <!-- Weekly Rating Graph -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <div [ngClass]="talentWeeklyRatingGraphClass">
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        Weekly Rating Graph
+                    </div>
+                    <div>
+                        <canvas height="200px" width="auto" id="talentWeeklyRatingGraph">
+                        </canvas>
+                    </div>
+                    <div class="font-sm-style color-757575 text-center">
+                        Week
+                    </div>
+                </div>
+                <ng-container *ngIf="talentAverageRatingAllWeekList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Weekly Rating Graph Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+
+            <!-- Feedback Parameter -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <div [ngClass]="talentRatingBarChartClass">
+                    <div class="font-lg-style margin-bottom-10-style">
+                        Feedback Parameter
+                        &nbsp;&nbsp;
+                        <select [(ngModel)]="talentFeedbackQusetionID" (change)="onTalentFeedbackQusetionChange()"
+                            class="form-control input-style feedback-question-select-style">
+                            <option *ngFor="let talentFeedbackQusetion of talentFeedbackQusetionList" 
+                                [ngValue]="talentFeedbackQusetion.id">
+                                {{talentFeedbackQusetion.keyword}}
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <canvas height="200px" width="auto" id="talentRatingBarChart">
+                        </canvas>
+                    </div>
+                    <div class="font-sm-style color-757575 text-center">
+                        Talent
+                    </div>
+                </div>
+                <ng-container *ngIf="talentAverageRatingAllWeekByParameterList.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Feedback Parameter Graph Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+
+            <!-- This Week's Leaderboard -->
+            <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                <ng-container *ngIf="facultyFeedbackForTalentLeaderBoard.length > 0">
+                    <div class="font-lg-style text-center margin-bottom-10-style">
+                        This Week's Leaderboard
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-borderless assignment-table-text-style">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="padding-5-style">Rank</th>
+                                    <th class="padding-5-style text-left">Student</th>
+                                    <th class="padding-5-style">Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let facultyFeedbackForTalent of facultyFeedbackForTalentLeaderBoard | slice:0:5; let i = index">
+                                    <tr class="text-center font-sm-style">
+                                        <td class="padding-5-style table-td-center-align">{{facultyFeedbackForTalent.rank}}</td>
+                                        <td class="padding-5-style text-left color-F6430F font-weight-bold">
+                                            {{facultyFeedbackForTalent.firstName}} {{facultyFeedbackForTalent.lastName}}
+                                        </td>
+                                        <td class="padding-5-style">{{facultyFeedbackForTalent.rating.toFixed(1)}}</td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+                <div *ngIf="facultyFeedbackForTalentLeaderBoard?.length > 5" class="view-more-style">
+                    <span class="cursor-pointer-style"
+                        (click)="onClickViewAllFacultyFeedbackForTalentLedaerboard()">View All</span>
+                </div>
+                <ng-container *ngIf="facultyFeedbackForTalentLeaderBoard.length == 0">
+                    <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No LeaderBoard Found'}">
+                    </ng-template>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<!-- Faculty Feedback Dashboard -->
+<ng-container *ngIf="!access.isTalent && !this.isTalentSelected && !isViewAllModules">
+    <div class="font-xl-style">
+        Faculty Feedback Dashboard
+    </div>
+    <br>
+    <div class="card my-course-card-style h-100 padding-0-style">
+        <div class="card-body">
+            <div class="row">
+
+                <!-- Weekly Rating Graph -->
+                <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                    <div [ngClass]="facultyWeeklyRatingGraphClass">
+                        <div class="font-lg-style text-center margin-bottom-10-style">
+                            Weekly Rating Graph
+                        </div>
+                        <div>
+                            <canvas height="200px" width="auto" id="facultyWeeklyRatingGraph">
+                            </canvas>
+                        </div>
+                        <div class="font-sm-style color-757575 text-center">
+                            Week
+                        </div>
+                    </div>
+                    <ng-container *ngIf="facultyAverageRatingAllWeekList.length == 0">
+                        <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Weekly Rating Graph Found'}">
+                        </ng-template>
+                    </ng-container>
+                </div>
+
+                <!-- Feedback Parameter -->
+                <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                    <div [ngClass]="facultyRatingBarChartClass">
+                        <div class="font-lg-style margin-bottom-10-style">
+                            Feedback Parameter
+                            &nbsp;&nbsp;
+                            <select [(ngModel)]="facultyFeedbackQusetionID" (change)="onFacultyFeedbackQusetionChange()"
+                                class="form-control input-style feedback-question-select-style">
+                                <option *ngFor="let facultyFeedbackQusetion of facultyFeedbackQusetionList" 
+                                    [ngValue]="facultyFeedbackQusetion.id">
+                                    {{facultyFeedbackQusetion.keyword}}
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <canvas height="200px" width="auto" id="facultyRatingBarChart">
+                            </canvas>
+                        </div>
+                        <div class="font-sm-style color-757575 text-center">
+                            Week
+                        </div>
+                    </div>
+                    <ng-container *ngIf="facultyAverageRatingAllWeekListByParameter.length == 0">
+                        <ng-template *ngTemplateOutlet="notFoundTemplate; context: {message: 'No Feedback Parameter Graph Found'}">
+                        </ng-template>
+                    </ng-container>
+                </div>
+
+                <!-- Weekly Average Rating -->
+                <div class="form-group col-md-4 col-sm-6 col-xs-12">
+                    <div *ngIf="facultyAverageRatingWeekly && facultyAverageRatingWeekly.rating > 0;else 
+                        noFacultyAverageRatingWeeklyTemplate" class="card my-course-card-style faculty-average-rating-weekly-card-style">
+                        <div class="font-lg-style text-center margin-bottom-10-style">
+                            Weekly Average Rating
+                        </div>
+                        <div class="card-body card-body-highest-lowest-score-style">
+                            <div class="text-center faculty-avaerage-rating-style font-weight-bold">
+                                {{facultyAverageRatingWeekly.rating.toFixed(1)}}
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noFacultyAverageRatingWeeklyTemplate>
+                        <div class="text-center">
+                            <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+                            <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+                            <br>
+                            <div class="font-lg-style text-center">
+                                No Weekly Average Rating Found
+                            </div>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+</ng-container>
+
+<!-- Overdue assignment list -->
+<ng-template #overdueAssignmentListModal let-modal>
+    <div class="modal-body">
+        <div class="float-right">
+            <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+                class="material-icons close-icon">close</i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <img src="assets/icon/colour-icons/assignment.png" width="80">&nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="col-10">
+                <div class="color-F26A00 font-weight-bold font-lg-style margin-top--style">
+                    Overdue Assigsnments
+                </div>
+            </div>
+        </div>
+  
+        <div class="table-responsive">
+            <table class="table table-borderless assignment-table-text-style">
+                <thead>
+                    <tr class="text-center">
+                        <th class="padding-5-style">Sr No</th>
+                        <th class="padding-5-style text-left">Student</th>
+                        <th class="padding-5-style text-left">Assignment</th>
+                        <th class="padding-5-style">Sub. Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let overdueAssignment of overdueAssignmentList; let i = index">
+                        <tr class="text-center font-sm-style">
+                            <td class="padding-5-style table-td-center-align">{{i+1}}</td>
+                            <td class="padding-5-style text-left color-F6430F font-weight-bold">
+                                {{overdueAssignment.talent?.firstName}} {{overdueAssignment.talent?.lastName}}
+                            </td>
+                            <td class="padding-5-style text-left">{{overdueAssignment.programmingQuestion?.label}}</td>
+                            <td class="padding-5-style">{{overdueAssignment.submittedOn | date: 'EEE, MMM d y'}}</td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Complex concepts found -->
+<ng-template #complexConceptListModal let-modal>
+    <div class="modal-body">
+        <div class="float-right">
+            <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+                class="material-icons close-icon">close</i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <img src="assets/icon/colour-icons/concept.png" width="80">&nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="col-10">
+                <div class="color-F26A00 font-weight-bold font-lg-style margin-top--style">
+                    Complex Concepts Found
+                </div>
+            </div>
+        </div>
+  
+        <div class="table-responsive">
+            <table class="table table-borderless assignment-table-text-style">
+                <thead>
+                    <tr class="text-center">
+                        <th class="padding-5-style">Sr No</th>
+                        <th class="padding-5-style text-left">Concept Name</th>
+                        <th class="padding-5-style">Complexity</th>
+                        <th class="padding-5-style">Level in Module</th>
+                        <th *ngIf="!access.isTalent && !this.isTalentSelected" class="padding-5-style">No. of Talents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let concept of complexConceptMaxTalentList; let i = index">
+                        <tr class="text-center font-sm-style">
+                            <td class="padding-5-style table-td-center-align">{{i+1}}</td>
+                            <td class="padding-5-style text-left color-F6430F font-weight-bold">
+                                {{concept[0]?.conceptName}}
+                            </td>
+                            <td class="padding-5-style" 
+                                [ngClass]="{'easy': concept[0]?.complexityName=='Easy','medium': concept[0]?.complexityName=='Medium','hard': concept[0]?.complexityName=='Hard'}">
+                                {{concept[0]?.complexityName}}
+                            </td>
+                            <td class="padding-5-style">{{concept[0]?.level}}</td>
+                            <td *ngIf="!access.isTalent && !this.isTalentSelected" class="padding-5-style">{{concept.length}}</td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Faculty feedback for talent leaderboard -->
+<ng-template #facultyFeedbackForTalentLedaerboardModal let-modal>
+    <div class="modal-body">
+        <div class="float-right">
+            <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+                class="material-icons close-icon">close</i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <img src="assets/icon/colour-icons/feedbackmodal.png" width="80">&nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="col-10">
+                <div class="color-F26A00 font-weight-bold font-lg-style margin-top--style">
+                    This Week's Leaderboard
+                </div>
+            </div>
+        </div>
+  
+        <div class="table-responsive">
+            <table class="table table-borderless assignment-table-text-style">
+                <thead>
+                    <tr class="text-center">
+                        <th class="padding-5-style">Sr No</th>
+                        <th class="padding-5-style text-left">Student</th>
+                        <th class="padding-5-style">Rating</th>
+                        <th class="padding-5-style">Rank</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let facultyFeedbackForTalent of facultyFeedbackForTalentLeaderBoard; let i = index">
+                        <tr class="text-center font-sm-style">
+                            <td class="padding-5-style table-td-center-align">{{i+1}}</td>
+                            <td class="padding-5-style text-left color-F6430F font-weight-bold">
+                                {{facultyFeedbackForTalent.firstName}} {{facultyFeedbackForTalent.lastName}}
+                            </td>
+                            <td class="padding-5-style">{{facultyFeedbackForTalent.rating.toFixed(1)}}</td>
+                            <td class="padding-5-style table-td-center-align">{{facultyFeedbackForTalent.rank}}</td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</ng-template>

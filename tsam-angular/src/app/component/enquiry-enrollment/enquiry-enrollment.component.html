@@ -1,0 +1,764 @@
+<div class="pageStyle">
+    <div class="container-fluid margin-2pt">
+        <div class="card">
+            <div class="card-body search-bar cardColor">
+                <mat-horizontal-stepper linear #stepper>
+                    <!-- Personal Details -->
+                    <mat-step [stepControl]="personalDetailsForm" [editable]=true>
+                        <form [formGroup]="personalDetailsForm">
+                            <ng-template matStepLabel><span class="matStepLabelColor">Personal Details</span>
+                            </ng-template>
+                            <span><span class="red small">*All marked fields are mandatory</span></span><br><br>
+                            <div class="row">
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"><span class="red">*</span> First Name:</label>
+                                    <input type="text" class="form-control" nbInput formControlName="firstName"
+                                        placeholder="Enter First Name">
+                                    <div class="alert alert-danger" *ngIf="(personalDetailsForm.get('firstName').touched || personalDetailsForm.get('firstName').dirty) 
+                                        && personalDetailsForm.get('firstName').invalid">
+                                        <div *ngIf="personalDetailsForm.get('firstName').errors.required">
+                                            First Name must be specified
+                                        </div>
+                                        <div *ngIf="personalDetailsForm.get('firstName').errors.pattern">
+                                            First Name should only have alphabets and no space
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"><span class="red">*</span> Last Name:</label>
+                                    <input type="text" class="form-control" nbInput formControlName="lastName"
+                                        placeholder="Enter Last Name">
+                                    <div class="alert alert-danger" *ngIf="(personalDetailsForm.get('lastName').touched || personalDetailsForm.get('lastName').dirty) 
+                                        && personalDetailsForm.get('lastName').invalid">
+                                        <div *ngIf="personalDetailsForm.get('lastName').errors.required">
+                                            Last Name must be specified
+                                        </div>
+                                        <div *ngIf="personalDetailsForm.get('lastName').errors.pattern">
+                                            Last Name should only have alphabets and no space
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"><span class="red">*</span> Email Address:</label>
+                                    <input type="email" class="form-control" nbInput formControlName="email"
+                                        placeholder="Enter Email">
+                                    <div class="alert alert-danger" *ngIf="(personalDetailsForm.get('email').touched || personalDetailsForm.get('email').dirty) 
+                                        && personalDetailsForm.get('email').invalid">
+                                        <div *ngIf="personalDetailsForm.get('email').errors.required">
+                                            Email should be specified.
+                                        </div>
+                                        <div *ngIf="personalDetailsForm.get('email').errors.pattern">
+                                            Email should be in example@domain.com format
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"><span class="red">*</span> Mobile Number:</label>
+                                    <input type="text" class="form-control" formControlName="contact"
+                                        placeholder="Enter Contact">
+                                    <div class="alert alert-danger" *ngIf="(personalDetailsForm.get('contact').touched || personalDetailsForm.get('contact').dirty) 
+                                        && personalDetailsForm.get('contact').invalid">
+                                        <div *ngIf="personalDetailsForm.get('contact').errors.required">
+                                            Contact should be specified.
+                                        </div>
+                                        <div *ngIf="personalDetailsForm.get('contact').errors.pattern">
+                                            Contact should consist of a 10 digit valid number
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"> What technologies are you aware of ?</label>
+                                    <ng-select [items]="technologyList" bindLabel="language"
+                                        placeholder="Select Technology" appendTo="body" multiple="true"
+                                        [searchable]="true" [clearable]="true" formControlName="technologies"
+                                        (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+                                        [loading]="isTechLoading">
+                                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                            {{item.language}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"><span class="red">*</span> Academic Year:</label>
+                                    <select class="form-control" formControlName="academicYear">
+                                        <option [ngValue]="null" disabled>Select Academic Year</option>
+                                        <option *ngFor="let academicyear of academicYearList"
+                                            [ngValue]="academicyear.key">
+                                            {{academicyear.value}}</option>
+                                    </select>
+                                    <div class="alert alert-danger" *ngIf="(personalDetailsForm.get('academicYear').touched || personalDetailsForm.get('academicYear').dirty) 
+                                        && personalDetailsForm.get('academicYear').invalid">
+                                        <div *ngIf="personalDetailsForm.get('academicYear').errors.required">
+                                            Academic Year should be specified
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style"><span class="red">*</span> Enquiry For:</label>
+                                    <select class="form-control" formControlName="enquiryType"
+                                        (change)="assignSelectedEnquiryType(personalDetailsForm.get('enquiryType').value)">
+                                        <option [ngValue]="null" disabled>Select Enquiry For</option>
+                                        <option *ngFor="let enquiryType of enquiryTypeList"
+                                            [ngValue]="enquiryType.value">{{enquiryType.value}}
+                                        </option>
+                                    </select>
+                                    <div class="alert alert-danger" *ngIf="(personalDetailsForm.get('enquiryType').touched || personalDetailsForm.get('enquiryType').dirty) 
+                                        && personalDetailsForm.get('enquiryType').invalid">
+                                        <div *ngIf="personalDetailsForm.get('enquiryType').errors.required">
+                                            Enquiry For should be specified.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="center-style">
+                                <button class="stepper-button-style" mat-button matStepperNext
+                                    (click)="validatePersonalDetailsForm()">Next</button>
+                            </div>
+                        </form>
+                    </mat-step>
+                    <!-- Address details -->
+                    <mat-step [stepControl]="addressForm" [editable]=true>
+                        <form [formGroup]="addressForm">
+                            <ng-template matStepLabel><span (click)="validatePersonalDetailsForm()"
+                                    class="matStepLabelColor">Address Details</span>
+                            </ng-template>
+                            <div class="row">
+                                <div class="form-group col-sm-12 col-md-12">
+                                    <label class="label-style">Address:</label>
+                                    <textarea type="text" class="form-control" nbInput appEmptyToNull
+                                        formControlName="address" rows="2" placeholder="Enter Address"></textarea>
+                                    <div class="alert alert-danger" *ngIf="(addressForm.get('address').touched || addressForm.get('address').dirty) 
+                                        && addressForm.get('address').invalid">
+                                        <div *ngIf="addressForm.get('address').errors.pattern">
+                                            Address should only have alphabets and special characters in (.,-/)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style">Country:</label>
+                                    <ng-select [items]="countryList" bindLabel="name" placeholder="Select Country"
+                                        appendTo="body" [searchable]="true" [clearable]="true" formControlName="country"
+                                        (change)="getStateListByCountryID(addressForm.get('country').value)">
+                                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                            {{item.name}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style">State:</label>
+                                    <ng-select [items]="stateList" bindLabel="name" placeholder="Select State"
+                                        appendTo="body" [searchable]="true" [clearable]="true" formControlName="state">
+                                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                            {{item.name}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style">City:</label>
+                                    <input type="text" class="form-control" nbInput appEmptyToNull
+                                        formControlName="city" placeholder="Enter City">
+                                    <div class="alert alert-danger" *ngIf="(addressForm.get('city').touched || addressForm.get('city').dirty) 
+                                        && addressForm.get('city').invalid">
+                                        <div *ngIf="addressForm.get('city').errors.pattern">
+                                            City name should only have alphabets
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="label-style">Pin Code:</label>
+                                    <input type="number" class="form-control" formControlName="pinCode"
+                                        placeholder="Enter Pin Code">
+                                    <div class="alert alert-danger" *ngIf="(addressForm.get('pinCode').touched || addressForm.get('pinCode').dirty) 
+                                        && addressForm.get('pinCode').invalid">
+                                        <div *ngIf="addressForm.get('pinCode').errors.pattern">
+                                            Pin Code must be of 6 digits
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="center-style">
+                                <button class="stepper-button-style" mat-button
+                                    matStepperPrevious>Back</button>&nbsp;&nbsp;&nbsp;
+                                <button class="stepper-button-style" mat-button matStepperNext>Next</button>
+                            </div>
+                        </form>
+                    </mat-step>
+                    <!-- Academic details -->
+                    <mat-step [stepControl]="academicsForm" [editable]=true>
+                        <form [formGroup]="academicsForm">
+                            <ng-template matStepLabel><span class="matStepLabelColor">Academics Details</span>
+                            </ng-template>
+                            <span><span class="red small">*All marked fields are mandatory</span></span><br>
+                            <div formArrayName="academics"
+                                *ngFor="let academic of academicControlArray.controls;let i = index">
+                                <ng-container [formGroupName]="i">
+                                    <div class="row" *ngIf="academicControlArray.length > 1">
+                                        <div class="col-sm-12 col-md-12">
+                                            <h3 class="label-style">College {{i+1}}</h3>
+                                            <button mat-button class="float-right deleteFromFormArrayButton"
+                                                (click)="deleteAcademic(i)">
+                                                Delete College
+                                            </button>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <div class="form-group col-sm-6 col-md-4">
+                                            <label class="label-style"><span class="red">*</span> College Name:</label>
+                                            <ng-select [addTag]="addCollegeToList" formControlName="college"
+                                                [clearOnBackspace]=false placeholder="Select College" clearable=false>
+                                                <ng-option [value]="college.branchName" [disabled]="college.disabled"
+                                                    *ngFor="let college of collegeBranchList">
+                                                    {{college.branchName}}
+                                                </ng-option>
+                                            </ng-select>
+                                            <div *ngIf="(academicControlArray.at(i).get('college').dirty || academicControlArray.at(i).get('college').touched) 
+                                                && academicControlArray.at(i).get('college').invalid"
+                                                class="alert alert-danger">
+                                                <div *ngIf="academicControlArray.at(i).get('college').errors.required">
+                                                    College Name must be specified
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-4">
+                                            <label class="label-style"><span class="red">*</span> Degree:</label>
+                                            <ng-select [items]="degreeList" bindLabel="name" placeholder="Qualification"
+                                                appendTo="body" [searchable]="true" [clearable]="true"
+                                                formControlName="degree"
+                                                (change)="getSpecializationListByDegreeID($event?.id,true)">
+                                                <option [ngValue]="null">Select Degree</option>
+                                                <ng-template ng-option-tmp let-item="item" let-item$="item$"
+                                                    let-index="index">
+                                                    {{item.name}}
+                                                </ng-template>
+                                            </ng-select>
+                                            <div class="alert alert-danger" *ngIf="(academicControlArray.at(i).get('degree').touched || academicControlArray.at(i).get('degree').dirty) 
+                                                && academicControlArray.at(i).get('degree').invalid">
+                                                <div *ngIf="academicControlArray.at(i).get('degree').errors.required">
+                                                    Degree must be specified
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-4">
+                                            <label class="label-style"> Specialization:</label>
+                                            <select class="form-control" [compareWith]="compareFn"
+                                                formControlName="specialization">
+                                                <option [ngValue]="null">Select Specialization</option>
+                                                <ng-container *ngFor="let specialization of specializationList">
+                                                    <option *ngIf="showSpecificSpecializations(academic,specialization)"
+                                                        [ngValue]="specialization">
+                                                        {{specialization.branchName}}
+                                                    </option>
+                                                </ng-container>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-sm-6 col-md-4">
+                                            <label class="label-style"><span class="red">*</span> Percentage:</label>
+                                            <input type="number" class="form-control" formControlName="percentage"
+                                                placeholder="Enter Percentage" appAllowNumbersWithDecimal>
+                                            <div class="alert alert-danger" *ngIf="(academicControlArray.at(i).get('percentage').touched || academicControlArray.at(i).get('percentage').dirty) 
+                                                && academicControlArray.at(i).get('percentage').invalid">
+                                                <div
+                                                    *ngIf="academicControlArray.at(i).get('percentage').errors.required">
+                                                    Percentage must be specified
+                                                </div>
+                                                <div *ngIf="academicControlArray.at(i).get('percentage').errors.min">
+                                                    Percentage should not be less than 1
+                                                </div>
+                                                <div
+                                                    *ngIf="academicControlArray.at(i).get('percentage').errors.pattern">
+                                                    Percentage should not be more than 100 and have only 2 numbers after
+                                                    decimal
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-4">
+                                            <label class="label-style"><span class="red">*</span> Year of
+                                                Passout:</label>
+                                            <input type="number" class="form-control" formControlName="passout"
+                                                placeholder="Enter Year" appAllowNumbersOnly>
+                                            <div class="alert alert-danger" *ngIf="(academicControlArray.at(i).get('passout').touched || academicControlArray.at(i).get('passout').dirty) 
+                                                && academicControlArray.at(i).get('passout').invalid">
+                                                <div *ngIf="academicControlArray.at(i).get('passout').errors.required">
+                                                    Passout year must be specified
+                                                </div>
+                                                <div *ngIf="academicControlArray.at(i).get('passout').errors.max">
+                                                    Passout year should be maximum {{currentYear + 3}}
+                                                </div>
+                                                <div *ngIf="academicControlArray.at(i).get('passout').errors.min">
+                                                    Passout year should be minimum 1980
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                            <br>
+                            <button class="addToFormArrayButton" mat-button (click)="addAcademic()">
+                                + Add College
+                            </button><br><br>
+                        </form>
+                        <div class="center-style">
+                            <button class="stepper-button-style" mat-button
+                                matStepperPrevious>Back</button>&nbsp;&nbsp;&nbsp;
+                            <button class="stepper-button-style" mat-button matStepperNext
+                                (click)="validateAacdemicsForm()">
+                                Next
+                            </button>
+                        </div>
+                    </mat-step>
+                    <!-- Experience Details -->
+                    <ng-container *ngIf="showExperiencesForm">
+                        <mat-step [stepControl]="experiencesForm" [editable]=true>
+                            <form [formGroup]="experiencesForm">
+                                <ng-template matStepLabel><span (click)="validateAacdemicsForm()"
+                                        class="matStepLabelColor">Experience Details</span>
+                                </ng-template>
+                                <span><span class="red small">*All marked fields are mandatory</span></span><br><br>
+                                <div class="row">
+                                    <div class="form-group col-sm-4 col-md-4">
+                                        <label class="label-style"><span class="red">*</span> Number of Companies you
+                                            have worked in:</label>
+                                        <input
+                                            (change)="numberOfCompaniesChange(experiencesForm.get('numberOfExperiences'))"
+                                            formControlName="numberOfExperiences" appAllowNumbersOnly
+                                            placeholder="Enter Passout" type="number" class="form-control">
+                                        <div class="alert alert-danger"
+                                            *ngIf="(experiencesForm.get('numberOfExperiences').dirty 
+                                            || experiencesForm.get('numberOfExperiences').touched) && experiencesForm.get('numberOfExperiences').invalid">
+                                            <div *ngIf="experiencesForm.get('numberOfExperiences').errors.min">
+                                                Number of Companies should be minimum 1
+                                            </div>
+                                            <div *ngIf="experiencesForm.get('numberOfExperiences').errors.required">
+                                                Number of Companies must be specified
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div formArrayName="experiences"
+                                    *ngFor="let experience of experienceControlArray.controls;let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <div class="row" *ngIf="experienceControlArray.length > 1">
+                                            <div class="col-sm-12 col-md-12">
+                                                <h3 class="label-style">Company {{i+1}}</h3>
+                                                <button mat-button class="float-right deleteFromFormArrayButton"
+                                                    (click)="deleteExperience(i)">
+                                                    Delete Company
+                                                </button>
+                                            </div>
+                                        </div><br>
+                                        <div class="row">
+                                            <div class="form-group col-sm-6 col-md-4">
+                                                <label class="label-style"><span class="red">*</span> Compamy
+                                                    Name:</label>
+                                                <input type="text" class="form-control" formControlName="company"
+                                                    placeholder="Enter Compamy">
+                                                <div class="alert alert-danger"
+                                                    *ngIf="(experienceControlArray.at(i).get('company').touched 
+                                                    || experienceControlArray.at(i).get('company').dirty) && experienceControlArray.at(i).get('company').invalid">
+                                                    <div
+                                                        *ngIf="experienceControlArray.at(i).get('company').errors.required">
+                                                        Company Name must be specified
+                                                    </div>
+                                                    <div
+                                                        *ngIf="experienceControlArray.at(i).get('company').errors.pattern">
+                                                        Company Name should only have alphabets
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-6 col-md-4">
+                                                <label class="label-style"><span class="red">*</span>
+                                                    Designation:</label>
+                                                <select class="form-control" [compareWith]="compareFn"
+                                                    formControlName="designation">
+                                                    <option [ngValue]="null">Select Designation</option>
+                                                    <option *ngFor="let design of designationList" [ngValue]="design">
+                                                        {{design.position}}
+                                                    </option>
+                                                </select>
+                                                <div class="alert alert-danger"
+                                                    *ngIf="(experienceControlArray.at(i).get('designation').touched 
+                                                    || experienceControlArray.at(i).get('designation').dirty) && experienceControlArray.at(i).get('designation').invalid">
+                                                    <div
+                                                        *ngIf="experienceControlArray.at(i).get('designation').errors.required">
+                                                        Designation Name must be specified
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-6 col-md-4">
+                                                <label class="label-style"><span class="red">*</span> What technologies
+                                                    is your experience in ?</label>
+                                                <ng-select [items]="technologyList" bindLabel="language"
+                                                    placeholder="Select Technology" appendTo="body" multiple="true"
+                                                    [searchable]="true" [clearable]="true"
+                                                    formControlName="technologies" (search)="getTechnologyList($event)"
+                                                    (focus)="getTechnologyList()" [loading]="isTechLoading">
+                                                    <ng-template ng-option-tmp let-item="item" let-item$="item$"
+                                                        let-index="index">
+                                                        {{item.language}}
+                                                    </ng-template>
+                                                </ng-select>
+                                                <div class="alert alert-danger"
+                                                    *ngIf="(experienceControlArray.at(i).get('technologies').touched 
+                                                    || experienceControlArray.at(i).get('technologies').dirty) && experienceControlArray.at(i).get('technologies').invalid">
+                                                    <div
+                                                        *ngIf="experienceControlArray.at(i).get('technologies').errors.required">
+                                                        Tyechnology(s) must be specified
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-6 col-md-4"
+                                                *ngIf="i==indexOfCurrentWorkingExp || indexOfCurrentWorkingExp == -1">
+                                                <label class="label-style"><span class="red">*</span> Are you currently
+                                                    working here ?</label>
+                                                <select class="form-control"
+                                                    (change)="isWorkingClicked($event.target.value,i,experienceControlArray.at(i))"
+                                                    formControlName="isCurrentWorking">
+                                                    <option [value]=false>No</option>
+                                                    <option [value]=true>Yes</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-6 col-md-4">
+                                                <label class="label-style"><span class="red">*</span> From:</label>
+                                                <input type="month" class="form-control" nbInput
+                                                    formControlName="fromDate" placeholder="yyyy-mm">
+                                                <div class="alert alert-danger"
+                                                    *ngIf="(experienceControlArray.at(i).get('fromDate').touched 
+                                                    || experienceControlArray.at(i).get('fromDate').dirty) && experienceControlArray.at(i).get('fromDate').invalid">
+                                                    <div
+                                                        *ngIf="experienceControlArray.at(i).get('fromDate').errors.required">
+                                                        From Date must be specified
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <ng-container *ngIf="!(i==indexOfCurrentWorkingExp)">
+                                                <div class="form-group col-sm-6 col-md-4">
+                                                    <label class="label-style"><span class="red">*</span> To:</label>
+                                                    <input type="month" class="form-control" nbInput
+                                                        formControlName="toDate" placeholder="yyyy-mm">
+                                                    <div class="alert alert-danger" *ngIf="(experienceControlArray.at(i).get('toDate').touched || experienceControlArray.at(i).get('toDate').dirty) 
+                                                        && experienceControlArray.at(i).get('toDate').invalid">
+                                                        <div
+                                                            *ngIf="experienceControlArray.at(i).get('toDate').errors.required">
+                                                            To Date must be specified
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                                <button class="addToFormArrayButton" mat-button (click)="addExperience()">
+                                    + Add Company
+                                </button><br><br>
+                                <div class="row">
+                                    <h4><label class="col-sm-12 col-form-label label-style">Resume:</label></h4>
+                                    <div class="form-group col-sm-3 col-md-3">
+                                        <span class="custom-file">
+                                            <input type="file" class="custom-file-input"
+                                                (change)="onResourceSelect($event)" id="customFile"
+                                                value="displayedFileName">
+                                            <label class="custom-file-label" id="custom-file-label" for="customFile"
+                                                [innerHTML]="displayedFileName"></label>
+                                            <button class="btn btn-success custom-file" id="uploadingButton"
+                                                type="button" *ngIf="isFileUploading">
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                    aria-hidden="true"></span>
+                                                Uploading file...
+                                            </button>
+                                        </span>
+                                        <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="center-style">
+                                <button class="stepper-button-style" mat-button
+                                    matStepperPrevious>Back</button>&nbsp;&nbsp;&nbsp;
+                                <button class="stepper-button-style" mat-button matStepperNext
+                                    (click)="validateExperiencesForm()">Next</button>
+                            </div>
+                        </mat-step>
+                    </ng-container>
+                    <!-- Masters Abroad Details -->
+                    <ng-container *ngIf="showMastersAbroadForm">
+                        <mat-step [stepControl]="mastersAbroadForm" [editable]=true>
+                            <form [formGroup]="mastersAbroadForm">
+                                <ng-template matStepLabel><span (click)="validateAacdemicsForm()"
+                                        class="matStepLabelColor">Masters Abroad
+                                        Details</span>
+                                </ng-template>
+                                <span><span class="red small">*All marked fields are mandatory</span></span><br><br>
+                                <div class="row">
+                                    <div class="form-group col-sm-4 col-md-3">
+                                        <div class="alert alert-warning mb-2" *ngIf="mastersAbroadForm.get('countries')?.value?.length === 3 && 
+                                            countrySelect.focused">
+                                            <small><strong>Max countries selected</strong></small>
+                                        </div>
+                                        <label class="label-style"><span class="red">*</span> In Which countries are you
+                                            planning to do masters ?</label>
+                                        <ng-select #countrySelect [items]="countryList" bindLabel="name"
+                                            placeholder="Select upto 3 countries" (add)="onAddCountry($event.id)"
+                                            [maxSelectedItems]="3" (remove)="onRemoveCountry($event.value?.id)"
+                                            (clear)="onClearCountries()" appendTo="body" [searchable]="true"
+                                            [multiple]="true" [clearable]="true" formControlName="countries">
+                                            <ng-template ng-option-tmp let-item="item" let-item$="item$"
+                                                let-index="index">
+                                                {{item.name}}
+                                            </ng-template>
+                                        </ng-select>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('countries').touched 
+                                            || mastersAbroadForm.get('countries').dirty) 
+                                            && mastersAbroadForm.get('countries').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('countries').errors.required">
+                                                Country(s) must be specified
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-4 col-md-3">
+                                        <div class="alert alert-warning mb-2" *ngIf="mastersAbroadForm.get('universities')?.value?.length === 10 && 
+                                            uniSelect.focused">
+                                            <small><strong>Max universities selected</strong></small>
+                                        </div>
+                                        <label class="label-style"><span class="red">*</span> In which universities are
+                                            you planning to do masters ?</label>
+                                        <ng-select #uniSelect [items]="universityList" bindLabel="universityName"
+                                            placeholder="Select upto 10 universities" appendTo="body" multiple="true"
+                                            [virtualScroll]="true" [searchable]="true" [clearable]="true"
+                                            [hideSelected]="true" [loading]="areUniversitiesLoading"
+                                            [maxSelectedItems]="10" groupBy="countryName"
+                                            formControlName="universities">
+                                            <ng-template ng-option-tmp let-item="item" let-item$="item$"
+                                                let-index="index">
+                                                {{item.universityName}}
+                                            </ng-template>
+                                        </ng-select>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('universities').touched 
+                                            || mastersAbroadForm.get('universities').dirty) 
+                                            && mastersAbroadForm.get('universities').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('universities').errors.required">
+                                                University(s) must be specified
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-4 col-md-3">
+                                        <label class="label-style"><span class="red">*</span> In which degree are you
+                                            planning to do masters ?</label>
+                                        <ng-select [items]="degreeList" bindLabel="name" placeholder="Select Degree"
+                                            appendTo="body" [searchable]="true" formControlName="degree"
+                                            (change)="onDegreeChange(mastersAbroadForm.get('degree').value)">
+                                            <ng-template ng-option-tmp let-item="item" let-item$="item$"
+                                                let-index="index">
+                                                {{item.name}}
+                                            </ng-template>
+                                        </ng-select>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('degree').touched 
+                                            || mastersAbroadForm.get('degree').dirty) 
+                                            && mastersAbroadForm.get('degree').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('degree').errors.required">
+                                                Degree must be specified
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-4 col-md-3">
+                                        <label class="label-style"><span class="red">*</span> In which year are you
+                                            planning to do masters ?</label>
+                                        <select class="form-control" formControlName="yearOfMS">
+                                            <option [ngValue]="null">Undecided</option>
+                                            <ng-container *ngFor="let yearOfMS of yearOfMSList">
+                                                <option [ngValue]="yearOfMS">{{yearOfMS}}</option>
+                                            </ng-container>
+                                        </select>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('yearOfMS').touched 
+                                          || mastersAbroadForm.get('yearOfMS').dirty) 
+                                          && mastersAbroadForm.get('yearOfMS').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('yearOfMS').errors.required">
+                                                Year of MS must be specified
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-3 col-md-3">
+                                        <label class="label-style"><span class="red">*</span> GRE Score:</label>
+                                        <input type="number" class="form-control" formControlName="gre"
+                                            placeholder="Enter GRE Score" appAllowNumbersOnly>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('gre').touched 
+                                            || mastersAbroadForm.get('gre').dirty) 
+                                            && mastersAbroadForm.get('gre').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('gre').errors.required">
+                                                GRE score must be specified
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('gre').errors.min">
+                                                GRE score cannot be below 0
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('gre').errors.max">
+                                                GRE score cannot be above {{greExam.totalMarks}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-3 col-md-3">
+                                        <label class="label-style"><span *ngIf="showMBADegreeRequiredError"
+                                                class="red">* </span>GMAT Score:</label>
+                                        <input type="number" class="form-control" formControlName="gmat"
+                                            placeholder="Enter GMAT Score" appAllowNumbersOnly>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('gmat').touched 
+                                            || mastersAbroadForm.get('gmat').dirty) 
+                                            && mastersAbroadForm.get('gmat').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('gmat').errors.required">
+                                                GMAT score must be specified
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('gmat').errors.min">
+                                                GMAT score cannot be below 0
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('gmat').errors.max">
+                                                GMAT score cannot be above {{gmatExam.totalMarks}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-3 col-md-3">
+                                        <label class="label-style">TOEFL Score:</label>
+                                        <input type="number" class="form-control" formControlName="toefl"
+                                            placeholder="Enter TOEFL Score" appAllowNumbersOnly>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('toefl').touched 
+                                            || mastersAbroadForm.get('toefl').dirty) 
+                                            && mastersAbroadForm.get('toefl').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('toefl').errors.min">
+                                                TOEFL score cannot be below 0
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('toefl').errors.max">
+                                                TOEFL score cannot be above {{toeflExam.totalMarks}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-3 col-md-3">
+                                        <label class="label-style">IELTS Score:</label>
+                                        <input type="number" class="form-control" formControlName="ielts"
+                                            placeholder="Enter IELTS Score" appAllowNumbersWithDecimal>
+                                        <div class="alert alert-danger" *ngIf="(mastersAbroadForm.get('ielts').touched 
+                                            || mastersAbroadForm.get('ielts').dirty) 
+                                            && mastersAbroadForm.get('ielts').invalid">
+                                            <div *ngIf="mastersAbroadForm.get('ielts').errors.min">
+                                                IELTS score cannot be below 0
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('ielts').errors.max">
+                                                IELTS score cannot be above {{ieltsExam.totalMarks}}
+                                            </div>
+                                            <div *ngIf="mastersAbroadForm.get('ielts').errors.pattern">
+                                                IELTS score can have only .5 after decimal
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <h4><label class="col-sm-12 col-form-label label-style">Resume:</label></h4>
+                                    <div class="form-group col-sm-3 col-md-3">
+                                        <span class="custom-file">
+                                            <input type="file" class="custom-file-input"
+                                                (change)="onResourceSelect($event)" id="customFile"
+                                                value="displayedFileName">
+                                            <label class="custom-file-label" id="custom-file-label" for="customFile"
+                                                [innerHTML]="displayedFileName"></label>
+                                            <button class="btn btn-success custom-file" id="uploadingButton"
+                                                type="button" *ngIf="isFileUploading">
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                    aria-hidden="true"></span>
+                                                Uploading file...
+                                            </button>
+                                        </span>
+                                        <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+                                    </div>
+                                </div>
+                                <div class="center-style">
+                                    <button class="stepper-button-style" mat-button
+                                        matStepperPrevious>Back</button>&nbsp;&nbsp;&nbsp;
+                                    <button class="stepper-button-style" (click)="validateMastersAboradForm()"
+                                        mat-button matStepperNext>Next</button>
+                                </div>
+                            </form>
+                        </mat-step>
+                    </ng-container>
+                    <mat-step [stepControl]="socialMediaForm" [editable]=true>
+                        <form [formGroup]="socialMediaForm">
+                            <ng-template matStepLabel><span (click)="validateExperiencesOrMastersAbroad()"
+                                    class="matStepLabelColor">Social Media Details</span>
+                            </ng-template>
+                            <div class="row">
+                                <div class="form-group col-sm-6 col-md-1 center-style">
+                                    <fa-icon class="githubColor fa-3x" [icon]="githubIcon"></fa-icon>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-5">
+                                    <label class="label-style">Github URL:</label>
+                                    <input appEmptyToNull formControlName="githubUrl"
+                                        placeholder="Paste your Github URL here" class="form-control">
+                                    <div class="alert alert-danger" *ngIf="(socialMediaForm.get('githubUrl').touched || socialMediaForm.get('githubUrl').dirty) 
+                                        && socialMediaForm.get('githubUrl').invalid">
+                                        <div *ngIf="socialMediaForm.get('githubUrl').errors.pattern">
+                                            Github URL must start with www.github.com
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-1 center-style">
+                                    <fa-icon class="linkedInColor fa-3x" [icon]="linkedInIcon"></fa-icon>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-5">
+                                    <label class="label-style">LinkedIn URL:</label>
+                                    <input appEmptyToNull formControlName="linkedInUrl"
+                                        placeholder="Paste your LinkedIn URL here" class="form-control">
+                                    <div class="alert alert-danger" *ngIf="(socialMediaForm.get('linkedInUrl').touched || socialMediaForm.get('linkedInUrl').dirty) 
+                                        && socialMediaForm.get('linkedInUrl').invalid">
+                                        <div *ngIf="socialMediaForm.get('linkedInUrl').errors.pattern">
+                                            LinkedIn URL must start with www.linkedin.com
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 col-md-1 center-style">
+                                    <fa-icon class="faceBookColor fa-3x" [icon]="facebookIcon"></fa-icon>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-5">
+                                    <label class="label-style">Facebook URL:</label>
+                                    <input appEmptyToNull formControlName="facebookUrl"
+                                        placeholder="Paste your Facebook URL here" class="form-control">
+                                    <div class="alert alert-danger" *ngIf="(socialMediaForm.get('facebookUrl').touched || socialMediaForm.get('facebookUrl').dirty) 
+                                        && socialMediaForm.get('facebookUrl').invalid">
+                                        <div *ngIf="socialMediaForm.get('facebookUrl').errors.pattern">
+                                            Facebook URL must start with www.facebook.com
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-1 center-style">
+                                    <fa-icon class="instagramColor fa-3x" [icon]="instagramIcon"></fa-icon>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-5">
+                                    <label class="label-style">Instagram URL:</label>
+                                    <input appEmptyToNull formControlName="instagramUrl"
+                                        placeholder="Paste your Instagram URL here" class="form-control">
+                                    <div class="alert alert-danger" *ngIf="(socialMediaForm.get('instagramUrl').touched || socialMediaForm.get('instagramUrl').dirty) 
+                                        && socialMediaForm.get('instagramUrl').invalid">
+                                        <div *ngIf="socialMediaForm.get('instagramUrl').errors.pattern">
+                                            Instagram URL must start with www.instagram.com
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="center-style">
+                            <button class="stepper-button-style" mat-button
+                                matStepperPrevious>Back</button>&nbsp;&nbsp;&nbsp;
+                            <button class="stepper-button-style" [disabled]='isFileUploading' mat-button
+                                (click)="addEnquiry()">Submit</button>
+                        </div>
+                    </mat-step>
+                </mat-horizontal-stepper>
+            </div>
+        </div>
+    </div>
+</div>

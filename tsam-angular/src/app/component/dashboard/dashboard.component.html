@@ -1,0 +1,1365 @@
+<app-master-navbar></app-master-navbar>
+<!-- <div class="root" style="height: 84vh;">
+  <p class="">Main DashBoard</p>
+</div> -->
+<!--  -->
+
+
+<div class="container-fluid p-3 margin-1pt" *ngIf="adminDashboard">
+
+  <div class="row">
+    <!-- Talents -->
+    <div class="col-12 col-lg-7 py-2">
+      <div class="card h-100">
+        <div class="card-header header  bg-dark text-white" (click)="goTo('/talent/master')">
+          <h2 class="card-title">TALENTS</h2>
+          <h3>
+            <label class="label">Total {{adminDashboard.talentDetails?.totalTalents}}</label>
+          </h3>
+        </div>
+        <br>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-borderless tdCenter">
+
+              <tbody class="removeHover">
+                <tr class="numbers" (click)="goTo('/talent/master')">
+                  <td>{{adminDashboard.talentDetails?.totalFreshers}}</td>
+                  <td>{{adminDashboard.talentDetails?.totalExperienced}}</td>
+                  <td>{{adminDashboard.talentDetails?.b2cTalents}}</td>
+                  <td>{{adminDashboard.talentDetails?.swabhavTalents}}</td>
+                  <td>{{adminDashboard.talentDetails?.nonSwabhavTalents}}</td>
+                  <td>{{adminDashboard.talentDetails?.totalInterestedInForeign}}</td>
+                  <td>{{adminDashboard.talentDetails?.totalLifetimeValue/100000 | number : '1.2-2' }}</td>
+                </tr>
+
+                <tr (click)="goTo('/talent/master')">
+                  <td>Freshers</td>
+                  <td>Experienced</td>
+                  <td>B2C</td>
+                  <td>Swabhav Talents</td>
+                  <td>Non Swabhav Talents</td>
+                  <td>US/Foreign Interested</td>
+                  <td>Total Lifetime Value(in lakhs)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enquiry -->
+    <div class="col-12 col-lg-5 py-2">
+      <div class="card h-100">
+        <div class="card-header header  bg-dark text-white" (click)="goTo('/talent/enquiry')">
+          <h2 class="card-title">TALENT ENQUIRIES</h2>
+          <h3>
+            <label class="label">Total {{adminDashboard.enquiryDetails?.totalEnquiries}}</label>
+          </h3>
+        </div>
+        <div class="card-body">
+          <span class="float-right">
+            <select class="form-control form-control-sm" [(ngModel)]="enquirySource"
+              (change)="getTalentEnquiryDashboardDetails()">
+              <option [ngValue]="null">All</option>
+              <option *ngFor="let source of sourceList" [ngValue]="source">
+                {{source.description}}
+              </option>
+            </select>
+          </span>
+          <h4 class="card-title subheader reqd"><em>Data of Last 30 Days</em></h4>
+          <div class="table-responsive">
+            <table class="table table-borderless tdCenter">
+              <tbody class="removeHover">
+                <tr class="numbers" (click)="goTo('/talent/enquiry')">
+                  <td>{{adminDashboard.enquiryDetails?.newEnquiries}}</td>
+                  <td>{{adminDashboard.enquiryDetails?.enquiriesAssigned}}</td>
+                  <td>{{adminDashboard.enquiryDetails?.enquiriesNotAssigned}}</td>
+                  <td>{{adminDashboard.enquiryDetails?.enquiriesNotHandled}}</td>
+                  <td>{{adminDashboard.enquiryDetails?.enquiriesConverted}}</td>
+                </tr>
+                <tr (click)="goTo('/talent/enquiry')">
+                  <td>New</td>
+                  <td>Assigned</td>
+                  <td class="reqd">Not Assigned</td>
+                  <td>Not Handled</td>
+                  <td>Converted</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Salesperson -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header  bg-dark text-white" (click)="goTo('/talent/enquiry')">
+          <h2 class="card-title">SALESPEOPLE</h2>
+          <h3>
+            <label class="label">Total {{adminDashboard.salesPeopleDetails?.totalSalesPeople}}</label>
+          </h3>
+        </div>
+        <div class="card-body">
+          <span class="float-right">
+            <!-- <label for="sel1">Sales Person:</label> -->
+            <select class="form-control" [(ngModel)]="salesPerson" (change)="getSalesPeopleDashboardDetails()">
+              <option [ngValue]="null">All</option>
+              <option *ngFor="let person of salesPeople" [ngValue]="person">
+                {{person.firstName}} {{person.lastName}}
+              </option>
+            </select>
+          </span>
+          <h4 class="card-title subheader reqd"><i>Data of Last 30 Days</i> </h4>
+          <div class="row">
+            <div class="col-sm-4 px-3">
+              <br>
+              <h4 class="card-title subheader-2" style="font-size: 21px;">By Enquiries</h4>
+              <table class="table table-sm table-hover">
+                <tbody>
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="borderless sales-subheader">Assigned</td>
+                    <td class="borderless tdRight salesNum">{{adminDashboard.salesPeopleDetails?.enquiriesAssigned}}
+                    </td>
+                  </tr>
+
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="sales-subheader">Converted</td>
+                    <td class="tdRight salesNum">{{adminDashboard.salesPeopleDetails?.enquiriesConverted}}</td>
+                  </tr>
+
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="reqd addborder sales-subheader">Not Handled</td>
+                    <td class="addborder tdRight salesNum">{{adminDashboard.salesPeopleDetails?.enquiriesNotHandled}}
+                    </td>
+                  </tr>
+
+
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="sales-subheader">Training</td>
+                    <td class="tdRight salesNum">{{adminDashboard.salesPeopleDetails?.trainingEnquiries}}</td>
+                  </tr>
+
+
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="sales-subheader">Placement</td>
+                    <td class="tdRight salesNum">{{adminDashboard.salesPeopleDetails?.placementEnquiries}}</td>
+                  </tr>
+
+
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="sales-subheader">Training And Placement</td>
+                    <td class="tdRight salesNum">{{adminDashboard.salesPeopleDetails?.trainingAndPlacementEnquiries}}
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+            <div class="col-sm-4 px-3">
+              <br>
+              <h4 class="card-title subheader-2" style="font-size: 21px;">By Talents</h4>
+              <table class="table table-sm table-hover">
+                <tbody>
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="borderless sales-subheader">Approached</td>
+                    <td class="borderless tdRight salesNum">{{adminDashboard.salesPeopleDetails?.talentsApproached}}
+                    </td>
+                  </tr>
+                  <tr (click)="goTo('/talent/enquiry')">
+                    <td class="addborder sales-subheader">Joined Batches</td>
+                    <td class="addborder tdRight salesNum">{{adminDashboard.salesPeopleDetails?.joinedBatches}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="col-sm-4 px-3">
+              <div class="row">
+                <div class="col-sm-12">
+                  <br>
+                  <h4 class="card-title subheader-2" style="font-size: 21px;">By Campus Drives</h4>
+
+                  <table class="table table-sm table-hover">
+                    <tbody>
+                      <tr (click)="goTo('/talent/enquiry')">
+                        <td class="addborder borderless sales-subheader">Completed</td>
+                        <td class="addborder tdRight borderless salesNum">
+                          {{adminDashboard.salesPeopleDetails?.campusDrivesCompleted}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <h4 class="card-title subheader-2" style="font-size: 21px;">By Seminars</h4>
+                  <table class="table table-sm table-hover">
+                    <tbody>
+                      <tr (click)="goTo('/talent/enquiry')">
+                        <td class="addborder borderless sales-subheader">Seminars</td>
+                        <td class="addborder borderless tdRight salesNum">
+                          {{adminDashboard.salesPeopleDetails?.seminarsCompleted}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="row">
+            <div class="col-12">
+              <h2 class="card-title">Enquiry Sources</h2>
+              <div class="table-responsive">
+                <table class="table table-borderless tdCenter">
+                  <tbody class="removeHover">
+                    <tr class="enquiry-numbers" (click)="goTo('/talent/enquiry')">
+                      <td *ngFor="let source of enquirySourceDetails">
+                        {{source.enquiryCount}}
+                      </td>
+                    </tr>
+                    <tr (click)="goTo('/talent/enquiry')">
+                      <td *ngFor="let source of enquirySourceDetails">
+                        {{source.description}}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- colleges and faculty -->
+    <div class="col-12 col-lg-8 d-flex align-items-stretch py-2">
+      <div class="card w-100">
+        <div class="card-header header bg-dark text-white colg-header" (click)="goTo('/college/master')">
+          <h2 class="card-title">COLLEGES</h2>
+          <h3>
+            <label class="label">Total {{adminDashboard.collegeDetails?.totalColleges}}</label>
+          </h3>
+          <!-- <a href="#//college/master" class="tdCenter">
+                            <h3>
+                              <label class="label live">Active</label>
+                              {{adminDashboard.collegeDetails?.totalActiveColleges}}
+                            </h3>
+                          </a> -->
+
+        </div>
+        <div class="card-body">
+          <h4 class="card-title subheader-2 tdLeft colg-subheader">College Details</h4>
+          <!-- style="margin-bottom:97.5px;" -->
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <tbody class="tdCenter removeHover">
+                <tr class="numbers" (click)="goTo('/college/branch')">
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.totalCampusDrives}}
+                  </td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.allTimeRegisteredTalents}}
+                  </td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.ongoing}}</td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.upcoming}}</td>
+                </tr>
+                <br>
+                <tr (click)="goTo('/college/branch')" class="addHover" style="font-size: 18px;">
+                  <td>Swabhav Associated</td>
+                  <td>IIT Colleges</td>
+                  <td>Indian Colleges</td>
+                  <td>Non Indian Colleges</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <br><br>
+          <h4 class="card-title subheader-2 tdLeft colg-subheader">Campus Details</h4>
+          <!-- style="margin-bottom:97.5px;" -->
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <tbody class="tdCenter removeHover">
+                <tr class="numbers" (click)="goTo('/college/campus')">
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.totalCampusDrives}}
+                  </td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.allTimeRegisteredTalents}}
+                  </td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.ongoing}}</td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.campusDetails?.upcoming}}</td>
+                </tr>
+                <br>
+                <tr (click)="goTo('/college/campus')" class="addHover" style="font-size: 18px;">
+                  <td>Campus Drives</td>
+                  <td>Registered Talents</td>
+                  <td>Ongoing Drives</td>
+                  <td>Upcoming Drives</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <br><br>
+          <h3 class="card-title subheader-2 tdLeft colg-subheader">Seminar Details</h3>
+          <div class="table-responsive">
+            <table class="table table-borderless">
+
+              <tbody class="tdCenter removeHover">
+
+                <tr (click)="goTo('/college/seminar')" class="numbers">
+                  <td>
+                    {{adminDashboard.collegeDetails?.seminarDetails?.totalSeminar}}
+                  </td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.seminarDetails?.allTimeRegisteredTalents}}
+                  </td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.seminarDetails?.ongoing}}</td>
+                  <td>
+                    {{adminDashboard.collegeDetails?.seminarDetails?.upcoming}}
+                  </td>
+                </tr>
+                <br>
+                <tr (click)="goTo('/college/seminar')" class="addHover" style="font-size: 18px;">
+                  <td>Total Seminars</td>
+                  <td>Registered Talents</td>
+                  <td>Ongoing Seminars</td>
+                  <td>Upcoming Seminars</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <!-- faculty -->
+    <div class="col-lg-4 py-2 h-50">
+      <div class="card">
+        <div class="card-header header  bg-dark text-white" (click)="goTo('/admin/employee/faculty')">
+          <h2 class="card-title">FACULTY</h2>
+          <h3>
+            <label class="label">Total {{adminDashboard.facultyDetails?.totalFaculty}}</label>
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <h3 class="card-title subheader-2 tdLeft colg-subheader">Faculty</h3>
+            <table class="table table-borderless">
+              <tbody class="tdCenter removeHover">
+                <tr class="numbers" (click)="goTo('/admin/employee/faculty')">
+                  <td>
+                    {{adminDashboard.facultyDetails?.partTime}}
+                  </td>
+                  <td>
+                    {{adminDashboard.facultyDetails?.fullTime }}
+                  </td>
+                  <td>
+                    {{adminDashboard.facultyDetails?.active}}
+                  </td>
+                  <td>
+                    {{adminDashboard.facultyDetails?.inActive}}
+                  </td>
+                </tr>
+                <tr (click)="goTo('/admin/employee/faculty')">
+                  <td>Part-time</td>
+                  <td>Full-time</td>
+                  <td>Active</td>
+                  <td>In Active</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-responsive">
+            <h3 class="card-title subheader-2 tdLeft colg-subheader">Completed Batches</h3>
+            <table class="table table-borderless">
+              <tbody class="tdCenter removeHover">
+                <tr class="numbers" (click)="goTo('/admin/employee/faculty')">
+                  <td>
+                    {{adminDashboard.facultyDetails?.batchesCompleted?.totalBatches}}
+                  </td>
+                  <td colspan="2">
+                    {{adminDashboard.facultyDetails?.batchesCompleted?.totalTalentsJoined }}
+                  </td>
+                </tr>
+                <tr (click)="goTo('/admin/employee/faculty')">
+                  <td>Total</td>
+                  <td colspan="2">Total Talents Joined</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-responsive">
+            <h3 class="card-title live subheader-2 tdLeft colg-subheader">Live Batches</h3>
+            <table class="table table-borderless">
+              <tbody class="tdCenter removeHover">
+                <tr class="numbers" (click)="goTo('/admin/employee/faculty')">
+                  <td>{{adminDashboard.facultyDetails?.liveBatches?.totalBatches}}</td>
+                  <td colspan="2">{{adminDashboard.facultyDetails?.liveBatches?.totalTalentsJoined}}</td>
+                </tr>
+                <tr (click)="goTo('/admin/employee/faculty')">
+                  <td>Total</td>
+                  <td colspan="2">Total Talents Joined</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-responsive">
+            <h3 class="card-title subheader-2 tdLeft colg-subheader">Upcoming Batches</h3>
+            <table class="table table-borderless">
+              <tbody class="tdCenter removeHover">
+                <tr class="numbers" (click)="goTo('/admin/employee/faculty')">
+                  <td>{{adminDashboard.facultyDetails?.upcomingBatches?.totalBatches}}</td>
+                  <td colspan="2">{{adminDashboard.facultyDetails?.upcomingBatches?.totalTalentsJoined}}</td>
+                </tr>
+                <tr (click)="goTo('/admin/employee/faculty')">
+                  <td>Total</td>
+                  <td colspan="2">Total Talents Joined</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Batches -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header bg-dark text-white header-cursor" (click)="showBatchDashboard()">
+          <h2 class="card-title ">BATCHES</h2>
+          <h3><label class="label">Total {{adminDashboard.batchDetails?.total?.allBatches}}</label></h3>
+        </div>
+        <div class="card-body table-hover" *ngIf="isBatchDashboardVisible">
+
+          <!-- Feedback Scores -->
+          <br>
+          <h4 class="card-title subheader-2" style="font-size: 21px;">Performance</h4>
+          <form [formGroup]="batchForm">
+            <div class="row">
+              <!-- <div class="col-sm-3 col-md-3">
+            </div> -->
+              <div class="col-sm-3 col-md-4">
+                <label for="sel1">Batch Status:</label>
+                <select class="form-control" formControlName="batchStatus"
+                  (change)="getBatchList(batchForm.get('batchStatus')?.value, batchForm.get('facultyID')?.value); getSearchBatchPerformance()">
+                  <!-- <option [ngValue]="null">All</option> -->
+                  <option *ngFor="let status of batchStatusList" [ngValue]="status.value">
+                    {{status.value}}
+                  </option>
+                </select>
+              </div>
+              <div class="col-sm-3 col-md-4">
+                <label for="sel1">Faculty:</label>
+                <select class="form-control" formControlName="facultyID"
+                  (change)="getBatchList(batchForm.get('batchStatus')?.value, batchForm.get('facultyID')?.value); getSearchBatchPerformance()">
+                  <option [ngValue]="null">All</option>
+                  <option *ngFor="let faculty of facultyList" [ngValue]="faculty.id">
+                    {{faculty.firstName}} {{faculty.lastName}}
+                  </option>
+                </select>
+              </div>
+              <div class="col-sm-3 col-md-4">
+                <label for="sel1">Batches:</label>
+                <fieldset [disabled]="!batchForm.get('batchStatus')?.value || batchList?.length == 0">
+                  <select class="form-control" (change)="getSearchBatchPerformance()" formControlName="batchID">
+                    <option [ngValue]="null">All</option>
+                    <option *ngFor="let batch of batchList" [ngValue]="batch.id">
+                      {{batch.batchName}}
+                    </option>
+                  </select>
+                </fieldset>
+              </div>
+            </div>
+          </form>
+          <div class="row">
+            <div class="col-sm-3">
+              <br>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <td class="addborder sales-subheader">Total Batches</td>
+                    <td class="addborder salesNum">{{adminDashboard.batchScore.totalBatches}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-sm-3">
+              <br>
+              <table class="table table-sm table-hover">
+                <tbody>
+                  <tr (click)="getOutstandingTalents()">
+                    <td class="addborder sales-subheader">Outstanding</td>
+                    <td class="addborder salesNum">{{adminDashboard.batchScore.outstanding}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-sm-3">
+              <br>
+              <table class="table table-sm table-hover">
+                <tbody>
+                  <tr (click)="getGoodTalents()">
+                    <td class="addborder sales-subheader">Good</td>
+                    <td class="addborder salesNum">{{adminDashboard.batchScore.good}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-sm-3">
+              <br>
+              <table class="table table-sm table-hover">
+                <tbody>
+                  <tr (click)="getAverageTalents()">
+                    <td class="addborder sales-subheader">Average</td>
+                    <td class="addborder salesNum">{{adminDashboard.batchScore.average}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div *ngIf="(showOutstandingTalents || showGoodTalents || showAverageTalents) && batchPerformanceDetails"
+            class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Sr. No</th>
+                  <th>Talent Name</th>
+                  <th>Batch Name</th>
+                  <th>Interview Rating</th>
+                  <!-- <th *ngFor="let title of feebackKeyword">
+                    {{title.name}}
+                  </th> -->
+                  <ng-container *ngFor="let group of feebackKeyword; let i = index">
+                    <th>
+                      Group {{group.groupName}}
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" [id]="group.groupName + 'id'"
+                          (click)="toggleGroupVisibility(group)" [(ngModel)]="group.showGroupDetails">
+                        <label class="custom-control-label" [for]="group.groupName + 'id'"></label>
+                      </div>
+                    </th>
+                    <ng-container *ngFor="let title of group.keywords">
+                      <th *ngIf="group.showGroupDetails">
+                        {{title.name}}
+                      </th>
+                    </ng-container>
+                  </ng-container>
+                  <th>Overall</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr (click)="getTalentScore(performance, batchSessionWiseScore)"
+                  *ngFor="let performance of batchPerformanceDetails; let i = index">
+                  <td class="text-center">{{i+1}}</td>
+                  <td class="text-center">{{performance.firstName}} {{performance.lastName}}</td>
+                  <td class="text-center">{{performance.batchName}}</td>
+                  <td class="text-center">
+                    <div *ngIf="performance.interviewRating > 0; else noRating">
+                      {{performance.interviewRating}}
+                    </div>
+                    <ng-template #noRating>
+                      N/A
+                    </ng-template>
+                  </td>
+                  <ng-container *ngFor="let groupScore of performance.feedbackKeywords; let j = index">
+                    <td class="text-center">
+                      <div *ngIf="groupScore.feedbackScore?.length > 0; else noFeedbackScore">
+                        {{calculateAvgGroupScore(groupScore) | number:'1.2-2'}}
+                      </div>
+                      <ng-template #noFeedbackScore>
+                        N/A
+                      </ng-template>
+                    </td>
+                    <ng-container *ngIf="feebackKeyword[j]?.showGroupDetails">
+                      <td *ngFor="let scores of performance.feedbackKeywords[j]?.feedbackScore" class="text-center">
+                        {{scores.keywordScore | number:'1.2-2'}}
+                      </td>
+                      <td
+                        *ngIf="feebackKeyword[j].keywords?.length != performance.feedbackKeywords[j].feedbackScore?.length"
+                        class="text-center"
+                        [attr.colspan]="feebackKeyword[j].keywords?.length - performance.feedbackKeywords[j].feedbackScore?.length">
+                        N/A
+                      </td>
+                    </ng-container>
+                  </ng-container>
+                  <!-- <td class="text-center" *ngFor="let scores of performance?.feedbackKeywords">
+                    {{scores.keywordScore | number:'1.2-2'}}
+                  </td> -->
+                  <td *ngIf="performance?.feedbackKeywords?.length != feebackKeyword?.length" class="text-center"
+                    [attr.colspan]="feebackKeyword?.length - performance?.feedbackKeywords?.length">
+                    N/A
+                  </td>
+                  <td class="text-center">
+                    <ng-container *ngIf="performance.interviewRating  == 0 || performance.score  == 0 || 
+                        performance.score == performance.interviewRating; then second; 
+                        else (performance.score > performance.interviewRating && first) || (third)">
+                    </ng-container>
+                    <ng-template #first>
+                      <p class="green sales-subheader"><strong>{{performance && performance.score |
+                          number:'1.2-2'}}</strong>
+                        <span class="material-icons">navigation</span>
+                      </p>
+                      <span class="green small-font">(+{{performance.score - performance.interviewRating |
+                        number:'1.2-2'}})</span>
+                    </ng-template>
+                    <ng-template #second>
+                      <div *ngIf="performance.score > 0; else noScore">
+                        <p class="grey sales-subheader"><strong>{{performance && performance.score | number:'1.2-2' ||
+                            "N/A"}}</strong></p>
+                      </div>
+                      <ng-template #noScore>
+                        N/A
+                      </ng-template>
+                    </ng-template>
+                    <ng-template #third>
+                      <p class="red sales-subheader"><strong>{{performance.score | number:'1.2-2'}}</strong>
+                        <span class="material-icons lowScore">navigation</span>
+                      </p>
+                      <span class="red small-font">{{((performance.score - performance.interviewRating) > 0) ? '-' : ''
+                        }}
+                        {{performance.score - performance.interviewRating | number:'1.2-2'}}</span>
+                    </ng-template>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+
+          <div class="table-responsive">
+            <table class="table tdCenter course-border table-hover">
+              <thead class="subheader bg-secondary text-white tdCenter">
+                <tr>
+                  <th rowspan="2" class="text-center">Batch Status</th>
+                  <th class="left-border right-border text-center">Batch Name</th>
+                  <th colspan="2" class="left-border right-border text-center">Batch Type</th>
+                  <th class="left-border right-border text-center">Total Students</th>
+                  <th class="left-border right-border text-center">Total Batches</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th class="right-border"></th>
+                  <th class="right-border"></th>
+                  <th class="right-border">B2B</th>
+                  <th class="right-border">B2C</th>
+                  <th class="right-border"></th>
+                  <th class="right-border"></th>
+                </tr>
+                <!-- batch details -->
+                <ng-container>
+                  <tr style="background-color: lightsteelblue;"
+                    (click)="adminDashboard.batchDetails.live.isVisible
+                  =!adminDashboard.batchDetails?.live?.isVisible;getBatchDetails('Ongoing', adminDashboard.batchDetails?.live?.allBatches)">
+                    <td class="right-border live text-size">Live</td>
+                    <td class="right-border">{{"-"}}</td>
+                    <td class="left right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.live?.b2bBatches}}</td>
+                    <td class="right-border text-center text-size">{{adminDashboard.batchDetails?.live?.b2cBatches}}
+                    </td>
+                    <td class="right-border text-center text-size">{{adminDashboard.batchDetails?.live?.totalStudents}}
+                    </td>
+                    <td class="right-border text-center text-size">{{adminDashboard.batchDetails?.live?.allBatches}}
+                    </td>
+                  </tr>
+                  <ng-container *ngIf="adminDashboard.batchDetails?.live?.isVisible">
+                    <tr *ngFor="let details of adminDashboard.batchDetails?.live?.batchStatusDetails; let i = index"
+                      (click)="getBatchTalent(details.batchID, details.batchName, batchTalents)">
+                      <td class="right-border">{{"-"}}</td>
+                      <td class="right-border">{{details.batchName}}</td>
+                      <td class="right-border">
+                        <div *ngIf="details.batchType; else noType">
+                          <span class="material-icons green">check</span>
+                        </div>
+                        <ng-template #noType>
+                          {{"-"}}
+                        </ng-template>
+                      </td>
+                      <td class="right-border">
+                        <div *ngIf="!details.batchType; else noType">
+                          <span class="material-icons green">check</span>
+                        </div>
+                        <ng-template #noType>
+                          {{"-"}}
+                        </ng-template>
+                      </td>
+                      <td class="right-border">{{details.totalStudents}}</td>
+                      <td class="right-border">{{"-"}}</td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+                <ng-container>
+                  <tr style="background-color: lightsteelblue;"
+                    (click)="adminDashboard.batchDetails.completed.isVisible
+                    =!adminDashboard.batchDetails?.completed?.isVisible;getBatchDetails('Finished', adminDashboard.batchDetails?.completed?.allBatches)">
+                    <td class="right-border text-size">Completed</td>
+                    <td class="right-border">{{"-"}}</td>
+                    <td class="left right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.completed?.b2bBatches}}</td>
+                    <td class="right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.completed?.b2cBatches}}</td>
+                    <td class="right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.completed?.totalStudents}}</td>
+                    <td class="right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.completed?.allBatches}}</td>
+                  </tr>
+                  <ng-container *ngIf="adminDashboard.batchDetails?.completed?.isVisible">
+                    <tr
+                      *ngFor="let details of adminDashboard.batchDetails?.completed?.batchStatusDetails; let i = index"
+                      (click)="getBatchTalent(details.batchID, details.batchName, batchTalents)">
+                      <td class="right-border">{{"-"}}</td>
+                      <td class="right-border">{{details.batchName}}</td>
+                      <td class="right-border">
+                        <div *ngIf="details.batchType; else noType">
+                          <span class="material-icons green">check</span>
+                        </div>
+                        <ng-template #noType>
+                          {{"-"}}
+                        </ng-template>
+                      </td>
+                      <td class="right-border">
+                        <div *ngIf="!details.batchType; else noType">
+                          <span class="material-icons green">check</span>
+                        </div>
+                        <ng-template #noType>
+                          {{"-"}}
+                        </ng-template>
+                      </td>
+                      <td class="right-border">{{details.totalStudents}}</td>
+                      <td class="right-border">{{"-"}}</td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+                <ng-container>
+                  <tr style="background-color: lightsteelblue;"
+                    (click)="adminDashboard.batchDetails.upcoming.isVisible
+                  =!adminDashboard.batchDetails?.upcoming?.isVisible;getBatchDetails('Upcoming', adminDashboard.batchDetails?.upcoming?.allBatches)">
+                    <td class="right-border text-size">Upcoming</td>
+                    <td class="right-border">{{"-"}}</td>
+                    <td class="left right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.upcoming?.b2bBatches}}</td>
+                    <td class="right-border text-center text-size">{{adminDashboard.batchDetails?.upcoming?.b2cBatches}}
+                    </td>
+                    <td class="right-border text-center text-size">
+                      {{adminDashboard.batchDetails?.upcoming?.totalStudents}}</td>
+                    <td class="right-border text-center text-size">{{adminDashboard.batchDetails?.upcoming?.allBatches}}
+                    </td>
+                  </tr>
+                  <ng-container *ngIf="adminDashboard.batchDetails?.upcoming?.isVisible">
+                    <tr *ngFor="let details of adminDashboard.batchDetails?.upcoming?.batchStatusDetails; let i = index"
+                      (click)="getBatchTalent(details.batchID, details.batchName, batchTalents)">
+                      <td class="right-border">{{"-"}}</td>
+                      <td class="right-border">{{details.batchName}}</td>
+                      <td class="right-border">
+                        <div *ngIf="details.batchType; else noType">
+                          <span class="material-icons green">check</span>
+                        </div>
+                        <ng-template #noType>
+                          {{"-"}}
+                        </ng-template>
+                      </td>
+                      <td class="right-border">
+                        <div *ngIf="!details.batchType; else noType">
+                          <span class="material-icons green">check</span>
+                        </div>
+                        <ng-template #noType>
+                          {{"-"}}
+                        </ng-template>
+                      </td>
+                      <td class="right-border">{{details.totalStudents}}</td>
+                      <td class="right-border">{{"-"}}</td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Batches end -->
+
+
+  <!-- Courses -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header bg-dark text-white header-cursor" (click)="showCourseDashboard()">
+          <h2 class="card-title">COURSES</h2>
+          <h3><label class="label">Total {{adminDashboard.courseDetails?.totalCourses}}</label></h3>
+        </div>
+        <br>
+        <div class="card-body" *ngIf="isCourseDashboardVisible">
+          <br>
+          <div class="table-responsive">
+            <table class="table tdCenter course-border table-hover">
+              <thead class="subheader bg-secondary text-white tdCenter">
+                <td colspan="3">Courses</td>
+                <td colspan="3" class="left-border right-border">All Batches</td>
+                <td colspan="2" class="left left-border right-border">Sessions</td>
+                <td colspan="4" class="right left-border right-border">Upcoming Batches</td>
+              </thead>
+              <tbody>
+                <tr id="no-hover">
+                  <th class="right-border">No.</th>
+                  <th>Name</th>
+                  <th>Level</th>
+                  <th class="left left-border">Total Batches</th>
+                  <th class="tableHead">Talents Joined</th>
+                  <th class="right right-border live">Live Batches</th>
+                  <th class="left">Total Sessions</th>
+                  <th class="reqd">Remaining Sessions</th>
+                  <th class="left left-border">Total Batches</th>
+                  <th class="tableHead">Talents Intake</th>
+                  <th class="tableHead">Talents Joined</th>
+                  <th class="reqd right right-border">Talents Required</th>
+                </tr>
+                <!-- <tr>
+                  <td *ngIf="!showCourses" colspan="11">
+                    <button type="button" class="btn">
+                      View All Courses
+                    </button>
+                  </td>
+                  <td *ngIf="showCourses" colspan="11">
+                    <button type="button" class="btn" (click)="showCourses=!showCourses">
+                      Hide Courses
+                    </button>
+                  </td>
+                </tr> -->
+                <ng-container *ngFor="let courseGroup of adminDashboard?.courseDetails?.courseGroups,let i = index">
+                  <tr style="background-color: lightsteelblue;"
+                    (click)="courseGroup.isVisible = !courseGroup.isVisible">
+                    <th scope="row" class="right-border">
+                      {{"-"}}
+                    </th>
+                    <th class="text-size" scope="row">
+                      {{courseGroup.groupName}}
+                    </th>
+                    <th scope="row">
+                      {{"-"}}
+                    </th>
+                    <td class="left left-border text-size">
+                      {{courseGroup?.allBatches?.totalBatches}}
+                    </td>
+                    <td class="tableHead text-size">
+                      {{courseGroup?.allBatches?.totalTalentsJoined}}
+                    </td>
+                    <td class="right right-border text-size">
+                      {{courseGroup?.liveBatches}}
+                    </td>
+                    <td class="left text-size">
+                      {{courseGroup?.sessions?.totalSessions}}
+                    </td>
+                    <td class="text-size">
+                      {{courseGroup?.sessions?.remainingSessions}}
+                    </td>
+                    <td class="left left-border text-size">
+                      {{courseGroup?.upcomingBatches?.totalBatches}}
+                    </td>
+                    <td class="text-size">{{courseGroup?.upcomingBatches?.totalTalentIntake}}</td>
+                    <td class="text-size">{{courseGroup?.upcomingBatches?.totalTalentsJoined}}</td>
+                    <td class="right right-border text-size">
+                      {{courseGroup?.upcomingBatches?.requiredTalents}}
+                    </td>
+                  </tr>
+                  <ng-container *ngIf="courseGroup?.isVisible">
+                    <tr *ngFor="let courseData of courseGroup.coursesData,let i =index"
+                      (click)="goTo('/course/master')">
+                      <th scope="row" class="right-border">
+                        <!-- {{courseGroup.groupName[courseGroup.groupName?.length-1] +"-"}} -->
+                        {{i+1}}
+                      </th>
+                      <th class="text-size" scope="row">
+                        {{courseData.courseName}}
+                      </th>
+                      <th class="text-size" scope="row">
+                        {{courseData.courseLevel}}
+                      </th>
+                      <td class="left left-border text-size">
+                        {{courseData.allBatches?.totalBatches}}
+                      </td>
+                      <td class="tableHead text-size">
+                        {{courseData.allBatches?.totalTalentsJoined}}
+                      </td>
+                      <td class="right right-border text-size">
+                        {{courseData.liveBatches}}
+                      </td>
+                      <td class="left text-size">
+                        {{courseData.sessions.totalSessions}}
+                      </td>
+                      <td class="text-size">
+                        {{courseData.sessions.remainingSessions}}
+                      </td>
+                      <td class="left text-size">
+                        {{courseData.upcomingBatches?.totalBatches}}
+                      </td>
+                      <td class="text-size">{{courseData.upcomingBatches?.totalTalentIntake}}</td>
+                      <td class="text-size">{{courseData.upcomingBatches?.totalTalentsJoined}}</td>
+                      <td class="right right-border text-size">
+                        {{courseData.upcomingBatches?.requiredTalents}}
+                      </td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Companies -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header bg-dark text-white header-cursor" (click)="goTo('/company/branch')">
+          <h2 class="card-title">COMPANIES</h2>
+          <h3><label class="label">Total {{adminDashboard.companyDetails?.totalCompanies}}</label></h3>
+        </div>
+        <div class="card-body table-responsive table-hover">
+          <table class="table table-borderless tdCenter" style="width: 90%;margin: 0 auto;">
+            <thead>
+              <th class="text-size" colspan="6">Requirements</th>
+              <th class="text-size" colspan="3">Company Requirements</th>
+              <th class="text-size">Total Talents Required</th>
+              <th class="live text-size">Placements In Process</th>
+              <th class="reqd text-size">Talents Needed</th>
+            </thead>
+            <tbody>
+              <tr (click)="goTo('/company/enquiry')">
+                <th class="text-size" scope="row" colspan="6">Live</th>
+                <td class="text-size" colspan="3">
+                  {{adminDashboard.companyDetails?.liveRequirements?.totalRequirements}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.liveRequirements?.totalTalentsRequired}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.liveRequirements?.placementsInProcess}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.liveRequirements?.talentsNeeded}}
+                </td>
+              </tr>
+              <tr (click)="goTo('/company/enquiry')">
+                <th class="text-size" scope="row" colspan="6">
+                  Freshers
+                </th>
+                <td class="text-size" colspan="3">
+                  {{adminDashboard.companyDetails?.fresherRequirements?.totalRequirements}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.fresherRequirements?.totalTalentsRequired}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.fresherRequirements?.placementsInProcess}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.fresherRequirements?.talentsNeeded}}
+                </td>
+              </tr>
+              <tr (click)="goTo('/company/enquiry')">
+                <th class="text-size" scope="row" colspan="6">
+                  Experienced
+                </th>
+                <td class="text-size" colspan="3">
+                  {{adminDashboard.companyDetails?.experienceRequirements?.totalRequirements}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.experienceRequirements?.totalTalentsRequired}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.experienceRequirements?.placementsInProcess}}
+                </td>
+                <td class="text-size">
+                  {{adminDashboard.companyDetails?.experienceRequirements?.talentsNeeded}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Technologies -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header bg-dark text-white header-cursor" (click)="showTechnologyDashboard()">
+          <h2 class="card-title ">TECHNOLOGIES</h2>
+          <h3 *ngIf="adminDashboard.technologyDetails?.totalCount && !isTechnologyDashboardVisible">
+            <label class="label">Total {{adminDashboard.technologyDetails?.totalCount}}</label>
+          </h3>
+          <h5 *ngIf="adminDashboard.technologyDetails?.totalCount && isTechnologyDashboardVisible">
+            <label class="label">Total with Talents
+              {{adminDashboard.technologyDetails?.technologiesData?.length}}</label>
+          </h5>
+        </div>
+        <div class="card-body table-hover" *ngIf="isTechnologyDashboardVisible">
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <tr>
+                <th class="text-size">No.</th>
+                <th class="text-size">Name</th>
+                <th class="text-center text-size">Fresher</th>
+                <th class="text-center text-size">Experienced</th>
+                <th class="text-center text-size">Total</th>
+              </tr>
+              <tr *ngFor="let technologyData of adminDashboard.technologyDetails?.technologiesData,let i =index"
+                (click)="goTo('/admin/models/technology')">
+                <!-- <ng-container *ngIf="!technologyData?.totalTalents == 0;"> -->
+                <th>{{i+1}}</th>
+                <th class="text-size">{{technologyData?.name}}</th>
+                <td class="text-center text-size">{{technologyData?.totalFreshers}}</td>
+                <td class="text-center text-size">{{technologyData?.totalExperienced}}</td>
+                <td class="text-center text-size">{{technologyData?.totalTalents}}</td>
+                <!-- </ng-container> -->
+              </tr>
+              <tr style="background-color: lightsteelblue;">
+                <th></th>
+                <th>Total</th>
+                <td class="text-center text-size"><strong>{{adminDashboard.technologyDetails?.totalFreshers}}</strong>
+                </td>
+                <td class="text-center text-size">
+                  <strong>{{adminDashboard.technologyDetails?.totalExperienced}}</strong>
+                </td>
+                <td class="text-center text-size"><strong>{{adminDashboard.technologyDetails?.totalTalents}}</strong>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<app-master-footer></app-master-footer>
+
+<ng-template #batchTalents let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h3 class="modal-title display-3">Batch Name: {{batchName}}</h3>
+    </div>
+    <button type="button" class="close" (click)="dismissBatchTalentModal(modal)" class="btn btn-default"
+      type="button"><i class="material-icons">highlight_off</i></button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <div *ngIf="batchTalentPerformanceDetails && batchTalentPerformanceDetails.length > 0; else noBatchDetails"
+      class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="subheader bg-secondary text-white tdCenter">
+          <tr>
+            <th>Sr. No</th>
+            <th>Talent Name</th>
+            <th>Interview Rating</th>
+            <!-- <th *ngFor="let title of feebackKeyword">
+              {{title.name}}
+            </th> -->
+            <ng-container *ngFor="let group of feebackKeyword; let i = index">
+              <th>
+                <!-- *ngIf="!group.showGroupDetails; else showGroupTitle"
+                (click)="group.showGroupDetails=!group.showGroupDetails" style="cursor: pointer;" -->
+                Group {{group.groupName}}
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" [id]="group.groupName + 'talentID'"
+                    (click)="toggleGroupVisibility(group)" [(ngModel)]="group.showGroupDetails">
+                  <label class="custom-control-label" [for]="group.groupName + 'talentID'"></label>
+                </div>
+              </th>
+              <ng-container *ngFor="let title of group.keywords">
+                <th *ngIf="group.showGroupDetails">
+                  {{title.name}}
+                </th>
+              </ng-container>
+              <!-- <ng-template #showGroupTitle>
+                <th *ngFor="let title of group.keywords" (click)="group.showGroupDetails=!group.showGroupDetails"
+                  style="cursor: pointer;">
+                  ❮ {{title.name}}
+                </th>
+              </ng-template> -->
+            </ng-container>
+            <th>Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr (click)="getTalentScore(performance, batchSessionWiseScore)"
+            *ngFor="let performance of batchTalentPerformanceDetails; let i = index">
+            <td class="text-center">{{i+1}}</td>
+            <td class="text-center">{{performance.firstName}} {{performance.lastName}}</td>
+            <td class="text-center">
+              <div *ngIf="performance.interviewRating > 0; else noRating">
+                {{performance && performance.interviewRating | number:'1.2-2'}}
+              </div>
+              <ng-template #noRating>
+                N/A
+              </ng-template>
+            </td>
+            <ng-container *ngFor="let groupScore of performance.feedbackKeywords; let j = index">
+              <!-- *ngIf="!feebackKeyword[j]?.showGroupDetails; else showFeedbackScore" -->
+              <td class="text-center">
+                <div *ngIf="groupScore.feedbackScore?.length > 0; else noFeedbackScore">
+                  {{calculateAvgGroupScore(groupScore) | number:'1.2-2'}}
+                </div>
+                <ng-template #noFeedbackScore>
+                  N/A
+                </ng-template>
+              </td>
+              <ng-container *ngIf="feebackKeyword[j]?.showGroupDetails">
+                <td *ngFor="let scores of performance.feedbackKeywords[j]?.feedbackScore" class="text-center">
+                  {{scores.keywordScore | number:'1.2-2'}}
+                </td>
+                <td *ngIf="feebackKeyword[j].keywords?.length != performance.feedbackKeywords[j].feedbackScore?.length"
+                  class="text-center"
+                  [attr.colspan]="feebackKeyword[j].keywords?.length - performance.feedbackKeywords[j].feedbackScore?.length">
+                  N/A
+                </td>
+              </ng-container>
+            </ng-container>
+            <td class="text-center">
+              <ng-container *ngIf="performance.interviewRating  == 0 || performance.score  == 0 || 
+                  performance.score == performance.interviewRating; then second; 
+                  else (performance.score > performance.interviewRating && first) || (third)">
+              </ng-container>
+              <ng-template #first>
+                <p class="green sales-subheader"><strong>{{performance && performance.score | number:'1.2-2'}}</strong>
+                  <span class="material-icons">navigation</span>
+                </p>
+                <span class="green small-font">(+{{performance.score - performance.interviewRating |
+                  number:'1.2-2'}})</span>
+              </ng-template>
+              <ng-template #second>
+                <div *ngIf="performance.score > 0; else noScore">
+                  <p class="grey sales-subheader"><strong>{{performance && performance.score | number:'1.2-2' ||
+                      "N/A"}}</strong></p>
+                </div>
+                <ng-template #noScore>
+                  N/A
+                </ng-template>
+              </ng-template>
+              <ng-template #third>
+                <p class="red sales-subheader"><strong>{{performance.score | number:'1.2-2'}}</strong>
+                  <span class="material-icons lowScore">navigation</span>
+                </p>
+                <span class="red small-font">{{((performance.score - performance.interviewRating) > 0) ? '-' : '' }}
+                  {{performance.score - performance.interviewRating | number:'1.2-2'}}</span>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noBatchDetails>
+      <div class="container full-h">
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h4>Talent details not found</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="dismissBatchTalentModal(modal)">Close</button>
+  </div>
+
+</ng-template>
+
+<ng-template #batchSessionWiseScore let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h3 class="modal-title display-3">Talent Name: {{sessionWiseTalentScore.firstName}}
+        {{sessionWiseTalentScore.lastName}}</h3>
+      <h3 class="modal-title display-3">Batch Name: {{sessionWiseTalentScore.batchName}}</h3>
+    </div>
+    <button type="button" class="close" (click)="modal.close()" class="btn btn-default" type="button"><i
+        class="material-icons">highlight_off</i></button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <!-- <div class="row"> -->
+    <div *ngIf="sessionWiseTalentScore; else noSessionDetails" class="table-responsive">
+      <table class="table table-bordered session-table">
+        <thead>
+          <tr>
+            <th>Sr. No</th>
+            <th>Session Name</th>
+            <th>Session Date</th>
+            <ng-container *ngFor="let group of sessionWiseTalentScore.keywordNames; let i = index">
+              <th>
+                <!-- *ngIf="!group.showGroupDetails; else showGroupTitle"
+                (click)="group.showGroupDetails=!group.showGroupDetails" style="cursor: pointer;" -->
+                Group {{group.groupName}}
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" [id]="group.groupName + 'sessionID'"
+                    (click)="toggleGroupVisibility(group)" [(ngModel)]="group.showGroupDetails">
+                  <label class="custom-control-label" [for]="group.groupName + 'sessionID'"></label>
+                </div>
+              </th>
+              <ng-container *ngFor="let title of group.keywords">
+                <th *ngIf="group.showGroupDetails">
+                  {{title.name}}
+                </th>
+              </ng-container>
+              <!-- <ng-template #showGroupTitle>
+                <th *ngFor="let title of group.keywords" (click)="group.showGroupDetails=!group.showGroupDetails"
+                  style="cursor: pointer;">
+                  ❮ {{title.name}}
+                </th>
+              </ng-template> -->
+            </ng-container>
+            <th style="cursor: pointer;">
+              <!-- (click)="isFeelingVisible=!isFeelingVisible" -->
+              Feeling
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="feelingID"
+                  (click)="isFeelingVisible=!isFeelingVisible" [(ngModel)]="isFeelingVisible">
+                <label class="custom-control-label" for="feelingID"></label>
+              </div>
+            </th>
+            <ng-container *ngIf="isFeelingVisible">
+              <th style="cursor: pointer;" (click)="isFeelingVisible=!isFeelingVisible">Feeling Level</th>
+              <th style="cursor: pointer;" (click)="isFeelingVisible=!isFeelingVisible">Feeling Descripton</th>
+            </ng-container>
+            <th>Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let performance of sessionWiseTalentScore.sessionFeedback; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{performance.sessionName}}</td>
+            <td>{{performance.sessionDate | date:'fullDate'}}</td>
+            <ng-container *ngFor="let groupScore of performance.feedbackGroup; let j = index">
+              <!-- *ngIf="!sessionWiseTalentScore.keywordNames[j]?.showGroupDetails; else showFeedbackScore" -->
+              <td class="text-center">
+                <div *ngIf="groupScore.feedbackScore?.length > 0; else noFeedbackScore">
+                  {{calculateAvgGroupScore(groupScore) | number:'1.2-2'}}
+                </div>
+                <ng-template #noFeedbackScore>
+                  N/A
+                </ng-template>
+              </td>
+              <ng-container *ngIf="sessionWiseTalentScore.keywordNames[j]?.showGroupDetails">
+                <td *ngFor="let scores of performance.feedbackGroup[j].feedbackScore" class="text-center">
+                  {{scores.keywordScore | number:'1.2-2'}}
+                </td>
+                <td *ngIf="sessionWiseTalentScore.keywordNames[j].keywords?.length != 
+                  performance.feedbackGroup[j].feedbackScore?.length" class="text-center"
+                  [attr.colspan]="performance.feedbackGroup[j].feedbackScore?.length-sessionWiseTalentScore.keywordNames[j].keywords?.length">
+                  N/A
+                </td>
+              </ng-container>
+              <!-- <ng-template #showFeedbackScore>
+              </ng-template> -->
+            </ng-container>
+            <td class="text-center">
+              <div *ngIf="performance.feelingName != '';else noFeelingName">
+                {{performance.feelingName}}
+              </div>
+              <ng-template #noFeelingName>
+                N/A
+              </ng-template>
+            </td>
+            <ng-container *ngIf="isFeelingVisible">
+              <td>
+                <div *ngIf="performance.levelNumber > 0; else noLevel">
+                  {{performance.levelNumber}}
+                </div>
+                <ng-template #noLevel>
+                  N/A
+                </ng-template>
+              </td>
+              <td>
+                <div *ngIf="performance.description != '';else noDescription">
+                  {{performance.description}}
+                </div>
+                <ng-template #noDescription>
+                  N/A
+                </ng-template>
+              </td>
+            </ng-container>
+            <td class="sales-subheader">{{performance.score | number:'1.2-2'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noSessionDetails>
+      <div class="container full-h">
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h4>Talent details not found</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+    <!-- </div> -->
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+  </div>
+
+</ng-template>

@@ -1,0 +1,203 @@
+<app-master-navbar></app-master-navbar>
+
+
+
+<ng-template #labelTemplate let-name="name">
+  <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #compulsaryLabelTemplate let-name="name">
+  <label class="form-control-label-style"><span *ngIf="!isViewClicked" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+
+<div class="container-fluid margin-2pt">
+  <br>
+
+  <div class="d-flex justify-content-start align-items-start">
+    <div class="totalLabel">
+      <h1>Total Programming Question Type: <span class="swabhav-light-orange-text">{{totalProgrammingQuestionTypes ||
+          0}}</span></h1>
+    </div>
+
+    <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission?.add"
+      (click)="onAddClick()">Add New Programming Question Type <i class="inline-icon material-icons">add</i>
+    </button>
+  </div>
+
+  <br>
+
+  <div *ngIf="totalProgrammingQuestionTypes > 0" class="view-label-flex">
+    Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+    &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalProgrammingQuestionTypes}}</strong></span>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center flex-row">
+    <div class="d-flex justify-content-between align-items-center flex-row">
+      <form class="form-inline" [formGroup]="programmingQuestionTypeSearchForm">
+        <label for="programmingType" class="filter-form-label">Programming Question Type:</label>
+        &nbsp;&nbsp;
+        <input type="text" name="programmingType" class="form-control input-style" formControlName="programmingType"
+          placeholder="Enter Type">
+        &nbsp;&nbsp;
+        <button class="btn btn-sm filter-button material-icons-button" type="submit"
+          (click)="searchProgrammingQuestion()" [disabled]="!programmingQuestionTypeSearchForm.dirty">Search</button>
+        &nbsp;&nbsp;&nbsp;
+      </form> &nbsp;&nbsp;&nbsp;
+      <button type="button" *ngIf="isSearched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+        (click)="resetSearchAndGetAll()">View All Programming Question Type</button>
+    </div>
+    <div class="d-flex justify-content-between align-items-start flex-row">
+      <div class="d-flex">
+        <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+        <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+          <option selected>5</option>
+          <option>10</option>
+          <option>20</option>
+          <option>50</option>
+        </select> &nbsp;&nbsp;&nbsp;
+      </div>
+      <div class="d-flex">
+        <ul class="pagination" *ngFor="let type of programmingQuestionType | paginate: { id:'typePageID',
+          itemsPerPage: limit, currentPage: currentPage, totalItems: totalProgrammingQuestionTypes }">
+        </ul>
+        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="typePageID">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="card-body padding-0pt swabhav-shadow" *ngIf="totalProgrammingQuestionTypes > 0; else noTypes">
+    <div class="table-responsive">
+      <table class="table table-striped table-borderless">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Type</th>
+            <th>View</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let type of programmingQuestionType; let i = index">
+            <td>{{(i+1)+(offset*limit)}}</td>
+            <td>{{type.programmingType}}</td>
+            <td data-toggle="tooltip" data-placement="top" title="View Programming Type Details">
+              <button type="button" class="btn btn-default" (click)="onViewClick(type)"><i
+                  class="material-icons">visibility</i>
+              </button>
+            </td>
+            <td *ngIf="permission && permission?.delete" data-toggle="tooltip" data-placement="top"
+              title="Delete Programming Type">
+              <button class="btn btn-default" (click)="onDeleteClick(type.id)"><i class="material-icons">delete</i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Programming question Not Found -->
+  <ng-template #noTypes>
+    <div class="container full-h">
+      <br />
+      <br />
+      <div class="d-flex align-items-center full-h">
+        <div class="col-sm-12 col-md-8 mx-auto">
+          <div class="jumbotron">
+            <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>Programming question type not found</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+</div>
+
+<app-master-footer></app-master-footer>
+
+<!-- Programming Question Type Modal -->
+<ng-template #programmingQuestionTypeModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">
+        {{isViewClicked? 'Programming Question Type Details': isUpdateClicked ? 'Update Programming Type Question' :
+        'Add Programming Type Question' }}
+        <button *ngIf="isViewClicked && permission?.update" class="btn btn-default material-icons-button" type="button"
+          (click)="onUpdateClick()"><i class="material-icons grey-icon">create</i></button>
+      </h4><span *ngIf="!isViewClicked"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="programmingQuestionTypeForm">
+      <div class="row">
+        <div class="form-group col-12">
+          <label class="filter-form-label"><span *ngIf="!isViewClicked" class="red">* </span>Type:</label>
+          <input type="text" formControlName="programmingType" class="form-control input-style"
+            placeholder="eg: Recursion">
+          <div class="alert alert-danger"
+            *ngIf="(programmingQuestionTypeForm.get('programmingType').touched||
+              programmingQuestionTypeForm.get('programmingType').dirty)&&programmingQuestionTypeForm.get('programmingType').invalid">
+            <div *ngIf="programmingQuestionTypeForm.get('programmingType').errors.required">
+              Programming question type must be specified
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.close()">Close</button>
+    <button type="button" *ngIf="!isViewClicked" class="btn btn-submit-swabhav material-icons-button"
+      [disabled]="!programmingQuestionTypeForm.dirty" (click)="validate()">
+      {{isUpdateClicked ? 'Update Type' : 'Add Type'}}
+    </button>
+  </div>
+
+</ng-template>
+
+<!-- Delete Modal -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Comfirmation</h4>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="button"><i
+        class="material-icons close-icon material-icons-button">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want you to delete this programming question type?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button"
+      (click)="modal.dismiss('Cross click');">No
+    </button>
+  </div>
+
+</ng-template>

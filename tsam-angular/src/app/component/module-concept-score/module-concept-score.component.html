@@ -1,0 +1,116 @@
+<app-master-navbar></app-master-navbar>
+
+<div class="page-style">
+
+    <br>
+
+    <!-- Back Button -->
+    <div class="button-group-style">
+        <button class="btn btn-default swabhav-button-round" (click)="redirectToBtchDetails()">Back</button>
+    </div>
+
+    <br>
+
+    <ng-container *ngIf="batchID">
+
+        <!-- Module Tab Menu -->
+        <ng-container *ngIf="batchModuleTabList.length > 0">
+            <div class="card module-tab-menu-style">
+                <mat-tab-group mat-align-tabs="center" (selectedTabChange)="onModuleTabClick($event)">
+                    <ng-container *ngFor="let batchModuleTab of batchModuleTabList;let i = index">
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <div>
+                                    <img width="40" src={{batchModuleTab.imageURL}}>
+                                    <br><br>
+                                    <div>{{batchModuleTab.moduleName}}</div>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                    </ng-container>
+                </mat-tab-group>
+            </div>
+        </ng-container>
+
+        <!-- Indicators -->
+        <ng-container *ngIf="batchModuleTabList.length > 0">
+            <div class="button-group-style indicator-box-style">
+                <div class="indicator-style red-indicator-style"><span class="tool-tip-text-style">Score from 0 to 5</span>
+                </div>&nbsp;&nbsp;<div class="font-weight-bold font-sm-style">Weak</div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="indicator-style orange-indicator-style"><span class="tool-tip-text-style">Score from 5.1 to
+                        7.5</span></div>&nbsp;&nbsp;<div class="font-weight-bold font-sm-style">Can Do Better</div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="indicator-style green-indicator-style"><span class="tool-tip-text-style">Score from 7.6 to
+                        10</span></div>&nbsp;&nbsp;<div class="font-weight-bold font-sm-style">Strong</div>
+            </div>
+        </ng-container>
+
+        <!-- Concept tree -->
+
+        <ng-container *ngIf="workflowItems.length > 0">
+            <div class="row">
+                <div class="col-2 no-side-padding">
+                    <div class="talent-panel-style h-100" *ngIf="!access.isTalent">
+                        <div class="card node-card-style">
+                            <div class="card-body card-body-style">
+                                <div class="font-weight-bold font-lg-style color-D63C2A">
+                                    Talents
+                                </div>
+                                <br>
+                                <div class="text-left font-weight-bold cursor-pointer-style talent-name-style"
+                                    (click)="onTalentClick(batchTalent.id)"
+                                    *ngFor="let batchTalent of batchTalentList; let i = index"
+                                    [ngClass]="{'selected-talent-name-style': talentID==batchTalent.id}">
+                                    &nbsp;&nbsp;&nbsp;{{i+1}}) {{batchTalent.firstName}} {{batchTalent.lastName}}
+                                    <hr class="talent-hr-style">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="no-side-padding" [ngClass]="{'col-10': !access.isTalent, 'col-12': access.isTalent}">
+                    <div class="h-100">
+                        <ng-container *ngIf="workflow$ | async as workflow">
+                            <div class="concept-tree-box-style" (scroll)="onConceptTreeScroll($event)">
+                                <div class="flex row row-style box"
+                                    *ngFor="let row of workflow; let first = first; let i = index">
+                                    <div class="level-style">
+                                        Level: {{i+1}}
+                                    </div>
+                                    <div class="mt-4 flex justify-between items-center push" *ngFor="let col of row">
+                                        <app-module-concept-score-node #nodeList #nodeComponentList [node]="col"
+                                            (redrawParentLines)="removeAndDrawLines()">
+                                        </app-module-concept-score-node>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <br><br>
+
+    </ng-container>
+
+    <!-- No Concept Tree Found -->
+    <ng-container *ngIf="!batchID || workflowItems.length == 0">
+        <div class="card my-course-card-style h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+                    <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+                    <br>
+                    <div class="font-lg-style text-center">
+                        No Concept Tree Found
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </ng-container>
+</div>
+
+<app-master-footer></app-master-footer>

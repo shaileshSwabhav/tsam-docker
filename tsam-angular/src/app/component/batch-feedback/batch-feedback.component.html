@@ -1,0 +1,650 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid margin-2pt">
+
+    <br />
+
+    <div class="d-flex justify-content-between align-items-baseline flex-row flex-wrap">
+        <div class="d-flex flex-wrap">
+            <button type="button" class="btn filter-button" [disabled]="disableButton" (click)="backToPreviousPage()">
+                <i class="inline-icon material-icons-outlined">chevron_left</i>Back
+            </button>
+        </div>
+        <div class="d-flex flex-wrap">
+            <h1 class="display-1">Batch Name: <span
+                    class="swabhav-light-orange-text"><strong>{{batchName}}</strong></span></h1>
+        </div>
+        <div class="d-flex"></div>
+    </div>
+
+</div>
+
+
+<div *ngIf="isFaculty || isAdmin || isSalesperson">
+
+    <div class="container-fluid">
+        <div class="card card-margin flex-fill" *ngIf="totalStudents > 0; else noTalents">
+            <div class="card-header">
+                <div class="form-group col-sm-12 col-md-12">
+                    <h1 class="display-1">Faculty's Feedback To Talent
+                        <div class="float-right">
+                            <span *ngIf="facultyAverageScore > 0">
+                                <ng-container
+                                    *ngIf="facultyAverageScore >= 7; then first; else (facultyAverageScore > 4 && second) || (third)">
+                                </ng-container>
+                                <ng-template #first>
+                                    <span class="badge badge-success">
+                                        Score: {{facultyAverageScore | number: '1.2-2'}}/10
+                                    </span>
+                                </ng-template>
+                                <ng-template #second>
+                                    <span class="badge badge-danger">
+                                        Score: {{facultyAverageScore | number: '1.2-2'}}/10
+                                    </span>
+                                </ng-template>
+                                <ng-template #third>
+                                    <span class="badge badge-warning">
+                                        Score: {{facultyAverageScore | number: '1.2-2'}}/10
+                                    </span>
+                                </ng-template>
+                            </span>
+                        </div>
+                    </h1>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div *ngFor="let feedback of facultyFeedbacks; let i = index" class="col-md-6 col-sm-12">
+                        <div class="card card-margin flex-fill">
+                            <!-- Card header -->
+                            <div class="card-header header-style pointer"
+                                (click)="feedback.showFeedback=!feedback.showFeedback">
+                                <h3 class="display-3">Name: {{feedback.talent.firstName}} {{feedback.talent.lastName}}
+                                    <div class="float-right">
+                                        <span
+                                            *ngIf="feedback.averageScore && feedback.averageScore != 0; else noFeedback">
+                                            <ng-container *ngIf="feedback.averageScore >= 7; then first; 
+                                                else (feedback.averageScore > 4 && second) || (third)">
+                                            </ng-container>
+                                            <ng-template #first>
+                                                <span class="badge badge-success">
+                                                    Score: {{feedback.averageScore | number: '1.2-2'}}/10
+                                                </span>
+                                            </ng-template>
+                                            <ng-template #second>
+                                                <span class="badge badge-danger">
+                                                    Score: {{feedback.averageScore | number: '1.2-2'}}/10
+                                                </span>
+                                            </ng-template>
+                                            <ng-template #third>
+                                                <span class="badge badge-warning">
+                                                    Score: {{feedback.averageScore | number: '1.2-2'}}/10
+                                                </span>
+                                            </ng-template>
+                                        </span>
+                                        <ng-template #noFeedback>
+                                            <button
+                                                *ngIf="(isFaculty || isAdmin) && feedback.batchFeedbacks.length == 0"
+                                                class="btn btn-sm"
+                                                (click)="onFacultyFeedbackAddClick(feedback, facultyFeedbackModal)"
+                                                [disabled]="disableButton">
+                                                <i class="material-icons green">feedback</i>
+                                            </button>
+                                        </ng-template>
+                                        <button
+                                            *ngIf="isAdmin && permission?.delete && feedback.batchFeedbacks.length > 0"
+                                            class="btn btn-sm"
+                                            (click)="onFacultyFeedbackDeleteClick(feedback, deleteConfirmationModal)"
+                                            [disabled]="disableButton">
+                                            <i class="material-icons red">delete</i>
+                                        </button>
+                                    </div>
+                                </h3>
+                            </div>
+                            <!-- Card Body -->
+                            <div *ngIf="feedback.showFeedback">
+                                <div class="card-body"
+                                    *ngIf="feedback.batchFeedbacks.length > 0; else feedbackNotFound">
+                                    <p><strong>Feedback:</strong></p>
+                                    <div class="container"
+                                        *ngFor="let sessionFeedback of feedback.batchFeedbacks;let j = index">
+                                        <p>Question {{j+1}}: {{sessionFeedback.question.question}}</p>
+                                        <p>Answer: {{sessionFeedback.answer}}</p>
+                                        <br />
+                                    </div>
+                                </div>
+                                <ng-template #feedbackNotFound>
+                                    <div class="col-sm-12 col-md-8 mx-auto">
+                                        <br />
+                                        <br />
+                                        <div class="jumbotron">
+                                            <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                                <h2>No feedbacks found</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ng-template #noTalents>
+            <br />
+            <br />
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-8 mx-auto">
+                    <div class="jumbotron">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Talents Not Found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+</div>
+
+
+<div class="container-fluid">
+    <div *ngIf="isAdmin || isSalesperson">
+
+        <div class="card card-margin flex-fill" *ngIf="totalFaculty > 0; else noFaculty">
+            <div class="card-header">
+                <div class="form-group col-sm-12 col-md-12">
+                    <h1 class="dispaly-">Talent's Feedback To Faculty</h1>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div *ngFor="let feedback of talentFeedbacks; let i = index" class="col-md-12 col-sm-12">
+                        <div class="card card-margin flex-fill">
+                            <!-- Card header -->
+                            <div class="card-header header-style pointer"
+                                (click)="feedback.showFeedback=!feedback.showFeedback">
+                                <h3 class="display-3">Name: {{feedback.faculty.firstName}} {{feedback.faculty.lastName}}
+                                    <div class="float-right">
+                                        <span *ngIf="feedback.averageScore && feedback.averageScore != 0">
+                                            <ng-container *ngIf="feedback.averageScore >= 7; then first; 
+                                            else (feedback.averageScore > 4 && second) || (third)">
+                                            </ng-container>
+                                            <ng-template #first>
+                                                <span class="badge badge-success">
+                                                    Score: {{feedback.averageScore | number: '1.2-2'}}/10
+                                                </span>
+                                            </ng-template>
+                                            <ng-template #second>
+                                                <span class="badge badge-danger">
+                                                    Score: {{feedback.averageScore | number: '1.2-2'}}/10
+                                                </span>
+                                            </ng-template>
+                                            <ng-template #third>
+                                                <span class="badge badge-warning">
+                                                    Score: {{feedback.averageScore | number: '1.2-2'}}/10
+                                                </span>
+                                            </ng-template>
+                                        </span>
+                                    </div>
+                                </h3>
+                            </div>
+                            <!-- Card Body -->
+                            <div *ngIf="feedback.showFeedback">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12"
+                                            *ngFor="let talentFeedback of feedback.feedbacks; let i = index">
+                                            <div class="card card-margin flex-fill">
+                                                <div class="card-header pointer"
+                                                    (click)="talentFeedback.showFeedback=!talentFeedback.showFeedback">
+                                                    <h3 class="display-3">Talent name:
+                                                        {{talentFeedback.talent.firstName}}
+                                                        {{talentFeedback.talent.lastName}}
+                                                        <div class="float-right">
+                                                            <button
+                                                                *ngIf="isAdmin && talentFeedback.batchFeedbacks.length == 0"
+                                                                class="btn btn-sm"
+                                                                (click)="onTalentFeedbackAddClick(feedback, talentFeedbackModal, talentFeedback)"
+                                                                [disabled]="disableButton">
+                                                                <i class="material-icons green">feedback</i>
+                                                            </button>
+                                                            <button
+                                                                *ngIf="isAdmin && permission?.delete && talentFeedback.batchFeedbacks.length > 0"
+                                                                class="btn btn-sm"
+                                                                (click)="onTalentFeedbackDeleteClick(feedback, talentFeedback, deleteConfirmationModal)"
+                                                                [disabled]="disableButton">
+                                                                <i class="material-icons red">delete</i>
+                                                            </button>
+                                                        </div>
+                                                    </h3>
+                                                </div>
+                                                <div *ngIf="talentFeedback.showFeedback">
+                                                    <div class="card-body">
+                                                        <div
+                                                            *ngIf="talentFeedback.batchFeedbacks.length > 0; else feedbackNotFound">
+                                                            <div class="container"
+                                                                *ngFor="let sessionFeedback of talentFeedback.batchFeedbacks;let j = index">
+                                                                <p>Question {{j+1}}:
+                                                                    {{sessionFeedback.question.question}}</p>
+                                                                <p>Answer: {{sessionFeedback.answer}}</p>
+                                                                <br />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <ng-template #feedbackNotFound>
+                                                    <div class="col-sm-12 col-md-8 mx-auto">
+                                                        <br />
+                                                        <br />
+                                                        <div class="jumbotron">
+                                                            <div
+                                                                class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                                                <h2>No feedbacks found</h2>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ng-template #noFaculty>
+            <br />
+            <br />
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-8 mx-auto">
+                    <div class="jumbotron">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Faculty Not Found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div *ngIf="isTalent">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="card card-left-margin flex-fill" *ngIf="totalFaculty > 0; else noFaculty">
+                    <div class="card-header">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <h1 class="display-1">Talents feedback to faculty</h1>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div *ngFor="let feedback of talentFeedbacks; let i = index" class="col-md-12 col-sm-12">
+                                <div class="card card-margin flex-fill">
+                                    <!-- Card header -->
+                                    <div class="card-header header-style pointer"
+                                        (click)="feedback.showFeedback=!feedback.showFeedback">
+                                        <h3 class="display-3">Name: {{feedback.faculty.firstName}}
+                                            {{feedback.faculty.lastName}}
+                                            <div class="float-right">
+                                                <button *ngIf="isTalent && feedback.batchFeedbacks.length == 0"
+                                                    class="btn btn-sm"
+                                                    (click)="onTalentFeedbackAddClick(feedback, talentFeedbackModal)"
+                                                    [disabled]="disableButton">
+                                                    <i class="material-icons green">feedback</i></button>
+                                            </div>
+                                        </h3>
+                                    </div>
+                                    <!-- Card Body -->
+                                    <div *ngIf="feedback.showFeedback">
+                                        <div class="card-body">
+                                            <div *ngIf="feedback.batchFeedbacks.length > 0; else feedbackNotFound">
+                                                <div class="container"
+                                                    *ngFor="let sessionFeedback of feedback.batchFeedbacks;let j = index">
+                                                    <p>Question {{j+1}}: {{sessionFeedback.question.question}}</p>
+                                                    <p>Answer: {{sessionFeedback.answer}}</p>
+                                                    <br />
+                                                </div>
+                                            </div>
+                                            <ng-template #feedbackNotFound>
+                                                <div class="col-sm-12 col-md-8 mx-auto">
+                                                    <br />
+                                                    <br />
+                                                    <div class="jumbotron">
+                                                        <div
+                                                            class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                                            <h2>No feedback found</h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noFaculty>
+                    <br />
+                    <br />
+                    <div class="d-flex align-items-center full-h">
+                        <div class="col-sm-12 col-md-8 mx-auto">
+                            <div class="jumbotron">
+                                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                                    <h2>Faculty Not Found</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-master-footer></app-master-footer>
+
+<!-- Talent Batch Feedback Modal -->
+<ng-template #talentFeedbackModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div class="modal-title">
+            <h2 class="modal-title">Feedback to {{feedbackTo}}</h2>
+            <span><span class="red">*
+                </span>marked fields are mandatory</span>
+        </div>
+        <button type="button" class="close" class="btn btn-default" type="submit"
+            (click)="modal.dismiss('Cross click')"><i class="material-icons">highlight_off</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="text-justify text-size"
+            *ngIf="talentBatchFeedbacksArray.controls.length > 0; else noFeedbackQuestions">
+            <form [formGroup]="talentBatchFeedbackForm">
+                <div formArrayName="feedbacks"
+                    *ngFor="let batchFeedback of talentBatchFeedbacksArray.controls;let i = index">
+                    <ng-container [formGroupName]="i">
+                        <div class="form-group col-md-12 col-sm-6">
+                            <label><span class="red">*</span> Question {{i+1}}:</label>
+                            {{talentFeedbackQuestions[i].question}}
+                        </div>
+                        <!-- From options -->
+                        <div *ngIf="talentFeedbackQuestions[i].hasOptions"
+                            class="form-group col-sm-6 col-md-12 margin-top">
+                            <label>Answer:</label>
+                            <div *ngIf="talentFeedbackQuestions[i].options.length == MAX_SCORE; 
+                                else showTalentOptions">
+                                <input type="range" [max]="MAX_SCORE" class="slider" step="1" [value]="INITIAL_SCORE"
+                                    (input)="onTalentFeedbackInput($event, batchFeedback, talentFeedbackQuestions[i].options)">
+                                <br>
+                                <div class="ticks">
+                                    <span class="tick">{{INITIAL_SCORE}}</span>
+                                    <span *ngFor="let option of talentFeedbackQuestions[i].options"
+                                        class="tick">{{option.value}}</span>
+                                </div>
+                            </div>
+                            <ng-template #showTalentOptions>
+                                <select class="form-control input-style" formControlName="optionID"
+                                    (change)="onTalentFeedbackChange(batchFeedback, talentFeedbackQuestions[i].options)">
+                                    <option [ngValue]="null" disabled>Select Answer</option>
+                                    <option *ngFor="let option of talentFeedbackQuestions[i].options"
+                                        [ngValue]="option.id">
+                                        {{option.value}}</option>
+                                </select>
+                            </ng-template>
+                            <div class="alert alert-danger" *ngIf="(batchFeedback.get('optionID').touched || batchFeedback.get('optionID').dirty)
+                                && batchFeedback.get('optionID').invalid">
+                                <span *ngIf="batchFeedback.get('optionID').errors.required">
+                                    Answer must be selected
+                                </span>
+                            </div>
+                        </div>
+                        <!-- No Options -->
+                        <div *ngIf="!talentFeedbackQuestions[i].hasOptions" class="form-group col-md-12 col-sm-6">
+                            <label for="exampleFormControlTextarea2">Answer:</label>
+                            <textarea class="form-control input-style rounded-0" id="exampleFormControlTextarea2"
+                                rows="3" formControlName="answer" placeholder="Enter your answer"></textarea>
+                            <div class="alert alert-danger" *ngIf="(batchFeedback.get('answer').touched || batchFeedback.get('answer').dirty)
+                                && batchFeedback.get('answer').invalid">
+                                <div *ngIf="batchFeedback.get('answer').errors.required">
+                                    Answer must be specified
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </form>
+        </div>
+        <ng-template #noFeedbackQuestions>
+            <br />
+            <br />
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-8 mx-auto">
+                    <div class="jumbotron">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Feedback Questions Not Found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+            (click)="modal.dismiss('Cross click')">Close
+        </button>
+        <button type="button" class="btn btn-submit-swabhav material-icons-button" [disabled]="disableButton"
+            *ngIf="talentBatchFeedbacksArray.controls.length > 0" (click)="validateTalentFeedback()">Submit
+        </button>
+    </div>
+
+</ng-template>
+
+<!-- Faculty Batch Feedback Modal -->
+<ng-template #facultyFeedbackModal let-modal>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div class="modal-title">
+            <h2 class="modal-title">Feedback to {{feedbackTo}}</h2>
+            <span><span class="red">*
+                </span>marked fields are mandatory</span>
+        </div>
+        <button type="button" class="close" class="btn btn-default" type="submit"
+            (click)="modal.dismiss('Cross click')"><i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="text-justify text-size" *ngIf="feedbackGroupQuestions.length > 0; else noFeedbackQuestions">
+            <form [formGroup]="feedbackGroupForm">
+                <div formArrayName="feedbackGroups"
+                    *ngFor="let feedbackGroup of feedbackGroupArray.controls;let i = index">
+                    <ng-container [formGroupName]="i">
+                        <div class="form-group col-md-12 col-sm-6">
+                            <label>Group:</label>
+                            {{feedbackGroupQuestions[i].groupName}}
+                        </div>
+                        <div class="form-group col-md-12 col-sm-6">
+                            <label>Description:</label>
+                            {{feedbackGroupQuestions[i].groupDescription}}
+                        </div>
+                        <div class="form-group col-md-12 col-sm-6">
+                            <label>Rating:</label>
+                        </div>
+                        <div class="form-group col-12">
+                            <!-- [min]="feedbackGroupQuestions[i].minScore" -->
+                            <input type="range" [max]="MAX_SCORE" [value]="INITIAL_SCORE" class="slider" step="1"
+                                (input)="addFeedbackQuestionsForGroup($event, i)">
+                            <br>
+                            <div class="ticks">
+                                <span class="tick" *ngFor="let count of counter(); let i = index">{{i}}</span>
+                            </div>
+                            <div class="alert alert-danger" *ngIf="(feedbackGroup.get('answer').touched || 
+                                feedbackGroup.get('answer').dirty) && feedbackGroup.get('answer').invalid">
+                                <span
+                                    *ngIf="feedbackGroup.get('answer').errors.required || feedbackGroup.get('answer').errors.min">
+                                    Answer must be selected
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Show questions if feedbackGroup score is less than 7 -->
+                        <div class="text-justify text-size" *ngIf="feedbackGroupQuestions[i].answer > INITIAL_SCORE">
+                            <div *ngIf="MINIMUM_SCORE >= feedbackGroup.get('answer').value; else optionNotFound">
+                                <br>
+                                <small><strong><i>Give us the specifics so we can pinpoint the
+                                            problem.</i></strong></small>
+                                <br>
+                                <br>
+                            </div>
+                            <ng-template #optionNotFound>
+                                <div *ngIf="isFeedbackOptionsAvailable(feedbackGroupQuestions[i].feedbackQuestions,
+                                    feedbackGroup.get('answer').value)">
+                                    <br>
+                                    <small><strong><i>These questions don't have the rating
+                                                {{feedbackGroup.get('answer')?.value}},
+                                                Please answer them!</i></strong></small>
+                                    <br>
+                                    <br>
+                                </div>
+
+                            </ng-template>
+
+                            <div formArrayName="feedbackQuestions"
+                                *ngFor="let feedbackQuestion of getFeedbackQuestions(i).controls;let j = index">
+                                <ng-container [formGroupName]="j">
+                                    <div *ngIf="!feedbackGroupQuestions[i].feedbackQuestions[j].hasOptions ||
+                                        feedbackQuestion.get('isVisible').value">
+                                        <div class="form-group col-md-12 col-sm-6">
+                                            <label><span class="red">*</span> Question:</label>
+                                            {{feedbackGroupQuestions[i].feedbackQuestions[j].question}}
+                                        </div>
+                                        <!-- Has Options -->
+                                        <div *ngIf="feedbackGroupQuestions[i].feedbackQuestions[j].hasOptions; else noOptions"
+                                            class="form-group col-sm-6 col-md-12 margin-top">
+                                            <label>Answer:</label>
+                                            <div *ngIf="feedbackGroupQuestions[i].feedbackQuestions[j].options.length == MAX_SCORE; 
+                                                else showOptions">
+                                                <input type="range" [max]="MAX_SCORE"
+                                                    [value]="feedbackQuestion.get('answer')?.value" class="slider"
+                                                    step="1" (input)="onFacultyFeedbackInput($event, feedbackQuestion, 
+                                                        feedbackGroupQuestions[i].feedbackQuestions[j].options)">
+                                                <br>
+                                                <div class="ticks">
+                                                    <span class="tick">{{INITIAL_SCORE}}</span>
+                                                    <span
+                                                        *ngFor="let option of feedbackGroupQuestions[i].feedbackQuestions[j].options"
+                                                        class="tick">{{option.key}}</span>
+                                                </div>
+                                            </div>
+                                            <ng-template #showOptions>
+                                                <select class="form-control input-style" formControlName="optionID"
+                                                    (change)="onFacultyFeedbackChange(feedbackQuestion, feedbackGroupQuestions[i].feedbackQuestions[j].options)">
+                                                    <option [ngValue]="null" disabled>Select Option</option>
+                                                    <option
+                                                        *ngFor="let option of feedbackGroupQuestions[i].feedbackQuestions[j].options"
+                                                        [ngValue]="option.id">
+                                                        {{option.value}}
+                                                    </option>
+                                                </select>
+                                            </ng-template>
+                                            <div class="alert alert-danger"
+                                                *ngIf="(feedbackQuestion.get('optionID').touched || 
+                                                feedbackQuestion.get('optionID').dirty) && feedbackQuestion.get('optionID').invalid">
+                                                <span *ngIf="feedbackQuestion.get('optionID').errors.required">
+                                                    Answer must be selected
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <!-- No Options -->
+                                        <ng-template #noOptions>
+                                            <div class="form-group col-md-12 col-sm-6">
+                                                <label for="exampleFormControlTextarea2">Answer:</label>
+                                                <textarea class="form-control input-style rounded-0"
+                                                    id="exampleFormControlTextarea2" rows="3" formControlName="answer"
+                                                    placeholder="Enter your answer"></textarea>
+                                                <div class="alert alert-danger"
+                                                    *ngIf="(feedbackQuestion.get('answer').touched || 
+                                                    feedbackQuestion.get('answer').dirty) && feedbackQuestion.get('answer').invalid">
+                                                    <div *ngIf="feedbackQuestion.get('answer').errors.required">
+                                                        Answer must be specified
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <hr>
+                </div>
+            </form>
+        </div>
+
+        <ng-template #noFeedbackQuestions>
+            <br />
+            <br />
+            <div class="d-flex align-items-center full-h">
+                <div class="col-sm-12 col-md-8 mx-auto">
+                    <div class="jumbotron">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                            <h2>Feedback Questions Not Found</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+            (click)="modal.dismiss('Cross click')">Close
+        </button>
+        <button type="button" class="btn btn-submit-swabhav material-icons-button" [disabled]="disableButton"
+            *ngIf="feedbackGroupQuestions.length > 0" (click)="validateFacultyFeedback()">Submit
+        </button>
+    </div>
+
+</ng-template>
+
+
+<!-- Delete Talent Comfirmation -->
+<ng-template #deleteConfirmationModal let-modal>
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <h3 class="modal-title">Comfirmation</h3>
+        <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default"
+            type="button"><i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+                Are you sure want you to delete the feedback?
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" (click)="deleteFacultyBatchFeedback()"
+            [disabled]="disableButton">Yes
+        </button>
+        <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click')">No</button>
+    </div>
+</ng-template>

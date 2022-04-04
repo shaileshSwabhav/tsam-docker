@@ -1,0 +1,141 @@
+<app-master-navbar></app-master-navbar>
+
+<ng-template #dashTemplate>
+    <span>-</span>
+</ng-template>
+
+<div>
+    <br>
+    <button class="btn btn-default swabhav-button-square back-button-margin" (click)="backToPreviousPage()">
+        Back
+    </button>
+    <br><br>
+</div>
+<div class="image-container">
+    <img class="main-image" src="{{buildingPath}}" alt="">
+    <div class="circle">
+        <div *ngIf="company?.logo; else companyBranchName">
+            <img class="logo" src={{company.logo}} alt="">
+        </div>
+    </div>
+    <ng-template #companyBranchName>
+        <img class="logo-default" src="assets/logo/default-logo-circle.png" alt="">
+    </ng-template>
+    <span class="company-name">{{companyBranch.branchName}}</span>
+    <!-- <br>
+    <span class="company-name-bottom">IT Company</span> -->
+    <button *ngIf="!isApplied; else applied" class="btn btn-default swabhav-button-square company-details-button-style"
+        type="button" (click)="onApplyNowButtonClick()">
+        Apply Now
+    </button>
+    <ng-template #applied>
+        <button class="btn btn-default swabhav-button-square company-details-button-style cursor-default-style"
+            type="button">
+            Applied
+        </button>
+    </ng-template>
+</div>
+<div class="container-fluid details">
+    <div class="standard-page-margin">
+        <div class="row">
+            <div class="col-sm-3 col-md-3">
+                <span>
+                    <i class="material-icons icon-style">location_on</i>
+                    <div class="icon-text">
+                        <div class="color-D63C2A font-weight-bold font-lg-style">Location</div>
+                        <div class="font-weight-bold font-md-style color-212121 cursor-default-style">
+                            {{companyRequirementDetails.city}}</div>
+                    </div>
+                </span>
+            </div>
+            <div class="col-sm-3 col-md-3">
+                <span>
+                    <i class="material-icons icon-style ">local_offer</i>
+                    <div class="icon-text">
+                        <div class="color-D63C2A font-weight-bold font-lg-style">Role</div>
+                        <div class="font-weight-bold font-md-style color-212121 cursor-default-style">
+                            <span *ngIf="companyRequirementDetails.designation">
+                                {{companyRequirementDetails.designation.position}}
+                            </span>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="col-sm-3 col-md-3">
+                <span>
+                    <i class="material-icons icon-style">people</i>
+                    <div class="icon-text">
+                        <div class="color-D63C2A font-weight-bold font-lg-style">Employee</div>
+                        <div class="font-weight-bold font-md-style color-212121 cursor-default-style">
+                            <span
+                                *ngIf="companyBranch.numberOfEmployees && companyBranch.numberOfEmployees>0;else dashTemplate">
+                                {{companyBranch.numberOfEmployees}}
+                            </span>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="col-sm-3 col-md-3">
+                <span>
+                    <i class="material-icons icon-style">attach_money</i>
+                    <div class="icon-text">
+                        <div class="color-D63C2A font-weight-bold font-lg-style">Salary</div>
+                        <div class="font-weight-bold font-md-style color-212121 cursor-default-style">
+                            {{packageInString}}</div>
+                    </div>
+                </span>
+            </div>
+        </div>
+        <hr>
+        <div class="color-000000 font-weight-bold font-lg-style">About the Company</div>
+        <br>
+        <div class="color-757575 font-md-style">
+            {{company.about}}
+        </div>
+        <br>
+        <div class="color-000000 font-weight-bold font-lg-style">Job Description</div>
+        <br>
+        <div class="color-757575 font-md-style" [innerHTML]="companyRequirementDetails.jobDescription">
+            <!-- {{companyRequirementDetails.jobDescription}} -->
+        </div>
+        <div class="color-000000 font-weight-bold font-lg-style">Requirements</div>
+        <br>
+        <div class="color-757575 font-md-style" [innerHTML]="companyRequirementDetails.jobRequirement">
+        </div>
+        <div class="color-000000 font-weight-bold font-lg-style">Experience</div>
+        <br>
+        <div class="color-757575 font-md-style">{{companyRequirementDetails.experienced}}</div>
+        <br>
+    </div>
+    <br>
+    <br>
+</div>
+
+<!-- Apply Now Confirmation -->
+<ng-template #applyNowModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 cursor-pointer-style font-weight-bold font-sm-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons .modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to apply for this oppurtunity?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default filter-button" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default filter-button"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>

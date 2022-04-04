@@ -1,0 +1,1356 @@
+<app-master-navbar></app-master-navbar>
+
+
+<ng-template #onLeave>
+  <td *ngIf="selectedCredentialID === credentialID else other_credential"
+    [attr.colspan]="areBatchDetailsVisible ? 8 : 6" class="text-center">
+    <strong>On Leave</strong>
+  </td>
+  <ng-template #other_credential>
+    <td [attr.colspan]="areBatchDetailsVisible ? 7 : 5" class="text-center">
+      <strong>On Leave</strong>
+    </td>
+  </ng-template>
+</ng-template>
+
+<ng-template #notAvailable>
+  <strong>N/A</strong>
+</ng-template>
+
+<!-- TIMESHEET ACTIVITY TEMPLATE -->
+<ng-template let-activity="activity" #timesheetActivity>
+  <!-- <ng-container *ngFor="let activity of timesheet.activities"> -->
+  <td>
+    <span *ngIf="activity?.project?.name; else notAvailable">
+      {{ activity.project?.name }}
+    </span>
+  </td>
+  <td>
+    <span *ngIf="activity?.subProject?.name; else notAvailable">
+      {{ activity.subProject?.name }}
+    </span>
+  </td>
+  <ng-container *ngIf="areBatchDetailsVisible">
+    <td>
+      <span *ngIf="activity?.batch?.batchName; else notAvailable">
+        {{ activity.batch?.batchName }}
+      </span>
+    </td>
+    <!-- <td>
+      <span class="text-wrap" *ngIf="activity?.batchTopic?.name; else notAvailable">
+        {{ activity.batchTopic?.name }}
+      </span>
+    </td> -->
+  </ng-container>
+  <td>
+    <span class="text-wrap" *ngIf="activity?.activity; else notAvailable">
+      {{ activity.activity }}
+    </span>
+  </td>
+  <td>
+    <span class="text-wrap" *ngIf="activity?.hoursNeeded; else notAvailable">
+      {{ activity.hoursNeeded }}
+    </span>
+  </td>
+  <td class="text-center">
+    <!-- <span *ngIf="timesheet.isOnLeave; else not_on_leave">
+      <strong>Leave</strong>
+    </span> -->
+    <span *ngIf="activity?.isCompleted === true; else not_completed">
+      <span class="material-icons green no_hover">task_alt</span>
+    </span>
+    <ng-template #not_completed>
+      <span *ngIf="activity?.isCompleted === false; else is_completed_not_set">
+        <span class="material-icons green no_hover"
+          [title]="'moved to '+ (activity.nextEstimatedDate | date: 'EEE, d MMM')">
+          redo
+        </span>
+      </span>
+      <!-- Below on click call method which marks task as complete -->
+      <ng-template #is_completed_not_set>
+        <button type="button" class="btn" title="click to mark as complete" (click)="onMarkCompleteClick(activity)">
+          <span class="material-icons material-icons-silver">
+            task_alt
+          </span>
+        </button>
+      </ng-template>
+    </ng-template>
+  </td>
+  <td *ngIf="permission?.update && selectedCredentialID === credentialID" class="text-center" data-toggle="tooltip"
+    data-placement="top" title="Edit Timesheet Activity">
+    <button type="button" class="btn" *ngIf="activity" (click)="onUpdateTimesheetActivityClick(activity)">
+      <i class="material-icons primary">create</i>
+    </button>
+  </td>
+  <!-- </ng-container> -->
+</ng-template>
+
+<!-- PREVIEW TEMPLATE -->
+<ng-template let-activity="activity" #previewTemplate>
+  <td>
+    <span *ngIf="activity.projectID; else notAvailable">
+      {{ getEntityByID('project',activity.projectID) }}
+    </span>
+  </td>
+  <td>
+    <span *ngIf="activity.subProjectID; else notAvailable">
+      {{ getEntityByID('subProject',activity.subProjectID,activity.subProjectList) }}
+    </span>
+  </td>
+  <ng-container *ngIf="areBatchDetailsVisible">
+    <td>
+      <span *ngIf="activity.batchID; else notAvailable">
+        {{ getEntityByID('batch',activity.batchID) }}
+      </span>
+    </td>
+    <td>
+      <span *ngIf="activity.batchTopicID; else notAvailable">
+        {{ getEntityByID('batchTopic',activity.batchTopicID,activity.batchTopicList) }}
+      </span>
+    </td>
+  </ng-container>
+  <!-- <td><span class="badge badge-success">{{activity.role?.roleName}}</span></td> -->
+  <td>{{ activity.activity }}</td>
+  <td>{{ activity.hoursNeeded }}</td>
+</ng-template>
+
+
+<div class="container-fluid margin-2pt">
+  <div class="card">
+    <div class="card-header">
+      <button class="btn btn-success mr-2 float-left" (click)="showSearch = !showSearch">
+        {{ showSearch ? "Hide Search" : "Show Search" }}
+      </button>
+      <button class="btn btn-primary mr-2 float-right" *ngIf="permission?.add" (click)="onAddMultipleClick()"
+        [disabled]="isOperationAdd">
+        Add Timesheets
+      </button>
+    </div>
+    <div class="card-body search-bar padding" *ngIf="showSearch">
+      <form [formGroup]="timesheetSearchForm">
+        <div class="card col-md-12 col-sm-12">
+          <div class="card-body search-bar padding">
+            <div class="filter-by-field row">
+              <div class="form-group col-sm-6 col-md-3">
+                <div class="form-group">
+                  <label>From Date:</label>
+                  <input type="date" class="form-control" formControlName="fromDate" />
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-3">
+                <div class="form-group">
+                  <label>To Date:</label>
+                  <input type="date" class="form-control" formControlName="toDate" />
+                </div>
+              </div>
+              <div class="form-group col-sm-4 col-md-3">
+                <label>Project:</label>
+                <ng-select [items]="projectList" bindLabel="name" bindValue="id" placeholder="Select Project"
+                  appendTo="body" [searchable]="true" [clearable]="true" formControlName="projectID">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{ item.name }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <div class="form-group col-sm-4 col-md-3">
+                <label>Timesheet of:</label>
+                <ng-select [items]="directReportList" bindLabel="firstName" bindValue="id" placeholder="Select Employee"
+                  appendTo="body" [searchable]="true" [clearable]="false" formControlName="credentialID"
+                  class="directReport" (change)="showOrHideBatchDetails($event)">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{ item.firstName }} {{ item.lastName }} -
+                    <strong>{{ item?.role?.roleName }}</strong>
+                  </ng-template>
+                </ng-select>
+              </div>
+              <ng-container *ngIf="roleName === roleConstant.FACULTY || roleName === roleConstant.ADMIN">
+                <div class="form-group col-sm-4 col-md-3">
+                  <label>Batch:</label>
+                  <ng-select [items]="batchList" bindLabel="batchName" bindValue="id" placeholder="Select Batch"
+                    appendTo="body" [searchable]="true" [clearable]="true" formControlName="batchID">
+                    <!-- (change)=" getBatchTopicList($event?.id, timesheetSearchForm, true)" --> 
+                    <!-- (change)=" getBatchSessionList($event?.id, timesheetSearchForm, true)" -->
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                      {{ item.batchName }}
+                    </ng-template>
+                  </ng-select>
+                </div>
+                <!-- <div class="form-group col-sm-4 col-md-3">
+                  <label>Topic:</label>
+                  <ng-select [items]="batchTopicList[0]" bindValue="id" bindLabel="moduleTopic.topicName"
+                    placeholder="Select Topic" [loading]="sessionLoadingSignals[0]" appendTo="body" [searchable]="true"
+                    [clearable]="true" formControlName="batchTopicID">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                      {{ item.moduleTopic?.topicName }}
+                    </ng-template>
+                  </ng-select>
+                </div> -->
+              </ng-container>
+              <div class="form-group col-sm-4 col-md-2">
+                <label for="status">Completed:</label>
+                <select class="form-control" formControlName="isCompleted">
+                  <option [ngValue]="null">Select Status</option>
+                  <option [ngValue]="'1'">Yes</option>
+                  <option [ngValue]="'0'">No</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-4 col-md-2">
+                <label for="status">Leave:</label>
+                <select class="form-control" formControlName="isOnLeave">
+                  <option [ngValue]="null">Select Status</option>
+                  <option [ngValue]="'1'">Yes</option>
+                  <option [ngValue]="'0'">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-footer">
+            <div class="float-right">
+              <button class="btn btn-success mr-2" type="submit" (click)="searchTimesheets()"
+                [disabled]=" !timesheetSearchForm.dirty || timesheetSearchForm.invalid">Search
+              </button>
+              <button class="btn btn-warning" (click)="onResetClick()">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- ============================================TESTING===================================================== -->
+  <br />
+
+  <div *ngIf="isOperationAdd && multipleTimesheetForm">
+    <h2 class="text-center"><strong>Add Timesheets</strong></h2>
+    <form [formGroup]="multipleTimesheetForm">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <tr class="d-flex d-sm-flex">
+            <ng-container *ngFor="let column of columns">
+              <th [class]="column.class">
+                <strong>{{ column.name }}</strong>
+              </th>
+            </ng-container>
+            <th class="col-1">
+              <i class='material-icons'>create</i>
+            </th>
+          </tr>
+          <!-- <tr class="d-flex">
+            <ng-container *ngFor="let column of subColumns">
+              <th [class]="column.class">
+                <strong>{{ column.name }}</strong>
+              </th>
+            </ng-container>
+          </tr> -->
+          <ng-container formArrayName="timesheetArray"
+            *ngFor="let timesheet of timesheetArray.controls; let rowIndex = index">
+            <ng-container [formGroupName]="rowIndex">
+              <tr class="d-flex">
+                <td [class]="getColumnClass('Date')">
+                  <input type="date" class="form-control form-control-sm" formControlName="date" nbInput appEmptyToNull
+                    placeholder="Enter Date">
+                  <div class="alert alert-danger"
+                    *ngIf=" (timesheet.get('date').dirty || timesheet.get('date').touched) && timesheet.get('date').invalid">
+                    <span *ngIf="timesheet.get('date').errors.required">
+                      Date should be mentioned.
+                    </span>
+                  </div>
+                </td>
+                <td [class]="getColumnClass('On Leave')">
+                  <select class="form-control form-control-sm" formControlName="isOnLeave"
+                    (change)="onIsOnLeaveChange(timesheet)">
+                    <option [ngValue]="true">Yes</option>
+                    <option [ngValue]="false">No</option>
+                  </select>
+                  <div class="alert alert-danger" *ngIf="(timesheet.get('isOnLeave').dirty || timesheet.get('isOnLeave').touched) &&
+                          timesheet.get('isOnLeave').invalid">
+                    <span *ngIf="timesheet.get('isOnLeave').errors.required">
+                      Whether you are on leave or not should be mentioned.
+                    </span>
+                  </div>
+                </td>
+                <td [class]="getColumnClass('Activities')">
+                  <div *ngIf="!timesheetArray.at(rowIndex).get('isOnLeave').value; else notAvailable">
+                    <ng-container formArrayName="activities"
+                      *ngFor="let activity of timesheet.get('activities').controls; let activityIndex = index;">
+                      <ng-container [formGroupName]="activityIndex">
+                        <div class="row">
+                          <div class="col-sm-12 col-md-12">
+                            <!-- <h2>Activity {{activityIndex+1}} -->
+                            <button type="button" *ngIf="timesheet.get('activities').controls?.length > 1"
+                              (click)="deleteActivityRowForTimesheetArray(rowIndex, activityIndex)"
+                              class="btn btn-sm float-right" data-toggle="tooltip" data-placement="left"
+                              title="Delete Activity">
+                              <span class="material-icons red"> close </span>
+                            </button>
+                            <!-- </h2> -->
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-sm-6 col-md-4">
+                            <label class="float-left"><strong>Project:</strong></label>
+                            <ng-select [items]="projectList" bindLabel="name" bindValue="id"
+                              placeholder="Select Project" appendTo="body" [searchable]="true" [clearable]="true"
+                              formControlName="projectID"
+                              (change)="getListOfSubProjects($event?.id,activity,true,activityIndex)">
+                              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                              </ng-template>
+                            </ng-select>
+                            <div class="alert alert-danger" *ngIf="(activity.get('projectID').touched ||
+                              activity.get('projectID').dirty) && activity.get('projectID').invalid">
+                              <div *ngIf=" activity.get('projectID').errors.required">
+                                Project must be selected.
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group col-sm-6 col-md-4">
+                            <label class="float-left"><strong>Sub-Project:</strong></label>
+                            <ng-select [items]="activity.get('subProjectList')?.value" bindLabel="name" bindValue="id"
+                              placeholder="Select SubProject" appendTo="body" [searchable]="true" [clearable]="true"
+                              [loading]="activity.get('isSubProjectLoading')?.value" formControlName="subProjectID">
+                              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                {{item.name}}
+                              </ng-template>
+                            </ng-select>
+                            <div class="alert alert-danger" *ngIf="(activity.get('subProjectID').touched||activity.get('subProjectID').dirty)
+                              &&activity.get('subProjectID').invalid">
+                              <div *ngIf=" activity.get('projectID').invalid; else sub_project_required">
+                                You must select a project first.
+                              </div>
+                              <ng-template #sub_project_required>
+                                <div *ngIf="activity.get('subProjectID').errors.required">
+                                  Sub-Project must be selected.
+                                </div>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <ng-container *ngIf="roleName === roleConstant.FACULTY">
+                            <div class="form-group col-sm-6 col-md-4">
+                              <label class="float-left"><strong>Batch:</strong></label>
+                              <ng-select [items]="batchList" bindLabel="batchName" bindValue="id"
+                                placeholder="Select Batch" appendTo="body" [searchable]="true" [clearable]="true"
+                                formControlName="batchID">
+                                <!-- (change)="getBatchTopicList($event?.id,activity,true,activityIndex)"> -->
+                                <!-- (change)="getBatchSessionList($event?.id,activity,true,activityIndex)" -->
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                  {{item.batchName}}
+                                </ng-template>
+                              </ng-select>
+                            </div>
+                            <!-- <div class="form-group col-sm-6 col-md-4">
+                              <label class="float-left"><strong>Topic:</strong></label>
+                              <ng-select [items]="activity.get('batchTopicList')?.value"
+                                bindLabel="moduleTopic.topicName" bindValue="id" placeholder="Select Topic"
+                                appendTo="body" [searchable]="true" [clearable]="true"
+                                [loading]="activity?.get('isBatchTopicLoading')?.value" formControlName="batchTopicID">
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                  {{ item.moduleTopic?.topicName }}
+                                </ng-template>
+                              </ng-select>
+                            </div> -->
+                          </ng-container>
+                          <div class="form-group col-sm-12 col-md-3">
+                            <label class="float-left"><strong>Hours Needed:</strong></label>
+                            <input type="number" class="form-control form-control-sm" formControlName="hoursNeeded"
+                              placeholder="eg: 2.5">
+                            <div class="alert alert-danger" *ngIf="(activity.get('hoursNeeded').dirty || 
+                              activity.get('hoursNeeded').touched) && activity.get('hoursNeeded').invalid">
+                              <span *ngIf="activity.get('hoursNeeded').errors.required">
+                                Hours needed must be specified
+                              </span>
+                              <span *ngIf="activity.get('hoursNeeded').errors.min">
+                                Should be more than 0 hours
+                              </span>
+                              <span *ngIf="activity.get('hoursNeeded').errors.pattern">
+                                Can't be more than 100 hours or more than 2 decimal places
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-sm-3 col-md-12">
+                            <label class="float-left"><strong>Activity:</strong></label>
+                            <input type="text" class="form-control form-control-lg" formControlName="activity"
+                              maxlength="1000" placeholder="eg: Team meeting. ">
+                            <!-- <textarea type="text" class="form-control form-control-lg" formControlName="activity" cols="1"
+                            maxlength="1000" placeholder="eg: Team meeting. "></textarea> -->
+                            <div class="alert alert-danger" *ngIf="(activity.get('activity').dirty ||activity.get('activity').touched) 
+                              && activity.get('activity').invalid">
+                              <span *ngIf="activity.get('activity').errors.required">
+                                Activity must be specified
+                              </span>
+                              <span *ngIf="activity.get('activity').errors.maxlength">
+                                Only 1000 characters are allowed
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div *ngIf="timesheet.get('activities').controls > 1">
+                          <hr />
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                    <button type="button" class="btn btn-secondary btn-sm float-right"
+                      (click)="addNewActivity(timesheet)">Add
+                      Activity</button>
+                  </div>
+                  <!-- <ng-template #on_leave>
+                    <strong>N/A</strong>
+                  </ng-template> -->
+                </td>
+                <td class="col-1 btn-flex">
+                  <!-- <button *ngIf="true" type="button" (click)="duplicateTimesheetRow(timesheet)" class="btn"
+                    data-toggle="tooltip" data-placement="left" title="Duplicate Row">
+                    <span class="material-icons dodgerblue">
+                      content_copy
+                    </span>
+                  </button> -->
+                  <!-- <span> -->
+                  <button type="button" class="btn" (click)="addNewTimesheetRow()" data-toggle="tooltip"
+                    data-placement="left" title="Add Row">
+                    <span class="material-icons green"> add </span>
+                  </button>
+                  <button type="button" *ngIf="timesheetArray?.length > 1" (click)="deleteTimesheetRow(rowIndex)"
+                    class="btn" data-toggle="tooltip" data-placement="left" title="Delete Row">
+                    <span class="material-icons red"> close </span>
+                  </button>
+                  <!-- </span> -->
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+          <br />
+          <div class="table-footer">
+            <button class="btn btn-success mr-3" type="button" (click)="previewAddedTimesheets()"
+              [disabled]="sessionLoadingSignals.includes(true) || subProjectLoadingSignals.includes(true)">
+              Preview
+            </button>
+            <button class="btn btn-danger" type="button" (click)="cancelAdd()">
+              Cancel
+            </button>
+          </div>
+        </table>
+      </div>
+    </form>
+  </div>
+
+  <!-- ============================================TESTING===================================================== -->
+
+  <div class="card margin-2pt">
+    <div class="card-header">
+      <div class="row">
+        <div class="col-sm-5 col-md-5">
+          <div class="totalLabel mr-2">
+            Total Timesheets: {{ totalTimesheets || 0 }}
+            <label class="mr-2"> | Total Hours: {{ totalHours }} </label>
+            <label class="mr-2" *ngIf="areBatchDetailsVisible"> | Free hours: {{ totalFreeHours }} </label>
+          </div>
+          <div class="container row">
+            <select class="form-control col-sm-3 col-md-2 mr-2" [(ngModel)]="limit" (change)="changePage(1)">
+              <option disabled>per page</option>
+              <option>10</option>
+              <option>20</option>
+              <option>30</option>
+              <option>40</option>
+            </select>
+            <select class=" form-control col-sm-5 col-md-5 pagination-dropdwon-style mr-2" [(ngModel)]="weekIndex"
+              (change)="getWeeklyTimesheet()">
+              <option disabled>Select week</option>
+              <option value="0">This Week</option>
+              <option value="1">Last Week</option>
+              <option value="2">Last to Last Week</option>
+              <option value="null" disabled hidden>N/A</option>
+            </select>
+            <button class="btn btn-primary" type="button" *ngIf="isSearched" (click)="resetSearchAndGetAll()">
+              {{ selectedCredentialID !== credentialID ? "My Timesheets" : "All Timesheets"}}
+            </button>
+          </div>
+        </div>
+        <div class="col-sm-2 col-md-2">
+          <ng-select [items]="directReportList" bindLabel="firstName" bindValue="id" placeholder="Select Employee"
+            [searchable]="true" [clearable]="false" (change)="onDirectReportChange($event)" class="directReport"
+            [(ngModel)]="selectedCredentialID">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{ item.firstName }} {{ item.lastName }} - <strong>{{ item?.role?.roleName }}</strong>
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="col-sm-5 col-md-5">
+          <div class="totalLabel align-right">{{ paginationString }}</div>
+          <div class="align-right">
+            <ul *ngFor=" let timesheet of allTimesheets | paginate : { id: 'timesheetPageID',itemsPerPage: limit, 
+                currentPage: currentPage,totalItems: totalTimesheets }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="timesheetPageID">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="totalTimesheets > 0">
+      <div class="card-body padding-0pt">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Date</th>
+                <th>On Leave</th>
+                <th>Project</th>
+                <th>Sub-Project</th>
+                <ng-container *ngIf="areBatchDetailsVisible">
+                  <th>Batch</th>
+                  <!-- <th>Session</th> -->
+                </ng-container>
+                <th>Activity</th>
+                <th>
+                  <span class="material-icons no_hover" data-toggle="tooltip" data-placement="left"
+                    title="Hours Needed for completion">
+                    schedule</span>
+                </th>
+                <th>
+                  <span class="material-icons no_hover" data-toggle="tooltip" data-placement="left"
+                    title="Is Activity Completed?">
+                    pending_actions</span>
+                </th>
+                <th *ngIf="permission?.update && selectedCredentialID === credentialID">Edit</th>
+                <th>View</th>
+                <th *ngIf="permission?.delete && selectedCredentialID === credentialID">
+                  Delete
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let timesheet of allTimesheets; let i = index">
+                <tr>
+                  <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1">
+                    {{ i + 1 + offset * limit }}
+                  </td>
+                  <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1">
+                    <strong>{{ timesheet.date | date: "EEE, d MMM" }}</strong>
+                  </td>
+                  <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1">
+                    {{ timesheet.isOnLeave ? "Yes" : "No" }}
+                  </td>
+                  <ng-container *ngIf="timesheet.activities && timesheet.activities.length > 0; else onLeave">
+                    <ng-container [ngTemplateOutlet]="timesheetActivity"
+                      [ngTemplateOutletContext]="{activity:timesheet.activities[0]}">
+                    </ng-container>
+                    <!-- <ng-container *ngFor="let activity of timesheet.activities | slice : 0:1">
+                    </ng-container> -->
+                  </ng-container>
+                  <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1"
+                    data-toggle="tooltip" data-placement="top" title="View Timesheet">
+                    <button type="button" (click)="onViewClick(timesheet)" class="btn">
+                      <i class="material-icons">visibility</i>
+                    </button>
+                  </td>
+                  <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1" *ngIf="
+                      permission?.delete && selectedCredentialID === credentialID" data-toggle="tooltip"
+                    data-placement="top" title="Delete Timesheet">
+                    <button type="button" (click)="onDeleteClick(timesheet.id)"
+                      [disabled]="timesheet.credentialID !== credentialID" class="btn">
+                      <i class="material-icons red">delete</i>
+                    </button>
+                  </td>
+                </tr>
+                <!-- NEW TR -->
+                <tr *ngFor="let activity of timesheet.activities | slice: 1; let j = index">
+                  <ng-container [ngTemplateOutlet]="timesheetActivity" [ngTemplateOutletContext]="{activity:activity}">
+                  </ng-container>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="display-inline" *ngIf="limit > 6 && totalTimesheets > 6">
+          <div class="form-group col-sm-6 col-md-6">
+            <div class="row">
+              <!-- changePage(1) change of limit will set the offset to 0 -->
+              <select class="form-control col-sm-3 col-md-2 mr-2" *ngIf="weekIndex === null" [(ngModel)]="limit"
+                (change)="changePage(1)">
+                <option disabled>per page</option>
+                <option>10</option>
+                <option>20</option>
+                <option>30</option>
+                <option>40</option>
+              </select>
+              <button class="btn btn-primary" type="button" *ngIf="isSearched" (click)="resetSearchAndGetAll()">
+                {{ selectedCredentialID !== credentialID ? "My Timesheets" : "All Timesheets" }}
+              </button>
+            </div>
+          </div>
+          <ul *ngFor="let timesheet of allTimesheets
+                | paginate: {
+                      id: 'timesheetPageID',
+                      itemsPerPage: limit,
+                      currentPage: currentPage,
+                      totalItems: totalTimesheets
+                    }">
+          </ul>
+          <pagination-controls responsive="true" maxSize="10" (pageChange)="changePage($event)" id="timesheetPageID">
+          </pagination-controls>
+        </div>
+      </div>
+    </div>
+    <div class="container full-h" *ngIf="totalTimesheets == 0">
+      <div class="d-flex align-items-center full-h">
+        <div class="col-sm-12 col-md-12 mx-auto">
+          <div class="jumbotron">
+            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+              <h2>No Timesheets found</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-master-footer></app-master-footer>
+
+<!-- Add New Timesheet -->
+<ng-template #timesheetFormModal let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h1>
+        <strong>
+          {{ isViewMode ? "Timesheet Details" : isOperationUpdate ? "Update Timesheet" : "Add Timesheet"}}
+        </strong>
+        <button *ngIf="isViewMode &&permission?.update &&selectedCredentialID === credentialID" class="btn btn-default"
+          type="button" (click)="onUpdateClick()">
+          <i class="material-icons">create</i>
+        </button>
+      </h1>
+      <span *ngIf="!isViewMode"><span class="red">* </span>marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons">highlight_off</i>
+    </button>
+  </div>
+  <form [formGroup]="timesheetForm">
+    <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-3">
+          <label><strong><span *ngIf="!isViewMode" class="red">* </span>Date:</strong></label>
+          <input type="date" class="form-control" formControlName="date" nbInput appEmptyToNull
+            placeholder="Enter Date">
+          <div class="alert alert-danger" *ngIf="(timesheetForm.get('date').dirty ||
+              timesheetForm.get('date').touched) && timesheetForm.get('date').invalid">
+            <span *ngIf="timesheetForm.get('date').errors.required">
+              Date should be mentioned.
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-2">
+          <label><strong><span *ngIf="!isViewMode" class="red">* </span> On Leave?</strong></label>
+          <select class="form-control" formControlName="isOnLeave" (change)="onIsOnLeaveChange(timesheetForm)">
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(timesheetForm.get('isOnLeave').dirty ||
+              timesheetForm.get('isOnLeave').touched) && timesheetForm.get('isOnLeave').invalid">
+            <span *ngIf="timesheetForm.get('isOnLeave').errors.required">
+              Whether you are on leave or not should be mentioned.
+            </span>
+          </div>
+        </div>
+        <ng-container *ngIf="timesheetForm.get('isOnLeave').value === false">
+          <div class="form-group col-sm-4 col-md-3">
+            <label><strong><span *ngIf="!isViewMode" class="red">* </span>Project:</strong></label>
+            <ng-select [items]="projectList" bindLabel="name" placeholder="Select Project" appendTo="body"
+              [searchable]="true" [clearable]="true" formControlName="project" (change)="
+                getListOfSubProjects($event?.id,timesheetForm,true)">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{ item.name }}
+              </ng-template>
+            </ng-select>
+            <div class="alert alert-danger" *ngIf="(timesheetForm.get('project').touched ||
+                  timesheetForm.get('project').dirty) && timesheetForm.get('project').invalid">
+              <div *ngIf="timesheetForm.get('project').errors.required">
+                Project must be selected.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-4">
+            <label><strong><span *ngIf="!isViewMode" class="red">* </span>Sub-Project:</strong></label>
+            <ng-select [items]="subProjectList[0]" bindLabel="name" placeholder="Select SubProject" appendTo="body"
+              [searchable]="true" [clearable]="true" [loading]="subProjectLoadingSignals[0]"
+              formControlName="subProject">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{ item.name }}
+              </ng-template>
+            </ng-select>
+            <div class="alert alert-danger" *ngIf="(timesheetForm.get('subProject').touched ||
+                  timesheetForm.get('subProject').dirty) && timesheetForm.get('subProject').invalid">
+              <div *ngIf="timesheetForm.get('projectID').invalid; else sub_project_required">
+                You must select a project first.
+              </div>
+              <ng-template #sub_project_required>
+                <div *ngIf="timesheetForm.get('subProject').errors.required">
+                  Sub-Project must be selected.
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div class="row" *ngIf="areBatchDetailsVisible">
+        <!--- *ngIf="isBatchAndSessionsVisible()" --->
+        <div class="form-group col-sm-4 col-md-4">
+          <label><strong>Batch:</strong></label>
+          <ng-select [items]="batchList" bindLabel="batchName" placeholder="Select Batch" appendTo="body"
+            [searchable]="true" [clearable]="true" formControlName="batch">
+            <!-- (change)=" getBatchTopicList($event?.id,timesheetForm.get('batchTopic'),true)" -->
+            <!-- (change)=" getBatchSessionList($event?.id,timesheetForm.get('batchSession'),true)" -->
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{ item.batchName }}
+            </ng-template>
+          </ng-select>
+        </div>
+        <!-- <div class="form-group col-sm-4 col-md-6">
+          <label><strong>Session:</strong></label>
+          <ng-select [items]="batchTopicList[0]" bindLabel="name" placeholder="Select Session" appendTo="body"
+            [searchable]="true" [clearable]="true" [loading]="sessionLoadingSignals[0]" formControlName="batchTopic">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{ item.name }}
+            </ng-template>
+          </ng-select>
+        </div> -->
+      </div>
+      <div class="row" *ngIf="timesheetForm.get('isOnLeave').value === false">
+        <div class="form-group col-sm-12 col-md-12">
+          <label><strong><span *ngIf="!isViewMode" class="red">* </span>Activity:</strong></label>
+          <textarea type="text" class="form-control" formControlName="activity" cols="4" maxlength="1000"
+            placeholder="eg: Team meeting. "></textarea>
+          <div class="alert alert-danger" *ngIf="(timesheetForm.get('activity').dirty ||
+                timesheetForm.get('activity').touched) && timesheetForm.get('activity').invalid">
+            <span *ngIf="timesheetForm.get('activity').errors.required">
+              Activity must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-2">
+          <label><strong><span *ngIf="!isViewMode" class="red">* </span> Hours Needed:</strong></label>
+          <input type="number" class="form-control" formControlName="hoursNeeded" placeholder="eg: 2.5">
+          <div class="alert alert-danger" *ngIf="(timesheetForm.get('hoursNeeded').dirty ||
+              timesheetForm.get('hoursNeeded').touched) && timesheetForm.get('hoursNeeded').invalid">
+            <span *ngIf="timesheetForm.get('hoursNeeded').errors.required">
+              Hours needed must be specified
+            </span>
+            <span *ngIf="timesheetForm.get('hoursNeeded').errors.min">
+              Should be more than 0 hours
+            </span>
+            <span *ngIf="timesheetForm.get('hoursNeeded').errors.pattern">
+              Can't be more than 100 hours or more than 2 decimal places
+            </span>
+          </div>
+        </div>
+        <!-- --------------------------------------------BELOW FOR UPDATE ONLY-------------------------------------------- -->
+        <ng-container *ngIf="isOperationUpdate || isViewMode">
+          <div class="form-group col-sm-6 col-md-2" *ngIf="roleName === roleConstant.ADMIN">
+            <label><strong>Billable?</strong></label>
+            <select class="form-control" formControlName="isBillable">
+              <option [ngValue]="null">Select</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-6 col-md-3">
+            <label><strong>Activity Completed?</strong></label>
+            <select class="form-control" formControlName="isCompleted">
+              <option [ngValue]="null">Select Status</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+          <div class="col-sm-6 col-md-3" *ngIf="timesheetForm.get('isCompleted').value == false">
+            <div class="form-group">
+              <label><strong><span *ngIf="!isViewMode" class="red">* </span>Next Estimated Date:
+                </strong></label>
+              <input type="date" class="form-control" formControlName="nextEstimatedDate" nbInput appEmptyToNull
+                placeholder="Enter Date" [min]="timesheetForm.get('date')?.value" />
+              <div class="alert alert-danger" *ngIf="(timesheetForm.get('nextEstimatedDate').dirty 
+                || timesheetForm.get('nextEstimatedDate').touched) && timesheetForm.get('nextEstimatedDate').invalid">
+                <span *ngIf="timesheetForm.get('nextEstimatedDate').errors.required">
+                  Next Estimated date must be specified.
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-12 col-md-12">
+            <label><strong>Work Completed:</strong></label>
+            <textarea type="text" class="form-control" formControlName="workDone" cols="4" maxlength="1000"
+              placeholder="Enter the activities that are completed"></textarea>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <!-- --------------------------------------------ABOVE FOR UPDATE ONLY-------------------------------------------- -->
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" (click)="dismissFormModal(modal)">Close</button>
+      <button *ngIf="!isViewMode" type="submit" class="btn btn-primary" [disabled]="!timesheetForm.dirty || subProjectLoadingSignals.includes(true) ||
+          sessionLoadingSignals.includes(true)" (click)="onSubmit()">
+        {{ isOperationUpdate ? "Update Timesheet" : "Add Timesheet" }}
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Delete Timesheet Confirmation -->
+<ng-template #deleteConfirmationModal let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons">highlight_off</i>
+    </button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure you want to delete this timesheet?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="modal.close()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="dismissFormModal(modal)">No</button>
+  </div>
+</ng-template>
+
+<!-- Delete Timesheet Confirmation -->
+<ng-template #previewModal let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h1 class="modal-title"><strong>Preview Added Timesheets</strong></h1>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons">highlight_off</i>
+    </button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body">
+
+
+
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Date</th>
+            <th>On Leave</th>
+            <th>Project</th>
+            <th>Sub-Project</th>
+            <ng-container *ngIf="areBatchDetailsVisible">
+              <th>Batch</th>
+              <!-- <th>Session</th> -->
+            </ng-container>
+            <th>Activity</th>
+            <th>
+              <span class="material-icons" data-toggle="tooltip" data-placement="left"
+                title="Hours Needed for completion">
+                schedule</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <ng-template #not_applicable><strong>N/A</strong></ng-template> -->
+          <ng-container *ngFor="let timesheet of timesheetArray.value; let i = index">
+            <tr>
+              <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1">{{ i + 1}}
+              </td>
+              <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1">
+                <strong>{{ timesheet.date | date: "EEE, d MMM" }}</strong>
+              </td>
+              <td class="text-center align-middle" [attr.rowspan]="timesheet.activities.length || 1">
+                {{ timesheet.isOnLeave ? "Yes" : "No" }}
+              </td>
+
+              <ng-container *ngIf="timesheet.activities && timesheet.activities.length > 0; else onLeave">
+                <ng-container [ngTemplateOutlet]="previewTemplate"
+                  [ngTemplateOutletContext]="{activity:timesheet.activities[0]}">
+                </ng-container>
+              </ng-container>
+
+            </tr>
+            <tr *ngFor="let activity of timesheet.activities | slice: 1; let j = index">
+              <ng-container [ngTemplateOutlet]="previewTemplate" [ngTemplateOutletContext]="{activity:activity}">
+              </ng-container>
+              <!-- <td>
+                <span *ngIf="activity.projectID; else notAvailable">
+                  {{ getEntityByID('project',activity.projectID) }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="activity.subProjectID; else notAvailable">
+                  {{ getEntityByID('subProject',activity.subProjectID,activity.subProjectList) }}
+                </span>
+              </td>
+              <ng-container *ngIf="areBatchDetailsVisible">
+                <td>
+                  <span *ngIf="activity.batchID; else notAvailable">
+                    {{ getEntityByID('batch',activity.batchID) }}
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="activity.batchSessionID; else notAvailable">
+                    {{ getEntityByID('batchSession',activity.batchSessionID,activity.batchSessionList) }}
+                  </span>
+                </td>
+              </ng-container>
+              -- <td><span class="badge badge-success">{{activity.role?.roleName}}</span></td> --
+              <td>{{ activity.activity }}</td>
+              <td>{{ activity.hoursNeeded }}</td> -->
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-success" (click)="addMultipleTimesheets()">Add Timesheets</button>
+    <button type="button" class="btn btn-outline-primary" (click)="dismissFormModal(modal)">Back</button>
+  </div>
+</ng-template>
+
+
+<!-- New Timesheet modal for add/update -->
+<ng-template #newTimesheetModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h1>
+        <strong>
+          {{ isViewMode ? "Timesheet Details" : isOperationUpdate ? "Update Timesheet" : "Add Timesheet"}}
+        </strong>
+        <button *ngIf="isViewMode &&permission?.update &&selectedCredentialID === credentialID" class="btn btn-default"
+          type="button" (click)="onUpdateClick()">
+          <i class="material-icons">create</i>
+        </button>
+      </h1>
+      <span *ngIf="!isViewMode"><span class="red">* </span>marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons">highlight_off</i>
+    </button>
+  </div>
+
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="timesheetForm">
+      <!-- <ng-container formArrayName="timesheetArray"
+        *ngFor="let timesheet of timesheetArray.controls;let rowIndex = index;">
+        <ng-container [formGroupName]="rowIndex"> -->
+      <div class="row">
+        <div class="form-group col-sm-3 col-md-3">
+          <label><strong><span *ngIf="!isViewMode" class="red">* </span>Date:</strong></label>
+          <input type="date" class="form-control form-control-sm" formControlName="date" nbInput appEmptyToNull
+            placeholder="Enter Date">
+          <div class="alert alert-danger" *ngIf="(timesheetForm.get('date').dirty || 
+                  timesheetForm.get('date').touched) && timesheetForm.get('date').invalid">
+            <span *ngIf="timesheetForm.get('date').errors.required">
+              Date should be mentioned.
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-3">
+          <label><strong><span *ngIf="!isViewMode" class="red">* </span>On Leave:</strong></label>
+          <select class="form-control form-control-sm" formControlName="isOnLeave"
+            (change)="onIsOnLeaveChange(timesheetForm);assignValidatorsForMultipleTimesheet(timesheetForm)">
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(timesheetForm.get('isOnLeave').dirty || 
+                  timesheetForm.get('isOnLeave').touched) && timesheetForm.get('isOnLeave').invalid">
+            <span *ngIf="timesheetForm.get('isOnLeave').errors.required">
+              Whether you are on leave or not should be mentioned.
+            </span>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="!timesheetForm.get('isOnLeave').value">
+        <ng-container formArrayName="activities"
+          *ngFor="let activity of timesheetArrayControls.controls;let activityIndex = index;">
+          <ng-container [formGroupName]="activityIndex">
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <hr />
+                <h3><strong>Activity {{activityIndex+1}}:</strong>
+                  <button type="button" *ngIf="!isViewMode && timesheetArrayControls.controls?.length > 1"
+                    (click)="deleteActivityRowForTimesheet(activityIndex)" class="btn btn-sm float-right"
+                    data-toggle="tooltip" data-placement="left" title="Delete Activity">
+                    <span class="material-icons red"> delete </span>
+                  </button>
+                </h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6 col-md-4">
+                <label><strong><span *ngIf="!isViewMode" class="red">* </span>Project:</strong></label>
+                <ng-select [items]="projectList" bindLabel="name" placeholder="Select Project" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="project"
+                  (change)="getListOfSubProjects($event?.id,activity,true,activityIndex)">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(activity.get('project').touched ||
+                        activity.get('project').dirty) && activity.get('project').invalid">
+                  <div *ngIf=" activity.get('project').errors.required">
+                    Project must be selected.
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-5">
+                <label><strong><span *ngIf="!isViewMode" class="red">* </span>Sub-Project:</strong></label>
+                <ng-select [items]="activity.get('subProjectList')?.value" bindLabel="name"
+                  placeholder="Select SubProject" appendTo="body" [searchable]="true" [clearable]="true"
+                  [loading]="activity.get('isSubProjectLoading')?.value" formControlName="subProject">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(activity.get('subProject').touched||activity.get('subProject').dirty)
+                        &&activity.get('subProject').invalid">
+                  <div *ngIf="activity.get('project').invalid; else sub_project_required">
+                    You must select a project first.
+                  </div>
+                  <ng-template #sub_project_required>
+                    <div *ngIf=" activity.get('subProject').errors.required">
+                      Sub-Project must be selected.
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+            <div class="row" *ngIf="isBatchAndSessionsVisible(activity)">
+              <div class="form-group col-sm-6 col-md-4">
+                <label><strong><span *ngIf="!isViewMode" class="red">* </span>Batch:</strong></label>
+                <ng-select [items]="batchList" bindLabel="batchName" placeholder="Select Batch" appendTo="body"
+                  [searchable]="true" [clearable]="true" formControlName="batch">
+                  <!-- (change)="getBatchTopicList($event?.id,activity,true,activityIndex)"> -->
+                  <!-- (change)="getBatchSessionList($event?.id,activity,true,activityIndex)" -->
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.batchName}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(activity.get('batch').touched ||
+                        activity.get('batch').dirty) && activity.get('batch').invalid">
+                  <div *ngIf=" activity.get('batch').errors.required">
+                    Bacth must be selected.
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="form-group col-sm-6 col-md-6">
+                <label><strong><span *ngIf="!isViewMode" class="red">* </span>Session:</strong></label>
+                <ng-select [items]="activity.get('batchTopicList')?.value" bindLabel="name" placeholder="Select Session"
+                  appendTo="body" [searchable]="true" [clearable]="true"
+                  [loading]="activity.get('isBatchTopicLoading')?.value" formControlName="batchTopic">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.name}}
+                  </ng-template>
+                </ng-select>
+                <div class="alert alert-danger" *ngIf="(activity.get('batchTopic').touched||activity.get('batchTopic').dirty)
+                        &&activity.get('batchTopic').invalid">
+                  <div *ngIf="activity.get('batch').invalid; else sub_project_required">
+                    You must select a batch first.
+                  </div>
+                  <ng-template #sub_project_required>
+                    <div *ngIf=" activity.get('batchTopic').errors.required">
+                      Session must be selected.
+                    </div>
+                  </ng-template>
+                </div>
+              </div> -->
+            </div>
+            <!-- <ng-container *ngIf="roleName === roleConstant.FACULTY">
+                  <div class="row">
+                  </div>
+                </ng-container> -->
+            <div class="row">
+              <div class="form-group col-sm-12 col-md-12">
+                <label><strong><span *ngIf="!isViewMode" class="red">* </span>Activity:</strong></label>
+                <textarea type="text" class="form-control" formControlName="activity" cols="4" maxlength="1000"
+                  placeholder="eg: Team meeting. "></textarea>
+                <div class="alert alert-danger" *ngIf="(activity.get('activity').dirty ||activity.get('activity').touched) 
+                        && activity.get('activity').invalid">
+                  <span *ngIf="activity.get('activity').errors.required">
+                    Activity must be specified
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-3 col-md-2">
+                <label><strong><span *ngIf="!isViewMode" class="red">* </span>Hours Needed:</strong></label>
+                <input type="number" class="form-control" formControlName="hoursNeeded" placeholder="eg: 2.5">
+                <div class="alert alert-danger" *ngIf="(activity.get('hoursNeeded').dirty || 
+                activity.get('hoursNeeded').touched) && activity.get('hoursNeeded').invalid">
+                  <span *ngIf="activity.get('hoursNeeded').errors.required">
+                    Hours needed must be specified
+                  </span>
+                  <span *ngIf="activity.get('hoursNeeded').errors.min">
+                    Should be more than 0 hours
+                  </span>
+                  <span *ngIf="activity.get('hoursNeeded').errors.pattern">
+                    Can't be more than 100 hours or more than 2 decimal places
+                  </span>
+                </div>
+              </div>
+              <!-- --------------------------------------------BELOW FOR UPDATE ONLY-------------------------------------------- -->
+              <ng-container *ngIf="isOperationUpdate || isViewMode">
+                <div class="form-group col-sm-6 col-md-2" *ngIf="roleName === roleConstant.ADMIN">
+                  <label><strong>Billable?</strong></label>
+                  <select class="form-control" formControlName="isBillable">
+                    <option [ngValue]="null">Select</option>
+                    <option [ngValue]="true">Yes</option>
+                    <option [ngValue]="false">No</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6 col-md-3">
+                  <label><strong>Activity Completed?</strong></label>
+                  <select class="form-control" formControlName="isCompleted">
+                    <option [ngValue]="null">Select Status</option>
+                    <option [ngValue]="true">Yes</option>
+                    <option [ngValue]="false">No</option>
+                  </select>
+                </div>
+                <div class="col-sm-6 col-md-3" *ngIf="activity.get('isCompleted').value == false">
+                  <div class="form-group">
+                    <label><strong><span *ngIf="!isViewMode" class="red">* </span>Next Estimated Date:
+                      </strong></label>
+                    <input type="date" class="form-control" formControlName="nextEstimatedDate" nbInput appEmptyToNull
+                      placeholder="Enter Date" [min]="activity.get('date')?.value" />
+                    <div class="alert alert-danger" *ngIf="(activity.get('nextEstimatedDate').dirty 
+                          || activity.get('nextEstimatedDate').touched) && activity.get('nextEstimatedDate').invalid">
+                      <span *ngIf="activity.get('nextEstimatedDate').errors.required">
+                        Next Estimated date must be specified.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-12">
+                  <label><strong>Work Done:</strong></label>
+                  <textarea type="text" class="form-control" formControlName="workDone" cols="4" maxlength="1000"
+                    placeholder="Enter the activities that are completed"></textarea>
+                </div>
+              </ng-container>
+            </div>
+            <!-- --------------------------------------------ABOVE FOR UPDATE ONLY-------------------------------------------- -->
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      <!-- <div *ngIf="!isViewMode && timesheetForm.get('isOnLeave').value === false" class="float-right">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="addNewActivity(timesheetForm)">Add
+          Activity</button>
+      </div> -->
+      <!-- </ng-container>
+      </ng-container> -->
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    <button *ngIf="!isViewMode" class="btn btn-success mr-3" type="submit" (click)="onSubmit()"
+      [disabled]="!timesheetForm.dirty || sessionLoadingSignals.includes(true) || subProjectLoadingSignals.includes(true)">
+      {{ isOperationUpdate ? "Update Timesheet" : "Add Timesheet" }}
+    </button>
+    <!-- <button *ngIf="!isViewMode" type="submit" class="btn btn-primary" [disabled]="!timesheetForm.dirty || 
+      subProjectLoadingSignals.includes(true) || sessionLoadingSignals.includes(true)" (click)="onSubmit()">
+    </button> -->
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #timesheetActivityModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h1><strong>Update Timesheet Activity</strong></h1>
+      <span class="red">* </span>marked fields are mandatory
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons">highlight_off</i>
+    </button>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="timesheetActivityForm">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <label><strong><span class="red">* </span>Project:</strong></label>
+          <ng-select [items]="projectList" bindLabel="name" placeholder="Select Project" appendTo="body"
+            [searchable]="true" [clearable]="true" formControlName="project"
+            (change)="getListOfSubProjects($event?.id,timesheetActivityForm,true)">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(timesheetActivityForm.get('project').touched ||
+                  timesheetActivityForm.get('project').dirty) && timesheetActivityForm.get('project').invalid">
+            <div *ngIf=" timesheetActivityForm.get('project').errors.required">
+              Project must be selected.
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><strong><span class="red">* </span>Sub-Project:</strong></label>
+          <ng-select [items]="timesheetActivityForm.get('subProjectList')?.value" bindLabel="name"
+            placeholder="Select SubProject" appendTo="body" [searchable]="true" [clearable]="true"
+            [loading]="timesheetActivityForm.get('isSubProjectLoading')?.value" formControlName="subProject">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(timesheetActivityForm.get('subProject').touched||timesheetActivityForm.get('subProject').dirty)
+                  &&timesheetActivityForm.get('subProject').invalid">
+            <div *ngIf="timesheetActivityForm.get('project').invalid; else sub_project_required">
+              You must select a project first.
+            </div>
+            <ng-template #sub_project_required>
+              <div *ngIf=" timesheetActivityForm.get('subProject').errors.required">
+                Sub-Project must be selected.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isBatchAndSessionsVisible(timesheetActivityForm)">
+        <div class="form-group col-sm-6 col-md-4">
+          <label><strong><span class="red">* </span>Batch:</strong></label>
+          <ng-select [items]="batchList" bindLabel="batchName" placeholder="Select Batch" appendTo="body"
+            [searchable]="true" [clearable]="true" formControlName="batch">
+            <!-- (change)="getBatchTopicList($event?.id,timesheetActivityForm,true)" -->
+            <!-- (change)="getBatchSessionList($event?.id,timesheetActivityForm,true)" -->
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.batchName}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(timesheetActivityForm.get('batch').touched ||
+                  timesheetActivityForm.get('batch').dirty) && timesheetActivityForm.get('batch').invalid">
+            <div *ngIf=" timesheetActivityForm.get('batch').errors.required">
+              Bacth must be selected.
+            </div>
+          </div>
+        </div>
+        <!-- <div class="form-group col-sm-6 col-md-6">
+          <label><strong><span class="red">* </span>Session:</strong></label>
+          <ng-select [items]="timesheetActivityForm.get('batchTopicList')?.value" bindLabel="name"
+            placeholder="Select Session" appendTo="body" [searchable]="true" [clearable]="true"
+            [loading]="timesheetActivityForm.get('isbatchTopicLoading')?.value" formControlName="batchTopic">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(timesheetActivityForm.get('batchTopic').touched||
+            timesheetActivityForm.get('batchTopic').dirty) && timesheetActivityForm.get('batchTopic').invalid">
+            <div *ngIf="timesheetActivityForm.get('batch').invalid; else sub_project_required">
+              You must select a batch first.
+            </div>
+            <ng-template #sub_project_required>
+              <div *ngIf=" timesheetActivityForm.get('batchTopic').errors.required">
+                Session must be selected.
+              </div>
+            </ng-template>
+          </div>
+        </div> -->
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <label><strong><span class="red">* </span>Activity:</strong></label>
+          <textarea type="text" class="form-control" formControlName="activity" cols="2" maxlength="1000"
+            placeholder="eg: Team meeting. "></textarea>
+          <div class="alert alert-danger" *ngIf="(timesheetActivityForm.get('activity').dirty ||
+            timesheetActivityForm.get('activity').touched) && timesheetActivityForm.get('activity').invalid">
+            <span *ngIf="timesheetActivityForm.get('activity').errors.required">
+              Activity must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-3 col-md-2">
+          <label><strong><span class="red">* </span>Hours Needed:</strong></label>
+          <input type="number" class="form-control" formControlName="hoursNeeded" placeholder="eg: 2.5">
+          <div class="alert alert-danger"
+            *ngIf="(timesheetActivityForm.get('hoursNeeded').dirty || 
+                  timesheetActivityForm.get('hoursNeeded').touched) && timesheetActivityForm.get('hoursNeeded').invalid">
+            <span *ngIf="timesheetActivityForm.get('hoursNeeded').errors.required">
+              Hours needed must be specified
+            </span>
+            <span *ngIf="timesheetActivityForm.get('hoursNeeded').errors.min">
+              Should be more than 0 hours
+            </span>
+            <span *ngIf="timesheetActivityForm.get('hoursNeeded').errors.pattern">
+              Can't be more than 100 hours or more than 2 decimal places
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-2" *ngIf="roleName === roleConstant.ADMIN">
+          <label><strong>Billable?</strong></label>
+          <select class="form-control" formControlName="isBillable">
+            <option [ngValue]="null">Select</option>
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-3">
+          <label><strong>Activity Completed?</strong></label>
+          <select class="form-control" formControlName="isCompleted">
+            <option [ngValue]="null">Select Status</option>
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-md-3" *ngIf="timesheetActivityForm.get('isCompleted').value == false">
+          <div class="form-group">
+            <label><strong><span class="red">* </span>Next Estimated Date:
+              </strong></label>
+            <input type="date" class="form-control" formControlName="nextEstimatedDate" nbInput appEmptyToNull />
+            <div class="alert alert-danger"
+              *ngIf="(timesheetActivityForm.get('nextEstimatedDate').dirty 
+                  || timesheetActivityForm.get('nextEstimatedDate').touched) && timesheetActivityForm.get('nextEstimatedDate').invalid">
+              <span *ngIf="timesheetActivityForm.get('nextEstimatedDate').errors.required">
+                Next Estimated date must be specified.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-12 col-md-12">
+          <label><strong>Work Completed:</strong></label>
+          <textarea type="text" class="form-control" formControlName="workDone" cols="2" maxlength="1000"
+            placeholder="Enter the activities that are completed"></textarea>
+        </div>
+      </div>
+      <!-- --------------------------------------------BELOW FOR UPDATE ONLY-------------------------------------------- -->
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    <button class="btn btn-success mr-3" type="submit" (click)="onActivitySubmit()"
+      [disabled]="!timesheetActivityForm.dirty">
+      Update Activity
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,335 @@
+<app-master-navbar></app-master-navbar>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #dashTemplate>
+    <span class="text-center">-</span>
+</ng-template>
+
+<!-- Template for programming question talent answers table -->
+<ng-template #answersTableTemplate>
+    <!-- Search Bar -->
+    <br>
+    <mat-drawer-container class="drawer-container-style">
+        <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+            <div class="overflow-x-hidden-style">
+                <div class="filter-header">
+                    Edit Filters&nbsp;&nbsp;&nbsp;
+                    <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                    <div class="float-right" (click)="drawer.toggle()">
+                        <span><i class="material-icons filter-close-icon-style">close</i></span>
+                    </div>
+                </div>
+                <br>
+                <form [formGroup]="answerSearchForm">
+                    <div class="filter-by-field row">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Label'}">
+                                </ng-container>
+                            </span>
+                            <input type="text" class="form-control input-style" formControlName="label"
+                                placeholder="eg: Reverse Nodes">
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-default filter-button" type="submit" [disabled]="!answerSearchForm.dirty"
+                            (click)="searchAnswers();drawer.toggle()">
+                            Search
+                            <span class="vertical-align-top-icon-style"><i
+                                    class="material-icons search-button-icon-style">search</i></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </mat-drawer>
+        <div class="container-fluid">
+            <!-- <button (click)="questionModal()">questions modal</button> -->
+            <br>
+            <div class="standard-page-margin">
+                <div class="display-inline">
+                    <div class="font-weight-bold font-xl-style">
+                        Talent Answers -
+                        <span class="color-F6430F"> {{totalAnswers}}</span>
+                        &nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                            (click)="resetSearchAndGetAll()">
+                            View All Talent Answers
+                        </button>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalAnswers > 0" class="view-label-flex">
+                    <span class="pagination-string">
+                        Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                        <span class="pagination-numbers">{{totalAnswers}}</span>
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center flex-row">
+                    <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalAnswers == 0 && isSearched) || (totalAnswers > 0 && !isSearched) 
+                        || (totalAnswers > 0 && isSearched)">
+                        <!-- <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                            Add Filter <strong>+</strong>
+                        </button> -->
+                    </div>
+                    <div *ngIf="totalAnswers > 0" class="d-flex justify-content-between align-items-start flex-row">
+                        <div class="d-flex">
+                            <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                                (change)="changePage(1)">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                            </select> &nbsp;&nbsp;&nbsp;
+                        </div>
+                        <div class="d-flex">
+                            <ul class="pagination no-padding-left" *ngFor="let answer of answerList | paginate: { id:'answerID',
+                                itemsPerPage: limit, currentPage: currentPage, totalItems: totalAnswers }">
+                            </ul>
+                            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                                id="answerID">
+                            </pagination-controls>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="searchFilterFieldList.length > 0">
+                    <br>
+                    <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                        {{searchFilterField.propertyNameText}}
+                        <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                            class="vertical-align-top-icon-style">
+                            <i class="material-icons search-name-delete-icon-style">close</i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalAnswers > 0">
+                <div class="card table-card-shadow table-card-style">
+                    <div class="card-body padding-0pt">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Talent</th>
+                                    <th>Qusetion Label</th>
+                                    <th>Programming Language</th>
+                                    <!-- <th>Maximum score</th>
+                                    <th>Correct/Wrong</th> -->
+                                    <th>Level</th>
+                                    <th>Is Solution Viewed ?</th>
+                                    <th>Total Attempts</th>
+                                    <th>Total Attempts Not Scored</th>
+                                    <th>View All Answers</th>
+                                    <th *ngIf="permission.delete">Delete</th>
+                                </tr>
+                                <tbody>
+                                    <tr *ngFor="let answer of answerList; let i = index">
+                                        <td>{{(i+1)+(offset*limit)}}</td>
+                                        <td>{{answer.talent.firstName + " " + answer.talent.lastName}}</td>
+                                        <td>{{answer.programmingQuestion.label}}</td>
+                                        <td>{{answer.programmingLanguage.name}}</td>
+                                        <!-- <td>{{answer.score}}</td>
+                                        <td>
+                                            <span *ngIf="answer.isCorrect; else wrongTemplate" class="easy">
+                                                Correct
+                                            </span>
+                                            <ng-template #wrongTemplate>
+                                                <span *ngIf="answer.isCorrect==false; else dashTemplate" class="hard">
+                                                    Wrong
+                                                </span>
+                                            </ng-template>
+                                        </td> -->
+                                        <td [ngClass]="answer.programmingQuestion.levelClass">
+                                            {{answer.programmingQuestion.levelName}}</td>
+                                        <td>
+                                            <span *ngIf="answer.programmingQuestion.solutonIsViewed; else noTemplate">
+                                                Yes
+                                            </span>
+                                            <ng-template #noTemplate>
+                                                <span>
+                                                    No
+                                                </span>
+                                            </ng-template>
+                                        </td>
+                                        <td>{{answer.totalAnswers}}</td>
+                                        <td>{{answer.totalNotChecked}}</td>
+                                        <td data-toggle="tooltip" data-placement="top"
+                                            title="View all attempts for this question and language">
+                                            <span (click)="onViewAllAnswersButtonClick(answer)">
+                                                <i class="material-icons color-F6430F">question_answer</i>
+                                            </span>
+                                        </td>
+                                        <td *ngIf="permission.delete" data-toggle="tooltip" data-placement="top"
+                                            title="Delete Talent Answer">
+                                            <span (click)="onDeleteAnswerClick(answer.id)">
+                                                <i class="material-icons color-F6430F">delete</i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="totalAnswers == 0">
+                <div class="card">
+                    <div class="card-body not-found-card-style">
+                        <h2>No Talent Answers Found</h2>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+        </div>
+    </mat-drawer-container>
+
+</ng-template>
+
+<!-- Table for programming question talent answer question type -->
+<div class="container-fluid">
+    <br>
+    <ul ngbNav #nav="ngbNav" [destroyOnHide]="true" class="nav-tabs ul-space-even-style"
+        (onChange)="onTabChange($event)">
+
+        <!-- Problem of the day -->
+        <li [ngbNavItem]="1" (click)="onTabChange(1)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Problem of the day</a>
+            <ng-template ngbNavContent>
+                <ng-template [ngTemplateOutlet]="answersTableTemplate"></ng-template>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+
+        <!-- Practice -->
+        <li [ngbNavItem]="2" (click)="onTabChange(2)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Practice</a>
+            <ng-template ngbNavContent>
+                <ng-template [ngTemplateOutlet]="answersTableTemplate"></ng-template>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+</div>
+
+
+<!-- Delete Talent Answer Confirmation -->
+<ng-template #deleteAnswerModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this talent answer?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- View All Answers -->
+<ng-template #viewAllAnswersModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            All Answers
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <div>
+            <span class="color-707070 font-weight-bold font-m-style">Question Label: </span><span
+                class="color-E73A00 font-weight-bold font-m-style">{{selectedAnswer.programmingQuestion.label}}</span>
+            <br>
+            <span class="color-707070 font-weight-bold font-m-style">Programming Language: </span><span
+                class="color-E73A00 font-weight-bold font-m-style">{{selectedAnswer.programmingLanguage.name}}</span>
+            <br>
+            <span class="color-707070 font-weight-bold font-m-style">Talent: </span><span
+                class="color-E73A00 font-weight-bold font-m-style">{{selectedAnswer.talent.firstName + " " +
+                selectedAnswer.talent.lastName}}</span>
+            <br><br>
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-12 col-md-12">
+                <div class="card table-card-shadow card-style-others">
+                    <div class="card-body padding-0pt">
+                        <div class="table-responsive">
+                            <table class="table table-striped other-table-style">
+                                <tr>
+                                    <th>Sr</th>
+                                    <th>Answered On</th>
+                                    <th>Is Correct ?</th>
+                                    <th>Is Solution Viewed ?</th>
+                                    <th>Max Score</th>
+                                    <th>Score Given</th>
+                                    <th>View</th>
+                                </tr>
+                                <tbody>
+                                    <tr *ngFor="let answer of multipleAnswerList; let i = index">
+                                        <td>{{i+1}}</td>
+                                        <td>{{answer.date.substr(0,10) | date:'dd MMM, yyyy'}}</td>
+                                        <td>
+                                            <span *ngIf="answer.isCorrect; else wrongTemplate" class="easy">
+                                                Correct
+                                            </span>
+                                            <ng-template #wrongTemplate>
+                                                <span *ngIf="answer.isCorrect==false; else dashTemplate" class="hard">
+                                                    Wrong
+                                                </span>
+                                            </ng-template>
+                                        </td>
+                                        <td>
+                                            <span *ngIf="answer.programmingQuestion.solutonIsViewed; else noTemplate">
+                                                Yes
+                                            </span>
+                                            <ng-template #noTemplate>
+                                                <span>
+                                                    No
+                                                </span>
+                                            </ng-template>
+                                        </td>
+                                        <td>{{answer.programmingQuestion.score}}</td>
+                                        <td>{{answer.score}}</td>
+                                        <td data-toggle="tooltip" data-placement="top"
+                                            title="Go To Answer Details Page">
+                                            <span (click)="redirectToAnswerDetails(answer.id)">
+                                                <i class="material-icons color-F6430F">question_answer</i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

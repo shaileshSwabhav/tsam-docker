@@ -1,0 +1,91 @@
+<app-master-navbar></app-master-navbar>
+
+<div class="container-fluid">
+    <br>
+    <div class="standard-page-margin">
+        <div>
+            <button class="btn btn-default swabhav-button-square" type="button" (click)="backToPreviousPage()">
+                Back
+            </button>
+            &nbsp;&nbsp;&nbsp;
+            <span class="font-weight-bold font-xl-style">
+                Problems -
+                <span class="color-F6430F"> {{totalProblems}}</span>
+            </span>
+        </div>
+        <br>
+        <div *ngIf="totalProblems > 0" class="view-label-flex">
+            <span class="pagination-string">
+                Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                <span class="pagination-numbers">{{totalProblems}}</span>
+            </span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center flex-row">
+            <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="totalProblems > 0">
+            </div>
+            <div *ngIf="totalProblems > 0" class="d-flex justify-content-between align-items-start flex-row">
+                <div class="d-flex">
+                    <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                        (change)="changePage(1)">
+                        <option selected>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select> &nbsp;&nbsp;&nbsp;
+                </div>
+                <div class="d-flex">
+                    <ul class="pagination no-padding-left" *ngFor="let problem of problemList | paginate: { id:'problemID',
+                        itemsPerPage: limit, currentPage: currentPage, totalItems: totalProblems }">
+                    </ul>
+                    <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="problemID">
+                    </pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div *ngIf="totalProblems > 0">
+        <div class="card table-card-shadow table-card-style">
+            <div class="card-body padding-0pt">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>No.</th>
+                            <th>Problem Name</th>
+                            <th>Level</th>
+                            <th>Attempted By</th>
+                            <th>Solved By</th>
+                            <th>Success Rate</th>
+                            <th>Solve</th>
+                        </tr>
+                        <tbody>
+                            <tr *ngFor="let problem of problemList; let i = index">
+                                <td>{{(i+1)+(offset*limit)}}</td>
+                                <td class="color-F6430F font-weight-bold">{{problem.label}}</td>
+                                <td><span [ngClass]="problem.levelClass">{{problem.levelName}}</span></td>
+                                <td>{{problem.attemptedByCount}}</td>
+                                <td>{{problem.solvedByCount}}</td>
+                                <td>{{problem.successRatio}}%</td>
+                                <td data-toggle="tooltip" data-placement="top" title="Solve Problem">
+                                    <span (click)="onSolveProblemClick(problem.id)">
+                                        <i class="material-icons color-F6430F">visibility</i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="totalProblems == 0">
+        <div class="card">
+            <div class="card-body not-found-card-style">
+                <h2>No Problems Found</h2>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+
+<app-master-footer></app-master-footer>

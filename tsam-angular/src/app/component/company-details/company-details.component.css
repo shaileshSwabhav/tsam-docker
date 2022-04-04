@@ -1,0 +1,97 @@
+.main-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    position: absolute;
+}
+
+.circle {
+    height: 150px;
+    width: 150px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    top: 220px;
+    left: 15%;
+    box-shadow: 5px 10px 8px #00000029;
+    text-align: center;
+}
+
+.logo{
+    right: 1%;
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    top: 35%;
+
+    /* height: auto;
+    width: 120px; */
+    /* position: absolute;
+    top: 240px;
+    left: 155px;
+    border-radius: 50%; */
+}
+
+.logo-default{
+    right: 0.1%;
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+}
+
+.company-name{
+    font-weight: bold;
+    position: absolute;
+    top: 320px;
+    left: 30%;
+    font-size: x-large;
+}
+
+.company-name-bottom{
+    font-weight: bold;
+    position: relative;
+    bottom: 110px;
+    left: 320px;
+    font-size: small;
+    color: #757575;
+}
+
+.company-details-button-style{
+    position: absolute;
+    left: 75%;
+    width: 200px;
+    top: 340px
+}
+
+.back-button-margin{
+    margin-left: 5%;
+}
+
+.icon-style{
+    font-size: 500%;
+    color: #BDBDBD;
+    opacity: 0.21;
+    transform: none;
+    cursor: default;
+}
+
+.icon-text{
+    color: #D63C2A;
+    position: relative;
+    left: 20%;
+    bottom: 50%;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.image-container{
+    position: relative;
+}
+
+.details{
+    position: relative;
+    top: 400px;
+}
+
+

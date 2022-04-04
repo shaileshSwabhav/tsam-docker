@@ -1,0 +1,290 @@
+.teal {
+  color: teal;
+}
+
+.subSession {
+  margin-left: 15%;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: larger;
+}
+
+.drawer-button {
+  text-align: justify;
+}
+
+a,
+a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.anchor-tag {
+  color: blue;
+  text-decoration: underline;
+}
+
+.anchor-tag:hover {
+  color: blue;
+  text-decoration: underline;
+}
+
+.brochure-btn,
+.brochure-btn:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+label {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.card-margin {
+  margin-bottom: 5%;
+}
+
+.session-margin {
+  margin-left: 5%;
+}
+
+.text-size {
+  font-size: large;
+}
+
+.card-overflow {
+  overflow: hidden;
+}
+
+.card-header,
+.card-footer {
+  background-color: #fff6f4d0;
+}
+
+.btn-swabhav {
+  color: #f6430f;
+}
+
+.table-striped > tbody > .striped-tr:nth-child(odd) > td,
+.table-striped > tbody > .striped-tr:nth-child(odd) > th {
+  background-color: #fff6f4;
+}
+
+.table-striped > tbody > .no-stripe:nth-child(odd) > td,
+.table-striped > tbody > .no-stripe:nth-child(odd) > th {
+  background-color: #fff;
+}
+
+/* *******************input styles***************** */
+.form-control:focus {
+  box-shadow: none;
+}
+
+.input-style,
+input[disabled],
+textarea[disabled],
+select[disabled],
+.ng-select.ng-select-style ::ng-deep .ng-select-container {
+  border-color: #fc6e26;
+  border-width: 1.5px;
+  font-size: small;
+  color: black;
+  font-weight: bold;
+}
+
+.ng-select.ng-select-disabled > .ng-select-container {
+  color: #ffffff;
+  background-color: #fc6e26;
+  border: 1.5px solid #fc6e26;
+  border-radius: 5px;
+}
+
+.sub-text {
+  margin-bottom: 10%;
+  margin-top: -5%;
+  font-size: 70%;
+}
+
+.menu-tab-container {
+  width: 100%;
+  height: 100%;
+}
+
+.drawer-container {
+  width: 18%;
+  box-shadow: 5px 5px 20px #9c9c9c26;
+  /* margin-left: 2%; */
+  padding-left: 2%;
+}
+
+.drawer-container-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 2%;
+}
+
+.content-container {
+  width: 100%;
+  background-color: #fff;
+  padding-left: 1%;
+}
+
+.batch-view {
+  padding-top: 1%;
+  padding-left: 1%;
+  padding-bottom: 1%;
+}
+
+.sub-sessions {
+  text-align: justify;
+  margin-left: 5%;
+  width: 95%;
+}
+
+.tab-btn:hover {
+  color: #f6430f;
+  font-weight: 500;
+}
+
+.assignment-label {
+  white-space: nowrap;
+}
+
+.no-sub-session {
+  margin-left: 43%;
+}
+
+/* Table scroll */
+.sticky-column {
+  left: 0;
+  position: sticky;
+  z-index: 9999;
+}
+
+.grey {
+  color: #aaa;
+}
+
+.img-icon {
+  width: 10%;
+}
+
+.feedback-img-icon {
+  width: 100%;
+}
+
+.margin-top {
+  margin-top: -3%;
+}
+
+.table-striped > tbody > .unstriped-tr > td {
+  background-color: #fff;
+}
+
+.table-unstriped > tbody > tr:nth-child(odd) > td,
+.table-unstriped > tbody > tr:nth-child(even) > td,
+.table-unstriped > thead > tr > th {
+  background-color: #fff;
+}
+
+.wide-btn {
+  width: 20%;
+}
+
+/* STAR RATING */
+.star {
+  letter-spacing: 2px;
+  font-size: 310%;
+  color: #b0c4de;
+}
+
+.star-fill {
+  color: #fee440;
+}
+
+.star-selected-count {
+  font-size: medium;
+}
+.date-margin {
+  margin-left: 5%;
+}
+
+.blue-title {
+  color: #0035a8;
+}
+
+/* Drawer hover hide show */
+
+.toggle-side-nav-style {
+  position: fixed;
+  left: 0%;
+  transition: 0.3s;
+  /* padding: 5px; */
+  text-decoration: none;
+  font-size: 20px;
+  color: white;
+  border-radius: 0 30px 30px 0;
+  bottom: 5%;
+  background-color: #fc6e26;
+  cursor: pointer;
+}
+
+.toggle-side-nav-style :hover {
+  left: 0;
+}
+
+.verticalLine {
+  width: 1px;
+  height: 100%;
+  background: transparent;
+}
+.lock-style {
+  margin-left: 75%;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.select-disabled {
+  user-select: none; /* For Chrome and Opera */
+  -ms-user-select: none; /* For Internet Edge and Explorer*/
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -khtml-user-select: none; /* Konqueror HTML */
+}
+
+.selected-day {
+  color: #ffffff;
+  background-color: #f34523;
+}
+
+.day {
+  border-radius: 2px;
+  width: 35px;
+  height: 30px;
+  display: inline-block;
+  border: 1px solid #bdbdbd;
+  text-align: center;
+  padding-top: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.day-text {
+  font-weight: bold;
+  margin-top: 7px;
+}
+
+.checkbox-text {
+  color: #D63C2A;
+  font-weight: bold;
+  font-size: medium;
+  cursor: pointer;
+}
+
+.btn-border {
+  border: 1px solid #bdbdbd;
+}

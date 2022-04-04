@@ -1,0 +1,1517 @@
+<ng-template #noneTemplate>
+  <span>None</span>
+</ng-template>
+
+<ng-template #dashTemplate>
+  <span>-</span>
+</ng-template>
+
+
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon close-icon">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="searchBatchForm">
+      <div class="col-md-12 col-sm-12">
+        <div class="search-bar padding">
+          <div class="filter-by-field row">
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Batch Name:</label>
+              <input type="text" formControlName="batchName" class="form-control input-style input-style"
+                placeholder="eg: Java01">
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Batch Objective:</label>
+              <select class="form-control input-style" formControlName="batchObjective">
+                <option [ngValue]="null">Select Objective</option>
+                <option *ngFor="let objective of batchObjectives" [ngValue]="objective.value">{{objective.value}}
+                </option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Start Date:</label>
+              <input type="date" formControlName="startDate" class="form-control input-style input-style">
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">End Date:</label>
+              <input type="date" formControlName="estimatedEndDate" class="form-control input-style input-style">
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Batch Status:</label>
+              <select class="form-control input-style" formControlName="batchStatus">
+                <option [ngValue]="null">Select Status</option>
+                <option *ngFor="let status of batchStatus" [ngValue]="status.value">{{status.value}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Is Active:</label>
+              <select class="form-control input-style" formControlName="isActive">
+                <option [ngValue]="null">Select Status</option>
+                <option [ngValue]="'1'">Active</option>
+                <option [ngValue]="'0'">Closed</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-6">
+              <label class="filter-form-label">Course Name:</label>
+              <select class="form-control input-style" formControlName="courseID">
+                <option [ngValue]="null">Select Course Name</option>
+                <option *ngFor="let course of courseList" [ngValue]="course.id">{{course.name}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-6" *ngIf="!isSalesPerson">
+              <label class="filter-form-label">Select Sales Person:</label>
+              <select class="form-control input-style" formControlName="salesPersonID">
+                <option [ngValue]="null">Select Sales Person</option>
+                <option *ngFor="let sales of salesPeople" [ngValue]="sales.id">{{sales.firstName}} {{sales.lastName}}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-submit-swabhav material-icons-button" [disabled]="!searchBatchForm.dirty"
+          (click)="searchAndCloseDrawer()">Search <i class="inline-icon material-icons">search</i>
+        </button>
+      </div>
+    </form>
+
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="totalLabel">
+          <h1>Total Batch: <span class="swabhav-light-orange-text">{{totalBatch || 0}}</span>
+            <span *ngIf="!isTalent">&nbsp;| Total Talent: <span class="swabhav-light-orange-text">
+                {{totalBatchTalents}}
+              </span></span>
+          </h1>
+        </div>
+
+        <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="!isFaculty && permission?.add"
+          (click)="onBatchAddClick()">Add New Batch
+          <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalBatch > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalBatch}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row">
+        <div class="d-flex justify-content-between align-items-center flex-row">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button class="btn btn-sm filter-button material-icons-button" *ngIf="isSearched"
+            (click)="resetSearchAndGetAll()">View All
+            Batches
+          </button>
+          &nbsp;&nbsp;
+          <span *ngIf="isFaculty && isHeadFcaulty" class="color-D63C2A font-weight-bold font-md-style">My</span>&nbsp;
+          <div *ngIf="isFaculty && isHeadFcaulty" class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="allMySwitched" (click)="toggleMyAllTalents()">
+            <label class="custom-control-label" for="allMySwitched">
+              <span class="color-D63C2A font-weight-bold font-md-style cursor-pointer-style">All</span>
+            </label>
+          </div>
+        </div>
+        <!-- <div class="d-flex justify-content-between align-items-start flex-row">
+          <div class="d-flex">
+            --- changePage(1) change of limit will set the offset to 0 --- -->
+        <!-- <select class="form-control form-control-sm input-style" [(ngModel)]="limit" (change)="changePage(1)">
+              <option selected>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex">
+            <ul class="pagination" *ngFor="let batch of batches | paginate: { id:'batchID',
+              itemsPerPage: limit, currentPage: currentPage, totalItems: totalBatch }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="batchID">
+            </pagination-controls>
+          </div>
+        </div> -->
+
+        <form [formGroup]="searchBatchForm">
+          <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+            <div class="d-flex flex-wrap">
+              <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+              <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="d-flex flex-wrap">
+              <ul class="pagination" *ngFor="let batch of batches | paginate: { id:'batchID',
+                itemsPerPage: searchBatchForm.get('limit').value, 
+                currentPage: (+searchBatchForm.get('offset').value + 1), 
+                totalItems: totalBatch }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="batchID">
+              </pagination-controls>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <br>
+
+      <div class="card-body padding-0pt swabhav-shadow" *ngIf="isBatchLoaded; else noBatch">
+        <div class="table-responsive">
+          <table class="table table-sm table-striped table-borderless">
+            <thead>
+              <tr>
+                <th><strong>Sr. No.</strong></th>
+                <th><strong>Batch Name</strong></th>
+                <th><strong>Batch Objective</strong></th>
+                <th><strong>Batch Type</strong></th>
+                <th><strong>Course</strong></th>
+                <th><strong>Company</strong></th>
+                <th><strong>Unit Head Name</strong> </th>
+                <th><strong>Hour</strong></th>
+                <th><strong>Status</strong></th>
+                <th><strong>Start On</strong></th>
+                <!-- <th><strong>End On</strong></th> -->
+                <th><strong>Estimated End Date</strong></th>
+                <th><strong>Batch Timings</strong></th>
+                <th><strong>Total Intake</strong></th>
+                <th><strong>Total Sessions</strong></th>
+                <th><strong>Completed Sessions</strong></th>
+                <th><strong>Counsellor</strong></th>
+                <th><strong>Faculty</strong></th>
+                <th *ngIf="!isTalent"><strong>Edit</strong></th>
+                <th *ngIf="isAdmin || isSalesPerson"><strong>Modules</strong></th>
+                <!-- <th><strong>Applicants</strong></th> -->
+                <th *ngIf="permission && permission?.delete && !isTalent"><strong>Delete</strong></th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let batch of batches;let i = index">
+                <tr class="row-hover" (click)="redirectToBatchDetails(batch)">
+                  <td>{{(i+1)+(searchBatchForm.get('offset').value*searchBatchForm.get('limit').value)}}</td>
+                  <td>{{batch && batch.batchName}}</td>
+                  <td>{{batch.batchObjective}}</td>
+                  <td>
+                    <div *ngIf="batch.isB2B; else isB2C">
+                      <strong><span class="btn-swabhav">B2B</span></strong>
+                    </div>
+                    <ng-template #isB2C>
+                      <strong><span class="btn-swabhav">B2C</span></strong>
+                    </ng-template>
+                  </td>
+                  <td>{{batch.course && batch.course.name || 'No Course Name'}}</td>
+                  <td>{{batch.requirement?.branch && batch.requirement?.branch?.branchName || '-'}}</td>
+                  <td>
+                    {{batch.requirement?.branch && batch.requirement?.branch?.unitHeadName || 'No Unit Head'}}
+                  </td>
+                  <td>{{batch.course && batch.course.totalHours || '0'}} Hrs</td>
+                  <td>
+                    <strong><span class="btn-swabhav">{{batch.batchStatus}}</span></strong>
+                  </td>
+                  <td>{{batch.startDate | date:'fullDate' || "-"}}</td>
+                  <td>{{batch.estimatedEndDate | date:'fullDate' || "-"}}</td>
+                  <td>
+                    <label>{{calculateBatchTiming(batch.batchTimings)}}</label>
+                  </td>
+                  <td class="text-center">{{batch && batch.totalStudents}}/{{batch.totalIntake}}</td>
+                  <td class="text-center">
+                    <div *ngIf="batch.totalSessionCount != 0; else noBatchSessions">
+                      {{batch.totalSessionCount}}
+                    </div>
+                    <ng-template #noBatchSessions>
+                      <span class="badge badge-warning">Sessions not assigned</span>
+                    </ng-template>
+                  </td>
+                  <td class="text-center">
+                    <ng-container *ngIf="batch.completedSessionCount != 0; then first; else second">
+                    </ng-container>
+                    <ng-template #first>{{batch.completedSessionCount}}</ng-template>
+                    <ng-template #second>{{"-"}}</ng-template>
+                  </td>
+                  <td>{{batch && batch.salesPerson.firstName}} {{batch && batch.salesPerson.lastName}}</td>
+                  <td>
+                    <ng-container *ngIf="batch?.faculty?.length>0 ;else noFaculty">
+                      <span *ngFor="let faculty of batch?.faculty">
+                        {{faculty && faculty.firstName || 'No Faculty'}}
+                        {{faculty && faculty.lastName}}
+                      </span>
+                    </ng-container>
+                    <ng-template #noFaculty>
+                      <span class="badge badge-warning">No Faculty</span>
+                    </ng-template>
+                  </td>
+                  <td *ngIf="!isTalent">
+                    <button class="btn btn-default" (click)="onBatchUpdateClick($event, batch)">
+                      <i class="inline-icon material-icons-outlined">create</i>
+                    </button>
+                  </td>
+                  <td *ngIf="isAdmin || isSalesPerson">
+                    <button type="button" class="btn btn-default" (click)="onModuleClick($event, batch)">
+                      <!-- <i class="inline-icon material-icons"></i> -->
+                      <img src="assets/course/Modules.png" alt="module" width="30">
+                    </button>
+                  </td>
+                  <!-- <td>
+                    <button class="btn btn-default" (click)="onShowApplicantsButtonClick($event, batch)">
+                      <i class="inline-icon material-icons">receipt_long</i>
+                    </button>
+                  </td> -->
+                  <td *ngIf="permission && permission?.delete && !isTalent">
+                    <button class="btn btn-default" (click)="assignSelectedBatch($event, batch)">
+                      <i class="inline-icon material-icons">delete</i>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <br>
+      <br>
+      <div *ngIf="totalBatch > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalBatch}}</strong></span>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end align-items-center flex-row mt-2">
+
+      <form [formGroup]="searchBatchForm">
+        <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+          <div class="d-flex flex-wrap">
+            <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+            <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select> &nbsp;&nbsp;&nbsp;
+          </div>
+          <div class="d-flex flex-wrap">
+            <ul class="pagination" *ngFor="let batch of batches | paginate: { id:'batchID',
+                itemsPerPage: searchBatchForm.get('limit').value, 
+                currentPage: (+searchBatchForm.get('offset').value + 1), 
+                totalItems: totalBatch }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="batchID">
+            </pagination-controls>
+          </div>
+        </div>
+      </form>
+    </div>
+
+
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<!-- Batches Not Found -->
+<ng-template #noBatch>
+  <div class="container full-h">
+    <br />
+    <br />
+    <div class="d-flex align-items-center full-h">
+      <div class="col-sm-12 col-md-8 mx-auto">
+        <div class="jumbotron">
+          <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+            <h2>Batches Not Found</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add New Batch -->
+<ng-template #batchModal let-modal>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="dismissFormModal(modal);toggleButtons()" class="btn btn-default"
+        type="button"><i class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/icon/colour-icons/batchdetails.png" width="80">
+      </div>
+      <div class="col-sm-4 left-margin">
+        <h1 class="swabhav-light-orange-text"><strong>Add a New Batch</strong></h1>
+        <span *ngIf="!isAddClicked">
+          <h2><strong>Batch Name: &nbsp; {{batchForm?.get("batchName")?.value}}</strong></h2>
+          <h2><strong>Course: &nbsp; {{batchForm?.get("course")?.value?.name}}</strong></h2>
+        </span>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <form [formGroup]="batchForm">
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Batch Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Objective:</label>
+          <select class="form-control input-style" formControlName="batchObjective">
+            <option [ngValue]="null" disabled>Select Objective</option>
+            <option *ngFor="let objective of batchObjectives" [ngValue]="objective.value">{{objective.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('batchObjective').touched || batchForm.get('batchObjective').dirty)
+                && batchForm.get('batchObjective').invalid">
+            <div *ngIf="batchForm.get('batchObjective').errors.required">
+              Objective must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Name:</label>
+          <input type="text" class="form-control input-style" formControlName="batchName" placeholder="eg: Java01">
+          <div class="alert alert-danger" *ngIf="(batchForm.get('batchName').touched || batchForm.get('batchName').dirty)
+                && batchForm.get('batchName').invalid">
+            <div *ngIf="batchForm.get('batchName').errors.required">
+              Batch name must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked == true">
+          <label>BatchID:</label>
+          <input type="text" class="form-control input-style" formControlName="code" [readonly]="true">
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Course:</label>
+          <select class="form-control input-style" [compareWith]="compareFn" formControlName="course">
+            <option [ngValue]="null" disabled>Select Course</option>
+            <option *ngFor="let course of courseList" [ngValue]="course">{{course.name}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('course').touched || batchForm.get('course').dirty)
+                && batchForm.get('course').invalid">
+            <div *ngIf="batchForm.get('course').errors.required">
+              Course must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isFaculty || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Start Date:</label>
+          <input type="date" class="form-control input-style" formControlName="startDate">
+          <div class="alert alert-danger" *ngIf="(batchForm.get('startDate').touched || batchForm.get('startDate').dirty)
+                && batchForm.get('startDate').invalid">
+            <div *ngIf="batchForm.get('startDate').errors.required">
+              Start Date must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked == true">
+          <label>Estimated End Date:</label>
+          <input type="date" class="form-control input-style" formControlName="estimatedEndDate" [readonly]="true">
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked == true">
+          <label>Total Students:</label>
+          <input type="number" class="form-control input-style" formControlName="totalStudents" [readonly]="true">
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Total Intake:</label>
+          <input type="number" class="form-control input-style" formControlName="totalIntake" placeholder="eg: 10">
+          <div class="alert alert-danger" *ngIf="(batchForm.get('totalIntake').touched || batchForm.get('totalIntake').dirty)
+                && batchForm.get('totalIntake').invalid">
+            <div *ngIf="batchForm.get('totalIntake').errors.required">
+              Total Intake must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> SalesPerson:</label>
+          <select class="form-control input-style" [compareWith]="compareFn" formControlName="salesPerson">
+            <option [ngValue]="null" disabled>Select SalesPerson</option>
+            <option *ngFor="let sales of salesPeople" [ngValue]="sales">{{sales.firstName}}
+              {{sales.lastName}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('salesPerson').touched || batchForm.get('salesPerson').dirty)
+                && batchForm.get('salesPerson').invalid">
+            <div *ngIf="batchForm.get('salesPerson').errors.required">
+              Sales Person must be specified
+            </div>
+          </div>
+        </div>
+        <!-- <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Faculty:</label>
+          <select class="form-control input-style" [compareWith]="compareFn" formControlName="faculty">
+            <option [ngValue]="null" disabled>Select Faculty</option>
+            <option *ngFor="let faculty of facultyList" [ngValue]="faculty">{{faculty.firstName}}
+              {{faculty.lastName}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('faculty').touched || batchForm.get('faculty').dirty)
+                && batchForm.get('faculty').invalid">
+            <div *ngIf="batchForm.get('faculty').errors.required">
+              Faculty must be specified
+            </div>
+          </div>
+        </div> -->
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isFaculty || isSalesPerson || isAdmin">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Status:</label>
+          <select class="form-control input-style" formControlName="batchStatus">
+            <option [ngValue]="null" disabled>Select Status</option>
+            <option *ngFor="let status of batchStatus" [ngValue]="status.value">{{status.value}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('batchStatus').touched || batchForm.get('batchStatus').dirty)
+                && batchForm.get('batchStatus').invalid">
+            <div *ngIf="batchForm.get('batchStatus').errors.required">
+              Status must be specified
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!isAddClicked" class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Is Active:</label>
+          <select class="form-control input-style" formControlName="isActive">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Closed</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('isActive').touched || batchForm.get('isActive').dirty)
+                && batchForm.get('isActive').invalid">
+            <div *ngIf="batchForm.get('isActive').errors.required">
+              Status must be specified
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label><span *ngIf="!isViewClicked" class="red">*</span> Batch Type:</label>
+          <select class="form-control input-style" formControlName="isB2B">
+            <option [ngValue]="null" disabled>Select Batch Type</option>
+            <option [ngValue]="true">B2B</option>
+            <option [ngValue]="false">B2C</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(batchForm.get('isB2B').dirty || batchForm.get('isB2B').touched) 
+                && batchForm.get('isB2B').invalid">
+            <span *ngIf="batchForm.get('isB2B').errors.required">
+              Batch type must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4" *ngIf="isAdmin || isSalesPerson">
+          <label>Requirement:</label>
+          <select class="form-control input-style" [compareWith]="compareFn" formControlName="requirement">
+            <option [ngValue]="null">Select Requirement</option>
+            <option *ngFor="let requirement of requirementList" [ngValue]="requirement">
+              {{requirement.branch.branchName}} - {{requirement.code}}</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label>Meet Link:</label>
+          <input type="text" class="form-control input-style" formControlName="meetLink"
+            placeholder="eg: https://meet.google.com/">
+        </div>
+
+        <div class="form-group col-sm-6 col-md-4">
+          <label>Telegram Link:</label>
+          <input type="text" class="form-control input-style" formControlName="telegramLink"
+            placeholder="eg: https://t.me/">
+        </div>
+
+        <hr>
+      </div>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center" *ngIf="isFaculty || isSalesPerson">
+        <h1 class="swabhav-light-orange-text"><strong>Session Timings</strong></h1>
+      </div>
+      <div class="container" *ngIf="isFaculty || isSalesPerson">
+        <!-- Day selection -->
+        <div class="row">
+          <div class="col-12">
+            <label class="font-weight-bold"><span class="red">*</span> No of sessions in a week:</label>
+            &nbsp;&nbsp;
+            <span class="day" [ngClass]="{'selected-day': day.isSelected==true}" *ngFor="let day of daysList"
+              (click)="onDayClick(day)">
+              {{day?.day?.substr(0,1)}}
+            </span>
+          </div>
+        </div>
+
+        <br>
+
+        <!-- Batch timings form -->
+        <div class="row">
+          <div class="col-12" *ngIf="this.batchTiming.length > 0">
+            <label class="font-weight-bold"><span class="red">*</span> Session Timings For:</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-6">
+            <div class="container">
+              <div formArrayName="batchTimings" *ngFor="let time of batchTiming.controls;let i = index">
+                <ng-container [formGroupName]="i">
+                  <div class="row">
+                    <div class="form-group col-sm-4 col-md-2">
+                      <div class="day-text text-right">
+                        {{time.get('day').value?.day}}:
+                      </div>
+                    </div>
+                    <div class="form-group col-sm-5 col-md-4">
+                      <input type="time" class="form-control input-style" formControlName="fromTime"
+                        (change)="onBatchTimeChange(i, time)">
+                      <div class="alert alert-danger" *ngIf="(time.get('fromTime').touched 
+                        || time.get('fromTime').dirty) && time.get('fromTime').invalid">
+                        <div *ngIf="time.get('fromTime').errors.required">
+                          Session start time must be specified
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-1 col-md-1">
+                      <div class="day-text text-center">To</div>
+                    </div>
+                    <div class="form-group col-sm-5 col-md-4">
+                      <input type="time" class="form-control input-style" formControlName="toTime"
+                        (change)="onBatchTimeChange(i, time)">
+                      <div class="alert alert-danger" *ngIf="(time.get('toTime').touched 
+                        || time.get('toTime').dirty) && time.get('toTime').invalid">
+                        <div *ngIf="time.get('toTime').errors.required">
+                          Session end time must be specified
+                        </div>
+                      </div>
+                      <div class="alert alert-danger" *ngIf="time.get('toTime').touched && time.get('toTime').dirty
+                        && time.get('toTime').value == time.get('fromTime').value">
+                        Start time and end time cannot be same
+                      </div>
+                    </div>
+                    <div class="col-sm-2 col-md-1 no-padding-style text-center">
+                      <img *ngIf="batchTiming.controls.length > 1" (click)="deleteBatchTimingInBatchForm(i)"
+                        src="assets/icon/colour-icons/delete.png" width="20" class="cursor-pointer-style">
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <div class="col-6" *ngIf="this.batchTiming.length > 0">
+            <div class="col-sm-12 col-md-12 no-padding-style">
+              <div class="form-check no-padding-style">
+                <label class="form-check-label">
+                  <label class="checkbox-container">
+                    <input type="checkbox" (change)="onApplyToAllSessionsClick()"
+                      formControlName="isApplyToAllSessions">
+                    <span class="checkmark"></span>
+                  </label>
+                  <span class="font-sm-style">Apply it to all sessions</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br />
+      <!-- Eligibility Formgroup -->
+      <div class="form-group form-check" *ngIf="!isViewClicked && (isFaculty || isSalesPerson)">
+        <label class="form-check-label">
+          <label class="checkbox-container">
+            <input type="checkbox" [checked]="doesEligibilityExists" id="eligilibility-checkbox"
+              (change)="eligilibilityChecked($event)">
+            <span class="checkmark"></span>
+            <span class="checkbox-text" for="eligilibility-checkbox"> Add Eligibility</span>
+          </label>
+        </label>
+      </div>
+      <div *ngIf="doesEligibilityExists && (isFaculty || isSalesPerson)">
+        <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+          <h1 class="swabhav-light-orange-text"><strong>Eligibility Details</strong></h1>
+        </div>
+        <div class="row" formGroupName="eligibility">
+          <ng-container>
+            <div class="form-group col-sm-6 col-md-3">
+              <label><span *ngIf="!isViewClicked" class="red">*</span> Technology:</label>
+              <ng-select [items]="technologies" bindLabel="language" placeholder="Select Technology" appendTo="body"
+                multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+                class="ng-select-style" (search)="getTechnology($event)" (focus)="getTechnology()"
+                [loading]="isTechLoading">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.language}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(batchForm.get('eligibility').get('technologies').dirty 
+                || batchForm.get('eligibility').get('technologies').touched)
+                && batchForm.get('eligibility').get('technologies').invalid">
+                <div *ngIf="batchForm.get('eligibility').get('technologies').errors.required">
+                  Technology is required
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-3">
+              <label>Student Rating:</label>
+              <select class="form-control input-style" formControlName="studentRating">
+                <option [ngValue]="null">Select Student Rating</option>
+                <option *ngFor=" let rating of ratinglist" [ngValue]="rating.value">{{rating.value}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-3">
+              <label>Experience:</label>
+              <select class="form-control input-style" formControlName="experience">
+                <option [ngValue]="null">Select Experience</option>
+                <option [ngValue]=false>Fresher</option>
+                <option [ngValue]=true>Experience</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6 col-md-3">
+              <label>Academic Year:</label>
+              <select class="form-control input-style" formControlName="academicYear">
+                <option [ngValue]="null">Select Academic Year</option>
+                <option *ngFor=" let year of academicYears" [ngValue]="year.value">{{year.value}}</option>
+              </select>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- span is used to hide the border as well -->
+      <span *ngIf="(!isViewClicked || batchForm.get('brochure')?.value) && (isAdmin || isSalesPerson)">
+        <hr>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Brochure:</label>
+          <div class="col-sm-4">
+            <span class="custom-file custom-file-border">
+              <input *ngIf="!isViewClicked" type="file" class="custom-file-input" (change)="onResourceSelect($event)"
+                id="customFile" value="displayedFileName">
+              <label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label" for="customFile"
+                [innerHTML]="displayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="batchForm.get('brochure')?.value && !isBrochureUploadedToServer" data-toggle="tooltip"
+                data-placement="top" title="View Brochure">
+                <button *ngIf="isViewClicked" class="btn btn-submit-swabhav material-icons-button">
+                  <a [href]="batchForm.get('brochure').value" target="_blank" class="anchor">View Brochure</a>
+                </button>
+              </div>
+            </span>
+            <!-- should add view uploaded brochure using a brochure variable after cleaning. -->
+            <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+          </div>
+        </div>
+      </span>
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="dismissFormModal(modal)">Close</button>
+    <button type="button" *ngIf="!isViewClicked" class="btn btn-submit-swabhav material-icons-button"
+      [disabled]="!batchForm.dirty" (click)="validate()">{{modalButtonLabel}}
+    </button>
+  </div>
+
+</ng-template>
+
+<!-- Open Talent Page -->
+<ng-template #talentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h2 class="modal-title swabhav-light-orange-text">Allocate Talent</h2>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal); resetSelectedTalent()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!--Modal Body-->
+  <div class="modal-body">
+    <div class="card" *ngIf="permission?.add || isSalesPerson">
+      <div class="card-header">
+        <h2 class="swabhav-light-orange-text">Search Talent</h2>
+      </div>
+      <!-- Card-Body -->
+      <form [formGroup]="searchedTalentForm">
+        <div class="card-body">
+          <div class="card col-md-12 col-sm-12">
+            <div class=" card-body search-bar padding">
+              <div class="filter-by-field row">
+                <div class="form-group col-sm-6 col-md-6">
+                  <label>First Name:</label>
+                  <input type="text" formControlName="firstName" class="form-control input-style"
+                    placeholder="eg: John">
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                  <label>Last Name:</label>
+                  <input type="text" formControlName="lastName" class="form-control input-style" placeholder="eg: Doe">
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                  <label>Phone Number:</label>
+                  <input type="number" formControlName="contact" class="form-control input-style"
+                    placeholder="Enter Phone Number">
+                </div>
+                <div class="form-group col-sm-6 col-md-6">
+                  <label>Email:</label>
+                  <input type="email" formControlName="email" nbInput appEmptyToNull class="form-control input-style"
+                    placeholder="eg: johndoe@example.com Address">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer overflow-hidden">
+          <div class="float-right">
+            <button class="btn filter-button material-icons-button" [disabled]="!searchedTalentForm.dirty" type="reset">
+              Reset
+            </button> &nbsp;&nbsp;&nbsp;
+            <button class="btn btn-submit-swabhav material-icons-button" type="submit"
+              [disabled]="!searchedTalentForm.dirty||searchedTalentForm.invalid||disableButton"
+              (click)="getAllSearchedTalents()">Search
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <br />
+    <div class="card" *ngIf="permission?.add || isSalesPerson">
+      <div *ngIf="isTalentLoaded; else noTalent">
+        <div class="card-header">
+          <div class="display-inline">
+            <div class="form-group col-sm-6 col-md-6">
+              <div class="row">
+                <!-- changePage(1) change of limit will set the offset to 0 -->
+                <select class="form-control input-style col-sm-2 col-md-2" [(ngModel)]="talentLimit"
+                  (change)="changeTalentPage(1)">
+                  <option selected>5</option>
+                  <option>10</option>
+                  <option>20</option>
+                  <option>50</option>
+                </select>
+              </div>
+            </div>
+            <ul class="pagination" *ngFor="let talent of talents | paginate: { id:'talentID',
+              itemsPerPage: talentLimit, currentPage: currentTalentPage, totalItems: totalTalent }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changeTalentPage($event)" id="talentID">
+            </pagination-controls>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-active">
+              <thead>
+                <tr>
+                  <th *ngIf="permission?.add">Select</th>
+                  <th>No.</th>
+                  <th>Candidate ID</th>
+                  <th>Firstname</th>
+                  <th>Lastname</th>
+                  <th>Email</th>
+                  <th>Resume</th>
+                  <th>Contact</th>
+                  <th>City</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let talent of talents; let i = index">
+                  <td *ngIf="permission?.add">
+                    <div class="form-check">
+                      <input class="form-check-input" id="checkboxNoLabel" [checked]="checkTalentAdded(talent.id)"
+                        type="checkbox" (change)="addTalentsToList($event, talent.id)">
+                    </div>
+                  </td>
+                  <td>{{i+1}}</td>
+                  <td>{{talent && talent.code}}</td>
+                  <td>{{talent && talent.firstName}}</td>
+                  <td>{{talent && talent.lastName}}</td>
+                  <td>{{talent && talent.email}}</td>
+                  <td>
+                    <span data-toggle="tooltip" data-placement="top" title="No Resume Added"
+                      *ngIf='talent.resume==null;else resumePresent'>
+                      <button class="btn btn-primary disabled">Resume</button></span>
+                    <ng-template #resumePresent>
+                      <span data-toggle="tooltip" data-placement="top" title="View Resume">
+                        <button class="btn btn-primary material-icons-button">
+                          <a href={{talent.resume}} target="_blank" class="anchor">Resume</a>
+                        </button>
+                      </span>
+                    </ng-template>
+                  </td>
+                  <td>{{talent && talent.contact}}</td>
+                  <td>{{talent && talent.city}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="float-right">
+            <button class="btn filter-button material-icons-button" [disabled]="addSelectedTalents.length==0"
+              type="reset" (click)="addSelectedTalents=[]">Reset
+            </button> &nbsp;&nbsp;&nbsp;
+            <button class="btn btn-submit-swabhav material-icons-button" type="submit"
+              [disabled]="addSelectedTalents.length==0 || disableButton" (click)="addTalentsToBatch()">Add
+            </button>
+            <!-- <button class="btn btn-success material-icons-button" type="submit" [disabled]="addSelectedTalents.length==0 || disableButton"
+              (click)="addTalentsToBatch()">
+              Submit</button> &nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="btn btn-secondary material-icons-button" type="reset" [disabled]="addSelectedTalents.length==0"
+              (click)="addSelectedTalents=[]">
+              Reset</button> -->
+          </div>
+          <br>
+          <br>
+        </div>
+      </div>
+      <!-- Talents not found -->
+      <ng-template #noTalent>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Talents not found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+    <br>
+    <div class="card">
+      <div *ngIf="isSelectedTalentLoaded; else noSelectedTalent">
+        <div class="card-header">
+          <!-- <div class="totalLabel float-right"><strong>{{selectedTalentPaginationString}}</strong></div> -->
+          <div class="display-inline">
+            <div class="form-group col-sm-6 col-md-6">
+              <div class="row">
+                <!-- changePage(1) change of limit will set the offset to 0 -->
+                <select class="form-control input-style col-sm-2 col-md-2" [(ngModel)]="selectedTalentLimit"
+                  (change)="changeSelectedTalentPage(1)">
+                  <option selected>5</option>
+                  <option>10</option>
+                  <option>20</option>
+                  <option>50</option>
+                </select>
+              </div>
+            </div>
+            <ul class="pagination"
+              *ngFor="let talent of selectedTalent | paginate: { id:'SelectTalentID',
+              itemsPerPage: selectedTalentLimit, currentPage: currentSelectedTalentPage, totalItems: totalSelectedTalent }">
+            </ul>
+            <pagination-controls responsive="true" maxSize="5" (pageChange)="changeSelectedTalentPage($event)"
+              id="SelectTalentID">
+            </pagination-controls>
+          </div>
+        </div>
+        <div class="card-body">
+          <h2 class="display-4">Selected Students - {{totalSelectedTalent}}</h2>
+          <div class="table-responsive">
+            <table class="table table-success">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Candidate ID</th>
+                  <th>Firstname</th>
+                  <th>Lastname</th>
+                  <th>Email</th>
+                  <th>Resume</th>
+                  <th>Contact</th>
+                  <th>City</th>
+                  <th *ngIf="permission?.delete">Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let talent of selectedTalent; let i = index">
+                  <td>{{i+1+(offset*limit)}}</td>
+                  <td>{{talent && talent.code}}</td>
+                  <td>{{talent && talent.firstName}}</td>
+                  <td>{{talent && talent.lastName}}</td>
+                  <td>{{talent && talent.email}}</td>
+                  <td>
+                    <span data-toggle="tooltip" data-placement="top" title="No Resume Added"
+                      *ngIf='talent.resume==null;else resumePresent'>
+                      <button class="btn btn-primary disabled">Resume</button></span>
+                    <ng-template #resumePresent>
+                      <span data-toggle="tooltip" data-placement="top" title="View Resume">
+                        <button class="btn btn-primary material-icons-button">
+                          <a href={{talent.resume}} target="_blank" class="anchor">Resume</a>
+                        </button>
+                      </span>
+                    </ng-template>
+                  </td>
+                  <td>{{talent && talent.contact}}</td>
+                  <td>{{talent && talent.city}}</td>
+                  <td *ngIf="permission?.delete">
+                    <button type="button" class="btn material-icons-button" (click)="assignTalentToDelete(talent.id)">
+                      <i class="material-icons red">delete</i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Talents not assigned to batch -->
+      <ng-template #noSelectedTalent>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Talents not assigned to this batch</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss('Cross click');resetSelectedTalent()">Close</button>
+  </div>
+</ng-template>
+
+<!--View Waiting List-->
+<ng-template #waitingListModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h2 class="modal-title swabhav-light-orange-text">Allocate Talent</h2>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal); resetSelectedTalent()">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div *ngIf="showTransferForm">
+      <div class="row">
+        <div class="form-group col-sm-6 col-md-4">
+          <label>Waiting For:</label>
+          <select class="form-control input-style" (change)="onWaitingForChange($event.target.value)">
+            <option [ngValue]="null" disabled>Select</option>
+            <option [ngValue]="'Requirement'">Requirement</option>
+            <option [ngValue]="'Batch'">Batch</option>
+          </select>
+        </div>
+        <ng-container *ngIf="showCompanyReqField">
+          <div class="form-group col-sm-8 col-md-8">
+            <label>Company Requirement:</label>
+            <ng-select [items]="requirementList" bindLabel="code" placeholder="Select" appendTo="body"
+              [searchable]="true" [clearable]="true" [(ngModel)]="selecetdrRequirementForTransfer"
+              class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.branch.branchName + " " + item.code}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="showBatchField">
+          <div class="form-group col-sm-8 col-md-8">
+            <label>Batch:</label>
+            <ng-select [items]="activeBatchList" bindLabel="batchName" placeholder="Select" appendTo="body"
+              [searchable]="true" [clearable]="true" [(ngModel)]="selectedBatchForTransfer" class="ng-select-style">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.batchName}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </ng-container>
+      </div>
+      <button type="button"
+        class="btn btn-default swabhav-light-orange-text float-right margin-for-button material-icons-button"
+        (click)="onCloseTrasferFormButtonClick()">Close Form</button>
+      <button type="button" class="btn btn-submit-swabhav float-right material-icons-button"
+        (click)="onSubmitTransferButtonClick()">Submit
+      </button>
+      <br>
+    </div>
+    <button *ngIf="showTransferButton material-icons-button" type="button" class="btn btn-submit-swabhav"
+      (click)="onTrasnferButtonClick()">Transfer</button>
+    <br><br>
+    <div class="table-responsive">
+      <table class="table table-striped text-center">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Number of applicants</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Talent</td>
+            <td>
+              <span class="fake-link" (click)="redirectToTalentsForWaitingList(selectedBatch.id)"
+                *ngIf="(twoWaitingLists.talentWaitingList != null && twoWaitingLists.talentWaitingList?.length != 0); else noneTemplate">
+                {{twoWaitingLists.talentWaitingList?.length}}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>Enquiry</td>
+            <td>
+              <span class="fake-link" (click)="redirectToEnquiriesForWaitingList(selectedBatch.id)"
+                *ngIf="(twoWaitingLists.enquiryWaitingList != null && twoWaitingLists.enquiryWaitingList?.length != 0); else noneTemplate">
+                {{twoWaitingLists.enquiryWaitingList?.length}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="reset" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss('Cross click')">Cancel
+    </button>&nbsp;&nbsp;
+  </div>
+
+</ng-template>
+
+<!-- Delete Batch Comfirmation -->
+<ng-template #deleteModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title">Comfirmation</h3>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button">
+      <i class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want you to delete this {{entity}}.
+        {{waitingListMessage}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger material-icons-button" [disabled]="disableButton"
+      (click)="modal.close()">Yes
+    </button>
+    <button type="button" class="btn btn-outline-primary material-icons-button" (click)="modal.dismiss();">No
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template #module let-modal>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-end">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-1">
+        <img src="assets/course/Modules.png" width="80">
+      </div>
+      <div class="col-sm-4 left-margin">
+        <h1 class="swabhav-light-orange-text"><strong>{{selectedBatch.batchName}}</strong></h1>
+        <!-- <span *ngIf="!isAddClicked">
+          <h4>Batch Name: &nbsp; test</h4>
+          <h4>Course: &nbsp; test</h4>
+        </span> -->
+      </div>
+    </div>
+
+    <br><br>
+    <ul ngbNav #nav="ngbNav" [(activeId)]="activeModuleTab" [destroyOnHide]="true"
+      class="nav-tabs justify-content-around" (onChange)="onTabChange($event)">
+      <li [ngbNavItem]="1" (click)="onTabChange(1)" class="list-active-link-style">
+        <a ngbNavLink class="font-larger-style tab-link-style">Course</a>
+        <ng-template ngbNavContent>
+          <ng-container *ngIf="courseModules?.length > 0; else noModules">
+            <h1>Total Modules: {{totalCourseModules}}</h1>
+            <form [formGroup]="batchModuleForm">
+              <div class="table-responsive">
+                <table class="table table-borderless table-striped">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th><strong>Sr No.</strong></th>
+                      <th><strong>Module</strong></th>
+                      <th><strong>Faculty</strong></th>
+                      <th><strong>Order</strong></th>
+                      <th><strong>Start Date</strong></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-container formArrayName="batchModules"
+                      *ngFor="let batchModuleForm of batchModuleControlArray.controls; let i=index">
+                      <ng-container [formGroupName]="i">
+                        <tr>
+                          <td>
+                            <label class="form-check-label">
+                              <label class="checkbox-container"
+                                [ngClass]="moduleIDList.includes(batchModuleForm.get('moduleID').value) ? 'disabled': ''">
+                                <input type="checkbox"
+                                  [disabled]="moduleIDList.includes(batchModuleForm.get('moduleID').value)"
+                                  (change)="toggleModule(batchModuleForm)"
+                                  [checked]="batchModuleForm.get('isMarked').value" />
+                                <span class="checkmark"></span>
+                              </label>
+                            </label>
+                          </td>
+                          <td>{{courseModules[i].order}}</td>
+                          <td class="text-left">
+                            <img [src]="courseModules[i].module?.logo" alt="" width="30"> &nbsp;&nbsp;
+                            {{courseModules[i].module?.moduleName}}
+                          </td>
+                          <td>
+                            <select class="form-control input-style" formControlName="facultyID">
+                              <option [ngValue]="null" disabled>Select Faculty</option>
+                              <option *ngFor="let faculty of facultyList" [ngValue]="faculty.id">
+                                {{faculty.firstName}} {{faculty.lastName}}
+                              </option>
+                            </select>
+                            <div class="alert alert-danger"
+                              *ngIf="(batchModuleForm?.get('facultyID')?.touched || 
+                                  batchModuleForm?.get('facultyID')?.dirty) && batchModuleForm?.get('facultyID')?.invalid">
+                              <div *ngIf="batchModuleForm?.get('facultyID')?.errors.required">
+                                Faculty must be specified
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <input type="number" appAllowNumbersOnly formControlName="order"
+                              class="form-control input-style input-style" min="1" placeholder="Eg. 1">
+                            <div class="alert alert-danger" *ngIf="(batchModuleForm?.get('order')?.touched || 
+                                  batchModuleForm?.get('order')?.dirty) && batchModuleForm?.get('order')?.invalid">
+                              <div *ngIf="batchModuleForm?.get('order')?.errors.required">
+                                Order must be specified
+                              </div>
+                              <div *ngIf="batchModuleForm?.get('order')?.errors.min">
+                                Order must be greater than 1
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <input type="date" appEmptyToNull formControlName="startDate"
+                              class="form-control input-style input-style">
+                            <div class="alert alert-danger"
+                              *ngIf="(batchModuleForm?.get('startDate')?.touched || 
+                                  batchModuleForm?.get('startDate')?.dirty) && batchModuleForm?.get('startDate')?.invalid">
+                              <div *ngIf="batchModuleForm?.get('startDate')?.errors?.required">
+                                Start date must be specified
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Batch timings form -->
+                        <ng-container *ngIf="batchModuleForm.get('isMarked').value">
+                          <tr class="unstriped-tr">
+                            <td colspan="10">
+                              <div class="row">
+                                <div class="col-12">
+                                  <label class="font-weight-bold"><span>
+                                      <label class="form-check-label">
+                                        <label class="checkbox-container">
+                                          <input type="checkbox" (change)="toggleModuleTimingValidators(i)"
+                                            [checked]="batchModuleForm.get('isModuleTimingMarked').value" />
+                                          <span class="checkmark"></span>
+                                        </label>
+                                      </label>
+                                    </span> Module Timings:</label>
+                                </div>
+                              </div>
+
+                              <div class="row">
+                                <div class="col-6">
+                                  <ng-container *ngIf="batchModuleForm.get('isModuleTimingMarked').value">
+                                    <div class="row">
+                                      <div class="col-12">
+                                        <ng-container formArrayName="moduleTimings"
+                                          *ngFor="let moduleTimingForm of getModuleTimingControlArray(i).controls; let j=index">
+                                          <ng-container [formGroupName]="j">
+                                            <button type="button" class="btn btn-border"
+                                              [ngClass]="{'selected-day': moduleTimingForm.get('isMarked').value}"
+                                              (click)="onModuleTimeChange(i, j, moduleTimingForm)">
+                                              {{moduleTimingForm.get('day').value?.day?.substr(0,1)}}
+                                            </button>
+                                          </ng-container>
+                                        </ng-container>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                </div>
+                                <!-- <div class="col-6" *ngIf="getTotalDays(i)>1">
+                                  <div class="col-sm-6 col-md-12 no-padding-style">
+                                    <div class="form-check no-padding-style">
+                                      <label class="form-check-label">
+                                        <label class="checkbox-container">
+                                          <input type="checkbox"
+                                            [checked]="batchModuleForm.get('isApplyToAllSessions').value"
+                                            (change)="onApplyToAllModulesClick(i)">
+                                          <span class="checkmark"></span>
+                                        </label>
+                                        <span class="font-sm-style text-nowrap">Apply it to all sessions</span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div> -->
+                              </div>
+
+                              <br>
+                              <div class="row">
+                                <div class="col-8">
+                                  <ng-container formArrayName="moduleTimings"
+                                    *ngFor="let moduleTimingForm of getModuleTimingControlArray(i).controls; let j=index">
+                                    <ng-container [formGroupName]="j">
+                                      <div *ngIf="moduleTimingForm.get('isMarked').value" class="row">
+                                        <div class="form-group col-sm-3 col-md-2">
+                                          <div class="day-text text-right">
+                                            {{moduleTimingForm.get('day').value?.day}}:
+                                          </div>
+                                        </div>
+                                        <div class="form-group col-sm-3 col-md-3">
+                                          <input type="time" class="form-control input-style"
+                                            formControlName="fromTime">
+                                          <div class="alert alert-danger"
+                                            *ngIf="(moduleTimingForm.get('fromTime').touched 
+                                            || moduleTimingForm.get('fromTime').dirty) && moduleTimingForm.get('fromTime').invalid">
+                                            <div *ngIf="moduleTimingForm.get('fromTime').errors.required">
+                                              Module start time must be specified
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-sm-1 col-md-1">
+                                          <div class="day-text text-center">To</div>
+                                        </div>
+                                        <div class="form-group col-sm-3 col-md-3">
+                                          <input type="time" class="form-control input-style" formControlName="toTime">
+                                          <div class="alert alert-danger"
+                                            *ngIf="(moduleTimingForm.get('toTime').touched 
+                                            || moduleTimingForm.get('toTime').dirty) && moduleTimingForm.get('toTime').invalid">
+                                            <div *ngIf="moduleTimingForm.get('toTime').errors.required">
+                                              Module end time must be specified
+                                            </div>
+                                          </div>
+                                          <div class="alert alert-danger"
+                                            *ngIf="moduleTimingForm.get('toTime').touched && moduleTimingForm.get('toTime').dirty
+                                            && moduleTimingForm.get('toTime').value == moduleTimingForm.get('fromTime').value">
+                                            Start time and end time cannot be same
+                                          </div>
+                                        </div>
+                                        <div class="col-sm-2 col-md-1 no-padding-style text-center">
+                                          <img *ngIf="getModuleTimingControlArray(i).controls.length > 1"
+                                            (click)="deleteModuleTiming(i, j)" src="assets/icon/colour-icons/delete.png"
+                                            width="20" class="cursor-pointer-style">
+                                        </div>
+                                      </div>
+                                    </ng-container>
+                                  </ng-container>
+                                </div>
+                                <div class="col-4 text-nowrap"
+                                  *ngIf="batchModuleForm.get('isModuleTimingMarked').value">
+                                  <div class="form-check no-padding-style">
+                                    <label class="form-check-label">
+                                      <label class="checkbox-container">
+                                        <input type="checkbox"
+                                          [checked]="batchModuleForm.get('isApplyToAllSessions').value"
+                                          (change)="onApplyToAllModulesClick(i)">
+                                        <span class="checkmark"></span>
+                                      </label>
+                                      <span class="font-sm-style text-nowrap">Apply it to all sessions</span>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </ng-container>
+                      </ng-container>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </ng-container>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="2" (click)="onTabChange(2)" class="list-active-link-style">
+        <a ngbNavLink class="font-larger-style tab-link-style">Batch</a>
+        <ng-template ngbNavContent>
+          <ng-container *ngIf="batchModules?.length > 0; else noModules">
+            <h1>Total Modules: {{totalBatchModules}}</h1>
+
+            <div class="table-responsive">
+              <table class="table table-borderless table-striped">
+                <thead>
+                  <tr>
+                    <th class="text-center"><strong>Order</strong></th>
+                    <th><strong>Module</strong></th>
+                    <th><strong>Faculty</strong></th>
+                    <th><strong>Start Date</strong></th>
+                    <th><strong>Delete</strong></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let batchModule of batchModules; let i = index">
+                    <tr>
+                      <td class="text-center algin-middle">
+                        <button type="button" class="btn btn-default"
+                          (click)="batchModule.showDetails=!batchModule.showDetails"
+                          *ngIf="batchModule.moduleTimings?.length > 0; else noExpand">
+                          <i class="material-icons-outlined material-icons-button inline-icon">
+                            {{batchModule.showDetails ? 'expand_more' : 'chevron_right'}}
+                          </i>{{batchModule.order}}
+                        </button>
+                        <ng-template #noExpand>
+                          <label class="no-sub-session">{{batchModule.order}}</label>
+                        </ng-template>
+                      </td>
+                      <td class="text-left">
+                        <img [src]="courseModules[i].module?.logo" alt="" width="30"> &nbsp;&nbsp;
+                        {{batchModule.module?.moduleName}}
+                      </td>
+                      <td>{{batchModule.faculty?.firstName}} {{batchModule.faculty?.lastName}}</td>
+                      <td>{{batchModule.startDate | date:'longDate'}}</td>
+                      <td>
+                        <button type="button" class="btn btn-default" (click)="onDeleteModuleClick(batchModule.id)">
+                          <img src="assets/icon/colour-icons/delete.png" alt="delete" width="30">
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="batchModule.showDetails" class="unstriped-tr">
+                      <td class="algin-middle" colspan="7">
+                        <div class="row">
+                          <div class="col-md-6 col-sm-12">
+                            <table class="table table-borderless table-unstriped">
+                              <thead>
+                                <tr>
+                                  <th class="text-center"><strong>Day</strong></th>
+                                  <th class="text-center"><strong>From Time</strong></th>
+                                  <th class="text-center"><strong>To Time</strong></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <ng-container
+                                  *ngFor="let moduleTiming of batchModule.moduleTimings; let j = index; let even = even">
+                                  <tr *ngIf="even">
+                                    <td class="text-center algin-middle">{{moduleTiming.day.day}}
+                                    </td>
+                                    <td class="text-center algin-middle">{{moduleTiming.fromTime}}</td>
+                                    <td class="text-center algin-middle">{{moduleTiming.toTime }}</td>
+                                  </tr>
+                                </ng-container>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="col-md-6 col-sm-12">
+                            <table class="table table-borderless table-unstriped">
+                              <thead>
+                                <tr>
+                                  <th class="text-center"><strong>Day</strong></th>
+                                  <th class="text-center"><strong>From Time</strong></th>
+                                  <th class="text-center"><strong>To Time</strong></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <ng-container
+                                  *ngFor="let moduleTiming of batchModule.moduleTimings; let j = index; let odd = odd">
+                                  <tr *ngIf="odd">
+                                    <td class="text-center algin-middle">{{moduleTiming.day.day}}
+                                    </td>
+                                    <td class="text-center algin-middle">{{moduleTiming.fromTime }}</td>
+                                    <td class="text-center algin-middle">{{moduleTiming.toTime }}</td>
+                                  </tr>
+                                </ng-container>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+
+          </ng-container>
+        </ng-template>
+      </li>
+    </ul>
+
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+    <ng-template #noModules>
+      <div class="container full-h">
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Modules not found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-submit-swabhav" (click)="validateBatchModule()" *ngIf="activeModuleTab == 1">
+      Assign
+    </button>
+    <button type="button" class="btn btn-default swabhav-light-orange-text" (click)="modal.close()">Close
+    </button>&nbsp;&nbsp;
+  </div>
+
+</ng-template>

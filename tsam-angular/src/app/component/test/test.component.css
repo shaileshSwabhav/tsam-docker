@@ -1,0 +1,157 @@
+  
+.heading-style{
+    color: #707070;
+    font-size: x-large;
+    font-weight: bold;
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+.page-margin{
+    margin-left: 5%;
+    margin-right: 5%;
+}  
+
+.card-style{
+    border: solid #D63C2A;
+}
+
+.problem-name{
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.card-shadow {
+    padding: 10px;
+    box-shadow: 5px 10px 8px #00000029;
+}
+
+.card-body-style{
+    padding-top: 0%;
+    padding-bottom: 0%;
+}
+
+.problem-date{
+    color: #EE3733;
+    font-size: smaller;
+    font-weight: bold;
+    text-align: center;
+}
+
+.card-sub-header{
+    color: #757575;
+    opacity: 0.75;
+    font-size: smaller;
+    font-weight: bold;
+}
+
+.card-sub-detail{
+    color: #212121;
+    opacity: 0.86;
+    font-size: smaller;
+    font-weight: bold;
+}
+
+.easy{
+    color: #009E0B;
+    opacity: 0.90;
+}
+
+.medium{
+    color: #F26A00;
+    opacity: 0.90;
+}
+
+.hard{
+    color: #D63C2A;
+    opacity: 0.90;
+}
+
+.solve-now{
+    color: #F6430F;
+    font-size: smaller;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.center-style{
+    text-align: center;
+}
+
+.arrow{
+    display:inline-flex;
+    vertical-align:top;
+}
+
+.icon-style{
+    font-size: 15px;
+    padding-top: 30%;
+    font-weight: bold;
+    transform: none;
+}
+
+.not-found{
+    text-align: center;
+    font-weight: bold;
+    color: #D63C2A;
+    border: solid;
+    border-radius: 5px;
+}
+
+.success-header{
+    color: #000000;
+    font-weight: bold;
+    font-size: x-large;
+    text-align: center;
+}
+
+.success-details{
+    color: #757575;
+    font-size: small;
+    text-align: center;
+}
+
+.success-body{
+    padding: 8%;
+}
+
+.close-style{
+    color: #757575;
+    font-size: small;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-icon{
+    font-size: 15px;
+    padding-top: 20%;
+    font-weight: bold;
+}
+
+.red{
+    color: #EE3733;
+    font-weight: bold;
+}
+
+.register-button{
+    color: #F26A00;
+    font-size: small;
+    font-weight: 500;
+    border-width: 1.5px;
+    border-color: #F17526;
+    padding-left: 4%;
+    padding-right: 4%;
+    margin-top: 2%;
+    margin-bottom: 1%;
+}
+
+/* .register-button:focus{
+    color: black;
+} */
+
+
+
+
+

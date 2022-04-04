@@ -1,0 +1,367 @@
+<app-master-navbar></app-master-navbar>
+
+
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #noPublishedDateTemplate>
+    <span>Not Published</span>
+</ng-template>
+
+<ng-template #BlogTemplate>
+    <mat-drawer-container class="drawer-container-style">
+        <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+            <div class="overflow-x-hidden-style">
+                <div class="font-weight-bold font-lg-style">
+                    Edit Filters&nbsp;&nbsp;&nbsp;
+                    <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                    <div class="float-right" (click)="drawer.toggle()">
+                        <span><i class="material-icons filter-close-icon-style">close</i></span>
+                    </div>
+                </div>
+                <br>
+                <form [formGroup]="blogSearchForm">
+                    <div class="filter-by-field row">
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Title'}">
+                                </ng-container>
+                            </span>
+                            <input type="text" class="form-control input-style" formControlName="title"
+                                placeholder="eg: Learning Golang">
+                            <div class="alert alert-danger" *ngIf="(blogSearchForm.get('title').touched 
+                                || blogSearchForm.get('title').dirty) 
+                                && blogSearchForm.get('title').invalid">
+                                <div *ngIf="blogSearchForm.get('title').errors.maxlength">
+                                    Title can have maximum 200 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Time to Read'}">
+                                </ng-container>
+                            </span>
+                            <input type="number" appAllowNumbersOnly class="form-control input-style"
+                                formControlName="timeToRead" placeholder="eg: 5">
+                            <div class="alert alert-danger" *ngIf="(blogSearchForm.get('timeToRead').touched 
+                                || blogSearchForm.get('timeToRead').dirty) 
+                                && blogSearchForm.get('timeToRead').invalid">
+                                <div *ngIf="blogSearchForm.get('timeToRead').errors.min">
+                                    Time to read cannot be less than 1
+                                </div>
+                                <div *ngIf="blogSearchForm.get('timeToRead').errors.max">
+                                    Time to read cannot be more than 240
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div>
+                                <label class="font-md-style font-weight-bolder-style">Published Date:</label>
+                            </div>
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'From'}">
+                                </ng-container>
+                            </span>
+                            <input type="date" class="form-control input-style" formControlName="publishedFromDate"
+                                placeholder="Enter Published Date Date From">
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <div>
+                                <label>&nbsp;</label>
+                            </div>
+                            <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'To'}">
+                                </ng-container>
+                            </span>
+                            <input type="date" class="form-control input-style" formControlName="publishedEndDate"
+                                placeholder="Enter Published Date Date To">
+                        </div>
+                        <div class="form-group col-sm-12 col-md-6">
+                            <span>
+                                <ng-container
+                                    *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Is Published?'}">
+                                </ng-container>
+                            </span>
+                            <select class="form-control input-style" formControlName="isPublished">
+                                <option [ngValue]="null">Select</option>
+                                <option [ngValue]="'0'">No</option>
+                                <option [ngValue]="'1'">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn btn-default filter-button" type="submit" [disabled]="!blogSearchForm.dirty"
+                            (click)="searchBlogs();drawer.toggle()">
+                            Search
+                            <span class="vertical-align-top-icon-style"><i
+                                    class="material-icons search-button-icon-style">search</i></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </mat-drawer>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Unverified Blogs -
+                    <span class="color-F6430F"> {{totalBlogs}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Unverified Blogs
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalBlogs > 0" class="view-label-flex">
+                <span class="text-right font-md-style">
+                    Viewing <span class="font-weight-bold color-F6430F">{{paginationStart}} - {{paginationEnd}}</span>
+                    of
+                    <span class="font-weight-bold color-F6430F">{{totalBlogs}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalBlogs == 0 && isSearched) || (totalBlogs > 0 && !isSearched) 
+                    || (totalBlogs > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalBlogs > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let blog of blogList | paginate: { id:'blogID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalBlogs }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="blogID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalBlogs > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table  table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Published Date</th>
+                                <th>Author</th>
+                                <th>Role</th>
+                                <th>View</th>
+                                <th>Delete</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let blog of blogList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td class="font-weight-bold color-EE3733">{{blog.title}}</td>
+                                    <td>{{blog.description}}</td>
+                                    <td>
+                                        <span *ngIf="blog.publishedDate; else noPublishedDateTemplate">
+                                            {{blog.publishedDate | date:'dd MMM, yyyy'}}
+                                        </span>
+                                    </td>
+                                    <td>{{blog.author.firstName + " " + blog.author.lastName}}</td>
+                                    <td>{{blog.author.role.roleName}}</td>
+                                    <td data-toggle="tooltip" data-placement="top" title="View Blog">
+                                        <span (click)="onViewBlogClick(blog)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Delete blog">
+                                        <span type="button" (click)="onDeleteBlogClick(blog.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalBlogs == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Unverified Blogs Found</h2>
+                </div>
+            </div>
+        </div>
+    </mat-drawer-container>
+</ng-template>
+
+<div class="container-fluid">
+    <br>
+    <ul ngbNav #nav="ngbNav" [destroyOnHide]="true" class="nav-tabs ul-space-even-style"
+        (onChange)="onTabChange($event)">
+
+        <!-- Unverified Blogs -->
+        <li [ngbNavItem]="1" (click)="onTabChange(1)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Unverified Blogs</a>
+            <ng-template ngbNavContent>
+                <!-- Search Bar -->
+                <br>
+                <ng-template [ngTemplateOutlet]="BlogTemplate"></ng-template>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+
+        <!-- Verified Blogs -->
+        <li [ngbNavItem]="2" (click)="onTabChange(2)" class="list-active-link-style">
+            <a ngbNavLink class="font-xl-style tab-link-style">Verified Blogs</a>
+            <ng-template ngbNavContent>
+                <!-- Search Bar -->
+                <br>
+                <ng-template [ngTemplateOutlet]="BlogTemplate"></ng-template>
+                <br>
+                <br>
+            </ng-template>
+        </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+</div>
+
+<!-- Add/Update/View Blog -->
+<ng-template #blogFormModal let-modal>
+    <form [formGroup]="blogForm">
+        <div class="modal-body">
+            <div class="form-header-style">
+                Blog Details
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Close click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class=" form-group col-sm-12 col-md-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Title'}"></ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" formControlName="title"
+                        placeholder="eg: Learning Golang">
+                </div>
+                <div class=" form-group col-sm-12 col-md-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Description'}">
+                        </ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" formControlName="description"
+                        placeholder="eg: About your blog...">
+                </div>
+                <div class="form-group col-sm-6 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Time To Read'}">
+                        </ng-container>
+                    </span>
+                    <input type="number" formControlName="timeToRead" appAllowNumbersOnly
+                        class="form-control input-style" placeholder="eg: 5">
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Topics'}">
+                        </ng-container>
+                    </span>
+                    <ng-select [items]="blogTopicList" bindLabel="name" placeholder="Select" appendTo="body"
+                        [searchable]="true" [clearable]="false" formControlName="blogTopics" class="ng-select-style"
+                        multiple="true">
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            {{item.name}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+                <div *ngIf="selectedBlogBannerImage" class="form-group col-sm-12 col-md-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Banner Image'}">
+                        </ng-container>
+                    </span>
+                    <div>
+                        <img class="banner-image-style" src={{selectedBlogBannerImage}} alt="">
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 col-md-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Content'}">
+                        </ng-container>
+                    </span>
+                    <ckeditor #ckeditorOption [config]="ckeEditorContentConfig" formControlName="content"></ckeditor>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button *ngIf="!blogForm.get('isVerified').value" type="button"
+                    class="btn btn-default swabhav-button-round" (click)="onVerifyButtonClik(true, false)">
+                    Verify Blog
+                </button>
+                <button *ngIf="blogForm.get('isVerified').value" type="button"
+                    class="btn btn-default swabhav-button-round" (click)="onVerifyButtonClik(false, false)">
+                    Unverify Blog
+                </button>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<!-- Delete Blog Confirmation -->
+<ng-template #deleteBlogModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this blog?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>

@@ -1,0 +1,113 @@
+<app-master-navbar></app-master-navbar>
+
+
+<div class="container-fluid">
+    <div class="standard-page-margin">
+        <div class="heading-style">Placement Cell</div>
+        <div>
+            <button
+                [ngClass]="eligibleSelected ? 'btn btn-default selected-header-button' : 'btn btn-default header-button'"
+                type="button" (click)="onEligibleButtonClick()">
+                Eligible
+            </button>
+            &nbsp;&nbsp;&nbsp;
+            <button
+                [ngClass]="appliedSelected ? 'btn btn-default selected-header-button' : 'btn btn-default header-button'"
+                type="button" (click)="onAppliedButtonClick()">
+                Applied
+            </button>
+            &nbsp;&nbsp;&nbsp;
+            <button
+                [ngClass]="allJobsSelected ? 'btn btn-default selected-header-button' : 'btn btn-default header-button'"
+                type="button" (click)="onAllJobsButtonClick()">
+                All Jobs
+            </button>
+        </div>
+        <br>
+        <div *ngIf="totalMyOppurtunities > 0">
+            <div class="totalLabel float-right">{{paginationString}}</div>
+            <div class="totalLabel">
+                Total Opportunities: {{totalMyOppurtunities}}
+            </div>
+            <div class="display-inline">
+                <div class="form-group col-sm-6 col-md-6">
+                    <!-- <div class="row">
+                        <select class="form-control col-sm-2 col-md-2" [(ngModel)]="limit" (change)="changePage(1)">
+                            <option selected>8</option>
+                        </select>&nbsp;&nbsp;&nbsp;
+                    </div> -->
+                </div>
+                <ul class="pagination" *ngFor="let requirement of myOppurtunityList | paginate: { id:'myOppurtunityID',
+                    itemsPerPage: limit, 
+                    currentPage: currentPage, totalItems: totalMyOppurtunities }">
+                </ul>
+                <pagination-controls autoHide="true" responsive="true" maxSize="10" (pageChange)="changePage($event)"
+                    id="myOppurtunityID"></pagination-controls>
+            </div>
+            <div class="row">
+                <ng-container *ngFor="let myOppurtunity of myOppurtunityList; let i = index">
+                    <div class="form-group col-sm-6 col-md-4">
+                        <div
+                            class="card opportunity-card-margin opportunity-card-shadow modal-popup-table-card-style h-100">
+                            <div class="card-body opportunity-card-body-margin">
+                                <div *ngIf="myOppurtunity.companyBranch?.company?.logo; else companyBranchName">
+                                    <img class="logo" src={{myOppurtunity.companyBranch.company.logo}} alt="">
+                                    <br><br>
+                                </div>
+                                <ng-template #companyBranchName>
+                                    <div class="company-branch-name">{{myOppurtunity.companyBranch.branchName}}</div>
+                                    <br>
+                                </ng-template>
+                                <div class="font-weight-bold font-md-style">{{myOppurtunity.designation.position}}</div>
+                                <div class="font-weight-bold font-sm-style color-757575">
+                                    {{myOppurtunity.companyBranch.branchName}}</div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-4 col-md-4">
+                                        <label class="color-BDBDBD font-sm-style font-weight-bold">Pay</label>
+                                        <div class="color-4F4F4F font-sm-style font-weight-bold">
+                                            {{myOppurtunity.packageOfferedInstring}}</div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-4">
+                                        <label class="color-BDBDBD font-sm-style font-weight-bold">Job Type</label>
+                                        <div class="color-4F4F4F font-sm-style font-weight-bold">Full Time</div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-4">
+                                        <label class="color-BDBDBD font-sm-style font-weight-bold">Loaction</label>
+                                        <div class="color-4F4F4F font-sm-style font-weight-bold">
+                                            {{myOppurtunity.city}}</div>
+                                    </div>
+                                </div>
+                                <br>
+                                <label class="color-BDBDBD font-sm-style font-weight-bold">Last Date of
+                                    Registration</label>
+                                <span
+                                    class="color-4F4F4F font-sm-style font-weight-bold">&nbsp;&nbsp;&nbsp;{{myOppurtunity.requiredBefore
+                                    | date:'dd MMM, yyyy'}}</span>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <button class="btn btn-default swabhav-button-square view-details-button-style"
+                                    type="button" (click)="redirectToCompanyDetails(myOppurtunity.id)">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="totalMyOppurtunities == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2 *ngIf="appliedSelected; else noOppurtunity">No Applications found</h2>
+                    <ng-template #noOppurtunity>
+                        <h2>No Oppurtunities found</h2>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>

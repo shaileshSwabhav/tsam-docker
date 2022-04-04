@@ -1,0 +1,210 @@
+.create-roadmap-style{
+    color: white;
+    background-color: #439943;
+    border-radius: 30px;
+    padding: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.batch-details-section-style{
+    padding: 1%;
+}
+
+.margin-top-style{
+    margin-top: 10px;
+}
+
+.page-width-style{
+    width: auto;
+}
+
+.day-style{
+    border-radius: 2px;
+    width: 35px;
+    height: 30px;
+    display: inline-block;
+    border: 1px solid #bdbdbd;
+    text-align: center;
+    padding-top: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.selected-day-style{
+    color: #ffffff;
+    background-color: #f34523;
+}
+
+.day-text-style{
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+.button-style{
+    width: 150px;
+    font-size: small;
+}
+
+.back-button-style{
+    border: 1px solid #e73a19;
+    border-radius: 30px;
+    font-weight: bold;
+}
+
+.header-style {
+    display: flex;
+}
+  
+.header-left-style {
+    margin-left: auto;
+}
+
+.total-module-style{
+    margin-top: 4px;
+}
+
+.table-td-center-align{
+    vertical-align: middle;
+}
+
+.no-padding-style{
+    padding: 0;
+}
+
+/* ************** Drag and drop styles ******************** */
+
+.cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px   
+        rgba(0, 0, 0, 0.14), 0 3px 14px 2px 
+        rgba(0, 0, 0, 0.12);
+
+    height: 48px;
+    background-color: white;
+    display: table;
+  }
+  
+.cdk-drag-preview td {
+    flex-grow: 2;
+    font-size: 14px;
+    padding: 4px;
+    vertical-align: middle;
+}
+
+/* ****************************************************** */
+
+/* ************** Module tab styles ******************** */
+
+.module-tab-menu-style{
+    box-shadow: 0 0 10px #ccc;
+    margin: 0 auto;
+}
+
+/* active tab */
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+    color:black;
+    background-color: #ffe0da;
+    height: 120px;
+}
+
+:host::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label {
+    color:black;
+    height: 120px;
+}
+
+:host::ng-deep .mat-tab-header {
+    border: none;
+}
+    
+/* ink bar */
+:host::ng-deep .mat-ink-bar {
+    background-color: var(--primary-color,#ffe0da) !important;
+}
+
+/* ****************************************************** */
+
+.width-60px-style{
+    width: 60px;
+}
+
+.no-background-tr-style{
+    background: white !important;
+}
+
+.order-style{
+    width: 20%;
+    margin: auto;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+  background-color: #fce9e4;
+}
+
+.left-panel{
+    float: left;
+    width: 65%;
+}
+
+.right-panel{
+    float: right;
+    width: 35%;
+    left: 60%;
+}
+
+.create-session-plan-style{
+    display: inline;
+}
+
+.red-box-style{
+    background-color: #ffeaea;
+    color: #f80309;
+}
+
+.blue-box-style{
+    background-color: #e5f6fd;
+    color: #61abde;
+}
+
+.green-box-style{
+    background-color: #e5fdf0;
+    color: #36b98c;
+}
+
+.yellow-box-style{
+    background-color: #faeed9;
+    color: #ed9511;
+}
+
+.tasklist-box-style{
+    border-radius: 30px;
+    font-weight: bold;
+    padding: 4px;
+    text-align: center;
+}
+
+.font-20-style{
+    font-size: 20px;
+}
+
+.table-margin-left-style{
+    padding-left: 5%;
+}
+
+.ng-select-style.ng-select ::ng-deep .ng-select-container  {            
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}
+  
+.ng-select.ng-select-disabled>.ng-select-container {
+    border: 1.5px solid #FC6E26;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    font-size: small;
+}

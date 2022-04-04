@@ -1,0 +1,586 @@
+<ng-template #dashTemplate>
+  -
+</ng-template>
+
+<ng-template #addSubmissionClick>
+  <div class="float-right" *ngIf="!selectedBatchProject.submissions[0]?.isAccepted">
+    <button class="btn btn-default swabhav-button-round button-width-style" (click)="onAddNewSubmissionClick()">
+      Add new submission
+    </button>
+  </div>
+</ng-template>
+
+
+<div class="font-weight-bold font-lg-style color-F6430F text-center">
+  Projects
+</div>
+
+<br>
+
+<!-- No Projects Found -->
+<ng-container *ngIf="batchProjectList.length == 0">
+  <br>
+  <div class="card my-course-card-style h-100">
+      <div class="card-body">
+          <div class="text-center">
+              <img width="100" src="assets/icon/colour-icons/no-session-plan.jpg">
+              <div class="font-weight-bold font-lg-style text-center">Oops!</div>
+              <br>
+              <div class="font-lg-style text-center">
+                  No Projects Found
+              </div>
+          </div>
+      </div>
+  </div>
+</ng-container>
+
+<!-- Project List -->
+<ng-container *ngIf="batchProjectList.length > 0 && isProjectListVisible">
+  <table class="table table-borderless">
+    <thead>
+      <tr class="text-center">
+        <th>Sr No.</th>
+        <th class="text-left">Project Name</th>
+        <th>Difficulty</th>
+        <th>Due Date</th>
+        <th>Submitted Date</th>
+        <th>Score</th>
+        <th>Feedback</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let project of batchProjectList;let i = index">
+        <tr class="text-center cursor-pointer-style project-row-style" (click)="onProjectRowClick(project)">
+          <td class="font-sm-style font-weight-bold color-757575">
+            {{i+1}}
+          </td>
+          <td class="text-left">
+            <img class="width-30px-style" src="assets/course/assignments.png" alt="Assignment Name">
+            &nbsp;&nbsp;
+            <span class="font-sm-style font-weight-bold color-757575">
+              {{project.programmingProject.projectName}}
+            </span>
+          </td>
+          <td>
+            <div class="tasklist-box-style"
+              [ngClass]="{'green-box-style': project.programmingProject.complexityLevel>=1 && project.programmingProject.complexityLevel<=5,
+                            'yellow-box-style': project.programmingProject.complexityLevel>=6 && project.programmingProject.complexityLevel<=8,
+                            'red-box-style': project.programmingProject.complexityLevel===9 || project.programmingProject.complexityLevel===10}">
+              <div *ngIf="project.programmingProject.complexityLevel>=1 && project.programmingProject.complexityLevel<=5">Easy</div>
+              <div *ngIf="project.programmingProject.complexityLevel>=6 && project.programmingProject.complexityLevel<=8">Medium</div>
+              <div *ngIf="project.programmingProject.complexityLevel>=9 && project.programmingProject.complexityLevel<=10">Hard</div>
+            </div>
+          </td>
+          <td>
+            <span *ngIf="project.dueDate; else dashTemplate" class="font-sm-style font-weight-bold">
+              {{project.dueDate | date:'EEE, MMM d, y'}}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="project.submissions?.length > 0; else dashTemplate" class="font-sm-style font-weight-bold">
+              {{project.submissions[0]?.submittedOn}}
+            </span>
+          </td>
+          <td class="font-sm-style font-weight-bold">
+            <span *ngIf="project.score; else dashTemplate" class="font-md-style font-weight-bold color-757575">
+              {{project.submissions[0].score}}/{{project.programmingProject.score}}
+            </span>
+          </td>
+          <td>
+            <ng-container *ngIf="project.facultyRemarks==null">
+              <img class="width-30px-style" src="assets/icon/grey-icons/assignment-feedback.png" alt="No remarks">
+            </ng-container>
+            <ng-container *ngIf="project.facultyRemarks!=null">
+              <img class="width-30px-style" src="assets/icon/colour-icons/comment.png" alt="Remarks">
+            </ng-container>
+            <!-- <div class="row"> -->
+            <!-- If nothing is sent from faculty -->
+            <!-- <ng-container *ngIf="assignment.voiceNote==null && assignment.comment==null">
+                                <div class="col-md-6">
+                                    <img class="width-30px-style" src="assets/icon/grey-icons/microphone.png" alt="No voice note">
+                                </div>
+                                <div class="col-md-12">
+                                    <div>
+                                        <img class="width-30px-style" src="assets/icon/grey-icons/assignment-feedback.png" alt="No comments">
+                                    </div>
+                                </div>
+                            </ng-container> -->
+
+            <!-- If atleast one feedback is sent from faculty -->
+            <!-- <ng-container *ngIf="assignment.voiceNote!=null || assignment.comment!=null">
+                                <div class="col-md-6">
+                                    <img *ngIf="assignment.voiceNote!=null" class="width-30px-style" 
+                                        src="assets/icon/colour-icons/play-voicenote.png" alt="Voice note">
+                                </div>
+                                <div class="col-md-12">
+                                    <div>
+                                        <img *ngIf="assignment.comment!=null" class="width-30px-style" 
+                                        src="assets/icon/colour-icons/comment.png" alt="Comment">
+                                    </div>
+                                </div>
+                            </ng-container> -->
+            <!-- </div> -->
+          </td>
+          <td>
+            <div class="tasklist-box-style" [ngClass]="{'red-box-style': project.status=='Pending', 
+                            'blue-box-style': project.status=='Submitted',
+                            'green-box-style': project.status=='Completed'}">
+              {{project.status}}
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</ng-container>
+
+<!-- Assignment Details -->
+<ng-container *ngIf="!isProjectListVisible">
+  <div>
+    <button class="btn btn-default swabhav-button-round" (click)="isProjectListVisible=true">
+      Back to list
+    </button>
+  </div>
+  <br>
+
+  <!-- Assignment Details Header -->
+  <div>
+    <span class="font-weight-bold font-lg-style">
+      <span class="cursor-pointer-style"
+        [ngClass]="{'primary': isQuestionSelected==true, 'color-BDBDBD' : isQuestionSelected==false }"
+        (click)="isQuestionSelected=true">
+        Project Details
+      </span>
+      <span class="color-BDBDBD">
+        |
+      </span>
+      <span class="cursor-pointer-style"
+        [ngClass]="{'primary': isQuestionSelected==false, 'color-BDBDBD' : isQuestionSelected==true }"
+        (click)="isQuestionSelected=false">
+        Your Answers
+      </span>
+    </span>
+  </div>
+  <br>
+
+  <!-- Assignment Question Details -->
+  <div *ngIf="isQuestionSelected && selectedBatchProject">
+
+    <!-- Header -->
+    <div class="heading-style">
+      {{selectedBatchProject.programmingProject.projectName}}
+      <span class="level"> (Level <span [ngClass]="selectedBatchProject.programmingProject.levelClass">
+          {{selectedBatchProject.programmingProject.levelName}})</span>
+      </span>
+    </div>
+
+    <!-- Question -->
+    <div class="color-757575 font-md-style color-212121 font-weight-bold">
+      Project Type :
+  </div>
+  <div [innerHTML]="selectedBatchProject.programmingProject.projectType">
+  </div>
+    <div class="color-757575 font-md-style" [innerHTML]="selectedBatchProject.programmingProject?.description">
+    </div>
+    <br>
+    <br>
+    <div *ngIf="selectedBatchProject.programmingProject?.document" data-toggle="tooltip" data-placement="top"
+      title="View Document">
+      <button class="btn btn-default swabhav-button-round">
+        <a [href]="selectedBatchProject.programmingProject?.document" target="_blank" class="anchor">View
+          Project Document</a>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Student's answers -->
+  <div *ngIf="!isQuestionSelected">
+    <div class="row">
+      <div class="col-md-1 no-padding-style">
+        <label class="font-sm-style font-weight-bold">Problem Statement:</label>
+      </div>
+      <div [innerHTML]="selectedBatchProject.programmingProject.projectName" class="col-md-11">
+      </div>
+    </div>
+    <div class="float-right" *ngIf="!selectedBatchProject.submissions;else addSubmissionClick">
+      <button class="btn btn-default swabhav-button-round button-width-style" (click)="onAddNewSubmissionClick()">
+        Add new submission
+      </button>
+    </div>
+    <ng-container *ngIf="selectedBatchProject.submissions?.length > 0">
+      <div>
+        <table class="table table-borderless">
+          <thead>
+            <tr class="text-center">
+              <th>Attempted No.</th>
+              <th>Date Submitted</th>
+              <th>Images</th>
+              <th>Git Link</th>
+              <th>Website link</th>
+              <th>Project Upload</th>
+              <th>Audio</th>
+              <th>Text</th>
+              <th>Score</th>
+              <th>Checked</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let submission of selectedBatchProject.submissions;let i = index">
+              <tr class="text-center">
+                <td class="font-weight-bold color-757575 font-sm-style">
+                  {{i+1}}
+                </td>
+                <td class="font-weight-bold color-757575 font-sm-style">
+                  {{submission.submittedOn | date:'EEE, MMM d, y'}}
+                </td>
+                <td>
+                  <img *ngIf="submission.projectSubmissionUpload;else dashTemplate"
+                    class="width-50px-style cursor-pointer-style" src="assets/icon/colour-icons/image.png" alt="Images"
+                    (click)="onImagesClick(submission)">
+                </td>
+                <td>
+                  <span *ngIf="submission.githubURL;else dashTemplate"
+                    class="cursor-pointer-style primary font-weight-bold font-sm-style"
+                    (click)="redirectToExternalLink(submission.githubURL)">
+                    Url
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="submission.websiteLink;else dashTemplate"
+                    class="cursor-pointer-style primary font-weight-bold font-sm-style"
+                    (click)="redirectToExternalLink(submission.websiteLink)">
+                    WebsiteLink
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="submission.projectUpload;else dashTemplate"
+                    class="cursor-pointer-style primary font-weight-bold font-sm-style"
+                    (click)="redirectToExternalLink(submission.projectUpload)">
+                    ProjectUpload
+                  </span>
+                </td>
+                <td>
+                  <img *ngIf="submission.facultyVoiceNote!=null;else dashTemplate"
+                    class="width-30px-style cursor-pointer-style" src="assets/icon/colour-icons/play-voicenote.png"
+                    alt="Play voice note" (click)="onVoiceClick(submission)">
+                </td>
+                <td>
+                  <img *ngIf="submission.facultyRemarks!=null;else dashTemplate"
+                    class="width-30px-style cursor-pointer-style" src="assets/icon/colour-icons/comment.png"
+                    alt="See comment" (click)="onCommentClick(submission)">
+                </td>
+                <td>
+                  <span *ngIf="submission.score!=null; else dashTemplate" (click)="onSubmissionScoreClick(submission)"
+                    class="cursor-pointer-style primary font-weight-bold font-sm-style">
+                    {{submission.score}}
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="submission.isChecked; else dashTemplate" class="primary font-weight-bold font-sm-style">
+                    <img class="width-30px-style" src="assets/icon/colour-icons/check.png" alt="check">
+                  </span>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+    <div *ngIf="!selectedBatchProject.submissions">
+      <br><br>
+      <div class="card">
+        <div class="card-body not-found-card-style">
+          <h2>No Submissions Done</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ng-container>
+
+<!-- Comment -->
+<ng-template #commentModal let-modal>
+
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <span class="close cursor-pointer-style" (click)="modal.dismiss()">
+        <i class="material-icons close-icon">close</i>
+      </span>
+    </div>
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-4">
+        <img src="assets/icon/colour-icons/comment.png" alt="comment" class="width-100px-style">
+      </div>
+      <div class="col-sm-8">
+        <h1 class="swabhav-light-orange-text"><strong>Feedback by faculty:</strong></h1>
+      </div>
+    </div>
+    <br>
+    <div class="text-center font-weight-bold font-md-style">
+      {{selectedSubmission.facultyRemarks}}
+    </div>
+    <br>
+    <!-- <div class="text-center">
+            <button class="btn btn-default delete-button-style button-width-style">
+                Close
+            </button>
+        </div> -->
+  </div>
+
+</ng-template>
+
+<!-- Images -->
+<ng-template #imagesModal let-modal>
+
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <span class="close cursor-pointer-style" (click)="modal.dismiss()">
+        <i class="material-icons close-icon">close</i>
+      </span>
+    </div>
+    <ngb-carousel>
+      <ng-template *ngFor="let image of selectedSubmission.projectSubmissionUpload;let i = index" ngbSlide>
+        <div class="picsum-img-wrapper">
+          <img [src]="image.imageURL" alt="Random first slide">
+        </div>
+      </ng-template>
+    </ngb-carousel>
+  </div>
+
+</ng-template>
+
+<!-- Submission form modal -->
+<ng-template #submissionFormModal let-modal>
+
+  <div class="modal-body">
+    <form [formGroup]="submissionForm">
+      <div class="float-right">
+        <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="button"><i
+            class="material-icons close-icon">close</i>
+        </button>
+      </div>
+      <br>
+
+      <div class="row">
+        <div class="col-sm-2">
+          <img src="assets/course/assignments-add.png" width="60">
+        </div>
+        <div class="col-sm-10 top-margin-10-style">
+          <div>
+            <span class="color-F6430F font-weight-bold font-lg-style">Add Submission:</span>
+          </div>
+        </div>
+      </div>
+      <br>
+      <br>
+      <div class="row">
+        <div class="form-group col-10 row-3">
+          <span class="red">*</span><span><strong>Github Link:</strong></span>
+          <input type="text" class="form-control input-style" formControlName="githubURL"
+            placeholder="https://github.com/">
+          <div class="alert alert-danger" *ngIf="(submissionForm.get('githubURL').touched||
+                        submissionForm.get('githubURL').dirty)&&submissionForm.get('githubURL').invalid">
+            <div *ngIf="submissionForm.get('githubURL').errors.required">
+              Github Link must be specified
+            </div>
+            <div *ngIf="submissionForm.get('githubURL').errors.pattern">
+              Github URL must start with https://github.com/
+            </div>
+            <div *ngIf="submissionForm.get('githubURL').errors.maxlength">
+              Github Link can have maximum 500 characters
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-10 row-3">
+          <span><strong>Website Link:</strong></span>
+          <input type="text" class="form-control input-style" formControlName="websiteLink"
+            placeholder="eg: http://admin.swabhavtechlabs.com/">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-10 row-3">
+          <span><strong>Project Upload:</strong></span>
+          <span class="custom-file custom-file-border">
+            <input type="file" class="form-control input-style" (change)="onResourceSelect($event)" id="customFile"
+              value="displayedFileName">
+            <label class="custom-file-label" id="custom-file-label" for="customFile"
+              [innerHTML]="displayedFileName"></label>
+            <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+              *ngIf="isProjectUploading">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Uploading file...
+            </button>
+          </span>
+          <!-- should add view uploaded document using a document variable after cleaning. -->
+          <label id="uploadStatus" for="customFile" [innerHTML]="projectStatus"></label>
+        </div>
+      </div>
+      <div class="form-sub-header-style">Image Uploads</div>
+      <div formArrayName="projectSubmissionUploads" *ngFor="let upload of uploadControlArray.controls;let i = index">
+        <ng-container [formGroupName]="i">
+          <div class="row">
+            <div class="col-sm-12 col-md-12">
+              <label class="font-weight-bold font-lg-style">Image {{i+1}}</label>
+              <label class="float-right" (click)="deleteUpload(i)">
+                <i class="material-icons color-F6430F cursor-pointer-style">delete</i>
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <span>
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">
+                    <span><strong>Image:</strong></span>
+                  </label>
+                  <div class="col-sm-2" *ngIf="uploadControlArray.at(i).get('isImageUploadedToServer').value">
+                    <span (click)="redirectToExternalLink(uploadControlArray.at(i).get('imageURL').value)"
+                      class="cursor-pointer-style">
+                      <img src="assets/icon/colour-icons/pdf.png" width="30">
+                      <span class="font-weight-bold">
+                        Image.pdf
+                      </span>
+                    </span>
+                  </div>
+                  <div class="col-sm-8">
+                    <span class="custom-file">
+                      <input type="file" class="custom-file-input input-style" (change)="onImageSelect($event,i)"
+                        id="customFile" value="uploadControlArray.at(i).get('imageDisplayedFileName').value">
+                      <label class="custom-file-label" id="custom-file-label" for="customFile"
+                        [innerHTML]="uploadControlArray.at(i).get('imageDisplayedFileName').value"></label>
+                      <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                        *ngIf="uploadControlArray.at(i).get('isImageUploading').value">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Uploading file...
+                      </button>
+                    </span>
+                    <label id="uploadStatus" for="customFile"
+                      [innerHTML]="uploadControlArray.at(i).get('imageDocStatus').value"></label>
+                  </div>
+                </div>
+              </span>
+            </div>
+            <div class="form-group col-12">
+              <span><strong>Description:</strong></span>
+              <textarea type="text" class="form-control input-style" nbInput formControlName="description"
+                placeholder="eg: About the image upload...">
+                            </textarea>
+              <div class="alert alert-danger" *ngIf="(uploadControlArray.at(i).get('description').touched 
+                                || uploadControlArray.at(i).get('description').dirty) 
+                                && uploadControlArray.at(i).get('description').invalid">
+                <div *ngIf="uploadControlArray.at(i).get('complexityLevel').errors.maxlength">
+                  Description cannot have more than 1000 characters
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <button class="btn btn-default swabhav-button-round" (click)="addUploadToSubmissionForm()">
+        + Add Image
+      </button>
+
+      <br>
+      <br>
+
+      <div class="float-right">
+        <button type="button" (click)="dismissFormModal(modal)"
+          class="btn btn-default swabhav-button-round">Close</button>
+        &nbsp;&nbsp;
+        <button type="button" [disabled]="!submissionForm.dirty || checkIfImageIsUploading()"
+          class="btn btn-default swabhav-button-round" (click)="validateSubmissionForm()">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+
+</ng-template>
+
+<!-- Concept score modal -->
+<ng-template #conceptScoreModal let-modal>
+
+  <div class="modal-body">
+    <div class="float-right">
+      <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="button"><i
+          class="material-icons close-icon">close</i>
+      </button>
+    </div>
+    <br>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <img src="assets/icon/colour-icons/checklist.png" width="60">
+      </div>
+      <div class="col-sm-10 top-margin-10-style">
+        <div>
+          <span class="color-F6430F font-weight-bold font-lg-style">Concept Wise Scores:</span>
+        </div>
+      </div>
+    </div>
+
+    <table class="table table-borderless">
+      <thead>
+        <tr class="text-center">
+          <th>Sr No.</th>
+          <th class="text-left">Rating Parameter</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let projectRating of selectedSubmission?.programmingProjectRatings;let i = index">
+          <tr class="text-center cursor-pointer-style project-row-style">
+            <td class="font-sm-style font-weight-bold color-757575">
+              {{i+1}}
+            </td>
+            <td class="text-left">
+              <span class="font-sm-style font-weight-bold color-757575">
+                {{projectRating.programmingProjectRatingParameter.label}}
+              </span>
+            </td>
+            <td>
+              {{projectRating.score}}
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <br><br>
+
+    <div class="float-right">
+      <button type="button" (click)="modal.dismiss()" class="btn btn-default swabhav-button-round">Close</button>
+    </div>
+  </div>
+
+</ng-template>
+
+<!-- Voice note -->
+<ng-template #voiceNoteModal let-modal>
+
+  <div class="modal-body">
+    <div class="d-flex justify-content-end">
+      <span class="close cursor-pointer-style" (click)="modal.dismiss()">
+        <i class="material-icons close-icon">close</i>
+      </span>
+    </div>
+    <div class="row d-flex align-items-center">
+      <div class="col-sm-4">
+        <img src="assets/icon/colour-icons/play-voicenote.png" alt="comment" class="width-100px-style">
+      </div>
+      <div class="col-sm-8">
+        <h1 class="swabhav-light-orange-text"><strong>VoiceNote by faculty:</strong></h1>
+      </div>
+    </div>
+    <div class="text-center font-weight-bold font-md-style">
+      <audio controls="" *ngIf="selectedSubmission.facultyVoiceNote" autoplay>
+        <source [src]="voiceNote(selectedSubmission.facultyVoiceNote)" type="audio/wav">
+      </audio>
+    </div>
+  </div>
+
+</ng-template>

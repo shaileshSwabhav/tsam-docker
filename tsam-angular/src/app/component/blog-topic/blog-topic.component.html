@@ -1,0 +1,231 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<ng-template #dashTemplate>
+    <span>-</span>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-30-style">
+        <div class="overflow-x-hidden-style">
+            <div class="font-weight-bold font-lg-style">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="font-weight-normal color-F6430F font-sm-style cursor-pointer-style"
+                    (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="blogTopicSearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-12">
+                        <span>
+                            <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="name"
+                            placeholder="eg: Learning Golang">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit" [disabled]="!blogTopicSearchForm.dirty"
+                        (click)="searchBlogTopics();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Blog Topics -
+                    <span class="color-F6430F"> {{totalBlogTopics}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Blog Topics
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" (click)="onAddNewBlogTopicClick()">
+                        Add New Blog Topic
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalBlogTopics > 0" class="view-label-flex">
+                <span class="text-right font-md-style">
+                    Viewing <span class="color-F6430F font-weight-bold">{{paginationStart}} - {{paginationEnd}}</span>
+                    of
+                    <span class="color-F6430F font-weight-bold">{{totalBlogTopics}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalBlogTopics == 0 && isSearched) || (totalBlogTopics > 0 && !isSearched) 
+                    || (totalBlogTopics > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalBlogTopics > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let blogTopic of blogTopicList | paginate: { id:'blogTopicID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalBlogTopics }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="blogTopicID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalBlogTopics > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>Name</th>
+                                <th>View</th>
+                                <th>Delete</th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let blogTopic of blogTopicList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td>{{blogTopic.name}}</td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Update Blog Topic">
+                                        <span (click)="onViewBlogTopicClick(blogTopic)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Delete Blog Topic">
+                                        <span (click)="onDeleteBlogTopicClick(blogTopic.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalBlogTopics == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Blog Topics Found</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</mat-drawer-container>
+
+<!-- Add/Update/View Blog Topic -->
+<ng-template #blogTopicFormModal let-modal>
+    <form [formGroup]="blogTopicForm">
+        <div class="modal-body">
+            <div class="form-header-style">
+                {{isViewMode? 'Blog Topic Details': isOperationUpdate ? 'Update Blog Topic' : 'Add Blog Topic' }}
+                <span *ngIf="isViewMode" (click)="onUpdateBlogTopicClick()">
+                    <i class="material-icons">create</i>
+                </span>
+            </div>
+            <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red"><strong>*</strong></span>
+                marked fields are mandatory</div>
+            <br>
+            <div class="row">
+                <div class=" form-group col-sm-12 col-md-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Name'}"></ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" formControlName="name"
+                        placeholder="eg: Learning Golang">
+                    <div class="alert alert-danger" *ngIf="(blogTopicForm.get('name').touched||
+                        blogTopicForm.get('name').dirty) && blogTopicForm.get('name').invalid">
+                        <div *ngIf="blogTopicForm.get('name').errors.required">
+                            Name must be specified
+                        </div>
+                        <div *ngIf="blogTopicForm.get('name').errors.maxlength">
+                            Name can have maximum 100 characters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button type="button" [disabled]="!blogTopicForm.dirty" class="btn btn-default swabhav-button-round"
+                    *ngIf="!isViewMode" (click)="onFormSubmit()">
+                    {{isOperationUpdate ? 'Update Blog Topic' : 'Add Blog Topic'}}
+                </button>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<!-- Delete Blog Topic Confirmation -->
+<ng-template #deleteBlogTopicModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-sm-style font-weight-bold cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this blog topic?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<app-master-footer></app-master-footer>

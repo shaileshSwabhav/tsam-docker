@@ -1,0 +1,175 @@
+<app-master-navbar></app-master-navbar>
+
+
+<img class="main-image-style" src="assets/images/refer-and-earn-banner.png" alt="">
+<br>
+<br>
+<div class="container-fluid">
+    <div class="standard-page-margin">
+        <div class="row">
+            <div class="form-group col-sm-12 col-md-5 h-100">
+                <div
+                    class="card refer-and-earn-margin refer-and-earn-card-shadow modal-popup-table-card-style px-0 pt-0">
+                    <div class="card-body refer-and-earn-card-body-margin">
+                        <div class="font-weight-bold font-larger-style color-000000">
+                            Refer and Earn
+                        </div>
+                        <br>
+                        <div class="font-sm-style color-757575">
+                            Invite your friends and earn<span class="font-weight-bold color-4F4F4F"> 1000 Mario
+                                Coins.</span>
+                            <br>
+                            Use this coins to get discounts when you purchase course from us.
+                        </div>
+                        <br>
+                        <div class="refer-and-ear-link-style">
+                            {{referLink}}
+                        </div>
+                        <br>
+                        <div class="display-flex-style">
+                            <div class="copy-and-refer-box-style">
+                                <span class="mario-running-style">
+                                    <img class="mario-running-image-style" src="assets/images/mario-running.png" alt="">
+                                </span>
+                                <span class="copy-and-refer-text-style">
+                                    Copy & Refer
+                                </span>
+                            </div>
+                            <div>
+                                <img class="social-media-image-style" src="assets/images/facebook-logo.png" alt="">
+                                <img class="social-media-image-style" src="assets/images/instagram-logo.png" alt="">
+                                <img class="social-media-image-style" src="assets/images/twitter-logo.png" alt="">
+                                <img class="social-media-image-style" src="assets/images/whatsapp-logo.png" alt="">
+                                <img class="social-media-image-style" src="assets/images/linkedin-logo.png" alt="">
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+                <div class="card refer-and-earn-card-shadow card-style px-0 pt-0">
+                    <div class="card-body refer-and-earn-card-body-margin">
+                        <div class="font-weight-bold font-larger-style color-000000">
+                            Current Mario Coins
+                        </div>
+                        <br>
+                        <div class="display-flex-style">
+                            <img class="golden-coin-image" src="assets/images/golden-coin.png" alt="">
+                            <div class="golden-coin-text">
+                                {{coins}}
+                            </div>
+                        </div>
+                        <br>
+                        <div class="font-sm-style color-757575">
+                            You can use this Mario Coins to get discount on courses.
+                        </div>
+                        <br>
+                        <img class="full-width-style" src="assets/images/coin-bar.png" alt="">
+                        <div class="row">
+                            <div class="col-sm-3 col-md-3 font-weight-bold font-sm-style text-center">
+                                Joining Bonus 1000 Mario Coins
+                            </div>
+                            <div class="col-sm-3 col-md-3 font-weight-bold font-sm-style text-center-disabled">
+                                Refer 3 Friends and get extra 1000 Mario Coins
+                            </div>
+                            <div class="col-sm-3 col-md-3 font-weight-bold font-sm-style text-center-disabled">
+                                Refer 5 Friends and get extra 1000 Mario Coins
+                            </div>
+                            <div class="col-sm-3 col-md-3 font-weight-bold font-sm-style text-center-disabled">
+                                Refer 10 Friends and get extra 2000 Mario Coins
+                            </div>
+                        </div>
+                        <!-- <div class="golden-coin-progress-style">
+                            <div class="golden-coin-progress">
+                            </div>
+                            <div class="row golden-coin-image-group">
+                                <div class="col-sm-3 image-adjust">
+                                    <img class="golden-coin-image-progress" src="assets/images/golden-coin.png" alt="">
+                                    <div class="golden-coin-image-text">
+                                        Joining Bonus 1000 Mario Coins
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 image-adjust">
+                                    <img class="golden-coin-image-progress" src="assets/images/star-coin.png" alt="">
+                                    <div class="golden-coin-image-text-disabled">
+                                        Refer 3 Friends and get extra 1000 Mario Coins
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 image-adjust">
+                                    <img class="golden-coin-image-progress" src="assets/images/coins.png" alt="">
+                                    <div class="golden-coin-image-text-disabled">
+                                        Refer 5 Friends and get extra 1000 Mario Coins
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 image-adjust">
+                                    <img class="golden-coin-image-progress" src="assets/images/mario-with-coins.png" alt="">
+                                    <div class="golden-coin-image-text-disabled">
+                                        Refer 10 Friends and get extra 2000 Mario Coins
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <br>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-sm-12 col-md-7">
+                <div class="card refer-and-earn-card-shadow card-style h-100 px-0 pt-0">
+                    <div class="card-body refer-and-earn-card-body-margin">
+                        <div class="font-weight-bold font-larger-style color-000000">
+                            Leaderboard
+                        </div>
+                        <div *ngIf="leaderList.length > 0">
+                            <table class="leader-board-table-style">
+                                <tr class="color-757575">
+                                    <th>Star Performers</th>
+                                    <th>Mario Coins Earned</th>
+                                    <th>Referals</th>
+                                    <th>Rank</th>
+                                </tr>
+                                <tr *ngFor="let leader of leaderList; let i = index">
+                                    <td class="color-212121 font-weight-bold">
+                                        <img class="leader-image" src={{leader.image}} alt="">
+                                        &nbsp;&nbsp;&nbsp;{{leader.name}}
+                                    </td>
+                                    <td class="color-212121 font-weight-bold table-coins">{{leader.coins}}</td>
+                                    <td class="color-212121 font-weight-bold">{{leader.referrals}}</td>
+                                    <td class="color-212121 font-weight-bold">{{leader.rank}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="font-weight-bold font-larger-style color-000000">
+            FAQ'S
+        </div>
+        <br>
+        <ng-container *ngFor="let faq of faqList; let i = index">
+            <div
+                class="card faq-refer-and-earn-margin refer-and-earn-card-shadow modal-popup-table-card-style px-0 pt-0">
+                <div class="card-body refer-and-earn-card-body-margin">
+                    <div class="color-757575">
+                        {{faq.title}}
+                        <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                            (click)="faq.isDescriptionVisible=!faq.isDescriptionVisible">
+                            <span *ngIf="!faq.isDescriptionVisible" class="vertical-align-top-icon-style">
+                                <i class="material-icons modal-popup-close-icon-style">arrow_downward</i>
+                            </span>
+                            <span *ngIf="faq.isDescriptionVisible" class="vertical-align-top-icon-style">
+                                <i class="material-icons modal-popup-close-icon-style color-F26A00">arrow_upward</i>
+                            </span>
+                        </div>
+                    </div>
+                    <div *ngIf="faq.isDescriptionVisible" class="faq-isDescriptionVisible">
+                        <br>
+                        {{faq.description}}
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <br>
+        <br>
+    </div>
+</div>

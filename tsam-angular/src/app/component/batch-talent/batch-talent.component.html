@@ -1,0 +1,397 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span class="red">*</span> {{name}}:</label>
+</ng-template>
+  
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<div class="container-fluid mt-n5">
+    <div class="font-xl-style color-F6430F font-weight-bold">
+        Manage Students List
+    </div>
+    <br>
+    <div class="font-md-style color-757575 font-weight-bold">
+        See which students are already in your class, manage their list.
+    </div>
+    <br><br>
+    <!-- <div id="textbox">
+        <p class="align-left-style font-xl-style font-weight-bold">Your Students ({{totalBatchTalents}})</p>
+        <p class="align-center-style font-lg-style color-F6430F font-weight-bold cursor-pointer-style" 
+            (click)="assignTalentsToBatch()">Add new students</p>
+    </div> -->
+    <div>
+        <span class="font-xl-style font-weight-bold">Your Students ({{totalBatchTalents}})</span>
+        <span class="float-right font-lg-style color-F6430F font-weight-bold cursor-pointer-style" 
+            (click)="assignTalentsToBatch()">Add new students</span>
+    </div>
+    <br><br>
+    <div *ngIf="totalBatchTalents > 0">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <tr>
+                    <th class="text-center">Sr No.</th>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th class="text-center">Total Hours</th>
+                    <th class="text-center">Assgn. Submitted</th>
+                    <th class="text-center">Avg Rating</th>
+                    <th class="text-center" data-toggle="tooltip" data-placement="top" title="Suspend Student">Pause/Resume</th>
+                    <th data-toggle="tooltip" data-placement="top" title="Delete Batch Talent" class="text-center">Delete</th>
+                </tr>
+                <tbody>
+                    <tr *ngFor="let batchTalent of batchTalentList; let i = index">
+                        <td class="text-center">{{i+1}}</td>
+                        <td>{{batchTalent.talent.firstName + " " + batchTalent.talent.lastName}}</td>
+                        <td>{{batchTalent.talent.email}}</td>
+                        <td class="text-center">{{batchTalent.totalHours|minute}}</td>
+                        <td class="text-center">-</td>
+                        <td class="text-center">{{batchTalent.averageRating}}</td>
+                        <td class="text-center">
+                            <span *ngIf="!batchTalent.suspensionDate && batchTalent.isActive">
+                                <img data-toggle="tooltip" data-placement="top" title="Suspend Student" 
+                                    class="table-icon-image-style" src="assets/icon/colour-icons/pause.png" 
+                                    alt="Suspend Student" (click)="updateSuspensionDateBatchTalent(batchTalent.id,'suspend',true)">
+                            </span>
+                            <span *ngIf="batchTalent.suspensionDate && batchTalent.isActive">
+                                <img data-toggle="tooltip" data-placement="top" title="Unsuspend Student" 
+                                    class="table-icon-image-style" src="assets/icon/colour-icons/play.png" 
+                                    alt="Unsuspend Student" (click)="updateSuspensionDateBatchTalent(batchTalent.id,'unsuspend',false)">
+                            </span>
+                            <span *ngIf="batchTalent.isActive==false">
+                                <img data-toggle="tooltip" data-placement="top" title="Batch talent is inactive" 
+                                    class="table-icon-image-disabled-style" src="assets/icon/grey-icons/cross.png" 
+                                    alt="Batch talent is inactive">
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span *ngIf="batchTalent.isActive">
+                                <img data-toggle="tooltip" data-placement="top" title="Delete Batch Talent" 
+                                    class="table-icon-image-style" src="assets/icon/colour-icons/delete.png" 
+                                    alt="Delete Batch Talent" (click)="updateIsActiveBatchTalent(batchTalent,'delete',false)">
+                            </span>
+                            <span *ngIf="!batchTalent.isActive">
+                                <img data-toggle="tooltip" data-placement="top" title="Restore Batch Talent" 
+                                    class="table-icon-image-style" src="assets/icon/grey-icons/cross.png" 
+                                    alt="Restore Batch Talent" (click)="updateIsActiveBatchTalent(batchTalent,'restore',true)">
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div *ngIf="totalBatchTalents == 0">
+        <div class="card">
+            <div class="card-body not-found-card-style">
+                <h2>No Batch Talents Found</h2>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+
+
+<!-- Open Talent Page -->
+<ng-template #talentModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Allocate Talents
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right" (click)="modal.dismiss('Close click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <mat-drawer-container class="drawer-container-style">
+            <!-- <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-50-style">
+                <div class="overflow-x-hidden-style">
+                    <div class="filter-header">
+                        Edit Filters&nbsp;&nbsp;&nbsp;
+                        <span class="clear-filter-style" (click)="resetTaleSearchForm()">Clear all filters</span>
+                        <div class="float-right" (click)="drawer.toggle()">
+                            <span><i class="material-icons filter-close-icon-style cursor-pointer-style">close</i></span>
+                        </div>
+                    </div>
+                    <br>
+                    <form [formGroup]="searchedTalentForm">
+                        <div class="row">
+
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" formControlName="firstName" class="form-control input-style" placeholder="eg: Ravi"
+                                    appEmptyToNull>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}"></ng-container>
+                                </span>
+                                <input type="text" formControlName="lastName" class="form-control input-style"
+                                    placeholder="eg: Sharma" appEmptyToNull>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+                                </span>
+                                <input type="email" formControlName="email" nbInput class="form-control input-style"
+                                placeholder="eg: ravisharma@gmail.com" appEmptyToNull>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-default filter-button" type="submit" [disabled]="!searchedTalentForm.dirty"
+                                (click)="searchTalents();drawer.toggle()">
+                                Search
+                                <span class="vertical-align-top-icon-style"><i class="material-icons search-button-icon-style">search</i></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </mat-drawer> -->
+            <div class="container-fluid">
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Talents -
+                            <span class="color-F6430F"> {{totalSearchedTalents}}</span>
+                            &nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-default filter-button" type="button" *ngIf="isTalentSearched"
+                                (click)="resetTalentSearchAndGetAll()">
+                                View All Talents
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="font-weight-bold font-lg-style">Search By:</div>
+                    <br>
+                    <form [formGroup]="searchedTalentForm">
+                        <div class="row">
+                            <div class="form-group col-sm-12 col-md-4">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'First Name'}">
+                                    </ng-container>
+                                </span>
+                                <input type="text" formControlName="firstName" class="form-control input-style" placeholder="eg: Ravi"
+                                    appEmptyToNull>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <span>
+                                    <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Last Name'}"></ng-container>
+                                </span>
+                                <input type="text" formControlName="lastName" class="form-control input-style"
+                                    placeholder="eg: Sharma" appEmptyToNull>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <span>
+                                <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Email'}"></ng-container>
+                                </span>
+                                <input type="email" formControlName="email" nbInput class="form-control input-style"
+                                placeholder="eg: ravisharma@gmail.com" appEmptyToNull>
+                            </div>
+                        </div>
+                    </form>
+                    <br>
+                    <div *ngIf="totalSearchedTalents > 0" class="view-label-flex"> 
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{searchedTalentPaginationStart}} - {{searchedTalentPaginationEnd}}</span> of 
+                            <span class="pagination-numbers">{{totalSearchedTalents}}</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-row">
+                        <div class="d-flex justify-content-between align-items-center flex-row"
+                            *ngIf="(totalSearchedTalents == 0 && isTalentSearched) || (totalSearchedTalents > 0 && !isTalentSearched) 
+                            || (totalSearchedTalents > 0 && isTalentSearched)">
+                            <!-- <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                                Add Filter <strong>+</strong>
+                            </button> -->
+                            <button class="btn btn-default filter-button" type="submit" [disabled]="!searchedTalentForm.dirty"
+                                (click)="searchTalents()">
+                                Search
+                                <span class="vertical-align-top-icon-style"><i class="material-icons search-button-icon-style">search</i></span>
+                            </button>
+                            &nbsp;&nbsp;
+                            <button class="btn btn-default swabhav-button-round" (click)="allocateTalentsToBatch()">
+                                Allocate to Batch
+                            </button>
+                        </div>
+                        <div *ngIf="totalSearchedTalents > 0" class="d-flex justify-content-between align-items-start flex-row">
+                            <div class="d-flex">
+                                <select class="form-control form-control-sm input-style" [(ngModel)]="searchedTalentLimit" (change)="changeSearchedTalentsPage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="d-flex">
+                                <ul class="pagination no-padding-left" *ngFor="let searchedTalent of searchedTalentList | paginate: { id:'searchedTalentID',
+                                    itemsPerPage: searchedTalentLimit, currentPage: currentSearchedTalentPage, totalItems: totalSearchedTalents }">
+                                </ul>
+                                <pagination-controls responsive="true" maxSize="5" (pageChange)="changeSearchedTalentsPage($event)" id="searchedTalentID">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalSearchedTalents > 0">
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>
+                                            <label class="checkbox-container">
+                                                <input type="checkbox" [checked]="checkTalentsAdded()"
+                                                    (change)="setSelectAllTalents($event.target.checked)">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </th>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Contact</th>
+                                        <th>City</th>
+                                        <th>Resume</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr *ngFor="let searchedTalent of searchedTalentList; let i = index">
+                                            <td>
+                                                <label class="checkbox-container">
+                                                    <input type="checkbox" [checked]="checkTalentAdded(searchedTalent.id)"
+                                                        (change)="addTalentToList($event.target.checked,searchedTalent)">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>{{(i+1)+(searchedTalentOffset*searchedTalentLimit)}}</td>
+                                            <td>{{searchedTalent.firstName + " " + searchedTalent.lastName}}</td>
+                                            <td>{{searchedTalent.email}}</td>
+                                            <td>{{searchedTalent.contact}}</td>
+                                            <td>{{searchedTalent.city}}</td>
+                                            <td><a class="modal-popup-tab-link-style" *ngIf="searchedTalent.resume!=null" href={{searchedTalent.resume}} target="_blank">
+                                                    <span class="vertical-align-top-icon-style color-F6430F">
+                                                        <i class="material-icons search-name-delete-icon-style">description</i>
+                                                    </span>
+                                                </a>
+                                                <span *ngIf="searchedTalent.resume==null">
+                                                    <span class="vertical-align-top-icon-style">
+                                                        <i class="material-icons search-name-delete-icon-style">block</i>
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalSearchedTalents == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Talents Found</h2>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+            <div class="container-fluid">
+                <br>
+                <div class="standard-page-margin">
+                    <div class="display-inline">
+                        <div class="font-weight-bold font-xl-style">
+                            Selected Talents -
+                            <span class="color-F6430F"> {{totalSelectedTalents}}</span>
+                        </div>
+                    </div>
+                    <br>
+                    <div *ngIf="totalSelectedTalents > 0" class="view-label-flex"> 
+                        <span class="pagination-string">
+                            Viewing <span class="pagination-numbers">{{selectedTalentPaginationStart}} - {{selectedTalentPaginationEnd}}</span> of 
+                            <span class="pagination-numbers">{{totalSelectedTalents}}</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-row">
+                        <div class="d-flex justify-content-between align-items-center flex-row">
+                        </div>
+                        <div *ngIf="totalSelectedTalents > 0" class="d-flex justify-content-between align-items-start flex-row">
+                            <div class="d-flex">
+                                <select class="form-control form-control-sm input-style" [(ngModel)]="selectedTalentLimit" (change)="changeSelectedTalentsPage(1)">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select> &nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="d-flex">
+                                <ul class="pagination no-padding-left" *ngFor="let selectedTalent of selectedTalentList | paginate: { id:'selectedTalentID',
+                                    itemsPerPage: selectedTalentLimit, currentPage: currentSelectedTalentPage, totalItems: totalSelectedTalents }">
+                                </ul>
+                                <pagination-controls responsive="true" maxSize="5" (pageChange)="changeSelectedTalentsPage($event)" id="selectedTalentID">
+                                </pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="totalSelectedTalents > 0">
+                    <div class="card table-card-shadow table-card-style">
+                        <div class="card-body padding-0pt">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Contact</th>
+                                        <th>City</th>
+                                        <th>Resume</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr *ngFor="let selectedTalent of selectedTalentList; let i = index">
+                                            <td>{{(i+1)+(selectedTalentOffset*selectedTalentLimit)}}</td>
+                                            <td>{{selectedTalent.firstName + " " + selectedTalent.lastName}}</td>
+                                            <td>{{selectedTalent.email}}</td>
+                                            <td>{{selectedTalent.contact}}</td>
+                                            <td>{{selectedTalent.city}}</td>
+                                            <td><a class="modal-popup-tab-link-style" *ngIf="selectedTalent.resume!=null" href={{selectedTalent.resume}} target="_blank">
+                                                    <span class="vertical-align-top-icon-style color-F6430F">
+                                                        <i class="material-icons search-name-delete-icon-style">description</i>
+                                                    </span>
+                                                </a>
+                                                <span *ngIf="selectedTalent.resume==null">
+                                                    <span class="vertical-align-top-icon-style">
+                                                        <i class="material-icons search-name-delete-icon-style">block</i>
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="totalSelectedTalents == 0">
+                    <div class="card">
+                        <div class="card-body not-found-card-style">
+                            <h2>No Selected Talents Found</h2>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')" class="btn btn-default swabhav-button-round">Close</button>
+            </div>
+        </mat-drawer-container>
+    </div>
+</ng-template>

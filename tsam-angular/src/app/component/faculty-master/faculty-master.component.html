@@ -1,0 +1,1312 @@
+<mat-drawer-container class="example-container" hasBackdrop="true">
+
+  <!-- DRAWER CONTENT -->
+  <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-style">
+    <div class="filter-header">
+      Edit Filters&nbsp;&nbsp;&nbsp;
+      <span class="clear-filter-style" (click)="resetSearchFacultyForm()">Clear all filters</span>
+      <div class="float-right">
+        <button type="button" class="btn btn-default" (click)="drawer.toggle()">
+          <i class="material-icons close-icon material-icons-button">close</i>
+        </button>
+      </div>
+    </div>
+
+    <br />
+    <br />
+
+    <form [formGroup]="facultySearchForm">
+      <div class="search-bar padding">
+        <div class="row filter-by-field">
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">First Name:</label>
+            <input class="form-control input-style" type="text" formControlName="firstName" placeholder="eg: John">
+            <div *ngIf="facultySearchForm.get('firstName').invalid">
+              <div class="alert alert-danger" *ngIf="facultySearchForm.get('firstName').errors.pattern">
+                First Name should only have alphabet.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">Last Name:</label>
+            <input class="form-control input-style" type="text" formControlName="lastName" placeholder="eg: Doe">
+            <div *ngIf="facultySearchForm.get('lastName').invalid">
+              <div class="alert alert-danger" *ngIf="facultySearchForm.get('lastName').errors.pattern">
+                Last Name should only have alphabet.
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">Email</label>
+            <input class="form-control input-style" type="email" formControlName="email"
+              placeholder="eg: johndoe@example.com">
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">Contact</label>
+            <input class="form-control input-style" type="text" appAllowNumbersOnly formControlName="contact"
+              placeholder="eg: 9090909090">
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">Status</label>
+            <select class="form-control input-style" formControlName="isActive">
+              <option [ngValue]="null">Select Status</option>
+              <option [ngValue]="'1'">Active</option>
+              <option [ngValue]="'0'">Inactive</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">City:</label>
+            <input class="form-control input-style" type="text" formControlName="city" placeholder="Enter City">
+          </div>
+          <div class="form-group col-sm-6 col-md-6">
+            <label class="filter-form-label">Technology:</label>
+            <!-- <ng-select [items]="technologyList" bindValue="id" bindLabel="language" placeholder="Select Technology" appendTo="body"
+                [searchable]="true" [clearable]="false" formControlName="technologies" multiple="true" class="ng-select-style">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.language}}
+                </ng-template>
+            </ng-select> -->
+            <ng-select [items]="technologyList" bindValue="id" bindLabel="language" placeholder="Select Technology"
+              appendTo="body" multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+              class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+              [loading]="isTechLoading">
+              <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                {{item.language}}
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <br>
+
+    <div class="text-center">
+      <button type="button" class="btn btn-submit-swabhav material-icons-button" [disabled]="!facultySearchForm.dirty"
+        (click)="searchAndCloseDrawer()">
+        Search <i class="inline-icon material-icons">search</i>
+      </button>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid margin-2pt">
+      <br>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Faculty: <span class="swabhav-light-orange-text">{{totalFaculty || 0}}</span></h1>
+        </div>
+
+        <button class="btn btn-submit-swabhav left-margin material-icons-button" *ngIf="permission?.add"
+          (click)="onAddNewFacultyClick()">Add New Faculty <i class="inline-icon material-icons">add</i>
+        </button>
+      </div>
+
+      <br>
+
+      <div *ngIf="totalFaculty > 0" class="view-label-flex">
+        Viewing &nbsp; <span class="swabhav-light-orange-text"><strong>{{paginationString}}</strong> </span>
+        &nbsp; of &nbsp;<span class="swabhav-light-orange-text"> <strong>{{totalFaculty}}</strong></span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+        <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+          <button class="btn filter-button material-icons-button" (click)="drawer.toggle()">
+            Add Filter <i class="inline-icon material-icons">add</i>
+          </button> &nbsp;&nbsp;&nbsp;
+          <button type="button" *ngIf="searched" class="btn btn-sm btn-submit-swabhav material-icons-button"
+            (click)="resetSearchAndGetAll()">View All Faculty
+          </button>
+        </div>
+        <form [formGroup]="facultySearchForm">
+          <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+            <div class="d-flex flex-wrap">
+              <!-- --- changePage(1) change of limit will set the offset to 0 --- -->
+              <select class="form-control form-control-sm input-style" formControlName="limit" (change)="changePage(1)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select> &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="d-flex flex-wrap">
+              <ul class="pagination" *ngFor="let faculty of faculties | paginate: { id:'facultyPageID', 
+                itemsPerPage: facultySearchForm.get('limit').value, currentPage: (+facultySearchForm.get('offset').value + 1),
+                totalItems: totalFaculty }">
+              </ul>
+              <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="facultyPageID">
+              </pagination-controls>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <br>
+
+      <div class="card-body swabhav-shadow padding-0pt" *ngIf="totalFaculty > 0; else noFaculty">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>FacultyID</th>
+                <th>Name</th>
+                <th>Email Address</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Status</th>
+                <th>Avaiability</th>
+                <th>Experience</th>
+                <th>Technologies</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let faculty of faculties;let i = index">
+                <td>{{(i+1)+(offset*limit)}}</td>
+                <td>{{faculty.code}}</td>
+                <td>{{faculty.firstName}} {{faculty.lastName}}</td>
+                <td>{{faculty.email}}</td>
+                <td>{{faculty.contact}}</td>
+                <td>{{faculty.address}}</td>
+                <td>{{faculty.city}}</td>
+                <td>{{faculty.state.name}}</td>
+                <td>
+                  <div *ngIf="faculty.isActive; else inActive">
+                    <span class="badge badge-success">Active</span>
+                  </div>
+                  <ng-template #inActive>
+                    <span class="badge badge-danger">Inactive</span>
+                  </ng-template>
+                </td>
+                <td>
+                  <div *ngIf="faculty.isFullTime != null;">
+                    <span *ngIf="faculty.isFullTime; else partTime">Full Time</span>
+                    <ng-template #partTime>
+                      <span>Part Time</span>
+                    </ng-template>
+                  </div>
+                  <ng-template #noSchedule>-</ng-template>
+                </td>
+                <td>
+                  <span *ngIf="faculty.totalYearsOfExperienceInString != '-'; else noExperience"
+                    class="badge swabhav-badge">{{faculty.totalYearsOfExperienceInString}}
+                  </span>
+                  <ng-template #noExperience>-</ng-template>
+                </td>
+                <td>
+                  <ng-container *ngIf="faculty.technologies.length > 0; else noTechnology">
+                    <div *ngFor="let tech of faculty.technologies">
+                      <span class="badge swabhav-badge">{{tech.language}}</span>
+                    </div>
+                  </ng-container>
+                  <ng-template #noTechnology>-</ng-template>
+                </td>
+                <td class="text-left">
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-element material-icons-button" type="button"
+                      id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="material-icons"><strong>more_vert</strong></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <button class="disabled-dropdown-item btn btn-default"
+                        *ngIf="faculty.resume==null;else resumePresent" disabled>
+                        <i class="inline-icon material-icons">description</i> No Resume
+                      </button>
+                      <ng-template #resumePresent>
+                        <a class="dropdown-item btn-dropdown btn-default anchor-tag" href={{faculty.resume}}
+                          target="_blank">
+                          <i class="inline-icon material-icons inline-icon">description</i> Resume
+                        </a>
+                      </ng-template>
+                      <button type="button" class="dropdown-item btn btn-dropdown btn-default"
+                        (click)="onViewFacultyClick(faculty)">
+                        <i class="inline-icon material-icons-outlined">visibility</i> View
+                      </button>
+                      <!-- FACULTY ASSESSMENT -->
+                      <button class="dropdown-item btn btn-default btn-dropdown"
+                        (click)="onViewFacultyAssessmentClick(faculty)">
+                        <i class="inline-icon material-icons">assessment</i> Faculty Assessment
+                        {{faculty.averageAssessmentScore > 0 ? "- " + faculty.averageAssessmentScore : ""}}
+                      </button>
+                      <!-- Course Technical Assessment -->
+                      <button class="dropdown-item btn btn-default btn-dropdown"
+                        (click)="onTechnicalAssessmentClick(faculty)">
+                        <i class="inline-icon material-icons">assessment</i> Course Technical Assessment
+                        {{faculty.averageTechnicalScore > 0 ? "- " + faculty.averageTechnicalScore : ""}}
+                      </button>
+                      <button class="dropdown-item btn btn-default btn-dropdown" type="button"
+                        (click)="onGetBatchListClick(faculty.id)">
+                        <i class="inline-icon material-icons">list</i> Batch List
+                      </button>
+                      <button class="dropdown-item btn btn-default btn-dropdown" *ngIf="permission?.delete"
+                        type="button" (click)="assignSelectedFaculty(faculty.id)">
+                        <i class="inline-icon material-icons">delete</i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Faculty not found -->
+      <ng-template #noFaculty>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Faculty Not Found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+
+
+
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add New Faculty -->
+<ng-template #facultyModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title swabhav-light-orange-text">{{modalHeader}}
+        <button type="button" *ngIf="isViewClicked && permission?.update" class="btn material-icons-button"
+          (click)="onUpdateFacultyClick()">
+          <i class="material-icons grey-icon material-icons-button">create</i></button>
+      </h4>
+      <span *ngIf="!isViewClicked"><span class="red">*
+        </span> Marked fields are mandatory</span>
+    </div>
+    <button type="button" class="close" (click)="dismissFormModal(modal)" class="btn btn-default" type="submit">
+      <i class="material-icons material-icons-button close-icon">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form [formGroup]="facultyForm">
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Personal Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-md-4" *ngIf="isViewClicked">
+          <div class="form-group">
+            <label>FacultyID:</label>
+            <input type="text" class="form-control input-style" formControlName="code" [readonly]="true">
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label><span *ngIf="!isViewClicked" class="red">* </span>First Name:</label>
+            <input type="text" class="form-control input-style" formControlName="firstName" placeholder="eg: John">
+            <div class="alert alert-danger" *ngIf="(facultyForm.get('firstName').dirty || facultyForm.get('firstName').touched) 
+                    && facultyForm.get('firstName').invalid">
+              <span *ngIf="facultyForm.get('firstName').errors.required">
+                First Name must be specified
+              </span>
+              <span *ngIf="facultyForm.get('firstName').errors.pattern">
+                First Name should only have alphabets.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label><span *ngIf="!isViewClicked" class="red">* </span>Last Name:</label>
+            <input type="text" class="form-control input-style" formControlName="lastName" placeholder="eg: Doe">
+            <div class="alert alert-danger" *ngIf="(facultyForm.get('lastName').dirty || facultyForm.get('lastName').touched) 
+                    && facultyForm.get('lastName').invalid">
+              <span *ngIf="facultyForm.get('lastName').errors.required">
+                Last Name must be specified
+              </span>
+              <span *ngIf="facultyForm.get('lastName').errors.pattern">
+                Last Name should only have alphabet.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label><span *ngIf="!isViewClicked" class="red">* </span>Email Address:</label>
+            <input type="email" class="form-control input-style" formControlName="email"
+              placeholder="eg: johndoe@example.com">
+            <div class="alert alert-danger" *ngIf="(facultyForm.get('email').dirty ||facultyForm.get('email').touched) 
+                    && facultyForm.get('email').invalid">
+              <span *ngIf="facultyForm.get('email').errors.required">
+                Email must be specified
+              </span>
+              <span *ngIf="facultyForm.get('email').errors.pattern">
+                Email must be of the type abc@domain.com
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label><span *ngIf="!isViewClicked" class="red">* </span>Mobile Number:</label>
+            <input type="text" appAllowNumbersOnly class="form-control input-style" formControlName="contact"
+              placeholder="eg: 9090909090">
+            <div class="alert alert-danger" *ngIf="(facultyForm.get('contact').dirty || facultyForm.get('contact').touched) 
+                    && facultyForm.get('contact').invalid">
+              <span *ngIf="facultyForm.get('contact').errors.required">
+                Contact must be specified
+              </span>
+              <span *ngIf="facultyForm.get('contact').errors.pattern">
+                Contact must be of type 9090909090
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label>Date of Birth:</label>
+            <input type="date" class="form-control input-style" formControlName="dateOfBirth" nbInput appEmptyToNull
+              placeholder="Enter Date of Birth" max="{{currentDate | date:'yyyy-MM-dd'}}">
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <div class="form-group">
+            <label>Date of Joining:</label>
+            <input type="date" class="form-control input-style" formControlName="dateOfJoining" nbInput appEmptyToNull
+              placeholder="Enter Date of Joining">
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <!-- <label for="comment"><span *ngIf="!isViewClicked" class="red">* </span>Technology Stack:</label> -->
+          <label>Technology Stack:</label>
+          <ng-select [items]="technologyList" bindLabel="language" placeholder="Select Technology" appendTo="body"
+            multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+            class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+            [loading]="isTechLoading">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.language}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(facultyForm.get('technologies').dirty || facultyForm.get('technologies').touched) 
+                  && facultyForm.get('technologies').errors">
+            <span *ngIf="facultyForm.get('technologies').errors.required">
+              Technology must be specified
+            </span>
+          </div>
+        </div>
+        <div *ngIf="!isAddClicked" class="form-group col-sm-4 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Status:</label>
+          <select class="form-control input-style" formControlName="isActive">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Inactive</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(facultyForm.get('isActive').dirty || facultyForm.get('isActive').touched) 
+                  && facultyForm.get('isActive').invalid">
+            <span *ngIf="facultyForm.get('isActive').errors.required">
+              Faculty status must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Is Faculty FullTime:</label>
+          <select class="form-control input-style" formControlName="isFullTime">
+            <option [ngValue]="null" disabled>Fulltime Status</option>
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(facultyForm.get('isFullTime').dirty || facultyForm.get('isFullTime').touched) 
+                  && facultyForm.get('isFullTime').invalid">
+            <span *ngIf="facultyForm.get('isFullTime').errors.required">
+              Faculty Fulltime status must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-4 col-md-4">
+          <label>Telegram username:</label>
+          <input class="form-control input-style" type="text" appEmptyToNull formControlName="telegramID"
+            placeholder="username">
+        </div>
+        <hr />
+      </div>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Location Details</strong></h1>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Address:</label>
+          <textarea type="text" class="form-control input-style" formControlName="address" rows="2"
+            placeholder="eg: Mumbai"></textarea>
+          <div class="alert alert-danger" *ngIf="(facultyForm.get('address').dirty ||facultyForm.get('address').touched) 
+                  && facultyForm.get('address').invalid">
+            <span *ngIf="facultyForm.get('address').errors.required">
+              Address must be specified
+            </span>
+            <label *ngIf="facultyForm.get('address').errors.pattern">
+              Address should only have alphabet , / number.
+            </label>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Country:</label>
+          <select class="form-control input-style" [compareWith]="compareFn"
+            (change)="getStateList(facultyForm.get('country').value.id)" formControlName="country" #country>
+            <option [ngValue]="null" disabled>Select Country</option>
+            <option *ngFor="let country of countryList" [ngValue]="country">{{country.name}}</option>
+          </select>
+          <div class="alert alert-danger" *ngIf="(facultyForm.get('country').dirty || facultyForm.get('country').touched) 
+                  && facultyForm.get('country').invalid">
+            <span *ngIf="facultyForm.get('country').errors.required">
+              Country must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>State:</label>
+          <ng-select [items]="stateList" bindLabel="name" placeholder="Select State" appendTo="body" [searchable]="true"
+            [clearable]="true" formControlName="state" class="ng-select-style">
+            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+          <div class="alert alert-danger" *ngIf="(facultyForm.get('state').dirty || facultyForm.get('state').touched) 
+                  && facultyForm.get('state').invalid">
+            <span *ngIf="facultyForm.get('state').errors.required">
+              State must be specified
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Enter city:</label>
+          <input type="text" class="form-control input-style" formControlName="city" placeholder="Enter City">
+          <div class="alert alert-danger"
+            *ngIf="(facultyForm.get('city').dirty || facultyForm.get('city').touched) && facultyForm.get('city').errors">
+            <span *ngIf="facultyForm.get('city').errors.required">
+              City must be specified
+            </span>
+            <span *ngIf="facultyForm.get('city').errors.pattern">
+              Invalid city name
+            </span>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-4">
+          <label><span *ngIf="!isViewClicked" class="red">* </span>Pincode:</label>
+          <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="pinCode"
+            placeholder="eg: 401104">
+          <div class="alert alert-danger"
+            *ngIf="(facultyForm.get('pinCode').dirty || facultyForm.get('pinCode').touched) && facultyForm.get('pinCode').errors">
+            <span *ngIf="facultyForm.get('pinCode').errors.required">
+              Pincode must be specified
+            </span>
+            <span *ngIf="facultyForm.get('pinCode').errors.pattern">
+              Pincode must be of 6 digit
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+        <h1 class="swabhav-light-orange-text"><strong>Qualification Details</strong></h1>
+      </div>
+      <div formArrayName="academics" *ngFor="let academic of facultyAcademicControlsArray.controls;let i = index">
+        <ng-container [formGroupName]="i">
+          <div class="row">
+            <div class="col-sm-12 col-md-12">
+              <h3><strong>College {{i+1}}</strong>
+                <button class="btn btn-lg float-right red" *ngIf="!isViewClicked && facultyAcademicControlsArray.length > 1"
+                  (click)="deleteAcademic(i)">&times;
+                </button>
+              </h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Qualification:</label>
+              <ng-select [items]="qualificationList" bindLabel="name" placeholder="Select Qualification" appendTo="body"
+                [searchable]="true" [clearable]="true" formControlName="degree" [virtualScroll]="true"
+                (change)="getSpecializationListForDegree(academic)" class="ng-select-style">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.name}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(academic.get('degree').touched || academic.get('degree').dirty) 
+                  && academic.get('degree').invalid">
+                <div *ngIf="academic.get('degree').errors.required">
+                  Qualification must be specified
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <fieldset [disabled]="!academic.get('degree')?.value || doesSpecializationExist(academic)">
+                <label><span *ngIf="!isViewClicked" class="red">* </span>Specialization:</label>
+                <ng-select [items]="academic.get('specializationList').value" bindLabel="branchName"
+                  placeholder="Select Specialization" appendTo="body" [searchable]="true" [clearable]="true"
+                  formControlName="specialization" [virtualScroll]="true" class="ng-select-style">
+                  <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                    {{item.branchName}}
+                  </ng-template>
+                </ng-select>
+                <!-- <select class="form-control input-style" [compareWith]="compareFn" formControlName="specialization">
+                    <option [ngValue]="null">Select Specialization</option>
+                    <ng-container *ngFor="let specialization of specializationList">
+                      <option *ngIf="showSpecificSpecializations(academic,specialization)" [ngValue]="specialization">
+                        {{specialization.branchName}}
+                      </option>
+                    </ng-container>
+                  </select> -->
+              </fieldset>
+              <div class="alert alert-danger"
+                *ngIf="academic.get('specialization').touched && academic.get('specialization').errors">
+                <span *ngIf="academic.get('specialization').errors.required">
+                  Specialization must be specified
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <!-- <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>College Name:</label>
+              <input type="text" class="form-control input-style" formControlName="college"
+                placeholder="Enter College Name">
+              <div class="alert alert-danger" *ngIf="academic.get('college').touched && academic.get('college').errors">
+                <span *ngIf="academic.get('college').errors.required">
+                  College Name must be specified
+                </span>
+                <span *ngIf="academic.get('college').errors.pattern">
+                  Invalid College Name
+                </span>
+              </div>
+            </div> -->
+            <div class="form-group col-sm-8 col-md-6">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>College Name:</label>
+              <ng-select formControlName="college" class="ng-select-style" bindLabel="branchName" bindValue="branchName"
+                [clearOnBackspace]=false placeholder="Select" clearable=false [loading]="isCollegeLoading"
+                (search)="getCollegeBranchList($event)" (focus)="getCollegeBranchList()">
+                <ng-option [value]="college.branchName" [disabled]="college.disabled"
+                  *ngFor="let college of collegeBranchList">
+                  {{college.branchName}}
+                </ng-option>
+              </ng-select>
+              <div
+                *ngIf="(academic.get('college').dirty || academic.get('college').touched) && academic.get('college').invalid"
+                class="alert alert-danger">
+                <span *ngIf="academic.get('college').errors.required">
+                  College Name must be specified
+                </span>
+                <span *ngIf="academic.get('college').errors.pattern">
+                  Invalid College Name
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Percentage:</label>
+              <input type="number" class="form-control input-style" formControlName="percentage"
+                placeholder="Enter Percentage">
+              <div class="alert alert-danger" *ngIf="(academic.get('percentage').dirty || academic.get('percentage').touched)
+                      && academic.get('percentage').invalid">
+                <span *ngIf="academic.get('percentage').errors.required">
+                  Percentage must be specified
+                </span>
+                <span *ngIf="academic.get('percentage').errors.pattern">
+                  Invalid Percentage
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Year of Passout:</label>
+              <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="passout"
+                min="1980" placeholder="Enter Year">
+              <div class="alert alert-danger" *ngIf="(academic.get('passout').dirty || academic.get('passout').touched) 
+                      && academic.get('passout').invalid">
+                <span *ngIf="academic.get('passout').errors.required">
+                  Passout Year must be specified
+                </span>
+                <span *ngIf="academic.get('passout').errors.pattern">
+                  Invalid Passout Year
+                </span>
+                <span *ngIf="academic.get('passout').errors.max">
+                  Passout Year cannot be greater than current year
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div class="float-right">
+        <button type="button" class="btn btn-default filter-button btn-sm" *ngIf="!isViewClicked"
+          (click)="addFacultyAcademic()"> Add College Detail
+        </button>
+      </div>
+      <br />
+      <br />
+      <div class="form-group form-check" *ngIf="!isViewClicked">
+        <label class="checkbox-container">
+          <input type="checkbox" [checked]="experienced" id="eligilibility-checkbox"
+            (change)="experienceChecked($event)">
+          <span class="checkmark"></span>
+          <span class="swabhav-light-orange-text pointer" for="eligilibility-checkbox"> Are you Experienced ?</span>
+        </label>
+      </div>
+      <div *ngIf="experienced == true">
+        <div class="row col-sm-12 col-md-12 d-flex justify-content-center">
+          <h1 class="swabhav-light-orange-text"><strong>Experience Details</strong></h1>
+        </div>
+        <div class="row" formArrayName="experiences"
+          *ngFor="let company of facultyExperienceControlsArray.controls;let i = index">
+          <ng-container [formGroupName]="i">
+            <div class="col-sm-12 col-md-12">
+              <h3><strong>Company {{i+1}}</strong>
+                <button *ngIf="!isViewClicked && facultyExperienceControlsArray.length > 1" class="btn float-right red"
+                  (click)="deleteExperience(i)">&times;</button>
+              </h3>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Company Name:</label>
+              <input type="text" formControlName="companyName" class="form-control input-style"
+                placeholder="Enter Company">
+              <div class="alert alert-danger"
+                *ngIf="(facultyExperienceControlsArray.at(i).get('companyName').dirty || 
+                  facultyExperienceControlsArray.at(i).get('companyName').touched) && facultyExperienceControlsArray.at(i).get('companyName').invalid">
+                <span *ngIf="facultyExperienceControlsArray.at(i).get('companyName').errors.required">
+                  Company Name must be specified
+                </span>
+                <span *ngIf="facultyExperienceControlsArray.at(i).get('companyName').errors.pattern">
+                  Company Name must be specified
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>Designation:</label>
+              <select class="form-control input-style" [compareWith]="compareFn" formControlName="designation">
+                <option [ngValue]="null" disabled>Select Designation</option>
+                <option *ngFor="let designation of designationList" [ngValue]="designation">
+                  {{designation.position || designation.name}}
+                </option>
+              </select>
+              <div class="alert alert-danger" *ngIf="(facultyExperienceControlsArray.at(i).get('designation').dirty || facultyExperienceControlsArray.at(i).get('designation').touched) 
+                      && facultyExperienceControlsArray.at(i).get('designation').invalid">
+                <span *ngIf="facultyExperienceControlsArray.at(i).get('designation').errors.required">
+                  Designation must be specified
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <!-- <label>Technology Stack:</label> -->
+              <!-- <ng-select [items]="technologyList" bindLabel="language" placeholder="Select Technology" appendTo="body"
+                multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies" class="ng-select-style">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.language}}
+                </ng-template>
+              </ng-select> -->
+              <label for="comment"><span *ngIf="!isViewClicked" class="red">* </span>Technology Stack:</label>
+              <ng-select [items]="technologyList" bindLabel="language" placeholder="Select Technology" appendTo="body"
+                multiple="true" [searchable]="true" [clearable]="true" formControlName="technologies"
+                class="ng-select-style" (search)="getTechnologyList($event)" (focus)="getTechnologyList()"
+                [loading]="isTechLoading">
+                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                  {{item.language}}
+                </ng-template>
+              </ng-select>
+              <div class="alert alert-danger" *ngIf="(facultyExperienceControlsArray.at(i).get('technologies').dirty || facultyExperienceControlsArray.at(i).get('technologies').touched) 
+                  && facultyExperienceControlsArray.at(i).get('technologies').invalid">
+                <span *ngIf="facultyExperienceControlsArray.at(i).get('technologies').errors.required">
+                  Technology must be specified
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-sm-6 col-md-4"
+              *ngIf="i==indexOfCurrentWorkingExp || indexOfCurrentWorkingExp == -1">
+              <label><span *ngIf="!isViewClicked" class="red">* </span>
+                Are you currently working here?</label>
+              <select class="form-control input-style" formControlName="isCurrentlyWorking"
+                (change)="isWorkingClicked($event.target.value,i,facultyExperienceControlsArray.at(i))">
+                <option [value]=false>No</option>
+                <option [value]=true>Yes</option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label>From Date:</label>
+                <input type="month" class="form-control input-style" formControlName="fromDate" nbInput appEmptyToNull
+                  placeholder="yyyy-mm" (change)="setMaxToDate($event.target.value, i)">
+                <div class="alert alert-danger" *ngIf="(facultyExperienceControlsArray.at(i).get('fromDate').dirty || facultyExperienceControlsArray.at(i).get('fromDate').touched) 
+                        && facultyExperienceControlsArray.at(i).get('fromDate').invalid">
+                  <div *ngIf="facultyExperienceControlsArray.at(i).get('fromDate').errors.required">
+                    From Date must be specified.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-container *ngIf="!(i==indexOfCurrentWorkingExp)">
+              <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label>To Date:</label>
+                  <input type="month" class="form-control input-style" formControlName="toDate" nbInput appEmptyToNull
+                    placeholder="yyyy-mm" max="{{currentDate | date:'yyyy-MM'}}"
+                    min="facultyExperienceControlsArray.at(i).get('fromDate').value">
+                  <div class="alert alert-danger"
+                    *ngIf="facultyExperienceControlsArray.at(i).get('toDate').errors?.toDateValidator">
+                    <span> To date should be after from date</span>
+                  </div>
+                  <div class="alert alert-danger" *ngIf="(facultyExperienceControlsArray.at(i).get('toDate').dirty || facultyExperienceControlsArray.at(i).get('toDate').touched) 
+                          && facultyExperienceControlsArray.at(i).get('toDate').invalid">
+                    <!-- handle error for toDate as it should not be less than fromDate -->
+                    <!-- <span> To date should be after from date</span> -->
+                    <div *ngIf="facultyExperienceControlsArray.at(i).get('toDate').errors.required">
+                      To Date must be specified
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <div class="form-group col-sm-6 col-md-4" *ngIf="isViewClicked">
+              <label>Year of Experience:</label>
+              <input type="text" appAllowNumbersOnly class="form-control input-style"
+                formControlName="yearsOfExperience" [readonly]="true">
+            </div>
+            <div class="form-group col-sm-6 col-md-4">
+              <label>Package:</label>
+              <input type="number" class="form-control input-style" formControlName="package"
+                placeholder="Enter Company Package">
+              <div class="alert alert-danger" *ngIf="(facultyExperienceControlsArray.at(i).get('package').touched || facultyExperienceControlsArray.at(i).get('package').dirty) 
+                  && facultyExperienceControlsArray.at(i).get('package').invalid">
+                <div *ngIf="facultyExperienceControlsArray.at(i).get('package').errors.min">
+                  Package should not be less than 100000.
+                </div>
+                <div *ngIf="facultyExperienceControlsArray.at(i).get('package').errors.max">
+                  Package cannot exceed 100000000.
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div class="float-right">
+          <button type="button" class="btn btn-default filter-button btn-sm" *ngIf="!isViewClicked"
+            (click)="addFacultyExperience()">Add Company Detail
+          </button>
+        </div>
+        <br>
+      </div>
+
+      <!-- span is used to hide the border as well -->
+      <span *ngIf="!isViewClicked || selectedFaculty.resume">
+        <hr>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Resume:</label>
+          <div class="col-sm-4">
+            <span class="custom-file">
+              <input *ngIf="!isViewClicked" type="file" class="custom-file-input input-style"
+                (change)="onResourceSelect($event)" id="customFile" value="displayedFileName">
+              <label *ngIf="!isViewClicked" class="custom-file-label" id="custom-file-label" for="customFile"
+                [innerHTML]="displayedFileName"></label>
+              <button class="btn btn-success custom-file" [disabled]="true" id="uploadingButton" type="button"
+                *ngIf="isFileUploading">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Uploading file...
+              </button>
+              <div *ngIf="(selectedFaculty && selectedFaculty.resume) && !isResumeUploadedToServer"
+                data-toggle="tooltip" data-placement="top" title="View Resume">
+                <button *ngIf="isViewClicked" class="btn btn-submit-swabhav material-icons-button">
+                  <a href={{selectedFaculty.resume}} target="_blank">View Resume</a>
+                </button>
+              </div>
+            </span>
+            <!-- should add view uploaded resume using a resume variable after cleaning. -->
+            <label id="uploadStatus" for="customFile" [innerHTML]="docStatus"></label>
+          </div>
+        </div>
+      </span>
+
+      <br />
+    </form>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button class="btn btn-default swabhav-light-orange-text material-icons-button" type="button"
+      (click)="dismissFormModal(modal)">Close
+    </button>
+    <button type="button" class="btn btn-submit-swabhav material-icons-button" [disabled]="!facultyForm.dirty"
+      (click)="validate()" *ngIf="!isViewClicked">{{modalButton}}
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Add Batch Faculty -->
+<ng-template #addBatchToFacultyModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h2 class="modal-title swabhav-light-orange-text">Batch List</h2>
+    <button type="button" class="close" (click)="modal.dismiss()" class="btn btn-default" type="submit"><i
+        class="material-icons material-icons-button close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="d-flex justify-content-between align-items-center flex-row flex-wrap"
+      *ngIf="isBatchList; else noBatches">
+      <div class="d-flex justify-content-between align-items-center flex-row flex-wrap">
+        <div class="totalLabel">
+          <h1>Total Batch: <span class="swabhav-light-orange-text">{{totalBatch || 0}}</span></h1>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between align-items-start flex-row flex-wrap">
+        <div class="d-flex flex-wrap">
+          <!-- --- changePage(1) change of batchLimit will set the offset to 0 --- -->
+          <select class="form-control form-control-sm input-style" [(ngModel)]="batchLimit"
+            (change)="changeBatchPage(1)">
+            <option selected>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+          </select> &nbsp;&nbsp;&nbsp;
+        </div>
+        <div class="d-flex flex-wrap">
+          <ul class="pagination" *ngFor="let batch of batchList | paginate: { id:'batchPageID',
+              itemsPerPage: batchLimit, currentPage: currentBatchPageNumber, totalItems: totalBatch }">
+          </ul>
+          <pagination-controls responsive="true" maxSize="5" (pageChange)="changeBatchPage($event)" id="batchPageID">
+          </pagination-controls>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="card-body swabhav-shadow padding-0pt" *ngIf="isBatchList; else noBatches">
+      <div class="row">
+        <div class="form-group col-sm-12 col-md-12">
+          <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Batch Name</th>
+                  <th>Start date</th>
+                  <th>End Date</th>
+                  <th>Total Student</th>
+                  <th>Timing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let batch of batchList; let i = index">
+                  <td>{{i+1}}</td>
+                  <td>{{batch.batchName}}</td>
+                  <td>{{batch.startDate | date:'longDate'}}</td>
+                  <td>{{batch.endDate | date:'longDate'}}</td>
+                  <td>{{batch.totalStudents}}</td>
+                  <td>
+                    <label>{{calculateBatchTiming(batch.batchTimings)}}</label>
+                    <!-- <div *ngIf="batch.batchTimings.length > 0; else noBatchTiming">
+                        <div *ngFor="let time of batch.batchTimings; let i = index">
+                          <span class="badge badge-secondary">{{time.day?.day}}: </span>
+                          <br />
+                          <span class="badge badge-dark">
+                            {{utilService.parseTime(time.fromTime)}} - {{utilService.parseTime(time.toTime)}}
+                          </span>
+                        </div>
+                      </div>
+                      <ng-template #noBatchTiming>
+                        <span class="badge badge-warning">Timings not specified</span>
+                      </ng-template> -->
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batches Not Found -->
+    <ng-template #noBatches>
+      <div class="container full-h">
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h4>Batches Not Found</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss()">Close
+    </button>
+  </div>
+
+</ng-template>
+
+
+<ng-template #facultyAssessmentModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h3 class="modal-title">Faculty: <span class="swabhav-light-orange-text">{{selectedFaculty.firstName}}
+          {{selectedFaculty.lastName}}</span>
+        &nbsp; <span *ngIf="averageAssessmentScore > 0">
+          <ng-container
+            *ngIf="averageAssessmentScore >= 7; then first; else (averageAssessmentScore > 4 && third) || (second)">
+          </ng-container>
+          <ng-template #first>
+            <span class="badge badge-success">
+              Score: {{averageAssessmentScore | number: '1.2-2'}}/10
+            </span>
+          </ng-template>
+          <ng-template #second>
+            <span class="badge badge-danger">
+              Score: {{averageAssessmentScore | number: '1.2-2'}}/10
+            </span>
+          </ng-template>
+          <ng-template #third>
+            <span class="badge badge-warning">
+              Score: {{averageAssessmentScore | number: '1.2-2'}}/10
+            </span>
+          </ng-template>
+        </span>
+      </h3>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="submit"><i
+        class="material-icons close-icon material-icons-button">close</i>
+    </button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <ng-container *ngIf="viewFacultyAssessment; else addFacultyAssessment">
+      <div class="float-right">
+        <button class="btn filter-button btn-sm" type="button" *ngIf="!isFacultyAssessment"
+          (click)="onAddFacultyAssessmentClick()">Add Faculty Assessment
+        </button>
+      </div>
+      <br>
+      <div class="card-body padding-0pt text-justify text-size" *ngIf="isFacultyAssessment; else noFacultyAssement">
+        <p><strong>Faculty Assessment:</strong></p>
+        <div class="container" *ngFor="let feedback of facultyAssessment;let j = index">
+          <p><strong>Group : {{feedback.feedbackQuestionGroup.groupName}}</strong></p>
+          <p>Question {{j+1}}: {{feedback.question.question}}</p>
+          <p>Answer: {{feedback.answer}}</p>
+          <br />
+        </div>
+      </div>
+
+      <ng-template #noFacultyAssement>
+        <div class="container full-h">
+          <br />
+          <br />
+          <div class="d-flex align-items-center full-h">
+            <div class="col-sm-12 col-md-8 mx-auto">
+              <div class="jumbotron">
+                <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h3>Faculty Assessment not found</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <ng-template #addFacultyAssessment>
+      <div class="text-justify text-size" *ngIf="facultyAssessmentArray.controls.length > 0; else noFeedbackQuestions">
+        <form [formGroup]="facultyAssessmentForm">
+          <div formArrayName="feedbacks"
+            *ngFor="let feedbackAssessment of facultyAssessmentArray.controls;let i = index">
+            <ng-container [formGroupName]="i">
+              <div class="form-group col-md-12 col-sm-6">
+                <p><strong>Group : {{facultyAssementQuestions[i].feedbackQuestionGroup.groupName}}</strong></p>
+                <label><span class="red">*</span> Question :</label>
+                {{facultyAssementQuestions[i].question}}
+              </div>
+              <!--From options-->
+              <div *ngIf="facultyAssementQuestions[i].hasOptions; else noOptions"
+                class="form-group col-sm-6 col-md-12 margin-top">
+                <label>Answer:</label>
+                <select class="form-control input-style" formControlName="optionID">
+                  <option [ngValue]="null" disabled>Select Answer</option>
+                  <option *ngFor="let option of facultyAssementQuestions[i].options" [ngValue]="option.id">
+                    {{option.value}}</option>
+                </select>
+                <!-- <div *ngFor="let option of facultyAssementQuestions[i].options" class="form-check col-6">
+                        <input class="form-check-input" type="radio" 
+                            id="{{option.id}}" [value]="option.id" formControlName="optionID">
+                        <label class="form-check-label" for="{{option.id}}">
+                            {{option.value}}
+                        </label>
+                      </div> -->
+                <div class="alert alert-danger" *ngIf="(feedbackAssessment.get('optionID').touched || feedbackAssessment.get('optionID').dirty)
+                        && feedbackAssessment.get('optionID').invalid">
+                  <span *ngIf="feedbackAssessment.get('optionID').errors.required">
+                    Answer must be selected
+                  </span>
+                </div>
+              </div>
+              <!-- No Options -->
+              <ng-template #noOptions>
+                <div class="form-group col-md-12 col-sm-6">
+                  <label for="exampleFormControlTextarea2">Answer:</label>
+                  <textarea class="form-control input-style rounded-0" id="exampleFormControlTextarea2" rows="3"
+                    formControlName="answer" placeholder="Enter your answer"></textarea>
+                  <div class="alert alert-danger" *ngIf="(feedbackAssessment.get('answer').touched || feedbackAssessment.get('answer').dirty)
+                        && feedbackAssessment.get('answer').invalid">
+                    <div *ngIf="feedbackAssessment.get('answer').errors.required">
+                      Answer must be specified
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ng-container>
+            <br>
+            <br>
+          </div>
+        </form>
+      </div>
+      <ng-template #noFeedbackQuestions>
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Feedback Questions Not Found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ng-template>
+
+    <!-- </div> -->
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss()">Close
+    </button>
+    <button type="button" class="btn btn-submit-swabhav material-icons-button" *ngIf="!viewFacultyAssessment"
+      (click)="validateFacultyAssessment()">Submit
+    </button>
+  </div>
+
+</ng-template>
+
+
+<!-- Faculty Course Technical Assessment -->
+<ng-template #technicalAssessmentModal let-modal>
+
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      <h4 class="modal-title">Faculty:
+        <span class="swabhav-light-orange-text">{{selectedFaculty.firstName}} {{selectedFaculty.lastName}}</span>
+      </h4>
+    </div>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="submit"><i
+        class="material-icons material-icons-button close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <ng-container *ngIf="viewTechnicalAssessment; else addTechnicalAssessment">
+
+      <div *ngIf="isTechnicalAssessment; else noTechnicalAssessment">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Sr No.</th>
+                <th>Course</th>
+                <th>Rating</th>
+                <th>View</th>
+                <!-- <th>Delete</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let assessment of technicalAssessments; let i = index">
+                <td>{{i+1}}</td>
+                <td>{{assessment.course.name}}</td>
+                <td>
+                  <div *ngIf="assessment.rating; else noRating">
+                    {{assessment.rating}}
+                  </div>
+                  <ng-template #noRating>
+                    {{"-"}}
+                  </ng-template>
+                </td>
+                <td>
+                  <button type="button" class="btn" (click)="onUpdateTechnicalAssessmentClick(assessment)">
+                    <i class="material-icons color-teal">create</i>
+                  </button>
+                </td>
+                <!-- <td>
+                    <button type="button" class="btn" (click)="deleteTechnicalAssessment(assessment.id)">
+                      <i class="material-icons red">delete</i>
+                    </button>
+                  </td> -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <ng-template #noTechnicalAssessment>
+
+        <div class="float-right">
+          <button class="btn filter-button btn-sm" type="button" (click)="onAddTechnicalAssessmentClick()">Add Course
+            Technical Assessment
+          </button>
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Course Technical Assessment Not Found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </ng-container>
+
+    <ng-template #addTechnicalAssessment>
+
+      <!-- <div class="row"> -->
+      <div class="text-justify text-size"
+        *ngIf="technicalAssessmentArray.controls.length > 0; else noAssessmentQuestions">
+        <form [formGroup]="technicalAssessmentForm">
+          <div formArrayName="assessments" class="row"
+            *ngFor="let technicalAssessment of technicalAssessmentArray.controls;let i = index">
+            <ng-container [formGroupName]="i">
+              <div *ngIf="!isUpdateAssessmentClick" class="form-group col-sm-6 col-md-6">
+                <fieldset disabled="disabled">
+                  <label>Course {{i+1}}:</label>
+                  <input type="text" class="form-control input-style" value="{{courseList[i].name}}">
+                </fieldset>
+              </div>
+              <div *ngIf="isUpdateAssessmentClick" class="form-group col-sm-6 col-md-6">
+                <label> Course:</label>
+                <select class="form-control input-style" [compareWith]="compareFn" formControlName="courseID">
+                  <option [ngValue]="null" disabled>Select Course</option>
+                  <option *ngFor="let course of courseList" [ngValue]="course.id">
+                    {{course.name}}
+                  </option>
+                </select>
+                <div class="alert alert-danger" *ngIf="(technicalAssessment.get('courseID').touched || technicalAssessment.get('courseID').dirty)
+                      && technicalAssessment.get('courseID').invalid">
+                  <div *ngIf="technicalAssessment.get('courseID').errors.required">
+                    Course must be specified.
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-sm-6 col-md-3">
+                <label>Rating:</label>
+                <input type="number" appAllowNumbersOnly class="form-control input-style" formControlName="rating"
+                  placeholder="Enter Rating">
+                <div class="alert alert-danger" *ngIf="(technicalAssessment.get('rating').touched || technicalAssessment.get('rating').dirty)
+                      && technicalAssessment.get('rating').invalid">
+                  <div *ngIf="technicalAssessment.get('rating').errors.min">
+                    Rating must be greater than 0.
+                  </div>
+                  <div *ngIf="technicalAssessment.get('rating').errors.max">
+                    Rating must be less than 10.
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </form>
+      </div>
+
+      <ng-template #noAssessmentQuestions>
+        <br />
+        <br />
+        <div class="d-flex align-items-center full-h">
+          <div class="col-sm-12 col-md-8 mx-auto">
+            <div class="jumbotron">
+              <div class="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                <h2>Courses not found</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </ng-template>
+
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+      (click)="modal.dismiss('Cross click')">Close
+    </button>
+    <div *ngIf="!viewTechnicalAssessment">
+      <button type="button" class="btn btn-default swabhav-light-orange-text material-icons-button"
+        (click)="viewTechnicalAssessment=!viewTechnicalAssessment">Back
+      </button> &nbsp;
+      <button type="button" class="btn btn-submit-swabhav material-icons-button"
+        (click)="validateTechnicalAssessment()">Submit
+      </button>
+    </div>
+  </div>
+
+</ng-template>
+
+<!-- Delete Faculty Confirmation -->
+<ng-template #deleteConfirmationModal let-modal>
+
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmation</h4>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" class="btn btn-default" type="submit"><i
+        class="material-icons material-icons-button close-icon">close</i></button>
+  </div>
+
+  <!-- Modal body -->
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12 col-md-12">
+        Are you sure want to delete this faculty ?
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-danger" (click)="deleteFaculty()">Yes</button>
+    <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss('Cross click')">No</button>
+  </div>
+
+</ng-template>

@@ -1,0 +1,401 @@
+<ng-template #fieldNameCompulsary let-name="name">
+    <label class="form-control-label-style"><span *ngIf="!isViewMode" class="red">*</span> {{name}}:</label>
+</ng-template>
+
+<ng-template #fieldNameNotCompulsary let-name="name">
+    <label class="form-control-label-style">{{name}}:</label>
+</ng-template>
+
+<mat-drawer-container class="drawer-container-style">
+    <mat-drawer #drawer mode="over" position="end" class="sidenav-style mat-drawer-30-style">
+        <div class="overflow-x-hidden-style">
+            <div class="filter-header">
+                Edit Filters&nbsp;&nbsp;&nbsp;
+                <span class="clear-filter-style" (click)="resetSearchForm()">Clear all filters</span>
+                <div class="float-right" (click)="drawer.toggle()">
+                    <span><i class="material-icons filter-close-icon-style">close</i></span>
+                </div>
+            </div>
+            <br>
+            <form [formGroup]="conceptSearchForm">
+                <div class="filter-by-field row">
+                    <div class="form-group col-sm-12 col-md-12">
+                        <span>
+                            <ng-container
+                                *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Programming Concept Name'}">
+                            </ng-container>
+                        </span>
+                        <input type="text" class="form-control input-style" formControlName="name"
+                            placeholder="eg: Programming Fundamentals">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-default filter-button" type="submit" [disabled]="!conceptSearchForm.dirty"
+                        (click)="searchConcepts();drawer.toggle()">
+                        Search
+                        <span class="vertical-align-top-icon-style"><i
+                                class="material-icons search-button-icon-style">search</i></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-drawer>
+    <app-master-navbar></app-master-navbar>
+    <div class="container-fluid">
+        <br>
+        <div class="standard-page-margin">
+            <div class="display-inline">
+                <div class="font-weight-bold font-xl-style">
+                    Programming Concepts -
+                    <span class="color-F6430F"> {{totalConcepts}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default filter-button" type="button" *ngIf="isSearched"
+                        (click)="resetSearchAndGetAll()">
+                        View All Programming Concepts
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button class="btn btn-default swabhav-button-round" *ngIf="permission.add"
+                        (click)="onAddNewConceptClick()">
+                        Add New Programming Concept
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div *ngIf="totalConcepts > 0" class="view-label-flex">
+                <span class="pagination-string">
+                    Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                    <span class="pagination-numbers">{{totalConcepts}}</span>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-row">
+                <div class="d-flex justify-content-between align-items-center flex-row" *ngIf="(totalConcepts == 0 && isSearched) || (totalConcepts > 0 && !isSearched) 
+                    || (totalConcepts > 0 && isSearched)">
+                    <button class="btn btn-default filter-button" (click)="drawer.toggle()">
+                        Add Filter <strong>+</strong>
+                    </button>
+                </div>
+                <div *ngIf="totalConcepts > 0" class="d-flex justify-content-between align-items-start flex-row">
+                    <div class="d-flex">
+                        <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                            (change)="changePage(1)">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select> &nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="d-flex">
+                        <ul class="pagination no-padding-left" *ngFor="let concept of conceptList | paginate: { id:'conceptID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalConcepts }">
+                        </ul>
+                        <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)"
+                            id="conceptID">
+                        </pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchFilterFieldList.length > 0">
+                <br>
+                <span class="search-filter-name-pod-style" *ngFor="let searchFilterField of searchFilterFieldList">
+                    {{searchFilterField.propertyNameText}}
+                    <span (click)="deleteSearchCriteria(searchFilterField.propertyName)"
+                        class="vertical-align-top-icon-style">
+                        <i class="material-icons search-name-delete-icon-style">close</i>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="totalConcepts > 0">
+            <div class="card table-card-shadow table-card-style">
+                <div class="card-body padding-0pt">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>No.</th>
+                                <th>Name</th>
+                                <th>Complexity</th>
+                                <!-- <th>Questions</th> -->
+                                <!-- <th>Sub concepts</th> -->
+                                <th data-toggle="tooltip" data-placement="top"
+                                    title="Check All Details Of Programming Concept">
+                                    View
+                                </th>
+                                <th data-toggle="tooltip" data-placement="top" title="Delete Programming Concept"
+                                    *ngIf="permission.delete">
+                                    Delete
+                                </th>
+                            </tr>
+                            <tbody>
+                                <tr *ngFor="let concept of conceptList; let i = index">
+                                    <td>{{(i+1)+(offset*limit)}}</td>
+                                    <td class="color-F6430F font-weight-bold">{{concept.name}}</td>
+                                    <td class="font-weight-bold">
+                                        <span
+                                            [ngClass]="{'easy': concept.complexity === 1, 'medium' : concept.complexity === 2,  'hard' : concept.complexity === 3}">
+                                            {{utilityService.getValueByKey(concept.complexity,
+                                            programmingConceptLevel)}}
+                                        </span>
+                                    </td>
+                                    <!-- <td>
+                                        <span *ngFor="let subProgrammingConcept of concept.subProgrammingConcepts; let j = index">
+                                            <span>{{(j+1) + ") "}}</span>
+                                            <span>{{subProgrammingConcept.name}}</span><br>
+                                        </span>
+                                    </td> -->
+                                    <!-- <td> 
+                                        <span *ngFor="let question of concept.programmingQuestions; let j = index">
+                                            <span class="badge swabhav-badge-style">{{question.label}}</span>
+                                        </span>
+                                    </td> -->
+                                    <td data-toggle="tooltip" data-placement="top"
+                                        title="View details of Programming Concept">
+                                        <span (click)="onViewConceptClick(concept)">
+                                            <i class="material-icons color-F6430F">visibility</i>
+                                        </span>
+                                    </td>
+                                    <td data-toggle="tooltip" data-placement="top" title="Delete Programming Concept"
+                                        *ngIf="permission.delete">
+                                        <span (click)="onDeleteConceptClick(concept.id)">
+                                            <i class="material-icons color-F6430F">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="totalConcepts == 0">
+            <div class="card">
+                <div class="card-body not-found-card-style">
+                    <h2>No Programming Concepts Found</h2>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div *ngIf="totalConcepts > 0" class="view-label-flex">
+            <span class="pagination-string">
+                Viewing <span class="pagination-numbers">{{paginationStart}} - {{paginationEnd}}</span> of
+                <span class="pagination-numbers">{{totalConcepts}}</span>
+            </span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center flex-row">
+
+            <div *ngIf="totalConcepts > 0" class="d-flex justify-content-between align-items-start flex-row">
+                <div class="d-flex">
+                    <select class="form-control form-control-sm input-style" [(ngModel)]="limit"
+                        (change)="changePage(1)">
+                        <option selected>5</option>
+                        <option>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select> &nbsp;&nbsp;&nbsp;
+                </div>
+                <div class="d-flex">
+                    <ul class="pagination no-padding-left" *ngFor="let concept of conceptList | paginate: { id:'conceptID',
+                            itemsPerPage: limit, currentPage: currentPage, totalItems: totalConcepts }">
+                    </ul>
+                    <pagination-controls responsive="true" maxSize="5" (pageChange)="changePage($event)" id="conceptID">
+                    </pagination-controls>
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+</mat-drawer-container>
+
+<app-master-footer></app-master-footer>
+
+
+<!-- Add/Update/View Programming Concept -->
+<ng-template #conceptFormModal let-modal>
+    <form [formGroup]="conceptForm">
+        <div class="modal-body">
+            <div class="form-header-style">
+                {{isViewMode? 'Programming Concept Details': isOperationUpdate ? 'Update Programming Concept' : 'Add
+                Programming Concept' }}
+                <span *ngIf="isViewMode && permission.update" (click)="onUpdateConceptClick()">
+                    <i class="material-icons">create</i>
+                </span>
+                <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                    (click)="modal.dismiss('Close click')">
+                    <span class="vertical-align-top-icon-style">
+                        <i class="material-icons modal-popup-close-icon-style">close</i>
+                    </span>
+                    Close
+                </div>
+            </div>
+            <div *ngIf="!isViewMode" class="marked-fields-right-style"><span class="red"><strong>*</strong></span>
+                marked
+                fields are mandatory</div>
+            <br>
+            <div class="row">
+                <div class="form-group col-sm-6 col-md-6">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Name'}"></ng-container>
+                    </span>
+                    <input type="text" class="form-control input-style" formControlName="name"
+                        placeholder="eg: Programming Fundamentals">
+                    <div class="alert alert-danger" *ngIf="(conceptForm.get('name').touched || conceptForm.get('name').dirty) 
+                        && conceptForm.get('name').invalid">
+                        <div *ngIf="conceptForm.get('name').errors.required">
+                            Name must be specified
+                        </div>
+                        <div *ngIf="conceptForm.get('name').errors.maxlength">
+                            Name can contain maximum 100 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Complexity'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="complexity">
+                        <option [ngValue]="null" disabled>Select</option>
+                        <option *ngFor="let level of programmingConceptLevel" [ngValue]="level.key">{{level.value}}
+                        </option>
+                    </select>
+                    <div class="alert alert-danger" *ngIf="(conceptForm.get('complexity').touched||
+                    conceptForm.get('complexity').dirty)&&conceptForm.get('complexity').invalid">
+                        <div *ngIf="conceptForm.get('complexity').errors.required">
+                            Complexity must be specified
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-2">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Is Module Independent?'}">
+                        </ng-container>
+                    </span>
+                    <select class="form-control input-style" formControlName="isModuleIndependent">
+                        <option [ngValue]="true" disabled>Yes</option>
+                        <option [ngValue]="false" disabled>No</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-12 col-md-12">
+                    <span>
+                        <ng-container *ngTemplateOutlet="fieldNameNotCompulsary; context:{name:'Description'}">
+                        </ng-container>
+                    </span>
+                    <textarea type="text" class="form-control input-style" formControlName="description"
+                        placeholder="Write description here..." rows="5"></textarea>
+                    <div class="alert alert-danger" *ngIf="(conceptForm.get('description').touched || conceptForm.get('description').dirty) 
+                        && conceptForm.get('description').invalid">
+                        <div *ngIf="conceptForm.get('description').errors.maxlength">
+                            Description can contain maximum 2000 characters
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <ng-container *ngIf="conceptForm.get('isModuleIndependent').value == false">
+                <div class="form-sub-header-style">Modules</div>
+                <div class="row">
+                    <div class="col-12">
+                        <div formArrayName="modules"
+                        *ngFor="let module of conceptModuleControlArray.controls;let i = index">
+                        <ng-container [formGroupName]="i">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12">
+                                    <label class="font-weight-bold font-lg-style">Module {{i+1}}</label>
+                                    <label class="float-right" *ngIf="!isViewMode && conceptModuleControlArray.length > 1"
+                                        (click)="deleteModule(i)">
+                                        <i class="material-icons color-F6430F">delete</i>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <span><ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Module'}"></ng-container></span>
+                                    <ng-select [items]="moduleList" bindLabel="moduleName" bindValue="id" placeholder="Select"
+                                        appendTo="body" [searchable]="true" [clearable]="true" formControlName="moduleID"
+                                        class="ng-select-style">
+                                        <option [ngValue]="null" disabled>Select</option>
+                                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                            {{item.moduleName}}
+                                        </ng-template>
+                                    </ng-select>
+                                    <div class="alert alert-danger" *ngIf="(conceptModuleControlArray.at(i).get('moduleID').touched 
+                                        || conceptModuleControlArray.at(i).get('moduleID').dirty) 
+                                        && conceptModuleControlArray.at(i).get('moduleID').invalid">
+                                        <div
+                                            *ngIf="conceptModuleControlArray.at(i).get('moduleID').errors.required">
+                                            Module must be specified
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <span><ng-container *ngTemplateOutlet="fieldNameCompulsary; context:{name:'Level'}"></ng-container></span>
+                                    <input type="number" class="form-control input-style" nbInput formControlName="level"
+                                        placeholder="eg: 1" appAllowNumbersOnly>
+                                    <div class="alert alert-danger" *ngIf="(conceptModuleControlArray.at(i).get('level').touched 
+                                    || conceptModuleControlArray.at(i).get('level').dirty) 
+                                    && conceptModuleControlArray.at(i).get('level').invalid">
+                                        <div *ngIf="conceptModuleControlArray.at(i).get('level').errors.required">
+                                            Level must be specified
+                                        </div>
+                                        <div *ngIf="conceptModuleControlArray.at(i).get('level').errors.min">
+                                            Level cannot be less than 1
+                                        </div>
+                                        <div *ngIf="conceptModuleControlArray.at(i).get('level').errors.max">
+                                            Level cannot be more than 99
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <button *ngIf="!isViewMode" class="btn btn-default swabhav-button-round" (click)="addModule()">
+                        + Add Module
+                    </button>
+                    </div>
+                </div>
+            </ng-container> -->
+            <div class="text-center">
+                <button type="button" (click)="modal.dismiss('Close click')"
+                    class="btn btn-default swabhav-button-round">Close</button>
+                &nbsp;&nbsp;&nbsp;
+                <button type="button" [disabled]="!conceptForm.dirty" class="btn btn-default swabhav-button-round"
+                    *ngIf="!isViewMode" (click)="onFormSubmit()">
+                    {{isOperationUpdate ? 'Update Programming Concept' : 'Add Programming Concept'}}
+                </button>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+
+<!-- Delete Programming Concept Confirmation -->
+<ng-template #deleteConceptModal let-modal>
+    <div class="modal-body">
+        <div class="form-header-style">
+            Confirmation
+            <div class="color-757575 font-weight-bold font-sm-style cursor-pointer-style float-right"
+                (click)="modal.dismiss('Cross click')">
+                <span class="vertical-align-top-icon-style">
+                    <i class="material-icons modal-popup-close-icon-style">close</i>
+                </span>
+                Close
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <div class="delete-text-style">
+                Are you sure you want to delete this programming concept?
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-default swabhav-button-round" (click)="modal.close()">Yes</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-default swabhav-button-round"
+                (click)="modal.dismiss('Close click')">No</button>
+        </div>
+    </div>
+</ng-template>
