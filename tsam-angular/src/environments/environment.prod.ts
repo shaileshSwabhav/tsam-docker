@@ -1,6 +1,6 @@
 const FILE_UPLOAD_LOACTION = "https://admin.swabhavtechlabs.com/tsm_uploads/"
 // const BASE_URL = "https://swabhav-tsam.herokuapp.com/api/v1/tsam"
-const BASE_URL = "tsam-go-serv:8080"
+const BASE_URL = "http://tsam-go-serv:8080/api/v1"
 
 export const environment = {
       production: true,

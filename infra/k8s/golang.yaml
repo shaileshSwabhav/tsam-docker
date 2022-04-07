@@ -11,14 +11,14 @@ spec:
       app: tsam-go-app
   template:
     metadata:
-      name: tsam-go-pod
+      name: tsam-go-app
       labels:
         app: tsam-go-app
     spec:
       containers:
-        - name: tsam-go-pod
+        - name: tsam-go-app
           # image: shaileshb/tsam-go
-          image: us.gcr.io/kubernetes-demo-345511/tsam-golang
+          image: us.gcr.io/elegant-racer-345508/tsam-golang
           
 ---
 apiVersion: v1

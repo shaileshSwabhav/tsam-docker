@@ -96,12 +96,13 @@ func (app *App) initializeServer() {
 		http.MethodPost, http.MethodPut, http.MethodGet, http.MethodDelete, http.MethodOptions,
 	})
 	origin := handlers.AllowedOrigins([]string{
-		"http://localhost:4200", "http://localhost:4201", "http://localhost:4202",
-		"https://admin.swabhavtechlabs.com", "http://admin.swabhavtechlabs.com",
+		// "http://localhost:4200", "http://localhost:4201", "http://localhost:4202",
+		// "https://admin.swabhavtechlabs.com", "http://admin.swabhavtechlabs.com",
+		"*",
 	})
 	apiPort := app.getPort()
 	app.Server = &http.Server{
-		Addr:         "0.0.0.0:" + apiPort,
+		Addr:         ":" + apiPort,
 		ReadTimeout:  time.Second * time.Duration(app.Config.GetInt64("HTTP_READ_TIMEOUT")),
 		WriteTimeout: time.Second * time.Duration(app.Config.GetInt64("HTTP_WRITE_TIMEOUT")),
 		IdleTimeout:  time.Second * time.Duration(app.Config.GetInt64("HTTP_IDLE_TIMEOUT")),

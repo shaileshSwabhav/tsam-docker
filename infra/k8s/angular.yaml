@@ -11,14 +11,14 @@ spec:
       app: tsam-angular-app
   template:
     metadata:
-      name: tsam-angular-pod
+      name: tsam-angular-app
       labels:
         app: tsam-angular-app
     spec:
       containers:
-        - name: tsam-angular-pod
+        - name: tsam-angular-app
           # image: shaileshb02/tsam-angular
-          image: us.gcr.io/kubernetes-demo-345511/tsam-angular
+          image: us.gcr.io/elegant-racer-345508/tsam-angular
 
 ---
 

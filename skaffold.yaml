@@ -5,11 +5,11 @@ deploy:
     manifests:
       - ./infra/k8s/*
 build:
-  # googleCloudBuild:
-  #   projectId: kubernetes-demo-345511
+  googleCloudBuild:
+    projectId: elegant-racer-345508
   artifacts:
     # - image: shaileshb02/tsam-go
-    - image: us.gcr.io/kubernetes-demo-345511/tsam-golang
+    - image: us.gcr.io/elegant-racer-345508/tsam-golang
       context: tsam-golang # path to find dockerfile
       docker:
         dockerfile: Dockerfile.dev
@@ -18,7 +18,7 @@ build:
           - dest: .
             src: "*/**/*.go" # specifing which file to be watched for changes
     # - image: shaileshb02/tsam-angular
-    - image: us.gcr.io/kubernetes-demo-345511/tsam-angular
+    - image: us.gcr.io/elegant-racer-345508/tsam-angular
       context: tsam-angular # path to find dockerfile
       docker:
         dockerfile: Dockerfile.dev
