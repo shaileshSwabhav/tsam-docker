@@ -1,6 +1,7 @@
 const FILE_UPLOAD_LOACTION = "https://admin.swabhavtechlabs.com/tsm_uploads/"
 // const BASE_URL = "https://swabhav-tsam.herokuapp.com/api/v1/tsam"
-const BASE_URL = "http://tsam-go-serv:8080/api/v1"
+// const BASE_URL = "http://tsam-go-serv:8080/api/v1/tsam/"
+const BASE_URL = "http://gposts.com/api/v1/tsam/"
 
 export const environment = {
       production: true,

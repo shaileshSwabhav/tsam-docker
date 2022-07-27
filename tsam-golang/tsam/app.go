@@ -2,6 +2,7 @@ package tsam
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"sync"
@@ -100,15 +101,16 @@ func (app *App) initializeServer() {
 		// "https://admin.swabhavtechlabs.com", "http://admin.swabhavtechlabs.com",
 		"*",
 	})
-	apiPort := app.getPort()
+	// apiPort := app.getPort()
 	app.Server = &http.Server{
-		Addr:         ":" + apiPort,
+		Addr:         ":8080",
 		ReadTimeout:  time.Second * time.Duration(app.Config.GetInt64("HTTP_READ_TIMEOUT")),
 		WriteTimeout: time.Second * time.Duration(app.Config.GetInt64("HTTP_WRITE_TIMEOUT")),
 		IdleTimeout:  time.Second * time.Duration(app.Config.GetInt64("HTTP_IDLE_TIMEOUT")),
 		Handler:      handlers.CORS(headers, methods, origin)(app.Router),
 	}
-	app.Log.Printf("Server Exposed On %s", apiPort)
+	fmt.Println(" ======================= Server Exposed On 8080")
+	app.Log.Printf("Server Exposed On 8080")
 }
 
 // RouterRegister will register the specified routes.
@@ -146,7 +148,9 @@ func (app *App) MigrateTables(configs []ModuleConfig) {
 
 // Start will start the app.
 func (app *App) Start() error {
+	fmt.Println(" ======================= starting server")
 	if err := app.Server.ListenAndServe(); err != nil {
+		fmt.Println(" ======================= some error ->", err)
 		app.Log.Error("=========listen and serve error========", err)
 		return err
 	}
